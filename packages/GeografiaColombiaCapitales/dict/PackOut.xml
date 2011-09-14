@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adempiereAD Name="GeografiaColombiaCapitales" Version="1.0"
+	CompVer="all" DataBase="2007-04-01"
+	Description="Registro de regiones, y ciudades capitales de Colombia en Adempiere."
+	creator="Quality Systems &amp; Solutions - Carlos Ruiz" creatorcontact="info@globalqss.com"
+	createddate="2007-04-23" updateddate="2009-09-22" PackOutVer="005">
+	<adempieredata clientname="System">
+		<SQLStatement DBType="ALL"
+			statement="UPDATE ad_column SET isupdateable = 'Y' WHERE ad_column_id IN (866, 7057)" />
+		<dtable name="C_Region">
+			<drow name="ANTIOQUIA">
+				<dcolumn name="Description" class="String" value="05 - ANTIOQUIA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="ATLÁNTICO">
+				<dcolumn name="Description" class="String" value="08 - ATLÁNTICO" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="D.C.">
+				<dcolumn name="Description" class="String" value="11 - D.C." />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+				<dcolumn name="IsDefault" class="Boolean" value="true" />
+			</drow>
+			<drow name="BOLÍVAR">
+				<dcolumn name="Description" class="String" value="13 - BOLÍVAR" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="BOYACÁ">
+				<dcolumn name="Description" class="String" value="15 - BOYACÁ" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CALDAS">
+				<dcolumn name="Description" class="String" value="17 - CALDAS" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CAQUETÁ">
+				<dcolumn name="Description" class="String" value="18 - CAQUETÁ" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CAUCA">
+				<dcolumn name="Description" class="String" value="19 - CAUCA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CESAR">
+				<dcolumn name="Description" class="String" value="20 - CESAR" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CÓRDOBA">
+				<dcolumn name="Description" class="String" value="23 - CÓRDOBA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CUNDINAMARCA">
+				<dcolumn name="Description" class="String" value="25 - CUNDINAMARCA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CHOCÓ">
+				<dcolumn name="Description" class="String" value="27 - CHOCÓ" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="HUILA">
+				<dcolumn name="Description" class="String" value="41 - HUILA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="LA GUAJIRA">
+				<dcolumn name="Description" class="String" value="44 - LA GUAJIRA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="MAGDALENA">
+				<dcolumn name="Description" class="String" value="47 - MAGDALENA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="META">
+				<dcolumn name="Description" class="String" value="50 - META" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="NARIÑO">
+				<dcolumn name="Description" class="String" value="52 - NARIÑO" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="NORTE DE SANTANDER">
+				<dcolumn name="Description" class="String" value="54 - NORTE DE SANTANDER" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="QUINDÍO">
+				<dcolumn name="Description" class="String" value="63 - QUINDÍO" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="RISARALDA">
+				<dcolumn name="Description" class="String" value="66 - RISARALDA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="SANTANDER">
+				<dcolumn name="Description" class="String" value="68 - SANTANDER" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="SUCRE">
+				<dcolumn name="Description" class="String" value="70 - SUCRE" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="TOLIMA">
+				<dcolumn name="Description" class="String" value="73 - TOLIMA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="VALLE">
+				<dcolumn name="Description" class="String" value="76 - VALLE" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="ARAUCA">
+				<dcolumn name="Description" class="String" value="81 - ARAUCA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CASANARE">
+				<dcolumn name="Description" class="String" value="85 - CASANARE" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="PUTUMAYO">
+				<dcolumn name="Description" class="String" value="86 - PUTUMAYO" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="SAN ANDRÉS">
+				<dcolumn name="Description" class="String" value="88 - SAN ANDRÉS" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="AMAZONAS">
+				<dcolumn name="Description" class="String" value="91 - AMAZONAS" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="GUAINÍA">
+				<dcolumn name="Description" class="String" value="94 - GUAINÍA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="GUAVIARE">
+				<dcolumn name="Description" class="String" value="95 - GUAVIARE" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="VAUPÉS">
+				<dcolumn name="Description" class="String" value="97 - VAUPÉS" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="VICHADA">
+				<dcolumn name="Description" class="String" value="99 - VICHADA" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+		</dtable>
+		<dtable name="C_City">
+			<drow name="MEDELLÍN">
+				<dcolumn name="C_Region_ID" lookupname="ANTIOQUIA" />
+				<dcolumn name="Postal" class="String" value="05001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="BARRANQUILLA">
+				<dcolumn name="C_Region_ID" lookupname="ATLÁNTICO" />
+				<dcolumn name="Postal" class="String" value="08001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="BOGOTÁ">
+				<dcolumn name="C_Region_ID" lookupname="D.C." />
+				<dcolumn name="Postal" class="String" value="11001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CARTAGENA">
+				<dcolumn name="C_Region_ID" lookupname="BOLÍVAR" />
+				<dcolumn name="Postal" class="String" value="13001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="TUNJA">
+				<dcolumn name="C_Region_ID" lookupname="BOYACÁ" />
+				<dcolumn name="Postal" class="String" value="15001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="MANIZALES">
+				<dcolumn name="C_Region_ID" lookupname="CALDAS" />
+				<dcolumn name="Postal" class="String" value="17001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="FLORENCIA">
+				<dcolumn name="C_Region_ID" lookupname="CAQUETÁ" />
+				<dcolumn name="Postal" class="String" value="18001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="POPAYÁN">
+				<dcolumn name="C_Region_ID" lookupname="CAUCA" />
+				<dcolumn name="Postal" class="String" value="19001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="VALLEDUPAR">
+				<dcolumn name="C_Region_ID" lookupname="CESAR" />
+				<dcolumn name="Postal" class="String" value="20001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="MONTERÍA">
+				<dcolumn name="C_Region_ID" lookupname="CÓRDOBA" />
+				<dcolumn name="Postal" class="String" value="23001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="QUIBDÓ">
+				<dcolumn name="C_Region_ID" lookupname="CHOCÓ" />
+				<dcolumn name="Postal" class="String" value="27001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="NEIVA">
+				<dcolumn name="C_Region_ID" lookupname="HUILA" />
+				<dcolumn name="Postal" class="String" value="41001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="RIOHACHA">
+				<dcolumn name="C_Region_ID" lookupname="LA GUAJIRA" />
+				<dcolumn name="Postal" class="String" value="44001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="SANTA MARTA">
+				<dcolumn name="C_Region_ID" lookupname="MAGDALENA" />
+				<dcolumn name="Postal" class="String" value="47001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="VILLAVICENCIO">
+				<dcolumn name="C_Region_ID" lookupname="META" />
+				<dcolumn name="Postal" class="String" value="50001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="PASTO">
+				<dcolumn name="C_Region_ID" lookupname="NARIÑO" />
+				<dcolumn name="Postal" class="String" value="52001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CÚCUTA">
+				<dcolumn name="C_Region_ID" lookupname="NORTE DE SANTANDER" />
+				<dcolumn name="Postal" class="String" value="54001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="ARMENIA">
+				<dcolumn name="C_Region_ID" lookupname="QUINDÍO" />
+				<dcolumn name="Postal" class="String" value="63001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="PEREIRA">
+				<dcolumn name="C_Region_ID" lookupname="RISARALDA" />
+				<dcolumn name="Postal" class="String" value="66001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="BUCARAMANGA">
+				<dcolumn name="C_Region_ID" lookupname="SANTANDER" />
+				<dcolumn name="Postal" class="String" value="68001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="SINCELEJO">
+				<dcolumn name="C_Region_ID" lookupname="SUCRE" />
+				<dcolumn name="Postal" class="String" value="70001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="IBAGUÉ">
+				<dcolumn name="C_Region_ID" lookupname="TOLIMA" />
+				<dcolumn name="Postal" class="String" value="73001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="CALI">
+				<dcolumn name="C_Region_ID" lookupname="VALLE" />
+				<dcolumn name="Postal" class="String" value="76001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="ARAUCA">
+				<dcolumn name="C_Region_ID" lookupname="ARAUCA" />
+				<dcolumn name="Postal" class="String" value="81001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="YOPAL">
+				<dcolumn name="C_Region_ID" lookupname="CASANARE" />
+				<dcolumn name="Postal" class="String" value="85001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="MOCOA">
+				<dcolumn name="C_Region_ID" lookupname="PUTUMAYO" />
+				<dcolumn name="Postal" class="String" value="86001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="SAN ANDRÉS">
+				<dcolumn name="C_Region_ID" lookupname="SAN ANDRÉS" />
+				<dcolumn name="Postal" class="String" value="88001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="LETICIA">
+				<dcolumn name="C_Region_ID" lookupname="AMAZONAS" />
+				<dcolumn name="Postal" class="String" value="91001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="INÍRIDA">
+				<dcolumn name="C_Region_ID" lookupname="GUAINÍA" />
+				<dcolumn name="Postal" class="String" value="94001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="SAN JOSÉ DEL GUAVIARE">
+				<dcolumn name="C_Region_ID" lookupname="GUAVIARE" />
+				<dcolumn name="Postal" class="String" value="95001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="MITÚ">
+				<dcolumn name="C_Region_ID" lookupname="VAUPÉS" />
+				<dcolumn name="Postal" class="String" value="97001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+			<drow name="PUERTO CARREÑO">
+				<dcolumn name="C_Region_ID" lookupname="VICHADA" />
+				<dcolumn name="Postal" class="String" value="99001" />
+				<dcolumn name="C_Country_ID" lookupname="Colombia" />
+			</drow>
+		</dtable>
+		<SQLStatement DBType="ALL"
+			statement="UPDATE ad_column SET isupdateable = 'N' WHERE ad_column_id IN (866, 7057)" />
+	</adempieredata>
+</adempiereAD>

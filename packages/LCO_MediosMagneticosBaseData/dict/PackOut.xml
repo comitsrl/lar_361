@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<adempiereAD Name="LCO_MediosMagneticosBaseData" Version="1" CompVer="all" DataBase="1" Description="LCO Medios Magneticos DIAN - Datos ejemplo en GardenWorld" creator="info@globalqss.com" creatorcontact="info@globalqss.com" createddate="2009-03-02 22:30:17" updateddate="2009-08-26 13:28:24" PackOutVer="005">
+	<data clientname="GardenWorld">
+		<dtable name="LCO_Conversion">
+			<drow key1name="LCO_Conversion_ID" name="Tabla Paises DIAN" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="AD_Table_ID" class="Table Direct" value="170"/>
+				<dcolumn name="AD_Column_ID" class="Table Direct" value="941"/>
+				<dcolumn name="Value" class="String" value="DIAN_Country"/>
+				<dcolumn name="Name" class="String" value="Tabla Paises DIAN"/>
+			</drow>
+		</dtable>
+		<dtable name="LCO_Conversion">
+			<drow key1name="LCO_Conversion_ID" name="Tabla Departamentos DIAN" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="AD_Table_ID" class="Table Direct" value="164"/>
+				<dcolumn name="AD_Column_ID" class="Table Direct" value="856"/>
+				<dcolumn name="Value" class="String" value="DIAN_Region"/>
+				<dcolumn name="Name" class="String" value="Tabla Departamentos DIAN"/>
+			</drow>
+		</dtable>
+		<dtable name="LCO_Conversion">
+			<drow key1name="LCO_Conversion_ID" name="Tabla Ciudades DIAN" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="AD_Table_ID" class="Table Direct" value="186"/>
+				<dcolumn name="AD_Column_ID" class="Table Direct" value="7052"/>
+				<dcolumn name="Value" class="String" value="DIAN_City"/>
+				<dcolumn name="Name" class="String" value="Tabla Ciudades DIAN"/>
+			</drow>
+		</dtable>
+	</data>
+	<data>
+		<dtable name="LCO_ConversionCode">
+			<drow name="" key1name="LCO_Conversion_ID" lookupkey1name="(SELECT LCO_Conversion_ID FROM LCO_Conversion WHERE value='DIAN_Country' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="InternalCode" lookupkey2name="'156'">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_Conversion_ID" class="Table Direct" lookupvalue="DIAN_Country"/>
+				<dcolumn name="ExternalCode" class="String" value="169"/>
+				<dcolumn name="InternalCode" class="String" value="156"/>
+			</drow>
+		</dtable>
+	</data>
+	<data>
+		<dtable name="LCO_DIAN_XMLPrintLabel">
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Año de envío" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Año de envío"/>
+				<dcolumn name="Value" class="String" value="Ano"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Primer Apellido del informado" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Primer Apellido del informado"/>
+				<dcolumn name="Value" class="String" value="apl1"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Segundo Apellido del informado" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Segundo Apellido del informado"/>
+				<dcolumn name="Value" class="String" value="apl2"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Cantidad registros" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Cantidad registros"/>
+				<dcolumn name="Value" class="String" value="CantReg"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Concepto envío" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Concepto envío"/>
+				<dcolumn name="Value" class="String" value="CodCpt"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Concepto" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Concepto"/>
+				<dcolumn name="Value" class="String" value="cpt"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Pagos o abonos en cuenta que no constituyan deducción" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Pagos o abonos en cuenta que no constituyan deducción"/>
+				<dcolumn name="Value" class="String" value="ded"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Dirección" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Dirección"/>
+				<dcolumn name="Value" class="String" value="dir"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Código del Departamento" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Código del Departamento"/>
+				<dcolumn name="Value" class="String" value="dpto"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Digito de Verificación" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Digito de Verificación"/>
+				<dcolumn name="Value" class="String" value="dv"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Fecha de envío" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Fecha de envío"/>
+				<dcolumn name="Value" class="String" value="FecEnvio"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Fecha Final" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Fecha Final"/>
+				<dcolumn name="Value" class="String" value="FecFinal"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Fecha Inicial" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Fecha Inicial"/>
+				<dcolumn name="Value" class="String" value="FecInicial"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Código formato" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Código formato"/>
+				<dcolumn name="Value" class="String" value="Formato"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Código del Municipio" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Código del Municipio"/>
+				<dcolumn name="Value" class="String" value="mun"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Número de Identificación" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Número de Identificación"/>
+				<dcolumn name="Value" class="String" value="nid"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Primer Nombre del informado" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Primer Nombre del informado"/>
+				<dcolumn name="Value" class="String" value="nom1"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Otros Nombres del informado" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Otros Nombres del informado"/>
+				<dcolumn name="Value" class="String" value="nom2"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Número de envío" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Número de envío"/>
+				<dcolumn name="Value" class="String" value="NumEnvio"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Pago o Abono en cuenta" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Pago o Abono en cuenta"/>
+				<dcolumn name="Value" class="String" value="pag"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Contenido de Pagos o abonos en cuenta" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Contenido de Pagos o abonos en cuenta"/>
+				<dcolumn name="Value" class="String" value="pagos"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="País de Residencia o domicilio" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="País de Residencia o domicilio"/>
+				<dcolumn name="Value" class="String" value="pais"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Razón Social del Informado" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Razón Social del Informado"/>
+				<dcolumn name="Value" class="String" value="raz"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Retención en la fuente que le practicaron" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Retención en la fuente que le practicaron"/>
+				<dcolumn name="Value" class="String" value="ret"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Contenido de retenciones en la fuente practicadas" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Contenido de retenciones en la fuente practicadas"/>
+				<dcolumn name="Value" class="String" value="rets"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Tipo de Documento" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Tipo de Documento"/>
+				<dcolumn name="Value" class="String" value="tdoc"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Valor del pago o abono sujeto a Retención en la fuente" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Valor del pago o abono sujeto a Retención en la fuente"/>
+				<dcolumn name="Value" class="String" value="vabo"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Valor Total" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Valor Total"/>
+				<dcolumn name="Value" class="String" value="Valor Total"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Versión del formato" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Versión del formato"/>
+				<dcolumn name="Value" class="String" value="Version"/>
+			</drow>
+			<drow key1name="LCO_DIAN_XMLPrintLabel_ID" name="Valor de la Retención en la fuente practicada a título de re" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Valor de la Retención en la fuente practicada a título de re"/>
+				<dcolumn name="Value" class="String" value="vret"/>
+			</drow>
+		</dtable>
+	</data>
+	<data>
+		<dtable name="LCO_DIAN_Concept">
+			<drow key1name="LCO_DIAN_Concept_ID" name="Retención por compras" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Retención por compras"/>
+				<dcolumn name="ValueMin" class="Amount" value="0.0"/>
+				<dcolumn name="Value" class="String" value="2302"/>
+			</drow>
+			<drow key1name="LCO_DIAN_Concept_ID" name="Retención por honorarios" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Retención por honorarios"/>
+				<dcolumn name="ValueMin" class="Amount" value="0.0"/>
+				<dcolumn name="Value" class="String" value="2304"/>
+			</drow>
+			<drow key1name="LCO_DIAN_Concept_ID" name="Retención por servicios" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Retención por servicios"/>
+				<dcolumn name="ValueMin" class="Amount" value="0.0"/>
+				<dcolumn name="Value" class="String" value="2305"/>
+			</drow>
+			<drow key1name="LCO_DIAN_Concept_ID" name="Retención por arrendamientos" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Retención por arrendamientos"/>
+				<dcolumn name="ValueMin" class="Amount" value="0.0"/>
+				<dcolumn name="Value" class="String" value="2306"/>
+			</drow>
+		</dtable>
+	</data>
+	<data>
+		<dtable name="LCO_DIAN_ConceptSource">
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2302' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="CalcColumnPosition" lookupkey2name="2">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="C_ElementValue_ID" class="Table Direct" lookupvalue="21610"/>
+				<!-- Colombia = 236540 -->
+				<dcolumn name="FieldExpression" class="String" value="@script:beanshell:MM1002vabo"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table Direct" lookupvalue="2302"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="2"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2302' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="CalcColumnPosition" lookupkey2name="1">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="C_ElementValue_ID" class="Table Direct" lookupvalue="21610"/>
+				<!-- Colombia = 236540 -->
+				<dcolumn name="FieldExpression" class="String" value="@script:beanshell:MM1002vret"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table Direct" lookupvalue="2302"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="1"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2304' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="CalcColumnPosition" lookupkey2name="2">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="C_ElementValue_ID" class="Table Direct" lookupvalue="21620"/>
+				<!-- Colombia = 236515 -->
+				<dcolumn name="FieldExpression" class="String" value="@script:beanshell:MM1002vabo"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table Direct" lookupvalue="2304"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="2"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2304' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="CalcColumnPosition" lookupkey2name="1">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="C_ElementValue_ID" class="Table Direct" lookupvalue="21620"/>
+				<!-- Colombia = 236515 -->
+				<dcolumn name="FieldExpression" class="String" value="@script:beanshell:MM1002vret"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table Direct" lookupvalue="2304"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="1"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2305' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="CalcColumnPosition" lookupkey2name="2">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="C_ElementValue_ID" class="Table Direct" lookupvalue="12610"/>
+				<!-- Colombia = 236525 -->
+				<dcolumn name="FieldExpression" class="String" value="@script:beanshell:MM1002vabo"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table Direct" lookupvalue="2305"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="2"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2305' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="CalcColumnPosition" lookupkey2name="1">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="C_ElementValue_ID" class="Table Direct" lookupvalue="12610"/>
+				<!-- Colombia = 236525 -->
+				<dcolumn name="FieldExpression" class="String" value="@script:beanshell:MM1002vret"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table Direct" lookupvalue="2305"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="1"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2306' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="CalcColumnPosition" lookupkey2name="2">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="C_ElementValue_ID" class="Table Direct" lookupvalue="12620"/>
+				<!-- Colombia = 236530 -->
+				<dcolumn name="FieldExpression" class="String" value="@script:beanshell:MM1002vabo"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table Direct" lookupvalue="2306"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="2"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2306' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="CalcColumnPosition" lookupkey2name="1">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="C_ElementValue_ID" class="Table Direct" lookupvalue="12620"/>
+				<!-- Colombia = 236530 -->
+				<dcolumn name="FieldExpression" class="String" value="@script:beanshell:MM1002vret"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table Direct" lookupvalue="2306"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="1"/>
+			</drow>
+		</dtable>
+	</data>
+	<data>
+		<dtable name="AD_Sequence">
+			<drow key1name="AD_Sequence_ID" name="Envío Medios Magnéticos (DIAN)" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Envío Medios Magnéticos (DIAN)"/>
+				<dcolumn name="Description" class="String" value="Archivos de información exógena"/>
+				<dcolumn name="IsAutoSequence" class="Yes-No" value="Y"/>
+				<dcolumn name="IncrementNo" class="Integer" value="1"/>
+				<dcolumn name="StartNo" class="Integer" value="1"/>
+				<dcolumn name="CurrentNext" class="Integer" value="1"/>
+				<dcolumn name="CurrentNextSys" class="Integer" value="1"/>
+				<dcolumn name="IsAudited" class="Yes-No" value="N"/>
+				<dcolumn name="IsTableID" class="Yes-No" value="N"/>
+				<dcolumn name="StartNewYear" class="Yes-No" value="Y"/>
+			</drow>
+		</dtable>
+	</data>
+	<data>
+		<dtable name="LCO_DIAN_Format">
+			<drow key1name="LCO_DIAN_Format_ID" name="Información de retenciones en la fuente practicadas" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="AD_Sequence_ID" class="Table Direct" lookupname="Envío Medios Magnéticos (DIAN)"/>
+				<dcolumn name="C_AcctSchema_ID" class="Table Direct" lookupname="GardenWorld US/A/US Dollar"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="IsBPartnerDetailed" class="Yes-No" value="Y"/>
+				<dcolumn name="MaxXMLRecords" class="Integer" value="5000"/>
+				<dcolumn name="Name" class="String" value="Información de retenciones en la fuente practicadas"/>
+				<dcolumn name="VersionNo" class="String" value="7"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="rets"/>
+				<dcolumn name="Value" class="String" value="1002"/>
+			</drow>
+		</dtable>
+	</data>
+	<data>
+		<dtable name="LCO_DIAN_ConceptFormat">
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2302' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="LCO_DIAN_Format_ID" lookupkey2name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table" lookupvalue="2302"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2304' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="LCO_DIAN_Format_ID" lookupkey2name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table" lookupvalue="2304"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2305' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="LCO_DIAN_Format_ID" lookupkey2name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table" lookupvalue="2305"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Concept_ID" lookupkey1name="(SELECT LCO_DIAN_Concept_ID FROM LCO_DIAN_Concept WHERE value='2306' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="LCO_DIAN_Format_ID" lookupkey2name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Concept_ID" class="Table" lookupvalue="2306"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+			</drow>
+		</dtable>
+	</data>
+	<data>
+		<dtable name="LCO_DIAN_FieldFormat">
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="10">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="10"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="cpt"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="20">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="20"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="tdoc"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="30">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="30"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="nid"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="40">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="40"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="dv"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="50">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="50"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="apl1"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="60">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="60"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="apl2"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="70">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="70"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="nom1"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="80">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="80"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="nom2"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="90">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="90"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="raz"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="100">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="100"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="dir"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="110">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="110"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="dpto"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="120">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="120"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="mun"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="130">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="0"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="130"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="pais"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="140">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="2"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="140"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="vabo"/>
+			</drow>
+			<drow name="" key1name="LCO_DIAN_Format_ID" lookupkey1name="(SELECT LCO_DIAN_Format_ID FROM LCO_DIAN_Format WHERE value='1002' AND AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client WHERE Name = 'GardenWorld'))" key2name="Line" lookupkey2name="150">
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="CalcColumnPosition" class="Integer" value="1"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="LCO_DIAN_Format_ID" class="Table" lookupvalue="1002"/>
+				<dcolumn name="Line" class="Integer" value="150"/>
+				<dcolumn name="LCO_DIAN_XMLPrintLabel_ID" class="Table" lookupvalue="vret"/>
+			</drow>
+		</dtable>
+	</data>
+	<data clientname="System">
+		<dtable name="AD_Rule">
+			<drow key1name="AD_Rule_ID" lookupkey1name="1000001" name="Medios Magnéticos - Formato 1002 - obtener vret" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Client_ID" class="Table Direct" value="0"/>
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="EntityType" class="Table" value="QSS_LCO"/>
+				<dcolumn name="EventType" class="List" value="C"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Medios Magnéticos - Formato 1002 - obtener vret"/>
+				<dcolumn name="RuleType" class="List" value="S"/>
+				<dcolumn name="Script" class="Memo" value="import org.compiere.model.*;&#10;import org.compiere.util.*;&#10;import java.math.*;&#10;MElementValue ev = new MElementValue(A_Ctx, A_ConceptSource.getC_ElementValue_ID(), A_TrxName);&#10;String sql = &quot;&quot;&#10;        + &quot;SELECT Sum(iw.taxamt * CASE  &quot;&#10;        + &quot;                         WHEN Substr(dt.docbasetype,3,3) = 'C' &quot;&#10;        + &quot;                         THEN -1 &quot;&#10;        + &quot;                         ELSE 1 &quot;&#10;        + &quot;                       END) AS taxamt &quot;&#10;        + &quot;FROM   lco_invoicewithholding iw &quot;&#10;        + &quot;       JOIN c_tax_acct ta &quot;&#10;        + &quot;         ON (ta.c_tax_id = iw.c_tax_id) &quot;&#10;        + &quot;       JOIN c_validcombination vc &quot;&#10;        + &quot;         ON (ta.t_credit_acct = vc.c_validcombination_id) &quot;&#10;        + &quot;       JOIN c_elementvalue ev &quot;&#10;        + &quot;         ON (vc.account_id = ev.c_elementvalue_id) &quot;&#10;        + &quot;       JOIN c_invoice i &quot;&#10;        + &quot;         ON (i.c_invoice_id = iw.c_invoice_id) &quot;&#10;        + &quot;       JOIN c_doctype dt &quot;&#10;        + &quot;         ON (i.c_doctype_id = dt.c_doctype_id) &quot;&#10;        + &quot;WHERE  i.ad_client_id = ? &quot;&#10;        + &quot;       AND iw.dateacct BETWEEN ? AND ? &quot;&#10;        + &quot;       AND i.issotrx = 'N' &quot;&#10;        + &quot;       AND iw.processed = 'Y' &quot;&#10;        + &quot;       AND iw.isactive = 'Y' &quot;&#10;        + &quot;       AND i.processed = 'Y' &quot;&#10;        + &quot;       AND i.isactive = 'Y' &quot;&#10;        + &quot;       AND ev.VALUE LIKE ? &quot;&#10;        + &quot;       AND i.c_bpartner_id = ?&quot;;&#10;Object[] args = new Object[] {&#10;                        Env.getAD_Client_ID(A_Ctx),&#10;                        A_SendSchedule.getStartDate(),&#10;                        A_SendSchedule.getEndDate(),&#10;                        ev.getValue() + '%',&#10;                        A_C_BPartner_ID };&#10;BigDecimal taxbaseamt = DB.getSQLValueBD(A_TrxName, sql, args);&#10;if (taxbaseamt != null &amp;&amp; taxbaseamt instanceof BigDecimal)&#10;        taxbaseamt.setScale(0, BigDecimal.ROUND_HALF_UP);&#10;else&#10;        taxbaseamt = Env.ZERO;&#10;result = taxbaseamt;"/>
+				<dcolumn name="Value" class="String" value="beanshell:MM1002vret"/>
+			</drow>
+			<drow key1name="AD_Rule_ID" lookupkey1name="1000000" name="Medios Magnéticos - Formato 1002 - obtener vabo" key2name="" lookupkey2name="">
+				<dcolumn name="AD_Client_ID" class="Table Direct" value="0"/>
+				<dcolumn name="AD_Org_ID" class="Table Direct" value="0"/>
+				<dcolumn name="AD_Rule_ID" class="ID" value="1000000"/>
+				<dcolumn name="EntityType" class="Table" value="QSS_LCO"/>
+				<dcolumn name="EventType" class="List" value="C"/>
+				<dcolumn name="IsActive" class="Yes-No" value="Y"/>
+				<dcolumn name="Name" class="String" value="Medios Magnéticos - Formato 1002 - obtener vabo"/>
+				<dcolumn name="RuleType" class="List" value="S"/>
+				<dcolumn name="Script" class="Memo" value="import org.compiere.model.*;&#10;import org.compiere.util.*;&#10;import java.math.*;&#10;MElementValue ev = new MElementValue(A_Ctx, A_ConceptSource.getC_ElementValue_ID(), A_TrxName);&#10;String sql = &quot;&quot;&#10;        + &quot;SELECT Sum(iw.taxbaseamt * CASE  &quot;&#10;        + &quot;                             WHEN Substr(dt.docbasetype,3,3) = 'C' &quot;&#10;        + &quot;                             THEN -1 &quot;&#10;        + &quot;                             ELSE 1 &quot;&#10;        + &quot;                           END) AS taxbaseamt &quot;&#10;        + &quot;FROM   lco_invoicewithholding iw &quot;&#10;        + &quot;       JOIN c_tax_acct ta &quot;&#10;        + &quot;         ON (ta.c_tax_id = iw.c_tax_id) &quot;&#10;        + &quot;       JOIN c_validcombination vc &quot;&#10;        + &quot;         ON (ta.t_credit_acct = vc.c_validcombination_id) &quot;&#10;        + &quot;       JOIN c_elementvalue ev &quot;&#10;        + &quot;         ON (vc.account_id = ev.c_elementvalue_id) &quot;&#10;        + &quot;       JOIN c_invoice i &quot;&#10;        + &quot;         ON (i.c_invoice_id = iw.c_invoice_id) &quot;&#10;        + &quot;       JOIN c_doctype dt &quot;&#10;        + &quot;         ON (i.c_doctype_id = dt.c_doctype_id) &quot;&#10;        + &quot;WHERE  i.ad_client_id = ? &quot;&#10;        + &quot;       AND iw.dateacct BETWEEN ? AND ? &quot;&#10;        + &quot;       AND i.issotrx = 'N' &quot;&#10;        + &quot;       AND iw.processed = 'Y' &quot;&#10;        + &quot;       AND iw.isactive = 'Y' &quot;&#10;        + &quot;       AND i.processed = 'Y' &quot;&#10;        + &quot;       AND i.isactive = 'Y' &quot;&#10;        + &quot;       AND ev.VALUE LIKE ? &quot;&#10;        + &quot;       AND i.c_bpartner_id = ?&quot;;&#10;Object[] args = new Object[] {&#10;                        Env.getAD_Client_ID(A_Ctx),&#10;                        A_SendSchedule.getStartDate(),&#10;                        A_SendSchedule.getEndDate(),&#10;                        ev.getValue() + '%',&#10;                        A_C_BPartner_ID };&#10;BigDecimal taxbaseamt = DB.getSQLValueBD(A_TrxName, sql, args);&#10;if (taxbaseamt != null &amp;&amp; taxbaseamt instanceof BigDecimal)&#10;        taxbaseamt.setScale(0, BigDecimal.ROUND_HALF_UP);&#10;else&#10;        taxbaseamt = Env.ZERO;&#10;result = taxbaseamt;"/>
+				<dcolumn name="Value" class="String" value="beanshell:MM1002vabo"/>
+			</drow>
+		</dtable>
+	</data>
+</adempiereAD>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/css" href="adempiereDocument.css"?>
+<adempiereDocument>
+	<header>GlobalQSS_FestivosColombia Package Description</header>
+	<H1>Package Name:</H1>
+	<packagename>GlobalQSS_FestivosColombia/</packagename>
+	<H1>Creator:</H1>
+	<creator>info@globalqss.com</creator>
+	<H1>Email Address:</H1>
+	<creatorcontact>info@globalqss.com</creatorcontact>
+	<H1>Created:</H1>
+	<createddate>2007-05-09 06:28:47.0</createddate>
+	<H1>Updated:</H1>
+	<updateddate>2010-01-17 17:38:00.0</updateddate>
+	<H1>Description:</H1>
+	<description>Días Festivos en Colombia</description>
+	<H1>Instructions:</H1>
+	<instructions>Descomprimir el paquete, cambiar GardenWorld Calendar por el nombre del calendario, cambiar GardenWorld por el nombre de la compañía en la cual se va a instalar, volver a comprimir e importar con PackIn.</instructions>
+	<H1>Files in Package:</H1>
+	<file>File: PackOut.xml</file>
+	<filedirectory>Directory: \dict\</filedirectory>
+	<filenotes>Notes: Contains all application/object settings for package</filenotes>
+</adempiereDocument>

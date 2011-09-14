@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/css" href="adempiereDocument.css"?>
+
+<adempiereDocument>
+    <header>LCO_MediosMagneticos Package Description</header>
+    <H1>Package Name:</H1>
+    <packagename>LCO_MediosMagneticos</packagename>
+    <H1>Creator:</H1>
+    <creator>info@globalqss.com</creator>
+    <H1>Email Address:</H1>
+    <creatorcontact>info@globalqss.com</creatorcontact>
+    <H1>Created:</H1>
+    <createddate>2009-04-29 16:38:05</createddate>
+    <H1>Updated:</H1>
+    <updateddate>2009-08-24 19:06:23</updateddate>
+    <H1>Description:</H1>
+    <description>LCO Medios Magneticos DIAN</description>
+    <H1>Instructions:</H1>
+    <instructions>Packin</instructions>
+    <H1>Files in Package:</H1>
+    <file>File: PackOut.xml</file>
+    <filedirectory>Directory: \dict\</filedirectory>
+    <filenotes>Notes: Contiene todos los objetos del diccionario para instalar la aplicación de generación de medios magnéticos para la DIAN (Colombia).  PREREQUISITO: Haber instalado la localización Colombia para retenciones LCO_Retenciones</filenotes>
+</adempiereDocument>

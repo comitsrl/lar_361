@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="extend/src"/>
+	<classpathentry kind="src" path="client/src"/>
+	<classpathentry kind="src" output="WEB-INF/classes" path="zkwebui/WEB-INF/src"/>
+	<classpathentry kind="src" path="zkwebui/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/patches_360"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/adempiere360lts"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

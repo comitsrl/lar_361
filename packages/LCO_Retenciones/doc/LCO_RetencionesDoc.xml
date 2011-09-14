@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/css" href="adempiereDocument.css"?>
+<adempiereDocument>
+	<header>LCO_Retenciones Package Description</header>
+	<H1>Package Name:</H1>
+	<packagename>LCO_Retenciones</packagename>
+	<H1>Creator:</H1>
+	<creator>info@globalqss.com</creator>
+	<H1>Email Address:</H1>
+	<creatorcontact>info@globalqss.com</creatorcontact>
+	<H1>Created:</H1>
+	<createddate>2007-05-09 06:28:47.0</createddate>
+	<H1>Updated:</H1>
+	<updateddate>2009-11-06 10:00:19.0</updateddate>
+	<H1>Description:</H1>
+	<description>Localizacion Colombia</description>
+	<H1>Instructions:</H1>
+	<instructions>Debe instalar este paquete y despues configurar apropiadamente las nuevas tablas de configuracion.</instructions>
+	<H1>Files in Package:</H1>
+	<file>File: PackOut.xml</file>
+	<filedirectory>Directory: \dict\</filedirectory>
+	<filenotes>Notes: Contains all application/object settings for package</filenotes>
+</adempiereDocument>
