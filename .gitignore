@@ -1,4 +1,5 @@
-# temp files
+#eclipse
+bin/*
+#temp files
 *~
 *.swp
-
