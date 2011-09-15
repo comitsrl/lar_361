@@ -301,7 +301,7 @@ public class FiscalDocumentPrint {
 		
 		// Se obtiene el tipo de documento a emitir por la impresora.
 		MDocType docType = new MDocType(ctx, docType_ID, null);
-		setPrinterDocType(docType.getFiscalDocument());
+		setPrinterDocType(docType.getfiscaldocument());
 		
 		// Se asigna el documento OXP.
 		setOxpDocument(document);
@@ -310,7 +310,7 @@ public class FiscalDocumentPrint {
 		MFiscalPrinter cFiscal = MFiscalPrinter.getOfDocType(docType_ID);
 		
 		// Ejecutar la acción
-		boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT, cFiscal.getID(), new Object[]{document});
+		boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT, cFiscal.get_ID(), new Object[]{document});
 
 		// Se actualizan los datos del documento oxp.
 		updateOxpDocument((MInvoice)document, !ok);
@@ -335,16 +335,16 @@ public class FiscalDocumentPrint {
 			throw new IllegalArgumentException("Error: No document type");
 		
 		// Se obtiene el tipo de documento a emitir por la impresora.
-		setPrinterDocType(docType.getFiscalDocument());
+		setPrinterDocType(docType.getfiscaldocument());
 		
 		// Se asigna el documento OXP.
 		setOxpDocument(document);
 		
 		// Se obtiene el controlador fiscal para chequear el status
-		MFiscalPrinter cFiscal = MFiscalPrinter.getOfDocType(docType.getID());
+		MFiscalPrinter cFiscal = MFiscalPrinter.getOfDocType(docType.get_ID());
 		
 		// Ejecutar la acción
-		boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT, cFiscal.getID(),
+		boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT, cFiscal.get_ID(),
 				new Object[] { document, documentPrintable, originalInvoice });
 
 		// Se actualizan los datos del documento oxp.
@@ -380,15 +380,15 @@ public class FiscalDocumentPrint {
 		fireActionStarted(FiscalDocumentPrintListener.AC_PRINT_DOCUMENT);
 		
 		// Emisión de una factura.
-		if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_Invoice)) {
+		if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_Factura)) {
 			printInvoice(documentPrintable);
 		
 		// Emisión de una nota de crédito.
-		} else if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_CreditNote)) {
+		} else if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_NotaDeCredito)) {
 			printCreditNote(documentPrintable, originalInvoice);
 		
 		// Emisión de una nota de débito.
-		} else if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_DebitNote)) {
+		} else if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_NotaDeDebito)) {
 			printDebitNote(documentPrintable);
 		}
 		
@@ -514,15 +514,15 @@ public class FiscalDocumentPrint {
 	public Document createDocument(MInvoice mInvoice, MInvoice originalInvoice){
 		Document document = null;
 		// Creación de una factura.
-		if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_Invoice)) {
+		if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_Factura)) {
 			document = createInvoice(mInvoice);
 		
 		// Creación de una nota de crédito.
-		} else if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_CreditNote)) {
+		} else if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_NotaDeCredito)) {
 			document = createCreditNote(mInvoice, originalInvoice);
 		
 		// Creación de una nota de débito.
-		} else if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_DebitNote)) {
+		} else if(getPrinterDocType().equals(MDocType.FISCALDOCUMENT_NotaDeDebito)) {
 			document = createDebitNote(mInvoice);
 		}
 		return document;
@@ -718,7 +718,7 @@ public class FiscalDocumentPrint {
 			// Si es una factura a consumidor final, los datos del cliente se
 			// obtienen a partir de la factura OXP.
 			if(customer.getIvaResponsibility() == Customer.CONSUMIDOR_FINAL &&
-					getPrinterDocType().equals(MDocType.FISCALDOCUMENT_Invoice)) {
+					getPrinterDocType().equals(MDocType.FISCALDOCUMENT_Factura)) {
 				
 				// Nombre, nro de identificación, domicilio
 				customer.setIdentificationType(Customer.DNI);
@@ -1181,7 +1181,7 @@ public class FiscalDocumentPrint {
 	}
 	
 	private void fireStatusReported(MFiscalPrinter cFiscal) {
-		fireStatusReported(cFiscal, cFiscal.getstatus());
+		fireStatusReported(cFiscal, cFiscal.getStatus());
 	}
 
 	private void fireActionStarted(Integer action) {
@@ -1223,7 +1223,7 @@ public class FiscalDocumentPrint {
 		int bsyCount = 0;
 		// Si la impresora se encuentra en estado de error se dispara el evento
 		// que informa dicha situación.
-		if(cFiscal.getstatus().equals(MFiscalPrinter.STATUS_ERROR)) {
+		if(cFiscal.getStatus().equals(MFiscalPrinter.STATUS_ERROR)) {
 			fireStatusReported(cFiscal);
 			// Dependiendo de si hay que ignorar o no el estado de error
 			// se continua con la impresión. (Esto se utiliza para evitar
@@ -1240,7 +1240,7 @@ public class FiscalDocumentPrint {
 		}			
 
 		// Mientras el status sea BUSY, espera 5 segundos y vuelve a chequear.
-		while(cFiscal.getstatus().equals(MFiscalPrinter.STATUS_BUSY) && !isCancelWaiting()) {
+		while(cFiscal.getStatus().equals(MFiscalPrinter.STATUS_OCUPADO) && !isCancelWaiting()) {
 			fireStatusReported(cFiscal);
 			Thread.sleep(BSY_SLEEP_TIME);
 			bsyCount++;
@@ -1258,8 +1258,8 @@ public class FiscalDocumentPrint {
 		fireStatusReported(cFiscal, MFiscalPrinter.STATUS_OCIOSO);
 		// Se asigna el status de la impresora, el usuario que realiza la operación
 		// y la fecha de operación.
-		cFiscal.setstatus(MFiscalPrinter.STATUS_BUSY);
-		cFiscal.setUsedBy_ID(Env.getAD_User_ID(ctx));
+		cFiscal.setStatus(MFiscalPrinter.STATUS_OCUPADO);
+		//cFiscal.setUsedBy_ID(Env.getAD_User_ID(ctx)); TODO - Revisar
 		cFiscal.setoperation_date(new Timestamp(System.currentTimeMillis()));
 		// No se usa trx dado que los cambios deben ser visibles 
 		// inmediatamente por otros usuarios.
@@ -1269,7 +1269,7 @@ public class FiscalDocumentPrint {
 	
 	private void setFiscalPrinterStatus(MFiscalPrinter cFiscal, String status) {
 		if(cFiscal != null) {
-			cFiscal.setstatus(status);
+			cFiscal.setStatus(status);
 			cFiscal.save();
 		}
 	}
@@ -1529,13 +1529,13 @@ public class FiscalDocumentPrint {
 					name = aProduct.getName().trim();
 				
 				// armar la descripción según la selección
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Name.equals(cFiscal.getOnPrintProductFormat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Nombre.equals(cFiscal.getonprintproductformat()))
 					description = name;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Value.equals(cFiscal.getOnPrintProductFormat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Codigo.equals(cFiscal.getonprintproductformat()))
 					description = value;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_NameValue.equals(cFiscal.getOnPrintProductFormat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_NombreCodigo.equals(cFiscal.getonprintproductformat()))
 					description = name + " " + value;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_ValueName.equals(cFiscal.getOnPrintProductFormat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_CodigoNombre.equals(cFiscal.getonprintproductformat()))
 					description = value + " " + name;	
 			}
 		}	
