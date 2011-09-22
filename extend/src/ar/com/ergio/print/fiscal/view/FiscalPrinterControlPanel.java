@@ -36,6 +36,8 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 
 	// Constantes
 	
+	private static final long serialVersionUID = -6703566239557862855L;
+
 	private final AInfoFiscalPrinter infoFiscalPrinter = 
 		new AInfoFiscalPrinter(
 				null,
@@ -64,14 +66,14 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 	
 	// Mensajes
 	
-	private String MSG_PROCESSING;
-	private String MSG_PLEASEWAIT;
-	private String MSG_CLOSE;
-	private String MSG_FISCAL_CLOSE;
-	private String MSG_FISCAL_CLOSE_TYPE;
-	private String MSG_FISCAL_CONTROLLER;
-	private String MSG_FISCAL_PRINTER_CONTROL_PANEL;
-	private String FISCAL_CLOSE_TYPES_REF_NAME;
+	private static String MSG_PROCESSING;
+	private static String MSG_PLEASEWAIT;
+	private static String MSG_CLOSE;
+	private static String MSG_FISCAL_CLOSE;
+	private static String MSG_FISCAL_CLOSE_TYPE;
+	private static String MSG_FISCAL_CONTROLLER;
+	private static String MSG_FISCAL_PRINTER_CONTROL_PANEL;
+	private static String FISCAL_CLOSE_TYPES_REF_NAME;
 
 	
 	// *********************************
@@ -247,7 +249,7 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 	 */
 	private CComboBox getComboFiscalCloseTypes(){
 		if(comboFiscalCloseTypes == null){
-			comboFiscalCloseTypes = new CComboBox(MRefList.getList(MReference.getReferenceID(FISCAL_CLOSE_TYPES_REF_NAME), false));
+			comboFiscalCloseTypes = new CComboBox(MRefList.getList(Env.getCtx(),MReference.getReferenceID(FISCAL_CLOSE_TYPES_REF_NAME), false));
 			comboFiscalCloseTypes.setMandatory(true);
 		}
 		return comboFiscalCloseTypes;
@@ -265,13 +267,14 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		return comboFiscalControllers;
 	}
 	
+	
 	/**
 	 * Retornar o crear el botón que dispara el cierre fiscal
 	 * @return
 	 */
 	private CButton getBtnFiscalClose(){
 		if(btnFiscalClose == null){
-			btnFiscalClose = new CButton(MSG_FISCAL_CLOSE,ImageFactory.getImageIcon("Process24.gif"));
+			btnFiscalClose = new CButton(MSG_FISCAL_CLOSE,Env.getImageIcon("Process24.gif"));
 			btnFiscalClose.addActionListener(new ActionListener() {
 				
 				@Override
@@ -290,7 +293,7 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 	 */
 	private CButton getBtnCloseForm(){
 		if(btnCloseForm == null){
-			btnCloseForm = new CButton(MSG_CLOSE,ImageFactory.getImageIcon("End24.gif"));
+			btnCloseForm = new CButton(MSG_CLOSE,Env.getImageIcon("End24.gif"));
 			btnCloseForm.addActionListener(new ActionListener() {
 				
 				@Override
