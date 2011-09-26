@@ -20,7 +20,7 @@ import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.compiere.model.MInvoice;
-import org.compiere.util.CLogger;
+//import org.compiere.util.CLogger;
 
 /**
  *	Invoice Withholding Model
@@ -35,7 +35,7 @@ public class MLCOInvoiceWithholding extends X_LCO_InvoiceWithholding
 	 */
 	private static final long serialVersionUID = -3086189821486687908L;
 	/**	Static Logger	*/
-	private static CLogger	s_log	= CLogger.getCLogger (MLCOInvoiceWithholding.class);
+	//private static CLogger	s_log	= CLogger.getCLogger (MLCOInvoiceWithholding.class);
 
 	
 	/**************************************************************************

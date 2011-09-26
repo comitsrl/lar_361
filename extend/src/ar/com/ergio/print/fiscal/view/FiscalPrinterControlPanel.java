@@ -18,22 +18,28 @@ import org.compiere.apps.SwingWorker;
 import org.compiere.apps.form.FormFrame;
 import org.compiere.apps.form.FormPanel;
 import org.compiere.grid.ed.VLookup;
+import org.compiere.model.MLookup;
+import org.compiere.model.MLookupFactory;
+import org.compiere.model.MLookupInfo;
+import org.compiere.model.MQuery;
 import org.compiere.model.MRefList;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CComboBox;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CPanel;
+// import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
 
+//import ar.com.ergio.util.*;
 import ar.com.ergio.model.FiscalDocumentPrint;
 import ar.com.ergio.print.fiscal.action.FiscalCloseAction;
 import ar.com.ergio.print.fiscal.action.FiscalPrinterAction;
 
 public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
-
+    // private static CLogger s_log = CLogger.getCLogger(FiscalPrinterControlPanel.class);
 	// Constantes
 	
 	private static final long serialVersionUID = -6703566239557862855L;
@@ -73,8 +79,9 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 	private static String MSG_FISCAL_CLOSE_TYPE;
 	private static String MSG_FISCAL_CONTROLLER;
 	private static String MSG_FISCAL_PRINTER_CONTROL_PANEL;
-	private static String FISCAL_CLOSE_TYPES_REF_NAME;
-
+	
+	/** Fiscal_Close_Types AD_Reference_ID=1000003 */
+    public static final int Fiscal_Close_Types_AD_Reference_ID=1000003;
 	
 	// *********************************
 	// 	   Panel principal
@@ -185,10 +192,10 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		MSG_CLOSE = getMsg("Close");
 		MSG_FISCAL_CLOSE = getMsg("FiscalClose");
 		MSG_FISCAL_CLOSE_TYPE = getMsg("FiscalCloseType");
-		MSG_FISCAL_CONTROLLER = Msg.getElement(Env.getCtx(), "C_Controlador_Fiscal_ID");
+		MSG_FISCAL_CONTROLLER = Msg.getElement(Env.getCtx(), "LAR_Fiscal_Printer_ID");
 		MSG_FISCAL_PRINTER_CONTROL_PANEL = getMsg("FiscalPrinterControlPanel"); 
 		// Nombres
-		FISCAL_CLOSE_TYPES_REF_NAME = "Fiscal_Close_Types";
+		// FISCAL_CLOSE_TYPES_REF_NAME = "Fiscal_Close_Types";
 	}
 		
 	private void jbInit(){
@@ -249,7 +256,7 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 	 */
 	private CComboBox getComboFiscalCloseTypes(){
 		if(comboFiscalCloseTypes == null){
-			comboFiscalCloseTypes = new CComboBox(MRefList.getList(Env.getCtx(),MReference.getReferenceID(FISCAL_CLOSE_TYPES_REF_NAME), false));
+	        comboFiscalCloseTypes = new CComboBox(MRefList.getList(Env.getCtx(),Fiscal_Close_Types_AD_Reference_ID, false));
 			comboFiscalCloseTypes.setMandatory(true);
 		}
 		return comboFiscalCloseTypes;
@@ -260,13 +267,22 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 	 * @return
 	 */
 	private VLookup getComboFiscalControllers(){
-		if(comboFiscalControllers == null){
-			comboFiscalControllers = VComponentsFactory.VLookupFactory("C_Controlador_Fiscal_ID", "C_Controlador_Fiscal", getWindowNo(), DisplayType.TableDir);
-			comboFiscalControllers.setMandatory(true);
+	    if(comboFiscalControllers == null){
+		  
+		    // AD_Column_ID = select c.ad_column_id from ad_column c inner join ad_table t on (c.ad_table_id=t.ad_table_id) where c.columnname ilike 'LAR_Fiscal_Printer_ID' and t.tablename ilike 'LAR_Fiscal_Printer_ID'
+		    int AD_Column_ID = 1000102;	  
+		    String columnName="lar_fiscal_printer_ID";
+	        MLookupInfo info    = MLookupFactory.getLookupInfo(Env.getCtx(), getWindowNo(), 
+	                AD_Column_ID, DisplayType.TableDir, Env.getLanguage(Env.getCtx()),
+	                columnName,0,false,"");
+ 	        info.ZoomQuery = new MQuery();        
+	        MLookup lookup = new MLookup(info, 0);
+   	        VLookup vl = new VLookup( columnName, false, false, true, lookup );
+   	        comboFiscalControllers = vl;
+		    comboFiscalControllers.setMandatory(true);
 		}
 		return comboFiscalControllers;
 	}
-	
 	
 	/**
 	 * Retornar o crear el botón que dispara el cierre fiscal

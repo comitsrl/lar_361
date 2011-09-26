@@ -5,7 +5,8 @@ import ar.com.ergio.print.fiscal.msg.MsgRepository;
 
 public class DocumentException extends Exception {
 
-	private Document document;
+    private static final long serialVersionUID = -6346053666329730577L;
+    private Document document;
 
 	/**
 	 * @param msg

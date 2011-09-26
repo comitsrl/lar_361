@@ -15,7 +15,9 @@ import ar.com.ergio.print.fiscal.util.ByteFormatter;
  */
 public class HasarFiscalPacket extends AbstractFiscalPacket
 {
-	private static final byte FS = 0x1C;
+
+    private static final long serialVersionUID = 3113281446232338907L;
+    private static final byte FS = 0x1C;
 	private static final byte NL  = 0x0D;
 	private final String encoding;
 	private final int baseRolloverYear;

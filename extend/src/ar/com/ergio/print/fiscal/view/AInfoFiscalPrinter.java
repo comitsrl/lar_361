@@ -55,13 +55,12 @@ import ar.com.ergio.print.fiscal.FiscalPrinterEventListener;
 import ar.com.ergio.print.fiscal.msg.FiscalMessage;
 import ar.com.ergio.print.fiscal.msg.FiscalMessages;
 
-@SuppressWarnings("serial")
+
 public class AInfoFiscalPrinter extends CDialog implements ActionListener, FiscalPrinterEventListener, FiscalDocumentPrintListener {
 	
-
+    private static final long serialVersionUID = 731761102221654153L;
 
     private static CLogger log = CLogger.getCLogger( AInfoFiscalPrinter.class );
-	
     private static Icon i_inform = Env.getImageIcon( "Inform32.gif" );
     private static Icon i_warn = Env.getImageIcon( "Warn32.gif" );
     private static Icon i_question = Env.getImageIcon( "Question32.gif" );
@@ -111,6 +110,7 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
        	this((JFrame)Env.getWindow(windowNo),title, "", JOptionPane.INFORMATION_MESSAGE);
        	this.windowNo = windowNo;
        	this.parent = parent;
+       	log.warning ("AInfoFiscalPrinter");
     }    // AInfoFiscalPrinter
     
     /**

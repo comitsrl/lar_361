@@ -13,7 +13,8 @@ import ar.com.ergio.print.fiscal.msg.FiscalMessages;
  */
 public class FiscalPrinterStatusError extends FiscalPrinterIOException {
 
-	private FiscalMessages statusMsgs = new FiscalMessages();
+    private static final long serialVersionUID = -1574831031553119448L;
+    private FiscalMessages statusMsgs = new FiscalMessages();
 	
 	public FiscalPrinterStatusError() {
 		super();

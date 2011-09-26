@@ -319,7 +319,7 @@ public class SpoolerTCPComm extends AbstractFiscalComm {
 	private static final byte byteD = 0x44;
 	private static final byte byteC = 0x43;
 	private static final byte byte2 = 0x32;
-	private static final byte byte4 = 0x34; //NO usado actulemtne; serviria para chequear respuesta "DC4" (cajon abierto)
+	// private static final byte byte4 = 0x34; //NO usado actulemtne; serviria para chequear respuesta "DC4" (cajon abierto)
 	
 	// Ader Javier: 10 Oct 2010 : esta es la forma correcta de 
 	// chequear los bytes DC2

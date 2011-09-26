@@ -14,7 +14,10 @@ import ar.com.ergio.print.fiscal.util.ByteFormatter;
 /** An abstract base class for FiscalPacket implementations. */
 public abstract class AbstractFiscalPacket implements FiscalPacket
 {
-	private static final boolean DISCARD_LEAP_SECOND = true;
+
+    private static final long serialVersionUID = 558117040031879527L;
+
+    private static final boolean DISCARD_LEAP_SECOND = true;
 
 	private static final byte[] EMPTY_FIELD = new byte[0];
 

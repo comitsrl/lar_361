@@ -9,7 +9,8 @@ import ar.com.ergio.print.fiscal.msg.MsgRepository;
  * generar las impresoras fiscales */
 public class FiscalPrinterIOException extends IOException
 {
-	private static String STR_REQUEST = MsgRepository.get("FiscalRequest");
+    private static final long serialVersionUID = 4370079950592531083L;
+    private static String STR_REQUEST = MsgRepository.get("FiscalRequest");
 	private static String STR_RESPONSE = MsgRepository.get("FiscalResponse");
 	
 	private FiscalPacket request;
