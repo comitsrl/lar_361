@@ -16,6 +16,27 @@
  *****************************************************************************/
 package ar.com.ergio.util;
 
-public class LAR_Utils {
-    private static final long serialVersionUID = -8128704971497452535L;
+import org.compiere.model.MInvoice;
+
+/**
+ * Utility class for Argentine Localization.
+ *
+ * @author Emiliano Pereyra - Ergio
+ *
+ */
+public final class LAR_Utils {
+
+    private LAR_Utils(){}
+
+    /**
+     * Calculates the letter from a given invoice using its document number.
+     *
+     * @param mInvoice
+     *            invoice to process
+     * @return the letter from a given invoice
+     */
+    public static String getLetter(final MInvoice mInvoice)
+    {
+        return String.valueOf(mInvoice.getDocumentNo().charAt(0));
+    }
 }

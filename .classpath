@@ -5,6 +5,6 @@
 	<classpathentry kind="src" path="zkwebui/resources"/>
 	<classpathentry kind="src" path="adempiere370lts"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/adempiereTrunk"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/adempiere370"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

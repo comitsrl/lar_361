@@ -53,6 +53,7 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Trx;
+import org.globalqss.model.X_LCO_TaxPayerType;
 
 import ar.com.ergio.print.fiscal.FiscalPrinter;
 import ar.com.ergio.print.fiscal.FiscalPrinterEventListener;
@@ -69,12 +70,15 @@ import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterIOException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterStatusError;
 import ar.com.ergio.print.fiscal.msg.FiscalMessages;
+import ar.com.ergio.util.LAR_Utils;
 
 /**
- * Impresión fiscal de documentos. Esta clase se encarga de mapear documentos
- * de openXpertya a documentos aceptados por las impresoras fiscales.
+ * Impresión fiscal de documentos. Esta clase se encarga de mapear documentos de
+ * openXpertya a documentos aceptados por las impresoras fiscales.
+ *
  * @author Franco Bonafine
- * @date 12/02/2008
+ * @author Emiliano Pereyra
+ *
  */
 public class FiscalDocumentPrint {
 
@@ -84,7 +88,14 @@ public class FiscalDocumentPrint {
 		ACTION_PRINT_DOCUMENT,
 		ACTION_FISCAL_CLOSE,
 		ACTION_PRINT_DELIVERY_DOCUMENT
-	};
+	}
+
+	// TODO - Improve this behavior
+    private static final String NO_CATEGORIZADO = "NoCategorizado";
+    private static final String RESPONSABLE_MONOTRIBUTO = "ResponsableMonotributo";
+    private static final String EXENTO = "Exento";
+    private static final String RESPONSABLE_INSCRIPTO = "ResponsableInscripto";
+    private static final String CONSUMIDOR_FINAL = "ConsumidorFinal";
 
 	static {
 		// Se inicializa la fuente de mensajes para las impresiones fiscales.
@@ -106,9 +117,9 @@ public class FiscalDocumentPrint {
 	private List<FiscalDocumentPrintListener> documentPrintListeners;
 	/** Impresora fiscal con la que se imprime el documento */
 	private FiscalPrinter fiscalPrinter;
-	/** Mapeo entre la categorías de IVA de openXpertya y las de
+	/** Mapeo entre la categorías de IVA de LAR y las de
 	 *  las clases de documentos para impresoras fiscales */
-	private Map<Integer, Integer> ivaResponsabilities;
+	private Map<String, Integer> taxPayerTypes;
 	/** Contexto de la aplicación */
 	protected Properties ctx = Env.getCtx();
 	/** Indica si se debe ignorar el estado de error de la impresora
@@ -137,12 +148,12 @@ public class FiscalDocumentPrint {
 	/**
 	 * @param printerEventListener
 	 */
-	public FiscalDocumentPrint(FiscalPrinterEventListener printerEventListener) {
+	public FiscalDocumentPrint(final FiscalPrinterEventListener printerEventListener) {
 		this();
 		this.printerEventListener = printerEventListener;
 	}
 
-	public FiscalDocumentPrint(FiscalPrinterEventListener printerEventListener, FiscalDocumentPrintListener documentPrintListener) {
+	public FiscalDocumentPrint(final FiscalPrinterEventListener printerEventListener, final FiscalDocumentPrintListener documentPrintListener) {
 		this();
 		this.printerEventListener = printerEventListener;
 		addDocumentPrintListener(documentPrintListener);
@@ -158,7 +169,7 @@ public class FiscalDocumentPrint {
 	 * @return true si se ejecutó correctamente, false caso contrario.
 	 */
 	MFiscalPrinter cFiscal = null;
-	private boolean execute(Actions action, Integer controladoraFiscalID, Object[] args) {
+	private boolean execute(final Actions action, final Integer controladoraFiscalID, final Object[] args) {
 		boolean error = false;
 		String newPrinterStatus = MFiscalPrinter.STATUS_OCIOSO;
 		String errorTitle = "";
@@ -285,7 +296,7 @@ public class FiscalDocumentPrint {
 	 * @param args
 	 * @throws Exception
 	 */
-	private void doAction(Actions action, Object[] args) throws Exception{
+	private void doAction(final Actions action, final Object[] args) throws Exception{
 		switch(action){
 			case ACTION_PRINT_DOCUMENT:		     doPrintDocument(args); break;
 			case ACTION_FISCAL_CLOSE:		     doFiscalClose(args); break;
@@ -309,7 +320,7 @@ public class FiscalDocumentPrint {
 	 * @return <code>true</code> en caso de que el documento se haya emitido
 	 * correctamente, <code>false</false> en caso contrario.
 	 */
-	public boolean printDocument(PO document) {
+	public boolean printDocument(final PO document) {
 		// Se valida que el documento tenga asignado el tipo de documento.
 		Integer docType_ID = (Integer)document.get_Value("C_DocTypeTarget_ID");
 		if(docType_ID == null || docType_ID == 0)
@@ -345,13 +356,15 @@ public class FiscalDocumentPrint {
 	 * @param originalInvoice
 	 * @return
 	 */
-	public boolean printDocument(PO document, Document documentPrintable, LAR_MDocType docType, MInvoice originalInvoice) {
+	public boolean printDocument(final PO document, final Document documentPrintable, final MDocType docType, final MInvoice originalInvoice) {
 		// Se valida que el tipo de documento exista
-		if(docType == null)
+		if(docType == null) {
 			throw new IllegalArgumentException("Error: No document type");
+		}
 
 		// Se obtiene el tipo de documento a emitir por la impresora.
-		setPrinterDocType(docType.getFiscalDocument());
+		String fiscalDocument = (String) docType.get_Value("fiscaldocument");
+		setPrinterDocType(fiscalDocument);
 
 		// Se asigna el documento OXP.
 		setOxpDocument(document);
@@ -377,7 +390,7 @@ public class FiscalDocumentPrint {
 	 * @param args
 	 * @throws Exception
 	 */
-	private void doPrintDocument(Object[] args) throws Exception{
+	private void doPrintDocument(final Object[] args) throws Exception{
 		// Argumentos
 		MInvoice document = (MInvoice)args[0];
 		Document documentPrintable = null;
@@ -425,7 +438,7 @@ public class FiscalDocumentPrint {
 	 * @param closeType Tipo de cierre
 	 * @return verdadero en caso de exito, falso si hubo algún problema
 	 */
-	public boolean fiscalClose(Integer cFiscalID, String closeType) {
+	public boolean fiscalClose(final Integer cFiscalID, final String closeType) {
 		// Ejecutar la acción
 		return execute(Actions.ACTION_FISCAL_CLOSE, cFiscalID, new Object[]{closeType});
 	}
@@ -435,7 +448,7 @@ public class FiscalDocumentPrint {
 	 * @param args arreglo de parámetros del procedimiento
 	 * @throws Exception
 	 */
-	private void doFiscalClose(Object[] args) throws Exception{
+	private void doFiscalClose(final Object[] args) throws Exception{
 		// Argumentos
 		String closeType = (String)args[0];
 
@@ -462,7 +475,7 @@ public class FiscalDocumentPrint {
 	 * @return <code>true</code> en caso de que el documento se haya emitido
 	 * correctamente, <code>false</false> en caso contrario.
 	 */
-	public boolean printDeliveryDocument(Integer cFiscalID, MOrder order) {
+	public boolean printDeliveryDocument(final Integer cFiscalID, final MOrder order) {
 		return execute(Actions.ACTION_PRINT_DELIVERY_DOCUMENT, cFiscalID, new Object[] {order});
 	}
 
@@ -471,7 +484,7 @@ public class FiscalDocumentPrint {
 	 * @param args Arreglo con los argumentos requeridos por esta funcionalidad
 	 * @throws Exception
 	 */
-	private void doPrintDeliveryDocument(Object[] args) throws Exception {
+	private void doPrintDeliveryDocument(final Object[] args) throws Exception {
 		MOrder order = (MOrder) args[0];
 		// Informa el inicio de la impresión
 		fireActionStarted(FiscalDocumentPrintListener.AC_PRINT_DOCUMENT);
@@ -512,7 +525,7 @@ public class FiscalDocumentPrint {
 	/**
 	 * @param fiscalPrinter The fiscalPrinter to set.
 	 */
-	public void setFiscalPrinter(FiscalPrinter fiscalPrinter) {
+	public void setFiscalPrinter(final FiscalPrinter fiscalPrinter) {
 		this.fiscalPrinter = fiscalPrinter;
 	}
 
@@ -527,7 +540,7 @@ public class FiscalDocumentPrint {
 	 * @return documento imprimible fiscalmente creado a partir de los
 	 *         parámetros y del tipo de documento fiscal configurado
 	 */
-	public Document createDocument(MInvoice mInvoice, MInvoice originalInvoice){
+	public Document createDocument(final MInvoice mInvoice, final MInvoice originalInvoice){
 		Document document = null;
 		// Creación de una factura.
 		if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_Factura)) {
@@ -553,12 +566,12 @@ public class FiscalDocumentPrint {
 	 *            factura
 	 * @return la factura imprimible creada
 	 */
-	public Invoice createInvoice(MInvoice mInvoice){
+	public Invoice createInvoice(final MInvoice mInvoice){
 		Invoice invoice = new Invoice();
 		// Se asigna el cliente.
 		invoice.setCustomer(getCustomer(mInvoice.getC_BPartner_ID()));
 		// Se asigna la letra de la factura.
-		invoice.setLetter(mInvoice.getLetra());
+		invoice.setLetter(LAR_Utils.getLetter(mInvoice));
 
 		// TODO: Se asigna el número de remito en caso de existir.
 
@@ -568,7 +581,7 @@ public class FiscalDocumentPrint {
 		loadInvoicePayments(invoice, mInvoice);
 
 		// Se asignan los descuentos de la factura
-		loadDocumentDiscounts(invoice, mInvoice.getDiscounts());
+		//loadDocumentDiscounts(invoice, mInvoice.getDiscounts());
 		return invoice;
 	}
 
@@ -580,12 +593,12 @@ public class FiscalDocumentPrint {
 	 *            factura oxp
 	 * @return nota de débito creada
 	 */
-	public DebitNote createDebitNote(MInvoice mInvoice){
+	public DebitNote createDebitNote(final MInvoice mInvoice){
 		DebitNote debitNote = new DebitNote();
 		// Se asigna el cliente.
 		debitNote.setCustomer(getCustomer(mInvoice.getC_BPartner_ID()));
 		// Se asigna la letra de la nota de débito.
-		debitNote.setLetter(mInvoice.getLetra());
+		debitNote.setLetter(LAR_Utils.getLetter(mInvoice));
 
 		// TODO: Se asigna el número de remito en caso de existir.
 
@@ -607,21 +620,20 @@ public class FiscalDocumentPrint {
 	 *            C_Invoice_Orig_ID se busca desde la BD.
 	 * @return nota de crédito imprimible por un controlador fiscal
 	 */
-	public CreditNote createCreditNote(MInvoice mInvoice, MInvoice originalInvoice){
+	public CreditNote createCreditNote(final MInvoice mInvoice, final MInvoice originalInvoice){
 		CreditNote creditNote = new CreditNote();
 		// Se asigna el cliente.
 		creditNote.setCustomer(getCustomer(mInvoice.getC_BPartner_ID()));
 		// Se asigna la letra de la nota de crédito.
-		creditNote.setLetter(mInvoice.getLetra());
+		creditNote.setLetter(LAR_Utils.getLetter(mInvoice));
 
 		// Se asigna el número de factura original.
 		String origInvoiceNumber = null;
 		MInvoice mOriginalInvoice = originalInvoice;
 		// Si la factura parámetro es null y la factura oxp parámetro contiene
 		// una factura original seteada entonces la busco
-		if (mOriginalInvoice == null && mInvoice.getC_Invoice_Orig_ID() != 0) {
-			mOriginalInvoice = new MInvoice(ctx, mInvoice
-					.getC_Invoice_Orig_ID(), getTrxName());
+		if (mOriginalInvoice == null && mInvoice.getRef_Invoice_ID() != 0) {
+			mOriginalInvoice = new MInvoice(ctx, mInvoice.getRef_Invoice_ID(), getTrxName());
 		}
 		// Si existe una factura original entonces obtengo el nro de factura
 		// original
@@ -652,7 +664,7 @@ public class FiscalDocumentPrint {
 	 *            una instancia de esa clase sino se producirá un error en
 	 *            tiempo de ejecución.
 	 */
-	private void printInvoice(Document document) throws FiscalPrinterStatusError, FiscalPrinterIOException, Exception {
+	private void printInvoice(final Document document) throws FiscalPrinterStatusError, FiscalPrinterIOException, Exception {
 		MInvoice mInvoice = (MInvoice)getOxpDocument();
 		// Se valida el documento OXP.
 		validateOxpDocument(mInvoice);
@@ -675,7 +687,7 @@ public class FiscalDocumentPrint {
 	 *            {@link DebitNote}, por lo tanto debe ser una instancia de esa
 	 *            clase, sino se producirá un error.
 	 */
-	private void printDebitNote(Document document) throws Exception {
+	private void printDebitNote(final Document document) throws Exception {
 		MInvoice mInvoice = (MInvoice)getOxpDocument();
 		// Se valida el documento OXP.
 		validateOxpDocument(mInvoice);
@@ -703,7 +715,7 @@ public class FiscalDocumentPrint {
 	 *            oxp configurado contiene una factura original, en ese caso la
 	 *            obtiene de la BD.
 	 */
-	private void printCreditNote(Document document, MInvoice originalInvoice) throws FiscalPrinterStatusError, FiscalPrinterIOException, Exception {
+	private void printCreditNote(final Document document, final MInvoice originalInvoice) throws FiscalPrinterStatusError, FiscalPrinterIOException, Exception {
 		MInvoice mInvoice = (MInvoice)getOxpDocument();
 		// Se valida el documento OXP.
 		validateOxpDocument(mInvoice);
@@ -721,45 +733,35 @@ public class FiscalDocumentPrint {
 	 * @return el cliente correspondiente.
 	 */
 	public Customer getCustomer(int bPartnerID) {
-		MBPartner bPartner = new MBPartner(Env.getCtx(), bPartnerID, getTrxName());
-		Customer customer = new Customer();
+	    //TODO - Review this implementation
+        MBPartner bPartner = new MBPartner(Env.getCtx(), bPartnerID, getTrxName());
+        Customer customer = new Customer();
 
-		if(bPartner != null) {
+        if (bPartner != null) {
 
-			// Se asigna la categoría de iva del cliente.
-			MCategoriaIva categoriaIva = new MCategoriaIva(Env.getCtx(),bPartner.getC_Categoria_Iva_ID(), getTrxName());
-			customer.setIvaResponsibility(traduceIvaResponsibility(categoriaIva.getCodigo()));
-			MInvoice mInvoice = (MInvoice)getOxpDocument();
+            // Se asigna la categoría de iva del cliente.
+            int taxpayertype_id = (Integer) bPartner.get_Value("LCO_TaxPayerType_ID");
+            X_LCO_TaxPayerType categoriaIva = new X_LCO_TaxPayerType(Env.getCtx(), taxpayertype_id,
+                    getTrxName());
+            customer.setIvaResponsibility(traduceTaxPayerType(categoriaIva.getName()));
+            MInvoice mInvoice = (MInvoice) getOxpDocument();
 
-			// Si es una factura a consumidor final, los datos del cliente se
-			// obtienen a partir de la factura OXP.
-			if(customer.getIvaResponsibility() == Customer.CONSUMIDOR_FINAL &&
-					getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_Factura)) {
+            // Se asigna el nombre del cliente a partir del BPartner.
+            customer.setName(bPartner.getName());
 
-				// Nombre, nro de identificación, domicilio
-				customer.setIdentificationType(Customer.DNI);
-				customer.setName(mInvoice.getNombreCli());
-				customer.setIdentificationNumber(mInvoice.getNroIdentificCliente());
-				customer.setLocation(mInvoice.getInvoice_Adress());
-			} else {
-				// Si no es factura a consumidor final
+            // Se asigna el domicilio.
+            MLocation location = MLocation.getBPLocation(Env.getCtx(), mInvoice.getC_BPartner_Location_ID(),
+                    getTrxName());
+            customer.setLocation(location.toString());
 
-				// Se asigna el nombre del cliente a partir del BPartner.
-				customer.setName(bPartner.getName());
-
-				// Se asigna el domicilio.
-				MLocation location = MLocation.get(ctx, mInvoice.getBPartnerLocation().getC_Location_ID(), getTrxName());
-				customer.setLocation(location.toStringShort());
-
-				// Se identifica al cliente con el C.U.I.T. configurado en el Bpartner.
-				if (bPartner.getTaxID() != null && !bPartner.getTaxID().trim().equals("")) {
-					customer.setIdentificationType(Customer.CUIT);
-					customer.setIdentificationNumber(bPartner.getTaxID());
-				}
-			}
-		}
-
-		return customer;
+            // Se identifica al cliente con el C.U.I.T. configurado en el
+            // Bpartner.
+            if (bPartner.getTaxID() != null && !bPartner.getTaxID().trim().equals("")) {
+                customer.setIdentificationType(Customer.CUIT);
+                customer.setIdentificationNumber(bPartner.getTaxID());
+            }
+        }
+        return customer;
 	}
 
 	/**
@@ -768,7 +770,7 @@ public class FiscalDocumentPrint {
 	 * @param oxpDocument Documento de OXP.
 	 * @param document Documento de impresoras fiscales.
 	 */
-	private void loadDocumentLines(MInvoice oxpDocument, Document document) {
+	private void loadDocumentLines(final MInvoice oxpDocument, final Document document) {
 		// Se obtiene el indicador de si los precios contienen los impuestos incluido
 		boolean taxIncluded = MPriceList.get(ctx, oxpDocument.getM_PriceList_ID(), getTrxName()).isTaxIncluded();
 		// Se obtiene el redondeo para precios de la moneda de la factura
@@ -788,9 +790,9 @@ public class FiscalDocumentPrint {
 			// 1. Sin Bonificaciones
 			// El precio unitario es entonces simplemente el precio actual de la
 			// línea, es decir el PriceActual.
-			if (!mLine.hasBonus()) {
-				unitPrice = mLine.getPriceActual();
-			} else {
+			//if (!mLine.hasBonus()) {
+			unitPrice = mLine.getPriceActual();
+			//} else {
 			// 2. Con Bonificaciones
 			// Aquí NO se puede utilizar el mLine.getPriceActual() ya que el
 			// mismo tiene contemplado las bonificaciones mientras que en la
@@ -801,10 +803,10 @@ public class FiscalDocumentPrint {
 			// El cálculo a realizar es:
 			//    (PriceList * Qty - LineDiscountAmt) / Qty
 			//
-				unitPrice = (mLine.getPriceList().multiply(mLine.getQtyEntered())
-						.subtract(mLine.getLineDiscountAmt())).divide(
-						mLine.getQtyEntered(), scale, RoundingMode.HALF_UP);
-			}
+			//	unitPrice = (mLine.getPriceList().multiply(mLine.getQtyEntered())
+			//		.subtract(mLine.getLineDiscountAmt())).divide(
+			//		mLine.getQtyEntered(), scale, RoundingMode.HALF_UP);
+			//}
 
 			docLine.setUnitPrice(unitPrice);
 			docLine.setQuantity(mLine.getQtyEntered());
@@ -812,7 +814,7 @@ public class FiscalDocumentPrint {
 			// Se obtiene la tasa del IVA de la línea
 			// Se asume que el impuesto es siempre IVA, a futuro se verá
 			// que hacer si el producto tiene otro impuesto que no sea IVA.
-			MTax mTax = MTax.get(Env.getCtx(),mLine.getC_Tax_ID(),null);
+			MTax mTax = MTax.get(Env.getCtx(),mLine.getC_Tax_ID());
 			docLine.setIvaRate(mTax.getRate());
 			// Se agrega la línea al documento.
 			document.addLine(docLine);
@@ -825,66 +827,66 @@ public class FiscalDocumentPrint {
 	 * @param document Documento a imprimir
 	 * @param discounts Lista de descuentos que se deben cargar.
 	 */
-	private void loadDocumentDiscounts(Document document, List<MDocumentDiscount> discounts) {
-		BigDecimal generalDiscountAmt = BigDecimal.ZERO;
-		DiscountLine discountLine = null;
-		for (MDocumentDiscount mDocumentDiscount : discounts) {
-			// Solo se tienen en cuenta descuentos que sean Bonificación o a nivel de
-			// Documento. Aquellos que son "Al Precio" ya se encuentran reflejados en
-			// los precios de las líneas del documento, y no deben se impresos en el
-			// ticket.
-			if (MDocumentDiscount.CUMULATIVELEVEL_Line.equals(mDocumentDiscount
-					.getCumulativeLevel())
-					&& !mDocumentDiscount.isBonusApplication()) {
-				continue;
-			}
-
-			// Si es descuento general manual se suma el importe al total de descuento
-			// de ese tipo. Este tipo de descuento es proporcional a todas las tasas de
-			// impuestos con lo cual no es necesario discriminar los importes según la
-			// tasa.
-			if (mDocumentDiscount.isManualGeneralDiscountKind()) {
-				generalDiscountAmt = generalDiscountAmt.add(mDocumentDiscount
-						.getDiscountAmt().negate());
-			} else {
-				// Para el resto de bonificaciones, se crea una línea de descuento por cada
-				// tasa de impuesto debido a que el controlador fiscal requiere saber para
-				// cada importe descontado, a que tasa de impuesto afecta para registrar la
-				// reducción o incremento del importe computado para la misma.
-				for (MDocumentDiscount mDiscountByTax : mDocumentDiscount
-						.getDiscountsByTax()) {
-
-					// Crea la línea de descuento para la tasa
-					discountLine = new DiscountLine(
-							mDiscountByTax.getDescription(),
-							mDiscountByTax.getDiscountAmt().negate(),
-							true, // Los importes en DocumentDiscount incluyen siempre el impuesto
-							mDiscountByTax.getTaxRate());
-					// Agrega el descuento al documento.
-					document.addDocumentDiscount(discountLine);
-				}
-			}
-		}
-
-		// Si hay descuentos manuales generales se asigna un descuento general
-		// al documento.
-		if (generalDiscountAmt.compareTo(BigDecimal.ZERO) != 0) {
-			document.setGeneralDiscount(
-				new DiscountLine(
-					Msg.translate(Env.getCtx(), "FiscalTicketGeneralDiscount"),
-					generalDiscountAmt,
-					true // Incluye impuestos
-				)
-			);
-		}
-
-	}
+//	private void loadDocumentDiscounts(Document document, List<MDocumentDiscount> discounts) {
+//		BigDecimal generalDiscountAmt = BigDecimal.ZERO;
+//		DiscountLine discountLine = null;
+//		for (MDocumentDiscount mDocumentDiscount : discounts) {
+//			// Solo se tienen en cuenta descuentos que sean Bonificación o a nivel de
+//			// Documento. Aquellos que son "Al Precio" ya se encuentran reflejados en
+//			// los precios de las líneas del documento, y no deben se impresos en el
+//			// ticket.
+//			if (MDocumentDiscount.CUMULATIVELEVEL_Line.equals(mDocumentDiscount
+//					.getCumulativeLevel())
+//					&& !mDocumentDiscount.isBonusApplication()) {
+//				continue;
+//			}
+//
+//			// Si es descuento general manual se suma el importe al total de descuento
+//			// de ese tipo. Este tipo de descuento es proporcional a todas las tasas de
+//			// impuestos con lo cual no es necesario discriminar los importes según la
+//			// tasa.
+//			if (mDocumentDiscount.isManualGeneralDiscountKind()) {
+//				generalDiscountAmt = generalDiscountAmt.add(mDocumentDiscount
+//						.getDiscountAmt().negate());
+//			} else {
+//				// Para el resto de bonificaciones, se crea una línea de descuento por cada
+//				// tasa de impuesto debido a que el controlador fiscal requiere saber para
+//				// cada importe descontado, a que tasa de impuesto afecta para registrar la
+//				// reducción o incremento del importe computado para la misma.
+//				for (MDocumentDiscount mDiscountByTax : mDocumentDiscount
+//						.getDiscountsByTax()) {
+//
+//					// Crea la línea de descuento para la tasa
+//					discountLine = new DiscountLine(
+//							mDiscountByTax.getDescription(),
+//							mDiscountByTax.getDiscountAmt().negate(),
+//							true, // Los importes en DocumentDiscount incluyen siempre el impuesto
+//							mDiscountByTax.getTaxRate());
+//					// Agrega el descuento al documento.
+//					document.addDocumentDiscount(discountLine);
+//				}
+//			}
+//		}
+//
+//		// Si hay descuentos manuales generales se asigna un descuento general
+//		// al documento.
+//		if (generalDiscountAmt.compareTo(BigDecimal.ZERO) != 0) {
+//			document.setGeneralDiscount(
+//				new DiscountLine(
+//					Msg.translate(Env.getCtx(), "FiscalTicketGeneralDiscount"),
+//					generalDiscountAmt,
+//					true // Incluye impuestos
+//				)
+//			);
+//		}
+//
+//	}
 
 	/**
 	 * Carga los pagos en la factura a emitir a partir de las imputaciones que
 	 * tenga la factura en la BD.
 	 */
-	private void loadInvoicePayments(Invoice invoice, MInvoice mInvoice) {
+	private void loadInvoicePayments(final Invoice invoice, final MInvoice mInvoice) {
 		BigDecimal totalPaidAmt = BigDecimal.ZERO;
 		final String OTHERS_DESC = Msg.translate(ctx, "FiscalTicketOthersPayment");
 		final String CASH_DESC = Msg.translate(ctx, "FiscalTicketCashPayment");
@@ -1036,12 +1038,13 @@ public class FiscalDocumentPrint {
 	/**
 	 * Devuelve la descripción a imprimir para un pago según un MPayment.
 	 */
-	private String getInvoicePaymentDescription(MPayment mPayment) {
+	private String getInvoicePaymentDescription(final MPayment mPayment) {
 		Properties ctx = mPayment.getCtx();
 		String description = null;
 		// - Tarjeta de Crédito: NombreTarjeta NroCupon.
 		//   Ej: VISA 1248
 		if (MPayment.TENDERTYPE_CreditCard.equals(mPayment.getTenderType())) {
+		    String couponNumber = (String) mPayment.get_Value("CouponNumber");
 			description = MRefList.getListName(ctx,
 					MPayment.CREDITCARDTYPE_AD_Reference_ID,
 					mPayment.getCreditCardType()) + " " + mPayment.getCouponNumber();
@@ -1084,7 +1087,7 @@ public class FiscalDocumentPrint {
 
 
 
-	private void saveDocumentData(MInvoice oxpDocument, Document document) {
+	private void saveDocumentData(final MInvoice oxpDocument, final Document document) {
 		String dtType = document.getDocumentType();
 
 		/////////////////////////////////////////////////////////////////
@@ -1138,39 +1141,36 @@ public class FiscalDocumentPrint {
 	}
 
 	/**
-	 * @return Returns the ivaResponsabilities.
+	 * Creates and caches tax payer types
+	 *
+	 * @return maps of tax categories
 	 */
-	protected Map<Integer, Integer> getIvaResponsabilities() {
-		if(ivaResponsabilities == null) {
-			ivaResponsabilities = new HashMap<Integer,Integer>();
-			ivaResponsabilities.put(1, Customer.CONSUMIDOR_FINAL);
-			ivaResponsabilities.put(2, Customer.RESPONSABLE_INSCRIPTO);
-			ivaResponsabilities.put(3, Customer.RESPONSABLE_NO_INSCRIPTO);
-			ivaResponsabilities.put(4, Customer.EXENTO);
-			ivaResponsabilities.put(5, Customer.RESPONSABLE_MONOTRIBUTO);
-			ivaResponsabilities.put(6, Customer.NO_RESPONSABLE);
-			ivaResponsabilities.put(7, Customer.NO_CATEGORIZADO);
-			ivaResponsabilities.put(8, Customer.RESPONSABLE_NO_INSCRIPTO_BIENES_DE_USO);
-			ivaResponsabilities.put(9, Customer.RESPONSABLE_INSCRIPTO);
-			ivaResponsabilities.put(10, Customer.RESPONSABLE_INSCRIPTO);
-			//ivaResponsabilities.put(Customer.MONOTRIBUTISTA_SOCIAL);
-			//ivaResponsabilities.put(Customer.PEQUENO_CONTRIBUYENTE_EVENTUAL);
-			//ivaResponsabilities.put(Customer.PEQUENO_CONTRIBUYENTE_EVENTUAL_SOCIAL);
+	protected Map<String, Integer> getTaxPayerTypes() {
+		if(taxPayerTypes == null) {
+			taxPayerTypes = new HashMap<String,Integer>();
+			taxPayerTypes.put(CONSUMIDOR_FINAL, Customer.CONSUMIDOR_FINAL);
+			taxPayerTypes.put(RESPONSABLE_INSCRIPTO, Customer.RESPONSABLE_INSCRIPTO);
+			taxPayerTypes.put(EXENTO, Customer.EXENTO);
+			taxPayerTypes.put(RESPONSABLE_MONOTRIBUTO, Customer.RESPONSABLE_MONOTRIBUTO);
+			taxPayerTypes.put(NO_CATEGORIZADO, Customer.NO_CATEGORIZADO);
 		}
-		return ivaResponsabilities;
+		return taxPayerTypes;
 	}
 
-	/**
-	 * Realiza la conversión entre el entero que representa a la categoría
-	 * de IVA de openXpertya y el entero en las clases de documentos de
-	 * las impresoras fiscales.
-	 * @param ivaResponsibility Valor de la responsabilidad frente a IVA.
-	 * @return El entero que representa la responsabilidad frente al IVA.
-	 */
-	protected int traduceIvaResponsibility(Integer ivaResponsibility) {
-		Integer result = getIvaResponsabilities().get(ivaResponsibility);
-		if(result == null)
-			result = Customer.NO_CATEGORIZADO;
+    /**
+     * Realiza la conversión entre el entero que representa a la categoría de
+     * IVA de openXpertya y el entero en las clases de documentos de las
+     * impresoras fiscales.
+     *
+     * @param taxPayerType
+     *            Valor de la responsabilidad frente a IVA.
+     * @return El entero que representa la responsabilidad frente al IVA.
+     */
+	protected int traduceTaxPayerType(final String taxPayerType) {
+		Integer result = getTaxPayerTypes().get(taxPayerType);
+		if(result == null) {
+		    result = Customer.NO_CATEGORIZADO;
+		}
 		return result;
 	}
 
@@ -1184,29 +1184,29 @@ public class FiscalDocumentPrint {
 	/**
 	 * @param printerEventListener The printerEventListener to set.
 	 */
-	public void setPrinterEventListener(FiscalPrinterEventListener printerEventListener) {
+	public void setPrinterEventListener(final FiscalPrinterEventListener printerEventListener) {
 		this.printerEventListener = printerEventListener;
 		if(getFiscalPrinter() != null)
 			getFiscalPrinter().setEventListener(printerEventListener);
 	}
 
-	private void fireStatusReported(MFiscalPrinter cFiscal, String status) {
+	private void fireStatusReported(final MFiscalPrinter cFiscal, final String status) {
 		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
 			fdpl.statusReported(this, cFiscal, status);
 		}
 	}
 
-	private void fireStatusReported(MFiscalPrinter cFiscal) {
+	private void fireStatusReported(final MFiscalPrinter cFiscal) {
 		fireStatusReported(cFiscal, cFiscal.getStatus());
 	}
 
-	private void fireActionStarted(Integer action) {
+	private void fireActionStarted(final Integer action) {
 		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
 			fdpl.actionStarted(this, action);
 		}
 	}
 
-	protected void fireErrorOcurred(String errorTitle, String errorDesc) {
+	protected void fireErrorOcurred(final String errorTitle, final String errorDesc) {
 		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
 			fdpl.errorOcurred(
                     this,
@@ -1222,7 +1222,7 @@ public class FiscalDocumentPrint {
 	}
 
 
-	private void fireActionEndedOk(Actions action){
+	private void fireActionEndedOk(final Actions action){
 		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
 			fdpl.actionEnded(true, action);
 		}
@@ -1235,7 +1235,7 @@ public class FiscalDocumentPrint {
 		return documentPrintListeners;
 	}
 
-	private boolean checkPrinterStatus(MFiscalPrinter cFiscal) throws Exception {
+	private boolean checkPrinterStatus(final MFiscalPrinter cFiscal) throws Exception {
 		int bsyCount = 0;
 		// Si la impresora se encuentra en estado de error se dispara el evento
 		// que informa dicha situación.
@@ -1283,7 +1283,7 @@ public class FiscalDocumentPrint {
 		return true;
 	}
 
-	private void setFiscalPrinterStatus(MFiscalPrinter cFiscal, String status) {
+	private void setFiscalPrinterStatus(final MFiscalPrinter cFiscal, String status) {
 		if(cFiscal != null) {
 			cFiscal.setStatus(status);
 			cFiscal.save();
@@ -1318,7 +1318,7 @@ public class FiscalDocumentPrint {
 		this.cancelWaiting = cancelWaiting;
 	}
 
-	private void validateOxpDocument(MInvoice mInvoice) throws Exception {
+	private void validateOxpDocument(final MInvoice mInvoice) throws Exception {
 		// Validar estado del documento y FiscalAlreadyPrinted
 		/*
 		if(!mInvoice.getDocStatus().equals("CO") && !mInvoice.getDocStatus().equals("CL")) {
@@ -1334,7 +1334,7 @@ public class FiscalDocumentPrint {
 		}
 	}
 
-	private void updateOxpDocument(MInvoice mInvoice, boolean error) {
+	private void updateOxpDocument(final MInvoice mInvoice, boolean error) {
 		if(error) {
 			//TODO: verificar.
 			//mInvoice.setDocStatus(MInvoice.DOCSTATUS_InProgress);
@@ -1342,7 +1342,7 @@ public class FiscalDocumentPrint {
 		}
 	}
 
-	private void updateDocTypeSequence(MInvoice mInvoice) {
+	private void updateDocTypeSequence(final MInvoice mInvoice) {
 		// Se actualiza la secuencia del tipo de documento del documento
 		// emitido recientemento por la impresora fiscal.
 		Integer lastDocumentNo = new Integer(getFiscalPrinter().getLastDocumentNo());
@@ -1373,7 +1373,7 @@ public class FiscalDocumentPrint {
 	 * los estados de la impresión.
 	 * @param fdpl <code>FiscalDocumentPrintListener</code> manejador de eventos.
 	 */
-	public void addDocumentPrintListener(FiscalDocumentPrintListener fdpl) {
+	public void addDocumentPrintListener(final FiscalDocumentPrintListener fdpl) {
 		if(!getDocumentPrintListeners().contains(fdpl)) {
 			getDocumentPrintListeners().add(fdpl);
 			fdpl.setFiscalDocumentPrint(this);
@@ -1384,7 +1384,7 @@ public class FiscalDocumentPrint {
 	 * Elimina un manejador de eventos de la colección.
 	 * @param fdpl Manejador de eventos a eliminar.
 	 */
-	public void removeDocumentPrintListener(FiscalDocumentPrintListener fdpl) {
+	public void removeDocumentPrintListener(final FiscalDocumentPrintListener fdpl) {
 		getDocumentPrintListeners().remove(fdpl);
 	}
 
