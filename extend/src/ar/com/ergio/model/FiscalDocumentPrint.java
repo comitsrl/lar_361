@@ -18,7 +18,6 @@ package ar.com.ergio.model;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,11 +29,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
-import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
@@ -60,7 +57,6 @@ import ar.com.ergio.print.fiscal.FiscalPrinterEventListener;
 import ar.com.ergio.print.fiscal.document.CreditNote;
 import ar.com.ergio.print.fiscal.document.Customer;
 import ar.com.ergio.print.fiscal.document.DebitNote;
-import ar.com.ergio.print.fiscal.document.DiscountLine;
 import ar.com.ergio.print.fiscal.document.Document;
 import ar.com.ergio.print.fiscal.document.DocumentLine;
 import ar.com.ergio.print.fiscal.document.Invoice;
@@ -669,12 +665,16 @@ public class FiscalDocumentPrint {
 		// Se valida el documento OXP.
 		validateOxpDocument(mInvoice);
 		// Se crea la factura imprimible en caso que no exista como parámetro
-		Invoice invoice = document != null ? (Invoice) document
-				: createInvoice(mInvoice);
+		final Invoice printeableInvoice;
+		if (document != null) {
+		    printeableInvoice = (Invoice) document;
+		} else {
+			printeableInvoice = createInvoice(mInvoice);
+		}
 		// Se manda a imprimir la factura a la impresora fiscal.
-		getFiscalPrinter().printDocument(invoice);
+		getFiscalPrinter().printDocument(printeableInvoice);
 		// Se actualizan los datos de la factura de oxp.
-		saveDocumentData(mInvoice, invoice);
+		saveDocumentData(mInvoice, printeableInvoice);
 	}
 
 	/**
@@ -774,17 +774,17 @@ public class FiscalDocumentPrint {
 		// Se obtiene el indicador de si los precios contienen los impuestos incluido
 		boolean taxIncluded = MPriceList.get(ctx, oxpDocument.getM_PriceList_ID(), getTrxName()).isTaxIncluded();
 		// Se obtiene el redondeo para precios de la moneda de la factura
-		int scale = MCurrency.get(oxpDocument.getCtx(),
-				oxpDocument.getC_Currency_ID()).getCostingPrecision();
+		//int scale = MCurrency.get(oxpDocument.getCtx(), oxpDocument.getC_Currency_ID()).getCostingPrecision();
 
 		MInvoiceLine[] lines = oxpDocument.getLines();
 		BigDecimal unitPrice = null;
-		String description = "";
+		//String description = "";
 		for (int i = 0; i < lines.length; i++) {
 			MInvoiceLine mLine = lines[i];
 			DocumentLine docLine = new DocumentLine();
 			docLine.setLineNumber(mLine.getLine());
 			docLine.setDescription(manageLineDescription(docLine, mLine));
+			// TODO - Review discounts at invoice behavior
 			// Calcula el precio unitario de la línea.
 			// Aquí tenemos dos casos de línea: Con Bonificaciones o Sin Bonificaciones
 			// 1. Sin Bonificaciones
@@ -1044,10 +1044,9 @@ public class FiscalDocumentPrint {
 		// - Tarjeta de Crédito: NombreTarjeta NroCupon.
 		//   Ej: VISA 1248
 		if (MPayment.TENDERTYPE_CreditCard.equals(mPayment.getTenderType())) {
-		    String couponNumber = (String) mPayment.get_Value("CouponNumber");
 			description = MRefList.getListName(ctx,
 					MPayment.CREDITCARDTYPE_AD_Reference_ID,
-					mPayment.getCreditCardType()) + " " + mPayment.getCouponNumber();
+					mPayment.getCreditCardType()); // + " " + mPayment.getCouponNumber();
 		// - Cheque: Cheque NumeroCheque
 		//   Ej: Cheque 00032456
 		} else if (MPayment.TENDERTYPE_Check.equals(mPayment.getTenderType())) {
@@ -1085,60 +1084,59 @@ public class FiscalDocumentPrint {
 		return description;
 	}
 
+	private void saveDocumentData(final MInvoice oxpDocument, final Document printeableDocument) {
+        String dtType = printeableDocument.getDocumentType();
 
+        /////////////////////////////////////////////////////////////////
+        // -- Numero del comprobante emitido --
+        //Solo para facturas, notas de crédito y débito.
+        if (dtType.equals(Document.DT_INVOICE) || dtType.equals(Document.DT_CREDIT_NOTE)
+                || dtType.equals(Document.DT_DEBIT_NOTE)) {
 
-	private void saveDocumentData(final MInvoice oxpDocument, final Document document) {
-		String dtType = document.getDocumentType();
+            // TODO - Review receipt fiscal number implementation
+            // int receiptNo =
+            // Integer.parseInt(printeableDocument.getDocumentNo());
+            String printedFiscalReceiptNumber = printeableDocument.getDocumentNo();
+            // Solo se actualiza el documento de oxp en caso de que el
+            // número de comprobante emitido por la impresora fiscal
+            // sead distinto al que le había asignado oxp.
+            String fiscalReceiptNumber = oxpDocument.get_ValueAsString("ReceiptNumber");
+            if (printedFiscalReceiptNumber != fiscalReceiptNumber) {
+                oxpDocument.set_ValueOfColumn("ReceiptNumber", printedFiscalReceiptNumber);
+                // Se modifica el número de documento de OXP acorde al número de
+                // comprobante fiscal.
+                // String documentNo = CalloutInvoiceExt.GenerarNumeroDeDocumento(
+                //         oxpDocument.getPuntoDeVenta(), receiptNo, oxpDocument.getLetra(), oxpDocument.isSOTrx());
+                // oxpDocument.setDocumentNo(documentNo);
+            }
 
-		/////////////////////////////////////////////////////////////////
-		// -- Numero del comprobante emitido --
-		// Solo para facturas, notas de crédito y débito.
-		if (dtType.equals(Document.DT_INVOICE) ||
-		    dtType.equals(Document.DT_CREDIT_NOTE) ||
-		    dtType.equals(Document.DT_DEBIT_NOTE)) {
+            /////////////////////////////////////////////////////////////////
+            // -- Numero del CAI --
+            // Solo para facturas y notas de débito, siempre y cuando
+            // la impresora haya seteado alguno.
+            if (dtType.equals(Document.DT_INVOICE) || dtType.equals(Document.DT_DEBIT_NOTE)) {
 
-			int receiptNo = Integer.parseInt(document.getDocumentNo());
-			// Solo se actualiza el documento de oxp en caso de que el
-			// número de comprobante emitido por la impresora fiscal
-			// sead distinto al que le había asignado oxp.
-			if(receiptNo != oxpDocument.getNumeroComprobante()) {
-				oxpDocument.setNumeroComprobante(receiptNo);
-				// Se modifica el número de documento de OXP acorde al número de
-				// comprobante fiscal.
-				String documentNo = CalloutInvoiceExt.GenerarNumeroDeDocumento(
-						oxpDocument.getPuntoDeVenta(), receiptNo, oxpDocument.getLetra(), oxpDocument.isSOTrx());
-				oxpDocument.setDocumentNo(documentNo);
-			}
+                Invoice invoiceOrDN = (Invoice) printeableDocument;
+                if (invoiceOrDN.hasCAINumber()) {
+                    // Se asigna el número del CAI.
+                    oxpDocument.set_ValueOfColumn("CAI", invoiceOrDN.getCAINumber());
+                    // Se asigna la fecha del CAI como la fecha actual.
+                    oxpDocument.set_ValueOfColumn("CAIDate", new Timestamp(System.currentTimeMillis()));
+                }
+            }
 
-		}
+            /////////////////////////////////////////////////////////////////
+            // -- Documento Impreso por Impresora fiscal --
+            // Se marca el documento como impreso fiscalmente para que no pueda
+            // volver a imprimirse.
+            oxpDocument.set_ValueOfColumn("IsFiscalPrinted", true);
 
-		/////////////////////////////////////////////////////////////////
-		// -- Numero del CAI --
-		// Solo para facturas y notas de débito, siempre y cuando
-		// la impresora haya seteado alguno.
-		if (dtType.equals(Document.DT_INVOICE) ||
-		    dtType.equals(Document.DT_DEBIT_NOTE)) {
-
-			Invoice invoiceOrDN = (Invoice)document;
-			if(invoiceOrDN.hasCAINumber()) {
-				// Se asigna el número del CAI.
-				oxpDocument.setCAI(invoiceOrDN.getCAINumber());
-				// Se asigna la fecha del CAI como la fecha actual.
-				oxpDocument.setDateCAI(new Timestamp(System.currentTimeMillis()));
-			}
-		}
-
-		/////////////////////////////////////////////////////////////////
-		// -- Documento Impreso por Impresora fiscal --
-		// Se marca el documento como impreso fiscalmente para que no pueda
-		// volver a imprimirse.
-		oxpDocument.setFiscalAlreadyPrinted(true);
-
-		// Se guardan los cambios realizados.
-		if(canSaveOxpDocument()){
-			oxpDocument.save();
-		}
-	}
+            // Se guardan los cambios realizados.
+            if (canSaveOxpDocument()) {
+                oxpDocument.save();
+            }
+        }
+    }
 
 	/**
 	 * Creates and caches tax payer types
@@ -1328,7 +1326,7 @@ public class FiscalDocumentPrint {
 		*/
 
 		// Validar si la factura ya fue impresa.
-		if(mInvoice.isFiscalAlreadyPrinted()) {
+		if(mInvoice.get_ValueAsBoolean("IsFiscalPrinted")) {
 			log.severe("The invoice was already printed with a fiscal printer.");
 			throw new Exception(Msg.translate(ctx,"FiscalAlreadyPrintedError"));
 		}
@@ -1533,7 +1531,7 @@ public class FiscalDocumentPrint {
 			/* Usar los campos Identificador para definir el contenido de la linea */
 			if (cFiscal.isonprintuseproductreference())
 			{
-				return genDescriptionFromIdentifiers(aProduct, getTrxName());
+				return genDescriptionFromIdentifiers(aProduct);
 			}
 			/* Usar alguna de las combinaciones CLAVE NOMBRE - NOMBRE CLAVE - NOMBRE - CLAVE */
 			else
@@ -1559,19 +1557,11 @@ public class FiscalDocumentPrint {
 		return description;
 	}
 
-	/**
-	 * Retorna la descrpcion a imprimir en funcion de la configuración de las columnas de M_Product
-	 */
-	public static String genDescriptionFromIdentifiers(MProduct aProduct, String trxName)
+	public static String genDescriptionFromIdentifiers(final MProduct mProduct)
 	{
-		// Recuperar las columnas identificadoras
-		Vector<String> columns = M_Table.getIdentifierColumns(trxName, "M_Product");
-
-		StringBuffer result = new StringBuffer();
-		int count = columns.size();
-		for (int i = 0; i < count; i++)
-			result.append((aProduct.get_Value(columns.elementAt(i))).toString()).append(" ");
-
-		return result.toString();
+	    // By default, indenfiers columns of product are search key (value) and name.
+	    // Use this as description
+	    // TODO - improve this behavior (if needed)
+	    return mProduct.getValue() + " " + mProduct.getName();
 	}
 }
