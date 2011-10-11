@@ -34,8 +34,8 @@ public class MFiscalPrinter extends X_LAR_Fiscal_Printer {
     /** Logger de la aplicación */
 	protected static CLogger log = CLogger.getCLogger(MFiscalPrinter.class);
 
-	public MFiscalPrinter(Properties ctx, int C_Controlador_Fiscal_ID, String trxName) {
-		super(ctx, C_Controlador_Fiscal_ID, trxName);
+	public MFiscalPrinter(Properties ctx, int LAR_Fiscal_Printer_ID, String trxName) {
+		super(ctx, LAR_Fiscal_Printer_ID, trxName);
 	}
 
 	public MFiscalPrinter(Properties ctx, ResultSet rs, String trxName) {
