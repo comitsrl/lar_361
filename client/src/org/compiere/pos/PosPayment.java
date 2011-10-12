@@ -39,7 +39,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.MaskFormatter;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -66,12 +65,10 @@ import org.compiere.util.ValueNamePair;
 
 public class PosPayment extends CDialog implements PosKeyListener, VetoableChangeListener, ActionListener {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1961106531807910948L;
-	NumberFormat formatter = new DecimalFormat("#0.00"); //red1 - parser to remove commas or dots separator for above '000s.
-    NumberFormat nf = NumberFormat.getInstance(Locale.getDefault()); // make locale-specific
+	// TODO - review this formatter (added by red1)
+	//private NumberFormat formatter = new DecimalFormat("#0.00"); //red1 - parser to remove commas or dots separator for above '000s.
+    private NumberFormat nf = NumberFormat.getInstance(Locale.getDefault()); // make locale-specific
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -83,8 +80,8 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 			BigDecimal pay = Env.ZERO;
 		    try
 		    {
-		      tender = new BigDecimal(formatter.format((nf.parse(fTenderAmt.getText())).floatValue()));
-		      pay =  new BigDecimal(formatter.format((nf.parse(fPayAmt.getText())).floatValue()));
+		      tender = BigDecimal.valueOf(nf.parse(fTenderAmt.getText()).doubleValue());
+		      pay =  BigDecimal.valueOf(nf.parse(fPayAmt.getText()).doubleValue());
  		    }
 		    catch (ParseException n)
 		    {
@@ -118,7 +115,7 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 		try {
 
 			String tenderType = ((ValueNamePair) tenderTypePick.getValue()).getID();
-			BigDecimal amt = new BigDecimal(formatter.format((nf.parse(fPayAmt.getText())).floatValue()));;
+			BigDecimal amt = BigDecimal.valueOf(nf.parse(fPayAmt.getText()).doubleValue());
 
 			if ( tenderType.equals(MPayment.TENDERTYPE_Cash) )
 			{
@@ -416,7 +413,7 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 		boolean cash = MPayment.TENDERTYPE_Cash.equals(tenderType);
 		boolean check = MPayment.TENDERTYPE_Check.equals(tenderType);
 		boolean creditcard = MPayment.TENDERTYPE_CreditCard.equals(tenderType);
-		boolean account = MPayment.TENDERTYPE_Account.equals(tenderType);
+		//boolean account = MPayment.TENDERTYPE_Account.equals(tenderType);
 
 		fTenderAmt.setVisible(cash);
 		fReturnAmt.setVisible(cash);
