@@ -125,11 +125,4 @@ public class HasarPrinterP320F extends HasarFiscalPrinter {
 		return super.cmdGeneralDiscount(description, amount, substract, baseAmount,
 				0);
 	}
-
-	@Override
-	public void setFiscalComm(FiscalComm fiscalComm) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
