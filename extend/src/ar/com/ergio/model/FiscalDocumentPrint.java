@@ -746,11 +746,11 @@ public class FiscalDocumentPrint {
         if (bPartner != null) {
 
             // Se asigna la categoría de iva del cliente.
-            int taxpayertype_id = (Integer) bPartner.get_Value("LCO_TaxPayerType_ID");
+            int taxpayertype_id = bPartner.get_ValueAsInt("LCO_TaxPayerType_ID");
             X_LCO_TaxPayerType categoriaIva = new X_LCO_TaxPayerType(Env.getCtx(), taxpayertype_id,
                     getTrxName());
             customer.setIvaResponsibility(traduceTaxPayerType(categoriaIva.getName()));
-            MInvoice mInvoice = (MInvoice) getOxpDocument();
+            MInvoice mInvoice = (MInvoice) getOxpDocument();// TODO - Parametrize this method
 
             // Se asigna el nombre del cliente a partir del BPartner.
             customer.setName(bPartner.getName());

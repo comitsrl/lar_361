@@ -13,7 +13,13 @@
  *****************************************************************************/
 package ar.com.ergio.model;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
 import org.compiere.model.MPOS;
@@ -28,7 +34,8 @@ import ar.com.ergio.print.fiscal.FiscalPrinterListener;
 public class FiscalDocumentPrintTest extends AdempiereTestCase
 {
     /** Logger  */
-    private static CLogger  log = CLogger.getCLogger(FiscalDocumentPrintTest.class);
+    private static final CLogger log = CLogger.getCLogger(FiscalDocumentPrintTest.class);
+    private static final int SERVER_PORT = 9911;
 
     private FiscalDocumentListener fiscalDocumentListener;
     private FiscalPrinterListener fiscalPrinterListener;
@@ -36,6 +43,7 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
     private MFiscalPrinter fiscalPrinter;
     private MPOS posModel;
     private PosOrderModel posOrder;
+    private TCPServerTest serverTest;
 
     private int m_AD_Org_ID = 11; // HQ
     private int m_C_DocType_ID = 135; // POS Order
@@ -53,11 +61,14 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
         getCtx().setProperty("#AD_Org_ID", new Integer(m_AD_Org_ID).toString());
         getCtx().setProperty("#M_Warehouse_ID", new Integer(m_M_Warehouse_ID).toString());
         createTestData();
+        serverTest = new TCPServerTest();
+        serverTest.start();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
+        serverTest.interrupt();
         deleteTestData();
         super.tearDown();
     }
@@ -99,6 +110,32 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //  Support Test Behavior
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     *
+     */
+    private static class TCPServerTest extends Thread {
+        @Override
+        public void run()
+        {
+            try {
+                ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
+                Socket socket = null;
+                while (true) {
+                    socket = serverSocket.accept();
+                    log.info("Connection accepted: " + socket);
+                    BufferedReader io = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String fiscalPacket;
+                    while ((fiscalPacket = io.readLine()) != null) {
+                        log.info("Packet recived: " + fiscalPacket);
+                    }
+                }
+            } catch (IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+    }
+
     private void createTestData() throws Exception
     {
         // Mock objetcs
@@ -116,7 +153,7 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
         fiscalPrinter.setLAR_Fiscal_Printer_Type_ID(fiscalPrinterType.getLAR_Fiscal_Printer_Type_ID());
         fiscalPrinter.setName("Test Printer");
         fiscalPrinter.setHost("localhost");
-        fiscalPrinter.setPort(9000);
+        fiscalPrinter.setPort(SERVER_PORT);
         fiscalPrinter.setStatus("IDL"); // TODO - should be init AD config with this status?
         fiscalPrinter.save();
         // POS Model
