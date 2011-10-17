@@ -24,11 +24,11 @@ import ar.com.ergio.print.fiscal.msg.FiscalMessages;
 
 /**
  * Contiene funcionalidad básica que facilitan la implementación de
- * controladores fiscales concretos. 
+ * controladores fiscales concretos.
  * @author Franco Bonafine
  * @date 22/01/2008
  */
-public abstract class BasicFiscalPrinter implements FiscalPrinter { 
+public abstract class BasicFiscalPrinter implements FiscalPrinterDevice {
 
 	/** Interfaz de comunicación con el dispositivo */
 	private FiscalComm fiscalComm;
@@ -36,7 +36,7 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	 * de un comando */
 	private FiscalMessages messages;
 	/** Manejador de eventos generados por la impresora fiscal */
-	private FiscalPrinterEventListener eventListener;
+	private FiscalPrinterListener eventListener;
 	/** Número de comprobante ultimamente creado por la impresora */
 	private String lastDocumentNo;
 	/** Indica si se encuentra un documento abierto actualmente */
@@ -51,11 +51,11 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	private FiscalPacket lastRequest;
 	/** Ultima respuesta recibida desde la impresora fiscal */
 	private FiscalPacket lastResponse;
-	
+
 	public BasicFiscalPrinter() {
 		super();
 	}
-	
+
 	/**
 	 * @param fiscalComm Interfaz de comunicación con el dispositivo.
 	 */
@@ -82,13 +82,13 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	 * @return <code>FiscalPacket</code> para la impresora.
 	 */
 	protected abstract FiscalPacket createFiscalPacket();
-	
+
 	public String formatText(String text, int maxLength) {
 		if(text != null && text.length() > maxLength)
 			text = text.substring(0, maxLength);
 		return text;
 	}
-	
+
 	public String formatNumber(BigDecimal number, int integerPart, int decimalPart) {
 		String num = number.toString();
 		int pointIndex = num.indexOf('.');
@@ -117,7 +117,7 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	public FiscalMessages getMessages() {
 		return messages;
 	}
-	
+
 	protected void setMessages(FiscalMessages messages) {
 		this.messages = messages;
 	}
@@ -125,17 +125,17 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	/**
 	 * @return Returns the eventListener.
 	 */
-	public FiscalPrinterEventListener getEventListener() {
+	public FiscalPrinterListener getEventListener() {
 		return eventListener;
 	}
 
 	/**
 	 * @param eventListener The eventListener to set.
 	 */
-	public void setEventListener(FiscalPrinterEventListener eventListener) {
+	public void setEventListener(FiscalPrinterListener eventListener) {
 		this.eventListener = eventListener;
 	}
-	
+
 	/**
 	 * Se ha ejecutado un comando. Se informa al EventListener (en caso de que
 	 * exista) del comando ejecutado.
@@ -148,18 +148,18 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	}
 
 	/**
-	 * Se ha producido un cambio en el estado de la impresora. Se informa al 
+	 * Se ha producido un cambio en el estado de la impresora. Se informa al
 	 * EventListener (en caso de que exista) de los cambios producidos .
 	 * @param command Comando ejecutado.
 	 * @param response Respuesta recibida.
-	 * @param msgs Mensajes de la impresora (contiene los errores en caso de 
+	 * @param msgs Mensajes de la impresora (contiene los errores en caso de
 	 * que se haya producido alguno).
 	 */
 	protected void fireStatusChanged(FiscalPacket command, FiscalPacket response, FiscalMessages msgs) {
 		if(getEventListener() != null)
 			getEventListener().statusChanged(this, command, response, msgs);
 	}
-	
+
 	/**
 	 * Se ha ejecutado un comando. Se informa al EventListener (en caso de que
 	 * exista) del comando ejecutado.
@@ -169,7 +169,7 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	protected void fireStatusChanged(FiscalPacket command, FiscalPacket response) {
 		fireStatusChanged(command, response, getMessages());
 	}
-	
+
 	/**
 	 * Se ha finalizado correctamente la impresión del documento. Se informa
 	 * al EventListener (en caso de que exista).
@@ -188,7 +188,7 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	protected void firePrintEnded() {
 		firePrintEnded(getMessages());
 	}
-	
+
 	public String getLastDocumentNo() {
 		return lastDocumentNo;
 	}
@@ -237,7 +237,7 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	protected void setConnected(boolean connected) {
 		this.connected = connected;
 	}
-	
+
 	/**
 	 * @return Returns the cancelAllowed.
 	 */
@@ -293,5 +293,5 @@ public abstract class BasicFiscalPrinter implements FiscalPrinter {
 	protected void setLastResponse(FiscalPacket lastResponse) {
 		this.lastResponse = lastResponse;
 	}
-	
+
 }

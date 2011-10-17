@@ -175,7 +175,7 @@ public class PosOrderModel extends MOrder {
 	 *
 	 * @author Comunidad de Desarrollo OpenXpertya
  *         *Basado en Codigo Original Modificado, Revisado y Optimizado de:
- *         *Copyright � ConSerTi
+ *         *Copyright (c) ConSerTi
 	 */
 	public boolean deleteOrder () {
 		if (getDocStatus().equals("DR"))
@@ -237,7 +237,7 @@ public class PosOrderModel extends MOrder {
 	 * 	Process Order
 	 *  @author Comunidad de Desarrollo OpenXpertya
 	 *         *Basado en Codigo Original Modificado, Revisado y Optimizado de:
-	 *         *Copyright � ConSerTi
+	 *         *Copyright (c) ConSerTi
 	 */
 	public boolean processOrder()
 	{

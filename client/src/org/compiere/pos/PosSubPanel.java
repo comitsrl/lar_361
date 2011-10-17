@@ -18,16 +18,19 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import javax.swing.KeyStroke;
 
 import org.compiere.apps.AppsAction;
+import org.compiere.apps.SwingWorker;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPOS;
 import org.compiere.print.ReportCtl;
 import org.compiere.print.ReportEngine;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CPanel;
+import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 
 /**
@@ -37,13 +40,11 @@ import org.compiere.util.Env;
  *         *Copyright (c) Jorg Janke
  *
  */
-public abstract class PosSubPanel extends CPanel
-	implements ActionListener
+public abstract class PosSubPanel extends CPanel implements ActionListener
 {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -158167614949876569L;
+
+    private static final long serialVersionUID = -158167614949876569L;
+    private static final CLogger log = CLogger.getCLogger(PosSubPanel.class);
 
 	/**
 	 * 	Constructor
@@ -131,16 +132,14 @@ public abstract class PosSubPanel extends CPanel
 	 * 	Print Ticket
 	 *  @author Comunidad de Desarrollo OpenXpertya
 	 *  *Basado en Codigo Original Modificado, Revisado y Optimizado de:
-	 *  *Copyright � ConSerTi
+	 *  *Copyright (c) ConSerTi
 	 */
 	public void printTicket()
 	{
 		if ( p_posPanel.m_order == null )
 			return;
 
-		MOrder order = p_posPanel.m_order;
-		//int windowNo = p_posPanel.getWindowNo();
-		//Properties m_ctx = p_posPanel.getPropiedades();
+		final MOrder order = p_posPanel.m_order;
 
 		if (order != null)
 		{
@@ -157,8 +156,23 @@ public abstract class PosSubPanel extends CPanel
 			}
 			catch (Exception e)
 			{
-				//log.severe("PrintTicket - Error Printing Ticket");
+				log.log(Level.SEVERE, "Error Printing Ticket", e);
 			}
 		}
 	}
+
+	/**
+	 * Thread that perform fiscal print operation
+	 */
+	private final class FiscalPrintWorker extends SwingWorker {
+
+	@Override
+	public Object construct()
+	{
+	    // TODO Auto-generated method stub
+	    return null;
+	}
+
+	}
+
 }	//	PosSubPanel

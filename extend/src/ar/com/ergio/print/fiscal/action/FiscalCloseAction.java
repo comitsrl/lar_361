@@ -19,45 +19,59 @@ package ar.com.ergio.print.fiscal.action;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
-import ar.com.ergio.model.FiscalDocumentPrint;
+/**
+ * Fiscal close action
+ *
+ * @author Comunidad de Desarrollo OpenXpertya *Basado en Codigo Original
+ *         Modificado, Revisado y Optimizado de:
+ * @author Emiliano Pereyra
+ */
+public class FiscalCloseAction extends FiscalPrinterAction
+{
 
-public class FiscalCloseAction extends FiscalPrinterAction {
-
-	// Variables de instancia
-	
-	/** Impresora fiscal */
-	
-	private Integer controladorFiscalID;
-	
 	/** Tipo de cierre */
-	
 	private String closetype;
-	
+
 	// Mensajes
 
 	private String MSG_FISCAL_CLOSE_ERROR = Msg.getMsg(Env.getCtx(), "FiscalCloseError");
 	private String MSG_FISCAL_CLOSE_TYPE = Msg.getMsg(Env.getCtx(), "FiscalCloseType");
 	private String MSG_FISCAL_CONTROLLER = Msg.getElement(Env.getCtx(), "C_Controlador_Fiscal_ID");
 	private String MSG_FISCAL_CLOSE_ERROR_MANDATORY_DATA = Msg.getMsg(Env.getCtx(), "MandatoryDataFiscalCloseError");
-	
+
 	// Constructores
-	
-	public FiscalCloseAction(FiscalDocumentPrint fdp, String trxName){
-		super(fdp, trxName);
-	}
-	
-	public FiscalCloseAction(FiscalDocumentPrint fdp, String trxName, String closeType, Integer controladorFiscalID){
-		this(fdp, trxName);
-		setClosetype(closeType);
-		setControladorFiscalID(controladorFiscalID);
-	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+    public FiscalCloseAction(String trxName, int LAR_Fiscal_Printer_ID)
+    {
+	super(trxName, LAR_Fiscal_Printer_ID);
+    }
+
+    /**
+     * Creates an close fiscal action
+     *
+     * @param trxName
+     *            transaction name
+     * @param closeType
+     *            close type action
+     * @param LAR_Fiscal_Printer_ID
+     *            fiscal printer configuration id
+     */
+    public FiscalCloseAction(String trxName, String closeType, int LAR_Fiscal_Printer_ID)
+    {
+	this(trxName, LAR_Fiscal_Printer_ID);
+	setClosetype(closeType);
+	setControladorFiscalID(LAR_Fiscal_Printer_ID);
+    }
+
 	@Override
 	public boolean execute() {
 		// Validaciones de datos obligatorios
 		StringBuffer mandatoryMsg = new StringBuffer();
 		// Tipo de cierre fiscal
-		if(getControladorFiscalID() == null || getControladorFiscalID() == 0){
+		if(getControladorFiscalID() == 0){
 			mandatoryMsg.append(MSG_FISCAL_CLOSE_TYPE);
 			mandatoryMsg.append(" , ");
 		}
@@ -76,23 +90,20 @@ public class FiscalCloseAction extends FiscalPrinterAction {
 			return false;
 		}
 
-		if(!getFdp().fiscalClose(getControladorFiscalID(), getClosetype())) {
-			setErrorMsg(getFdp().getErrorMsg());
-			return false;
-		}
+		try {
+	    if(!getFiscalDocumentPrint().fiscalClose(getClosetype())) {
+		setErrorMsg(getFiscalDocumentPrint().getErrorMsg());
+		return false;
+	    }
+	} catch (Exception e) {
+	    setErrorMsg(e.getMessage());
+	}
 		return false;
 	}
 
-	
-	// Getters y Setters
-	
-	public void setControladorFiscalID(Integer controladorFiscalID) {
-		this.controladorFiscalID = controladorFiscalID;
-	}
 
-	public Integer getControladorFiscalID() {
-		return controladorFiscalID;
-	}
+	// Getters y Setters
+
 
 	public void setClosetype(String closetype) {
 		this.closetype = closetype;

@@ -38,18 +38,18 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 	private static final byte[] EMPTY_FIELD = new byte[0];
 
 	private List fields = new ArrayList();
-	
-	private FiscalPrinter fiscalPrinter;
 
-	
+	private FiscalPrinterDevice fiscalPrinter;
+
+
 	public AbstractFiscalPacket() {
 		super();
 	}
-	
+
 	/**
 	 * @param fiscalPrinter
 	 */
-	public AbstractFiscalPacket(FiscalPrinter fiscalPrinter) {
+	public AbstractFiscalPacket(FiscalPrinterDevice fiscalPrinter) {
 		super();
 		this.fiscalPrinter = fiscalPrinter;
 	}
@@ -347,7 +347,7 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 		else
 			setString(field, falseValue);
 	}
-	
+
 	public void setOptionalField(int field, Object value) {
 		if(value == null)
 			set(field,EMPTY_FIELD);
@@ -368,7 +368,7 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 		else if(value instanceof Date)
 			setDate(field, (Date)value);
 		else
-			throw new IllegalArgumentException(); 
+			throw new IllegalArgumentException();
 	}
 
 	public void setOptionalBoolean(int field, Boolean value, String trueValue, String falseValue) {
@@ -378,19 +378,19 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 			setBoolean(field, value, trueValue, falseValue);
 	}
 
-	public FiscalPrinter getFiscalPrinter() {
+	public FiscalPrinterDevice getFiscalPrinter() {
 		return fiscalPrinter;
 	}
 
-	public void setFiscalPrinter(FiscalPrinter fiscalPrinter) {
+	public void setFiscalPrinter(FiscalPrinterDevice fiscalPrinter) {
 		this.fiscalPrinter = fiscalPrinter;
 	}
-	
+
 	public void setQuantity(int field, BigDecimal quantity, boolean optional) {
 		String qtyStr = quantity.toString();
 		if(getFiscalPrinter() != null)
 			qtyStr = getFiscalPrinter().formatQuantity(quantity);
-		
+
 		if(optional)
 			setOptionalField(field,qtyStr);
 		else
@@ -398,7 +398,7 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 	}
 
 	public void setAmount(int field, BigDecimal amount, boolean optional) {
-		String amtStr = amount.toString(); 
+		String amtStr = amount.toString();
 		if(getFiscalPrinter() != null)
 			amtStr = getFiscalPrinter().formatAmount(amount);
 		if(optional)
@@ -406,33 +406,33 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 		else
 			setString(field, amtStr);
 	}
-	
+
 	public void setText(int field, String text, int maxLength, boolean optional) {
 		if(getFiscalPrinter() != null)
 			text = getFiscalPrinter().formatText(text, maxLength);
-		
+
 		if(optional)
 			setOptionalField(field,text);
 		else
 			setString(field, text);
 	}
-	
+
 	public void setText(int field, String text, boolean optional) {
 		int length = (text == null? 0: text.length());
 		setText(field, text, length, optional);
 	}
-	
+
 	public void setNumber(int field, BigDecimal number, int integerPart, int decimalPart, boolean optional) {
-		String numStr = number.toString(); 
+		String numStr = number.toString();
 		if(getFiscalPrinter() != null)
 			numStr = getFiscalPrinter().formatNumber(number, integerPart, decimalPart);
-		
+
 		if(optional)
 			setOptionalField(field, numStr);
 		else
 			setString(field, numStr);
 	}
-	
+
 	public void setNumber(int field, BigDecimal number, boolean optional) {
 		if(optional)
 			setOptionalField(field, number);
@@ -446,15 +446,15 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 		else
 			setInt(field, number);
 	}
-	
+
 	public void setBoolean(int field, Boolean value, String trueValue, String falseValue, boolean optional) {
-		if(optional) 
+		if(optional)
 			setOptionalBoolean(field, value, trueValue, falseValue);
 		else
 			setBoolean(field, value, trueValue, falseValue);
 	}
-	
+
 	public void decode(String packetStr) {
-		decode(packetStr.getBytes());		
+		decode(packetStr.getBytes());
 	}
 }

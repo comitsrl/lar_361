@@ -16,13 +16,13 @@
  *****************************************************************************/
 package ar.com.ergio.util;
 
-import java.util.ArrayList;
 import java.util.logging.Level;
 
-import org.compiere.model.MColumn;
 import org.compiere.model.MInvoice;
-import org.compiere.model.MProduct;
 import org.compiere.util.CLogger;
+import org.compiere.util.Env;
+
+import ar.com.ergio.model.LAR_MDocType;
 
 /**
  * Utility class for Argentine Localization.
@@ -111,5 +111,22 @@ public final class LAR_Utils {
             log.log(Level.SEVERE, "Error when validate CUIT", e);
         }
         return ret;
+    }
+
+    /**
+     * Returns whether a document is fiscal or not
+     *
+     * @param docType_ID
+     *            document type id
+     * @return true if document is fiscal, false otherwise
+     */
+    public static boolean isFiscalDocType(int docType_ID)
+    {
+	boolean result = false;
+	if (docType_ID != 0) {
+	    LAR_MDocType docType = new LAR_MDocType(Env.getCtx(), docType_ID, null);
+	    result = docType.isFiscal();
+	}
+	return result;
     }
 }

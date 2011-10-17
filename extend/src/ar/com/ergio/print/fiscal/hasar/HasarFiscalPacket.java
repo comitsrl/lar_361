@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
 import ar.com.ergio.print.fiscal.AbstractFiscalPacket;
-import ar.com.ergio.print.fiscal.FiscalPrinter;
+import ar.com.ergio.print.fiscal.FiscalPrinterDevice;
 import ar.com.ergio.print.fiscal.util.ArrayUtils;
 import ar.com.ergio.print.fiscal.util.ByteFormatter;
 
@@ -40,7 +40,7 @@ public class HasarFiscalPacket extends AbstractFiscalPacket
 	private final int baseRolloverCentury;
 	private final int rolloverYear;
 
-	public HasarFiscalPacket(String encoding, int baseRolloverYear, FiscalPrinter fiscalPrinter)
+	public HasarFiscalPacket(String encoding, int baseRolloverYear, FiscalPrinterDevice fiscalPrinter)
 	{
 		super(fiscalPrinter);
 		if (baseRolloverYear < 0) throw new IllegalArgumentException();
@@ -196,13 +196,13 @@ public class HasarFiscalPacket extends AbstractFiscalPacket
 
 	public byte[] encodeBytes() {
 		byte[] result = new byte[0];
-		
+
 		for (int i = 0, s = getSize(); i < s; i++) {
 			byte[] bytes = get(i);
 			if(bytes.length > 0)
 				result = ArrayUtils.append(result, bytes);
 			if(i != s - 1)
-				result = ArrayUtils.append(result, FS);			
+				result = ArrayUtils.append(result, FS);
 		}
 		result = ArrayUtils.append(result, NL);
 		return result;
@@ -239,6 +239,6 @@ public class HasarFiscalPacket extends AbstractFiscalPacket
 		byte[] newPacketBytes = ArrayUtils.append(cmdBytes,packetBytes);
 		decode(newPacketBytes);
 	}
-	
-	
+
+
 }

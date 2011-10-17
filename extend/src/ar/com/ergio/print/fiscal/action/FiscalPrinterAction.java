@@ -19,72 +19,95 @@ package ar.com.ergio.print.fiscal.action;
 import ar.com.ergio.model.FiscalDocumentPrint;
 
 
-public abstract class FiscalPrinterAction {
+public abstract class FiscalPrinterAction
+{
 
-	// Variables de instancia
-	
-	/** Mensaje de error */
-	
-	private String errorMsg;
-	
-	/** Mensaje de descripción de error */
-	
-	private String errorDesc;
-	
-	/** Nombre de transacción a utilizar, en caso que utilice */
-	
-	private String trxName;
-	
-	/** Acceso a la impresora */
-	
-	private FiscalDocumentPrint fdp;
-	
-	// Constructores
-	
-	public FiscalPrinterAction(FiscalDocumentPrint fdp, String trxName){
-		setFdp(fdp);
-		setTrxName(trxName);
-	}
-	
-	// Métodos abstractos
-	
-	/**
-	 * Ejecuta la acción correspondiente
-	 */
-	public abstract boolean execute();
-	
-	// Getters y Setters
-	
-	protected void setErrorMsg(String errorMsg) {
-		this.errorMsg = errorMsg;
-	}
+    /** Mensaje de error */
+    private String errorMsg;
 
-	public String getErrorMsg() {
-		return errorMsg;
-	}
+    /** Mensaje de descripción de error */
+    private String errorDesc;
 
-	public void setErrorDesc(String errorDesc) {
-		this.errorDesc = errorDesc;
-	}
+    /** Nombre de transacción a utilizar, en caso que utilice */
+    private String trxName;
 
-	public String getErrorDesc() {
-		return errorDesc;
-	}
-
-	protected void setTrxName(String trxName) {
-		this.trxName = trxName;
-	}
+    private int m_LAR_Fiscal_Printer_ID;
+    private FiscalDocumentPrint fdp;
 
 
-	protected String getTrxName() {
-		return trxName;
-	}
+    /**
+     * Creates an close fiscal action
+     *
+     * @param trxName
+     *            transaction name
+     * @param m_LAR_Fiscal_Printer_ID
+     *            fiscal printer configuration id
+     */
+    FiscalPrinterAction(String trxName, int LAR_Fiscal_Printer_ID)
+    {
+	// setFdp(fdp);
+	setTrxName(trxName);
+	setControladorFiscalID(LAR_Fiscal_Printer_ID);
+    }
 
-	protected void setFdp(FiscalDocumentPrint fdp) {
-		this.fdp = fdp;
-	}
+    // Métodos abstractos
 
-	protected FiscalDocumentPrint getFdp() {
-		return fdp;
+    /**
+     * Ejecuta la acción correspondiente
+     */
+    public abstract boolean execute();
+
+    // Getters y Setters
+
+    protected void setErrorMsg(String errorMsg)
+    {
+	this.errorMsg = errorMsg;
+    }
+
+    public String getErrorMsg()
+    {
+	return errorMsg;
+    }
+
+    public void setErrorDesc(String errorDesc)
+    {
+	this.errorDesc = errorDesc;
+    }
+
+    public String getErrorDesc()
+    {
+	return errorDesc;
+    }
+
+    protected void setTrxName(String trxName)
+    {
+	this.trxName = trxName;
+    }
+
+    protected String getTrxName()
+    {
+	return trxName;
+    }
+
+    public void setControladorFiscalID(int LAR_Fiscal_Printer_ID)
+    {
+	this.m_LAR_Fiscal_Printer_ID = LAR_Fiscal_Printer_ID;
+    }
+
+    public int getControladorFiscalID()
+    {
+	return m_LAR_Fiscal_Printer_ID;
+    }
+
+
+    FiscalDocumentPrint getFiscalDocumentPrint() throws Exception
+    {
+	if (fdp == null) {
+	    fdp = new FiscalDocumentPrint(m_LAR_Fiscal_Printer_ID);
 	}
+	return fdp;
+    }
+//     protected void setFdp(FiscalDocumentPrint fdp) {
+//     this.fdp = fdp;
+//     }
 }

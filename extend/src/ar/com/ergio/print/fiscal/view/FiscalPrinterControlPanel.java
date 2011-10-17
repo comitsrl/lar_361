@@ -44,50 +44,47 @@ import org.compiere.swing.CButton;
 import org.compiere.swing.CComboBox;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CPanel;
-// import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
 
-import ar.com.ergio.model.FiscalDocumentPrint;
 import ar.com.ergio.print.fiscal.action.FiscalCloseAction;
 import ar.com.ergio.print.fiscal.action.FiscalPrinterAction;
 
 public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
     // private static CLogger s_log = CLogger.getCLogger(FiscalPrinterControlPanel.class);
 	// Constantes
-	
+
 	private static final long serialVersionUID = -6703566239557862855L;
 
-	private final AInfoFiscalPrinter infoFiscalPrinter = 
+	private final AInfoFiscalPrinter infoFiscalPrinter =
 		new AInfoFiscalPrinter(
 				null,
 				Msg.parseTranslation(Env.getCtx(),"@FiscalPrinterControlPanel@"),
 				"",
 				JOptionPane.INFORMATION_MESSAGE
 		);
-	
+
 	// Variables de instancia
-	
+
 	/** Frame contenedor */
-	
+
 	private FormFrame frame;
-	
+
 	/** Window no */
-	
+
 	private int windowNo;
-		
+
 	/** Interface de conexión con la impresora fiscal */
-	
-	private FiscalDocumentPrint iFiscalPrinter;
-	
+	//private FiscalDocumentPrint fiscalDocumentPrint;
+
 	/** Acción actual a procesar o en proceso */
-	
+
 	private FiscalPrinterAction actualAction;
-	
+
 	// Mensajes
-	
+
 	private static String MSG_PROCESSING;
 	private static String MSG_PLEASEWAIT;
 	private static String MSG_CLOSE;
@@ -95,73 +92,73 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 	private static String MSG_FISCAL_CLOSE_TYPE;
 	private static String MSG_FISCAL_CONTROLLER;
 	private static String MSG_FISCAL_PRINTER_CONTROL_PANEL;
-	
+
 	/** Fiscal_Close_Types AD_Reference_ID=1000003 */
-    public static final int Fiscal_Close_Types_AD_Reference_ID=1000003;
-	
+    public static final int FISCAL_CLOSE_TYPES_REFERENCE_ID = 1000003;
+
 	// *********************************
 	// 	   Panel principal
 	// *********************************
-	
+
 	/** Panel principal */
-	
+
 	private CPanel mainPanel;
-	
+
 	/** Layout principal */
-	
+
 	private BorderLayout mainLayout = new BorderLayout();
-	
+
 	// *********************************
 	// 	   Panel de cierre fiscal
 	// *********************************
-	
+
 	/** Panel de comandos de cierre fiscal */
-	
+
 	private CPanel fiscalClosePanel;
-	
+
 	// Componentes del panel
-	
+
 	/** Tipo de cierre fiscal */
-	
+
 	public CComboBox comboFiscalCloseTypes;
-	
+
 	/** Combo con los controladores fiscales */
-	
+
 	public VLookup comboFiscalControllers;
-	
+
 	/** Botón para ejecutar el cierre */
-	
+
 	private CButton btnFiscalClose;
-	
+
 	// Labels
-	
+
 	private CLabel lblFiscalCloseType;
 	private CLabel lblFiscalControllers;
-	
-	
+
+
 	// *********************************
 	// 	     Panel inferior
 	// *********************************
 
 	/** Panel inferior */
-	
+
 	private CPanel bottomPanel;
-	
+
 	/** Botón Cerrar  */
-	
+
 	private CButton btnCloseForm;
 
 	// *********************************
-	
+
 	// Constructores
-	
+
 	public FiscalPrinterControlPanel(){
 		initFiscalInterface();
 		initMsgs();
 	}
 
 	// Heredados
-	
+
 	@Override
 	public void dispose() {
 		setVisible(false);
@@ -177,27 +174,29 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
-	
+	}
+
 	/**
 	 * Inicializa la interface de conexión con la impresora fiscal
 	 */
 	private void initFiscalInterface(){
-		setiFiscalPrinter(new FiscalDocumentPrint());
-		addFiscalPrinterListeners();
+	    // TODO - Review. Do not creates fiscal document print without LAR_Fiscal_Printer_ID
+		//setiFiscalPrinter(new FiscalDocumentPrint());
+		//addFiscalPrinterListeners();
 	}
-	
+
 	/**
-	 * Agregar los listeners a la interface de la impresora fiscal 
+	 * Agregar los listeners a la interface de la impresora fiscal
 	 */
-	private void addFiscalPrinterListeners() {
-		getiFiscalPrinter().addDocumentPrintListener(infoFiscalPrinter);
-		getiFiscalPrinter().setPrinterEventListener(infoFiscalPrinter);
-		
-		// Referenciar la impresora desde la ventana de info.
-		infoFiscalPrinter.setFiscalDocumentPrint(getiFiscalPrinter());
-	}
-	
+	// TODO - Review. Do not add listener because fiscal document print is no instantiated
+//	private void addFiscalPrinterListeners() {
+//		getiFiscalDocumentPrint().addDocumentPrintListener(infoFiscalPrinter);
+//		getiFiscalDocumentPrint().setPrinterEventListener(infoFiscalPrinter);
+//
+//		// Referenciar la impresora desde la ventana de info.
+//		infoFiscalPrinter.setFiscalDocumentPrint(getiFiscalDocumentPrint());
+//	}
+
 	/**
 	 * Inicializo los mensajes
 	 */
@@ -209,25 +208,25 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		MSG_FISCAL_CLOSE = getMsg("FiscalClose");
 		MSG_FISCAL_CLOSE_TYPE = getMsg("FiscalCloseType");
 		MSG_FISCAL_CONTROLLER = Msg.getElement(Env.getCtx(), "LAR_Fiscal_Printer_ID");
-		MSG_FISCAL_PRINTER_CONTROL_PANEL = getMsg("FiscalPrinterControlPanel"); 
+		MSG_FISCAL_PRINTER_CONTROL_PANEL = getMsg("FiscalPrinterControlPanel");
 		// Nombres
 		// FISCAL_CLOSE_TYPES_REF_NAME = "Fiscal_Close_Types";
 	}
-		
+
 	private void jbInit(){
 		// Inicializar los componentes principales del form
 		mainLayout = new BorderLayout();
 		mainPanel = new CPanel();
-		
+
 		mainPanel.setLayout(mainLayout);
 		getFrame().setContentPane(mainPanel);
 		getFrame().setTitle(MSG_FISCAL_PRINTER_CONTROL_PANEL);
-		// Crear e inicializar las áreas del panel de control  
+		// Crear e inicializar las áreas del panel de control
 		initAreas();
 		// Agregarlas al panel principal
 		addAreasToMainPanel();
 	}
-	
+
 	/**
 	 * Inicializo las áreas del panel de control
 	 */
@@ -235,7 +234,7 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		initFiscalClosePanel();
 		initBottomPanel();
 	}
-	
+
 	/**
 	 * Área de cierre fiscal
 	 */
@@ -253,7 +252,7 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		fiscalClosePanel.add(getComboFiscalControllers(), new GridBagConstraints(1, 1, 1, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 0, 5, 0), 0, 0));
 		fiscalClosePanel.add(getBtnFiscalClose(), new GridBagConstraints(0, 2, 2, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.SOUTH, new Insets(15, 0, 5, 0), 0, 0));
 	}
-	
+
 	/**
 	 * Área inferior
 	 */
@@ -264,61 +263,74 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		// Crear sus componentes y agregarlos al contenedor
 		bottomPanel.add(getBtnCloseForm());
 	}
-	
-	/**
-	 * Retornar o crear en caso que no exista el combo con los 
-	 * tipos de cierres fiscales. 
-	 * @return
-	 */
-	private CComboBox getComboFiscalCloseTypes(){
-		if(comboFiscalCloseTypes == null){
-	        comboFiscalCloseTypes = new CComboBox(MRefList.getList(Env.getCtx(),Fiscal_Close_Types_AD_Reference_ID, false));
-			comboFiscalCloseTypes.setMandatory(true);
-		}
-		return comboFiscalCloseTypes;
+
+    /**
+     * Retornar o crear en caso que no exista el combo con los tipos de cierres
+     * fiscales.
+     *
+     * @return
+     */
+    private CComboBox getComboFiscalCloseTypes()
+    {
+	if (comboFiscalCloseTypes == null) {
+	    comboFiscalCloseTypes = new CComboBox(MRefList.getList(Env.getCtx(),
+			    FISCAL_CLOSE_TYPES_REFERENCE_ID, false));
+	    comboFiscalCloseTypes.setMandatory(true);
 	}
-	
-	/**
-	 * Retornar o crear el lookup con los controladores fiscales
-	 * @return
-	 */
-	private VLookup getComboFiscalControllers(){
-	    if(comboFiscalControllers == null){
-		  
-		    // AD_Column_ID = select c.ad_column_id from ad_column c inner join ad_table t on (c.ad_table_id=t.ad_table_id) where c.columnname ilike 'LAR_Fiscal_Printer_ID' and t.tablename ilike 'LAR_Fiscal_Printer_ID'
-		    int AD_Column_ID = 1000102;	  
-		    String columnName="lar_fiscal_printer_ID";
-	        MLookupInfo info    = MLookupFactory.getLookupInfo(Env.getCtx(), getWindowNo(), 
-	                AD_Column_ID, DisplayType.TableDir, Env.getLanguage(Env.getCtx()),
-	                columnName,0,false,"");
- 	        info.ZoomQuery = new MQuery();        
-	        MLookup lookup = new MLookup(info, 0);
-   	        VLookup vl = new VLookup( columnName, false, false, true, lookup );
-   	        comboFiscalControllers = vl;
-		    comboFiscalControllers.setMandatory(true);
-		}
-		return comboFiscalControllers;
+	return comboFiscalCloseTypes;
+    }
+
+    /**
+     * Retornar o crear el lookup con los controladores fiscales
+     *
+     * @return
+     */
+    private VLookup getComboFiscalControllers()
+    {
+	if (comboFiscalControllers == null) {
+
+	    // AD_Column_ID = select c.ad_column_id from ad_column c inner join
+	    // ad_table t on (c.ad_table_id=t.ad_table_id) where c.columnname
+	    // ilike 'LAR_Fiscal_Printer_ID' and t.tablename ilike
+	    // 'LAR_Fiscal_Printer_ID'
+	    int AD_Column_ID = 1000102;
+	    String columnName = "LAR_Fiscal_Printer_ID";
+	    MLookupInfo info = MLookupFactory.getLookupInfo(Env.getCtx(), getWindowNo(),
+			    AD_Column_ID, DisplayType.TableDir, Env.getLanguage(Env.getCtx()),
+			    columnName, 0, false, "");
+	    info.ZoomQuery = new MQuery();
+	    MLookup lookup = new MLookup(info, 0);
+	    comboFiscalControllers = new VLookup(columnName, false, false, true, lookup);
+	    comboFiscalControllers.setMandatory(true);
 	}
-	
-	/**
-	 * Retornar o crear el botón que dispara el cierre fiscal
-	 * @return
-	 */
-	private CButton getBtnFiscalClose(){
-		if(btnFiscalClose == null){
-			btnFiscalClose = new CButton(MSG_FISCAL_CLOSE,Env.getImageIcon("Process24.gif"));
-			btnFiscalClose.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					setActualAction(new FiscalCloseAction(getiFiscalPrinter(), null, ((ValueNamePair)getComboFiscalCloseTypes().getValue()).getValue(), (Integer)getComboFiscalControllers().getValue()));
-					executeAction();
-				}
-			});
+	return comboFiscalControllers;
+    }
+
+    /**
+     * Retornar o crear el botón que dispara el cierre fiscal
+     *
+     * @return
+     */
+    private CButton getBtnFiscalClose()
+    {
+	if (btnFiscalClose == null) {
+	    btnFiscalClose = new CButton(MSG_FISCAL_CLOSE, Env.getImageIcon("Process24.gif"));
+	    btnFiscalClose.addActionListener(new ActionListener()
+	    {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0)
+		{
+		    String closeType = ((ValueNamePair) getComboFiscalCloseTypes().getValue()).getValue();
+		    int LAR_Fiscal_Printer_ID = (Integer) getComboFiscalControllers().getValue();
+		    setActualAction(new FiscalCloseAction(null, closeType, LAR_Fiscal_Printer_ID));
+		    executeAction();
 		}
-		return btnFiscalClose;
+	    });
 	}
-	
+	return btnFiscalClose;
+    }
+
 	/**
 	 * Retornar o crear el botón de cierre de form
 	 * @return
@@ -327,7 +339,7 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		if(btnCloseForm == null){
 			btnCloseForm = new CButton(MSG_CLOSE,Env.getImageIcon("End24.gif"));
 			btnCloseForm.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					dispose();
@@ -336,7 +348,7 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		}
 		return btnCloseForm;
 	}
-	
+
 	/**
 	 * Agregar las áreas del panel de control al panel principal
 	 */
@@ -344,16 +356,16 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		mainPanel.add(fiscalClosePanel,BorderLayout.CENTER);
 		mainPanel.add(bottomPanel,BorderLayout.SOUTH);
 	}
-	
-	
+
+
 	// Funciones del panel de control
-	
+
 	private void executeAction(){
 		SwingWorker worker = new SwingWorker() {
 
 			private String errorMsg = null;
 			private String errorDesc = null;
-			
+
 			@Override
 			public Object construct() {
 				errorMsg = null;
@@ -379,15 +391,15 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 			}
 		};
 
-		
+
 		mWait();
 		String waitMsg = MSG_PROCESSING + ", " + MSG_PLEASEWAIT;
 		getFrame().setBusyMessage(waitMsg);
 		getFrame().setBusyTimer(4);
 		getFrame().setBusy(true);
-		
+
 		worker.start();
-		
+
 		// Mostrar ventana de la impresora fiscal
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -395,27 +407,27 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 			}
 		});
 	}
-	
+
 	protected String getMsg(String name) {
 		return Msg.getMsg(Env.getCtx(), name);
 	}
-	
+
 	protected void errorMsg(String msg) {
 		errorMsg(msg,null);
 	}
-	
+
 	protected void errorMsg(String msg, String subMsg) {
 		ADialog.error(getWindowNo(),this,msg,subMsg);
 	}
-	
+
     private void mWait() {
     	getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
     }
-    
+
     private void mNormal() {
     	getFrame().setCursor(Cursor.getDefaultCursor());
     }
-	
+
 	// Getters y Setters
 
 	private void setFrame(FormFrame frame) {
@@ -434,13 +446,13 @@ public class FiscalPrinterControlPanel extends CPanel implements FormPanel{
 		return windowNo;
 	}
 
-	private void setiFiscalPrinter(FiscalDocumentPrint iFiscalPrinter) {
-		this.iFiscalPrinter = iFiscalPrinter;
-	}
-
-	private FiscalDocumentPrint getiFiscalPrinter() {
-		return iFiscalPrinter;
-	}
+//	private void setiFiscalPrinter(FiscalDocumentPrint iFiscalPrinter) {
+//		this.fiscalDocumentPrint = iFiscalPrinter;
+//	}
+//
+//	private FiscalDocumentPrint getiFiscalDocumentPrint() {
+//		return fiscalDocumentPrint;
+//	}
 
 	private void setActualAction(FiscalPrinterAction actualAction) {
 		this.actualAction = actualAction;

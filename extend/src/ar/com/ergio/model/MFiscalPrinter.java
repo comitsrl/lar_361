@@ -18,12 +18,13 @@ package ar.com.ergio.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
-import ar.com.ergio.print.fiscal.FiscalPrinter;
+import ar.com.ergio.print.fiscal.FiscalPrinterDevice;
 import ar.com.ergio.print.fiscal.comm.FiscalComm;
 import ar.com.ergio.print.fiscal.comm.SpoolerTCPComm;
 
@@ -67,7 +68,7 @@ public class MFiscalPrinter extends X_LAR_Fiscal_Printer {
 	 * @throws Exception cuando ocurre algun error en el intento de instanciar
 	 * la clase configurada o si el DocType no es fiscal.
 	 */
-	public static FiscalPrinter getFiscalPrinter(int docType_ID) throws Exception {
+	public static FiscalPrinterDevice getFiscalPrinter(int docType_ID) throws Exception {
 		Properties ctx = Env.getCtx();
 
 		MFiscalPrinter cFiscal = getOfDocType(docType_ID);
@@ -78,39 +79,43 @@ public class MFiscalPrinter extends X_LAR_Fiscal_Printer {
 		return cFiscal.getFiscalPrinter();
 	}
 
-	/**
-	 * Retorna la <code>FiscalPrinter</code> correspondiente al tipo de documento
-	 * especificado. Se obtienen los datos del <code>MFiscalPrinter</code>
-	 * que tiene asignado el DocType, e intenta instanciar la impresora fiscal
-	 * según la clase configurada en el tipo del controlador fiscal.
-	 * @return La instancia de la impresora.
-	 * @throws Exception cuando ocurre algun error en el intento de instanciar
-	 * la clase configurada o si el DocType no es fiscal.
-	 */
-	public FiscalPrinter getFiscalPrinter() throws Exception {
-		Properties ctx = Env.getCtx();
-		FiscalPrinter fiscalPrinter = null;
-		X_LAR_Fiscal_Printer_Type cType = new X_LAR_Fiscal_Printer_Type(Env.getCtx(), getLAR_Fiscal_Printer_Type_ID(), null);
-		String className = cType.getclazz();
+    /**
+     * Retorna la <code>FiscalPrinter</code> correspondiente al tipo de
+     * documento especificado. Se obtienen los datos del
+     * <code>MFiscalPrinter</code> que tiene asignado el DocType, e intenta
+     * instanciar la impresora fiscal según la clase configurada en el tipo del
+     * controlador fiscal.
+     *
+     * @return La instancia de la impresora.
+     * @throws Exception
+     *             cuando ocurre algun error en el intento de instanciar la
+     *             clase configurada o si el DocType no es fiscal.
+     */
+    public FiscalPrinterDevice getFiscalPrinter() throws Exception
+    {
+	Properties ctx = Env.getCtx();
+	FiscalPrinterDevice fiscalPrinter = null;
+	X_LAR_Fiscal_Printer_Type cType = new X_LAR_Fiscal_Printer_Type(Env.getCtx(),
+			getLAR_Fiscal_Printer_Type_ID(), null);
+	String className = cType.getclazz();
 
-		try {
-			try {
-				fiscalPrinter = (FiscalPrinter)Class.forName(className).newInstance();
-			} catch (ClassNotFoundException e) {
-				throw new Exception(Msg.translate(ctx,"FiscalPrinterClassNotFound"), e);
-			} catch (Exception e) {
-				throw new Exception(Msg.translate(ctx,"FiscalPrinterInstanciationError"), e);
-			}
-			String host = getHost();
-			int port = getPort();
-			FiscalComm fiscalComm = new SpoolerTCPComm(host, port);
-			fiscalPrinter.setFiscalComm(fiscalComm);
-
-		} catch(Exception e) {
-			log.severe(e.getMessage());
-			throw e;
-		}
-		return fiscalPrinter;
-
+	try {
+	    fiscalPrinter = (FiscalPrinterDevice) Class.forName(className).newInstance();
+	} catch (ClassNotFoundException e) {
+	    String msg = Msg.translate(ctx, "FiscalPrinterClassNotFound");
+	    log.log(Level.SEVERE, msg, e);
+	    throw new Exception(msg, e);
+	} catch (Exception e) {
+	    String msg = Msg.translate(ctx, "FiscalPrinterInstanciationError");
+	    log.log(Level.SEVERE, msg, e);
+	    throw new Exception(msg, e);
 	}
+	String host = getHost();
+	int port = getPort();
+	FiscalComm fiscalComm = new SpoolerTCPComm(host, port);
+	fiscalPrinter.setFiscalComm(fiscalComm);
+
+	return fiscalPrinter;
+
+    }
 }

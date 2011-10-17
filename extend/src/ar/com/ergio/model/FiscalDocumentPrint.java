@@ -52,8 +52,8 @@ import org.compiere.util.Msg;
 import org.compiere.util.Trx;
 import org.globalqss.model.X_LCO_TaxPayerType;
 
-import ar.com.ergio.print.fiscal.FiscalPrinter;
-import ar.com.ergio.print.fiscal.FiscalPrinterEventListener;
+import ar.com.ergio.print.fiscal.FiscalPrinterDevice;
+import ar.com.ergio.print.fiscal.FiscalPrinterListener;
 import ar.com.ergio.print.fiscal.document.CreditNote;
 import ar.com.ergio.print.fiscal.document.Customer;
 import ar.com.ergio.print.fiscal.document.DebitNote;
@@ -93,13 +93,6 @@ public class FiscalDocumentPrint {
     private static final String RESPONSABLE_INSCRIPTO = "ResponsableInscripto";
     private static final String CONSUMIDOR_FINAL = "ConsumidorFinal";
 
-	static {
-		// Se inicializa la fuente de mensajes para las impresiones fiscales.
-		// Se asigna la fuente de openXpertya que utiliza la funcionalidad
-		// de la clase Msg.translate(...).
-		//MsgRepository.setMsgSource(new OXPFiscalMsgSource());
-	}
-
 	/** Cantidad maxima de esperas cuando la impresora se encuentra en estado ocupado */
 	private static int MAX_BSY_SLEEP_COUNT = 12;
 	/** Período en milisegundos mediante el cual se chequea el estado de la impresora fiscal */
@@ -108,11 +101,13 @@ public class FiscalDocumentPrint {
 	/** Logger del sistema */
 	private static CLogger log = CLogger.getCLogger(FiscalDocumentPrint.class);
 	/** Manejador de eventos de la impresora fiscal */
-	private FiscalPrinterEventListener printerEventListener;
+	//private FiscalPrinterListener printerEventListener;
 	/** Manejador de eventos del estado del Controlador Fiscal de OXP */
-	private List<FiscalDocumentPrintListener> documentPrintListeners;
+	private List<FiscalDocumentListener> documentPrintListeners;
+	/** Modelo asociado a la configuración de la impresora fiscal */
+	private final MFiscalPrinter fiscalPrinter;
 	/** Impresora fiscal con la que se imprime el documento */
-	private FiscalPrinter fiscalPrinter;
+    private final FiscalPrinterDevice fiscalPrinterDevice;
 	/** Mapeo entre la categorías de IVA de LAR y las de
 	 *  las clases de documentos para impresoras fiscales */
 	private Map<String, Integer> taxPayerTypes;
@@ -136,170 +131,185 @@ public class FiscalDocumentPrint {
 	 * no se asigne ninguna externamente */
 	private boolean createTrx = false;
 
-	public FiscalDocumentPrint() {
-		super();
-		this.documentPrintListeners = new ArrayList<FiscalDocumentPrintListener>();
-	}
+    /**
+     * Creates a fiscal document print
+     *
+     * @param LAR_Fiscal_Printer_ID
+     *            fiscal printer configuration id
+     * @throws Exception
+     *             if fiscal printer object cannot be instantiated
+     */
+	// TODO - Review whether is more proper id or object instance for fiscal printer
+    public FiscalDocumentPrint(int LAR_Fiscal_Printer_ID) throws Exception
+    {
+        fiscalPrinter = new MFiscalPrinter(ctx, LAR_Fiscal_Printer_ID, null);
+        fiscalPrinterDevice = fiscalPrinter.getFiscalPrinter();
+        documentPrintListeners = new ArrayList<FiscalDocumentListener>();
+    }
 
-	/**
-	 * @param printerEventListener
-	 */
-	public FiscalDocumentPrint(final FiscalPrinterEventListener printerEventListener) {
-		this();
-		this.printerEventListener = printerEventListener;
-	}
+    /**
+     * Creates a fiscal document print with a printer listener
+     *
+     * @param LAR_Fiscal_Printer_ID
+     *            fiscal printer configuration id
+     * @param fiscalPrinterListener
+     *            listener for fiscal printer
+     * @throws Exception
+     *             if fiscal printer object cannot be instantiated
+     */
+    public FiscalDocumentPrint(int LAR_Fiscal_Printer_ID,
+            final FiscalPrinterListener fiscalPrinterListener) throws Exception
+    {
+        this(LAR_Fiscal_Printer_ID);
+        // this.printerEventListener = fpl;
+        fiscalPrinterDevice.setEventListener(fiscalPrinterListener);
+    }
 
-	public FiscalDocumentPrint(final FiscalPrinterEventListener printerEventListener, final FiscalDocumentPrintListener documentPrintListener) {
-		this();
-		this.printerEventListener = printerEventListener;
-		addDocumentPrintListener(documentPrintListener);
-	}
-
+    /**
+     * Creates a fiscal document print with a printer and document listeners
+     *
+     * @param LAR_Fiscal_Printer_ID
+     *            fiscal printer configuration id
+     * @param fiscalPrinterListener
+     *            listener for fiscal printer
+     * @param fiscalDocumentListener
+     *            listener for fiscal document
+     * @throws Exception
+     *             if fiscal printer object cannot be instantiated
+     */
+    public FiscalDocumentPrint(int LAR_Fiscal_Printer_ID,
+            final FiscalPrinterListener fiscalPrinterListener,
+            final FiscalDocumentListener fiscalDocumentListener) throws Exception
+    {
+        this(LAR_Fiscal_Printer_ID, fiscalPrinterListener);
+        addDocumentPrintListener(fiscalDocumentListener);
+    }
 
 	/**
 	 * Ejecuta la acción (comando) parámetro con los argumentos específicos
 	 * en la impresora parámetro.
 	 * @param action acción a ejecutar
-	 * @param controladoraFiscalID controlador fiscal
 	 * @param args argumentos de la acción
 	 * @return true si se ejecutó correctamente, false caso contrario.
 	 */
-	MFiscalPrinter cFiscal = null;
-	private boolean execute(final Actions action, final Integer controladoraFiscalID, final Object[] args) {
-		boolean error = false;
-		String newPrinterStatus = MFiscalPrinter.STATUS_OCIOSO;
-		String errorTitle = "";
-		String errorDesc = "";
+	//MFiscalPrinter cFiscal = null;
+    private boolean execute(final Actions action, final Object[] args)
+    {
+        boolean error = false;
+        String newPrinterStatus = MFiscalPrinter.STATUS_OCIOSO;
+        String errorTitle = "";
+        String errorDesc = "";
 
-		// Se crea una transacción en caso de que no se haya asignado externamente
-		// una. manageTrx indica si se deben administrar internamente la transacción
-		// (commit y roolback). Si la transacción es asignada externamente, no se realizan
-		// operaciones de commit y rollback aquí.
-		boolean manageTrx = false;
-		if (getTrx() == null && isCreateTrx()) {
-			setTrx(Trx.get(Trx.createTrxName("FiscalDocumentPrint"), true));
-			getTrx().start();
-			manageTrx = true;
-		}
+        // Se inicializa el indicador de fin de espera para el casos en que
+        // la impresora se encuentre en estado BUSY.
+        setCancelWaiting(false);
 
-		// Se inicializa el indicador de fin de espera para el casos en que
-		// la impresora se encuentre en estado BUSY.
-		setCancelWaiting(false);
+        try {
+            // Se informa al manejador que se esta chequeando el status de
+            // la impresora.
+            fireActionStarted(FiscalDocumentListener.AC_CHECK_STATUS);
 
-		// Get the printer
-		cFiscal = new MFiscalPrinter(ctx, controladoraFiscalID, getTrxName());
+            // Chequeo el estado de la impresora
+            if (!checkPrinterStatus(fiscalPrinter)) {
+                return false;
+            }
 
-		try {
-			// Se informa al manejador que se esta chequeando el status de
-			// la impresora.
-			fireActionStarted(FiscalDocumentPrintListener.AC_CHECK_STATUS);
-			// Chequeo el estado de la impresora
-			if(!checkPrinterStatus(cFiscal))
-				return false;
+            // Se informa al manejador que se esta intentando conectar con
+            // la impresora fiscal.
+            fireActionStarted(FiscalDocumentListener.AC_CONNECT_PRINTER);
 
-			// Se informa al manejador que se esta intentando conectar con
-			// la impresora fiscal.
-			fireActionStarted(FiscalDocumentPrintListener.AC_CONNECT_PRINTER);
-			// Se obtiene la impresora fiscal con la que se debe imprimir
-			// el documento segun su tipo de documento.
-			FiscalPrinter fiscalPrinter = cFiscal.getFiscalPrinter();
-			fiscalPrinter.setEventListener(getPrinterEventListener());
-			setFiscalPrinter(fiscalPrinter);
-			// Se intenta conectar la impresora.
-			getFiscalPrinter().connect();
+            // Se intenta conectar la impresora.
+            getFiscalPrinter().connect();
 
-			// Ejecutar la acción correspondiente
-			doAction(action, args);
+            // Ejecutar la acción correspondiente
+            doAction(action, args);
 
-			// Se libera la impresora fiscal.
-			setFiscalPrinterStatus(cFiscal, MFiscalPrinter.STATUS_OCIOSO);
-		} catch (FiscalPrinterStatusError e) {
-			// Si la impresora retornó un estado de error se marca el controlador
-			// fiscal con estado de ERROR.
-			newPrinterStatus = MFiscalPrinter.STATUS_ERROR;
-			// Se asigna el mensaje de error.
-			errorTitle = "FiscalPrinterStatusError";
-			errorDesc = e.getDeviceErrorMsg();
-			error = true;
-			log.severe(e.getMessage() + ". " + errorDesc);
+            // Se libera la impresora fiscal.
+            setFiscalPrinterStatus(fiscalPrinter, MFiscalPrinter.STATUS_OCIOSO);
+        } catch (FiscalPrinterStatusError e) {
+            // Si la impresora retornó un estado de error se marca el controlador
+            // fiscal con estado de ERROR.
+            newPrinterStatus = MFiscalPrinter.STATUS_ERROR;
+            // Se asigna el mensaje de error.
+            errorTitle = "FiscalPrinterStatusError";
+            errorDesc = e.getDeviceErrorMsg();
+            error = true;
+            log.log(Level.SEVERE, e.getMessage() + ". " + errorDesc, e);
 
-		} catch (FiscalPrinterIOException e) {
-			// Se asigna el mensaje de error.
-			errorTitle = "FiscalPrinterIOError";
-			errorDesc = e.getMessage();
-			error = true;
-			log.severe(e.getFullMessage());
+        } catch (FiscalPrinterIOException e) {
+            // Se asigna el mensaje de error.
+            errorTitle = "FiscalPrinterIOError";
+            errorDesc = e.getMessage();
+            error = true;
+            log.log(Level.SEVERE, e.getFullMessage(), e);
 
-		} catch (DocumentException e) {
-			// Se asigna el mensaje de error.
-			errorTitle = "DocumentValidationError";
-			errorDesc = e.getMessage();
-			error = true;
-			log.severe(e.getMessage());
+        } catch (DocumentException e) {
+            // Se asigna el mensaje de error.
+            errorTitle = "DocumentValidationError";
+            errorDesc = e.getMessage();
+            error = true;
+            log.log(Level.SEVERE, e.getMessage(), e);
 
-		} catch (IOException e) {
-			// Se asigna el mensaje de error.
-			errorTitle = "UnexpectedIOError";
-			errorDesc = e.getMessage();
-			error = true;
-			log.severe(e.getMessage());
+        } catch (IOException e) {
+            // Se asigna el mensaje de error.
+            errorTitle = "UnexpectedIOError";
+            errorDesc = e.getMessage();
+            error = true;
+            log.log(Level.SEVERE, e.getMessage(), e);
 
-		} catch (Exception e) {
-			// Se asigna el mensaje de error.
-			errorTitle = "PrintFiscalDocumentError";
-			errorDesc = e.getMessage();
-			error = true;
-			log.severe(e.getMessage());
-			e.printStackTrace();
+        } catch (Exception e) {
+            // Se asigna el mensaje de error.
+            errorTitle = "PrintFiscalDocumentError";
+            errorDesc = e.getMessage();
+            error = true;
+            log.log(Level.SEVERE, e.getMessage(), e);
 
-		} finally {
-			try {
-				// Si hubo error...
-				if(error) {
-					// Se asigna el nuevo estado de la impresora.
-					setFiscalPrinterStatus(cFiscal, newPrinterStatus);
-					// Se dispara el evento que informa del error ocurrido.
-					fireErrorOcurred(errorTitle, errorDesc);
-					// Se cancela la trasancción.
-					if (manageTrx)
-						getTrx().rollback();
-					// Se guarda el mensaje de error.
-					setErrorMsg("@" + errorTitle + "@ - @" + errorDesc + "@");
-				} else {
-					// Se efectiviza la transacción solo si no ocurrió un error.
-					if (manageTrx) {
-						getTrx().commit();
-						getTrx().close();
-					}
-				}
+        } finally {
+            try {
+                // Si hubo error...
+                if (error) {
+                    // Se asigna el nuevo estado de la impresora.
+                    setFiscalPrinterStatus(fiscalPrinter, newPrinterStatus);
+                    // Se dispara el evento que informa del error ocurrido.
+                    fireErrorOcurred(errorTitle, errorDesc);
+                    // Se guarda el mensaje de error.
+                    setErrorMsg("@" + errorTitle + "@ - @" + errorDesc + "@");
+                }
 
-				// Se desconecta la impresora en caso de que este conectada aún.
-				if(getFiscalPrinter() != null && getFiscalPrinter().isConnected())
-					getFiscalPrinter().close();
+                // Se desconecta la impresora en caso de que este conectada aún.
+                if (fiscalPrinterDevice != null && fiscalPrinterDevice.isConnected())
+                    fiscalPrinterDevice.close();
 
-			} catch (IOException e) {
-				log.severe(e.getMessage());
-			}
-		}
-		return !error;
-	}
+            } catch (IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+        return !error;
+    }  // execute
 
-
-	/**
-	 * Ejecuto la acción correspondiente a partir de la acción parámetro
-	 * @param action
-	 * @param controladoraFiscalID
-	 * @param args
-	 * @throws Exception
-	 */
-	private void doAction(final Actions action, final Object[] args) throws Exception{
-		switch(action){
-			case ACTION_PRINT_DOCUMENT:		     doPrintDocument(args); break;
-			case ACTION_FISCAL_CLOSE:		     doFiscalClose(args); break;
-			case ACTION_PRINT_DELIVERY_DOCUMENT: doPrintDeliveryDocument(args); break;
-			default:						throw new Exception(Msg.getMsg(ctx, "InvalidAction"));
-		}
-	}
+    /**
+     * Ejecuto la acción correspondiente a partir de la acción parámetro
+     *
+     * @param action
+     * @param args
+     * @throws Exception
+     */
+    private void doAction(final Actions action, final Object[] args) throws Exception
+    {
+        switch (action) {
+        case ACTION_PRINT_DOCUMENT:
+            doPrintDocument(args);
+            break;
+        case ACTION_FISCAL_CLOSE:
+            doFiscalClose(args);
+            break;
+        case ACTION_PRINT_DELIVERY_DOCUMENT:
+            doPrintDeliveryDocument(args);
+            break;
+        default:
+            throw new Exception(Msg.getMsg(ctx, "InvalidAction"));
+        }
+    }
 
 	// **************************************************
 	//   			ACCIONES (COMANDOS)
@@ -310,119 +320,123 @@ public class FiscalDocumentPrint {
 	//   IMPRESIÓN DE FACTURA
 	// *************************
 
-	/**
-	 * Manda a imprimir un documento de openXpertya en una impresora fiscal.
-	 * @param document <code>PO</code> que representa el documento a imprimir.
-	 * @return <code>true</code> en caso de que el documento se haya emitido
-	 * correctamente, <code>false</false> en caso contrario.
-	 */
-	public boolean printDocument(final PO document) {
-		// Se valida que el documento tenga asignado el tipo de documento.
-		Integer docType_ID = (Integer)document.get_Value("C_DocTypeTarget_ID");
-		if(docType_ID == null || docType_ID == 0)
-			throw new IllegalArgumentException("Error: the document has no type");
+    /**
+     * Manda a imprimir un documento en una impresora fiscal.
+     *
+     * @param document
+     *            <code>PO</code> que representa el documento a imprimir.
+     * @return <code>true</code> en caso de que el documento se haya emitido
+     *         correctamente, <code>false</false> en caso contrario.
+     */
+    // TODO - Review the parameter (i think that can be moved to contruction fase)
+    public boolean printDocument(final PO document)
+    {
+        if (document == null) {
+            throw new IllegalArgumentException("Error: the document is null");
+        }
+        // Se valida que el documento tenga asignado el tipo de documento.
+        int C_DocType_ID = document.get_ValueAsInt("C_DocTypeTarget_ID");
+        if (C_DocType_ID == 0) {
+            throw new IllegalArgumentException("Error: the document has no type");
+        }
 
-		// Se obtiene el tipo de documento a emitir por la impresora.
-		LAR_MDocType docType = new LAR_MDocType(ctx, docType_ID, null);
-		setPrinterDocType(docType.getFiscalDocument());
+        // Se obtiene el tipo de documento a emitir por la impresora.
+        LAR_MDocType docType = new LAR_MDocType(ctx, C_DocType_ID, null);
+        setPrinterDocType(docType.getFiscalDocument());
 
-		// Se asigna el documento OXP.
-		setOxpDocument(document);
+        // Se asigna el documento OXP.
+        setOxpDocument(document);
 
-		// Se obtiene el controlador fiscal para chequear el status
-		MFiscalPrinter cFiscal = MFiscalPrinter.getOfDocType(docType_ID);
+        // Se obtiene el controlador fiscal para chequear el status
+        // MFiscalPrinter cFiscal = MFiscalPrinter.getOfDocType(docType_ID);
 
-		// Ejecutar la acción
-		boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT, cFiscal.get_ID(), new Object[]{document});
+        // Ejecutar la acción
+        boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT, new Object[] { document });
 
-		// Se actualizan los datos del documento oxp.
-		updateOxpDocument((MInvoice)document, !ok);
+        // Se actualizan los datos del documento oxp.
+        // updateOxpDocument((MInvoice)document, !ok);
 
-		// reset documento oxp y tipo de doc de la impresora
-		//setOxpDocument(null);
-		setPrinterDocType(null);
-		return ok;
-	}
+        // reset documento oxp y tipo de doc de la impresora
+        // setOxpDocument(null);
+        setPrinterDocType(null);
+        return ok;
+    }
 
-	/**
-	 *
-	 * @param document
-	 * @param documentPrintable
-	 * @param docType
-	 * @param originalInvoice
-	 * @return
-	 */
-	public boolean printDocument(final PO document, final Document documentPrintable, final MDocType docType, final MInvoice originalInvoice) {
-		// Se valida que el tipo de documento exista
-		if(docType == null) {
-			throw new IllegalArgumentException("Error: No document type");
-		}
+//	// TODO - Review the parameters
+//	public boolean printDocument(final PO document, final Document documentPrintable, final MDocType docType, final MInvoice originalInvoice) {
+//		// Se valida que el tipo de documento exista
+//		if(docType == null) {
+//			throw new IllegalArgumentException("Error: No document type");
+//		}
+//
+//		// Se obtiene el tipo de documento a emitir por la impresora.
+//		String fiscalDocument = (String) docType.get_Value("fiscaldocument");
+//		setPrinterDocType(fiscalDocument);
+//
+//		// Se asigna el documento OXP.
+//		setOxpDocument(document);
+//
+//		// Se obtiene el controlador fiscal para chequear el status
+//		//MFiscalPrinter cFiscal = MFiscalPrinter.getOfDocType(docType.get_ID());
+//
+//		// Ejecutar la acción
+//		boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT,
+//				new Object[] { document, documentPrintable, originalInvoice });
+//
+//		// Se actualizan los datos del documento oxp.
+//		//updateOxpDocument((MInvoice)document, !ok);
+//
+//		// reset documento oxp y tipo de doc de la impresora
+//		//setOxpDocument(null);
+//		setPrinterDocType(null);
+//		return ok;
+//	}
 
-		// Se obtiene el tipo de documento a emitir por la impresora.
-		String fiscalDocument = (String) docType.get_Value("fiscaldocument");
-		setPrinterDocType(fiscalDocument);
+    /**
+     * Realiza la impresión de la factura con los parámetros correspondientes.
+     *
+     * @param args
+     * @throws Exception
+     */
+    // TODO - Review the parameters: object array with differents t
+    private void doPrintDocument(final Object[] args) throws Exception
+    {
+        // Argumentos
+        MInvoice document = (MInvoice) args[0];
+        Document documentPrintable = null;
+        MInvoice originalInvoice = null;
+        // Factura imprimible por la impresora creada a partir del documento oxp
+        if (args.length > 1) {
+            documentPrintable = (Document) args[1];
+        }
+        // Documento oxp original configurada en el documento oxp, posiblemente
+        // necesario para notas de crédito
+        if (args.length > 2) {
+            originalInvoice = (MInvoice) args[2];
+        }
+        // Se manda a imprimir el documento según el tipo de documento
+        // de las impresoras fiscales asignado al tipo de documento de oxp
+        fireActionStarted(FiscalDocumentListener.AC_PRINT_DOCUMENT);
 
-		// Se asigna el documento OXP.
-		setOxpDocument(document);
+        // Emisión de una factura.
+        if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_Factura)) {
+            printInvoice(documentPrintable);
 
-		// Se obtiene el controlador fiscal para chequear el status
-		MFiscalPrinter cFiscal = MFiscalPrinter.getOfDocType(docType.get_ID());
+        // Emisión de una nota de crédito.
+        } else if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_NotaDeCredito)) {
+            printCreditNote(documentPrintable, originalInvoice);
 
-		// Ejecutar la acción
-		boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT, cFiscal.get_ID(),
-				new Object[] { document, documentPrintable, originalInvoice });
+        // Emisión de una nota de débito.
+        } else if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_NotaDeDebito)) {
+            printDebitNote(documentPrintable);
+        }
 
-		// Se actualizan los datos del documento oxp.
-		updateOxpDocument((MInvoice)document, !ok);
+        // Se dispara el evento de impresión finalizada.
+        fireDocumentPrintEndedOk();
 
-		// reset documento oxp y tipo de doc de la impresora
-		//setOxpDocument(null);
-		setPrinterDocType(null);
-		return ok;
-	}
-
-	/**
-	 * Realiza la impresión de la factura con los parámetros correspondientes.
-	 * @param args
-	 * @throws Exception
-	 */
-	private void doPrintDocument(final Object[] args) throws Exception{
-		// Argumentos
-		MInvoice document = (MInvoice)args[0];
-		Document documentPrintable = null;
-		MInvoice originalInvoice = null;
-		// Factura imprimible por la impresora creada a partir del documento oxp
-		if(args.length > 1){
-			documentPrintable = (Document)args[1];
-		}
-		// Documento oxp original configurada en el documento oxp, posiblemente
-		// necesario para notas de crédito
-		if(args.length > 2){
-			originalInvoice = (MInvoice)args[2];
-		}
-		// Se manda a imprimir el documento según el tipo de documento
-		// de las impresoras fiscales asignado al tipo de documento de oxp
-		fireActionStarted(FiscalDocumentPrintListener.AC_PRINT_DOCUMENT);
-
-		// Emisión de una factura.
-		if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_Factura)) {
-			printInvoice(documentPrintable);
-
-		// Emisión de una nota de crédito.
-		} else if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_NotaDeCredito)) {
-			printCreditNote(documentPrintable, originalInvoice);
-
-		// Emisión de una nota de débito.
-		} else if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_NotaDeDebito)) {
-			printDebitNote(documentPrintable);
-		}
-
-		// Se dispara el evento de impresión finalizada.
-		fireDocumentPrintEndedOk();
-
-		// Se actualiza la secuencia del tipo de documento emitido.
-		updateDocTypeSequence(document);
-	}
+        // Se actualiza la secuencia del tipo de documento emitido.
+        updateDocTypeSequence(document);
+    }
 
 	// *************************
 	// 		CIERRE FISCAL
@@ -430,13 +444,12 @@ public class FiscalDocumentPrint {
 
 	/**
 	 * Envia el comando de cierre de jornada fiscal a la impresora.
-	 * @param cFiscalID Impresora a la cual enviar el comando
 	 * @param closeType Tipo de cierre
 	 * @return verdadero en caso de exito, falso si hubo algún problema
 	 */
-	public boolean fiscalClose(final Integer cFiscalID, final String closeType) {
+	public boolean fiscalClose(final String closeType) {
 		// Ejecutar la acción
-		return execute(Actions.ACTION_FISCAL_CLOSE, cFiscalID, new Object[]{closeType});
+		return execute(Actions.ACTION_FISCAL_CLOSE, new Object[]{closeType});
 	}
 
 	/**
@@ -448,7 +461,7 @@ public class FiscalDocumentPrint {
 		// Argumentos
 		String closeType = (String)args[0];
 
-		fireActionStarted(FiscalDocumentPrintListener.AC_EXECUTING_ACTION);
+		fireActionStarted(FiscalDocumentListener.AC_EXECUTING_ACTION);
 
 		// Cerrar la impresora fiscal
 		getFiscalPrinter().fiscalClose(closeType);
@@ -471,8 +484,8 @@ public class FiscalDocumentPrint {
 	 * @return <code>true</code> en caso de que el documento se haya emitido
 	 * correctamente, <code>false</false> en caso contrario.
 	 */
-	public boolean printDeliveryDocument(final Integer cFiscalID, final MOrder order) {
-		return execute(Actions.ACTION_PRINT_DELIVERY_DOCUMENT, cFiscalID, new Object[] {order});
+	public boolean printDeliveryDocument(final MOrder order) {
+		return execute(Actions.ACTION_PRINT_DELIVERY_DOCUMENT, new Object[] {order});
 	}
 
 	/**
@@ -483,7 +496,7 @@ public class FiscalDocumentPrint {
 	private void doPrintDeliveryDocument(final Object[] args) throws Exception {
 		MOrder order = (MOrder) args[0];
 		// Informa el inicio de la impresión
-		fireActionStarted(FiscalDocumentPrintListener.AC_PRINT_DOCUMENT);
+		fireActionStarted(FiscalDocumentListener.AC_PRINT_DOCUMENT);
 		// Crea el documento no fiscal y luego obtiene todas las líneas del pedido
 		NonFiscalDocument nonFiscalDocument = new NonFiscalDocument();
 		//MOrderLine[] orderLines = order.getLines(true);
@@ -514,15 +527,8 @@ public class FiscalDocumentPrint {
 	/**
 	 * @return Returns the fiscalPrinter.
 	 */
-	public FiscalPrinter getFiscalPrinter() {
-		return fiscalPrinter;
-	}
-
-	/**
-	 * @param fiscalPrinter The fiscalPrinter to set.
-	 */
-	public void setFiscalPrinter(final FiscalPrinter fiscalPrinter) {
-		this.fiscalPrinter = fiscalPrinter;
+	public FiscalPrinterDevice getFiscalPrinter() {
+	    return fiscalPrinterDevice;
 	}
 
 	/**
@@ -1175,21 +1181,21 @@ public class FiscalDocumentPrint {
 	/**
 	 * @return Returns the printerEventListener.
 	 */
-	public FiscalPrinterEventListener getPrinterEventListener() {
-		return printerEventListener;
-	}
+//	public FiscalPrinterListener getPrinterEventListener() {
+//		return printerEventListener;
+//	}
 
 	/**
 	 * @param printerEventListener The printerEventListener to set.
 	 */
-	public void setPrinterEventListener(final FiscalPrinterEventListener printerEventListener) {
-		this.printerEventListener = printerEventListener;
+	public void setPrinterEventListener(final FiscalPrinterListener printerEventListener) {
+		//this.printerEventListener = printerEventListener;
 		if(getFiscalPrinter() != null)
 			getFiscalPrinter().setEventListener(printerEventListener);
 	}
 
 	private void fireStatusReported(final MFiscalPrinter cFiscal, final String status) {
-		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
+		for (FiscalDocumentListener fdpl : getDocumentPrintListeners()) {
 			fdpl.statusReported(this, cFiscal, status);
 		}
 	}
@@ -1198,14 +1204,14 @@ public class FiscalDocumentPrint {
 		fireStatusReported(cFiscal, cFiscal.getStatus());
 	}
 
-	private void fireActionStarted(final Integer action) {
-		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
+	private void fireActionStarted(int action) {
+		for (FiscalDocumentListener fdpl : getDocumentPrintListeners()) {
 			fdpl.actionStarted(this, action);
 		}
 	}
 
 	protected void fireErrorOcurred(final String errorTitle, final String errorDesc) {
-		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
+		for (FiscalDocumentListener fdpl : getDocumentPrintListeners()) {
 			fdpl.errorOcurred(
                     this,
                     Msg.parseTranslation(ctx,errorTitle),
@@ -1214,14 +1220,14 @@ public class FiscalDocumentPrint {
 	}
 
 	protected void fireDocumentPrintEndedOk() {
-		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
+		for (FiscalDocumentListener fdpl : getDocumentPrintListeners()) {
 			fdpl.documentPrintEndedOk(this);
 		}
 	}
 
 
 	private void fireActionEndedOk(final Actions action){
-		for (FiscalDocumentPrintListener fdpl : getDocumentPrintListeners()) {
+		for (FiscalDocumentListener fdpl : getDocumentPrintListeners()) {
 			fdpl.actionEnded(true, action);
 		}
 	}
@@ -1229,7 +1235,7 @@ public class FiscalDocumentPrint {
 	/**
 	 * @return Returns the documentPrintListeners.
 	 */
-	public List<FiscalDocumentPrintListener> getDocumentPrintListeners() {
+	public List<FiscalDocumentListener> getDocumentPrintListeners() {
 		return documentPrintListeners;
 	}
 
@@ -1332,13 +1338,14 @@ public class FiscalDocumentPrint {
 		}
 	}
 
-	private void updateOxpDocument(final MInvoice mInvoice, boolean error) {
-		if(error) {
-			//TODO: verificar.
-			//mInvoice.setDocStatus(MInvoice.DOCSTATUS_InProgress);
-			//mInvoice.save();
-		}
-	}
+//  TODO - Determine if this behavior is needed
+//	private void updateOxpDocument(final MInvoice mInvoice, boolean error) {
+//		if(error) {
+//			//TODO: verificar.
+//			//mInvoice.setDocStatus(MInvoice.DOCSTATUS_InProgress);
+//			//mInvoice.save();
+//		}
+//	}
 
 	private void updateDocTypeSequence(final MInvoice mInvoice) {
 		// Se actualiza la secuencia del tipo de documento del documento
@@ -1369,9 +1376,9 @@ public class FiscalDocumentPrint {
 	/**
 	 * Agrega un manejador de impresió de documentos al cual se le reportan
 	 * los estados de la impresión.
-	 * @param fdpl <code>FiscalDocumentPrintListener</code> manejador de eventos.
+	 * @param fdpl <code>FiscalDocumentListener</code> manejador de eventos.
 	 */
-	public void addDocumentPrintListener(final FiscalDocumentPrintListener fdpl) {
+	public void addDocumentPrintListener(final FiscalDocumentListener fdpl) {
 		if(!getDocumentPrintListeners().contains(fdpl)) {
 			getDocumentPrintListeners().add(fdpl);
 			fdpl.setFiscalDocumentPrint(this);
@@ -1382,7 +1389,7 @@ public class FiscalDocumentPrint {
 	 * Elimina un manejador de eventos de la colección.
 	 * @param fdpl Manejador de eventos a eliminar.
 	 */
-	public void removeDocumentPrintListener(final FiscalDocumentPrintListener fdpl) {
+	public void removeDocumentPrintListener(final FiscalDocumentListener fdpl) {
 		getDocumentPrintListeners().remove(fdpl);
 	}
 
@@ -1474,7 +1481,7 @@ public class FiscalDocumentPrint {
 		cancelWaiting = false;
 		errorMsg = null;
 		printerDocType = null;
-		fiscalPrinter = null;
+		//fiscalPrinter = null;
 
 		return printDocument(getOxpDocument());
 	}
@@ -1508,7 +1515,7 @@ public class FiscalDocumentPrint {
 	/**
 	 * @return el String a imprimir en cada linea del ticket
 	 */
-	protected String manageLineDescription(DocumentLine docLine, MInvoiceLine mLine)
+	private String manageLineDescription(DocumentLine docLine, MInvoiceLine mLine)
 	{
 		MProduct aProduct = null;
 		String value = "";
@@ -1529,7 +1536,7 @@ public class FiscalDocumentPrint {
 			description = " ";
 
 			/* Usar los campos Identificador para definir el contenido de la linea */
-			if (cFiscal.isonprintuseproductreference())
+			if (fiscalPrinter.isonprintuseproductreference())
 			{
 				return genDescriptionFromIdentifiers(aProduct);
 			}
@@ -1543,13 +1550,13 @@ public class FiscalDocumentPrint {
 					name = aProduct.getName().trim();
 
 				// armar la descripción según la selección
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Nombre.equals(cFiscal.getonprintproductformat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Nombre.equals(fiscalPrinter.getonprintproductformat()))
 					description = name;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Codigo.equals(cFiscal.getonprintproductformat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Codigo.equals(fiscalPrinter.getonprintproductformat()))
 					description = value;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_NombreCodigo.equals(cFiscal.getonprintproductformat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_NombreCodigo.equals(fiscalPrinter.getonprintproductformat()))
 					description = name + " " + value;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_CodigoNombre.equals(cFiscal.getonprintproductformat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_CodigoNombre.equals(fiscalPrinter.getonprintproductformat()))
 					description = value + " " + name;
 			}
 		}
