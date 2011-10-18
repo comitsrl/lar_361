@@ -84,20 +84,23 @@ public abstract class BasicFiscalPrinter implements FiscalPrinterDevice {
 	protected abstract FiscalPacket createFiscalPacket();
 
 	public String formatText(String text, int maxLength) {
-		if(text != null && text.length() > maxLength)
-			text = text.substring(0, maxLength);
+        if (text != null && text.length() > maxLength) {
+            text = text.substring(0, maxLength);
+        }
 		return text;
 	}
 
 	public String formatNumber(BigDecimal number, int integerPart, int decimalPart) {
-		String num = number.toString();
-		int pointIndex = num.indexOf('.');
-		if(pointIndex == -1) {
-			num = number + ".";
-			for(int i = 1; i <= decimalPart; num += "0", i++);
-		} else if (num.substring(pointIndex + 1).length() > decimalPart)
-			num = num.substring(0, num.indexOf('.') + decimalPart);
-		return num;
+        String num = number.toString();
+        int pointIndex = num.indexOf('.');
+        if (pointIndex == -1) {
+            num = number + ".";
+            for (int i = 1; i <= decimalPart; num += "0", i++)
+                ;
+        } else if (num.substring(pointIndex + 1).length() > decimalPart) {
+            num = num.substring(0, num.indexOf('.') + decimalPart);
+        }
+        return num;
 	}
 
 	/**
@@ -143,8 +146,9 @@ public abstract class BasicFiscalPrinter implements FiscalPrinterDevice {
 	 * @param response Respuesta recibida.
 	 */
 	protected void fireCommandExecuted(FiscalPacket command, FiscalPacket response) {
-		if(getEventListener() != null)
-			getEventListener().commandExecuted(this, command, response);
+        if (getEventListener() != null) {
+            getEventListener().commandExecuted(this, command, response);
+        }
 	}
 
 	/**
@@ -156,8 +160,9 @@ public abstract class BasicFiscalPrinter implements FiscalPrinterDevice {
 	 * que se haya producido alguno).
 	 */
 	protected void fireStatusChanged(FiscalPacket command, FiscalPacket response, FiscalMessages msgs) {
-		if(getEventListener() != null)
-			getEventListener().statusChanged(this, command, response, msgs);
+        if (getEventListener() != null) {
+            getEventListener().statusChanged(this, command, response, msgs);
+        }
 	}
 
 	/**
@@ -176,8 +181,9 @@ public abstract class BasicFiscalPrinter implements FiscalPrinterDevice {
 	 * @param msgs Mensajes de estado de la impresora.
 	 */
 	protected void firePrintEnded(FiscalMessages msgs) {
-		if(getEventListener() != null)
-			getEventListener().printEnded(this, msgs);
+        if (getEventListener() != null) {
+            getEventListener().printEnded(this, msgs);
+        }
 	}
 
 	/**
@@ -293,5 +299,4 @@ public abstract class BasicFiscalPrinter implements FiscalPrinterDevice {
 	protected void setLastResponse(FiscalPacket lastResponse) {
 		this.lastResponse = lastResponse;
 	}
-
 }

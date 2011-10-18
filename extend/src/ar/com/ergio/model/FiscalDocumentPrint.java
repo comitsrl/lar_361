@@ -894,28 +894,29 @@ public class FiscalDocumentPrint {
 	 */
 	private void loadInvoicePayments(final Invoice invoice, final MInvoice mInvoice) {
 		BigDecimal totalPaidAmt = BigDecimal.ZERO;
-		final String OTHERS_DESC = Msg.translate(ctx, "FiscalTicketOthersPayment");
-		final String CASH_DESC = Msg.translate(ctx, "FiscalTicketCashPayment");
+		final String othersDesc = Msg.translate(ctx, "FiscalTicketOthersPayment");
+		final String cashDesc = Msg.translate(ctx, "FiscalTicketCashPayment");
 		// Lista temporal de pagos creados a partir de los allocations
 		List<Payment> payments = new ArrayList<Payment>();
 
 		// Obtiene todas las imputaciones de la factura agrupadas por pago.
 		String sql =
+		    //TODO - Review this, we may be needed for billing outside POS
 			"SELECT C_Payment_ID, " +
 			       "C_CashLine_ID, " +
-			       "C_Invoice_Credit_ID, " +
+			       //"C_Invoice_Credit_ID, " +
 			       "SUM(Amount + DiscountAmt + WriteoffAmt) AS PaidAmount " +
 			"FROM C_AllocationLine " +
 			"WHERE C_Invoice_ID = ? " +
-			"GROUP BY C_Payment_ID, C_CashLine_ID, C_Invoice_Credit_ID " +
+			"GROUP BY C_Payment_ID, C_CashLine_ID " + //, C_Invoice_Credit_ID " +
 			"ORDER BY PaidAmount ";
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
 		// Crea los pagos de Efectivo y Otros para acumular montos de sendos tipos.
-		Payment othersPayment = new Payment(BigDecimal.ZERO, OTHERS_DESC);
-		Payment cashPayment =new Payment(BigDecimal.ZERO, CASH_DESC);
+		Payment othersPayment = new Payment(BigDecimal.ZERO, othersDesc);
+		Payment cashPayment =new Payment(BigDecimal.ZERO, cashDesc);
 
 		try {
 			pstmt = DB.prepareStatement(sql, getTrxName());
@@ -935,7 +936,7 @@ public class FiscalDocumentPrint {
 				// se utilizó para el pago
 				paymentID = rs.getInt("C_Payment_ID");
 				cashLineID = rs.getInt("C_CashLine_ID");
-				invoiceCreditID = rs.getInt("C_Invoice_Credit_ID");
+				//invoiceCreditID = rs.getInt("C_Invoice_Credit_ID");
 				paidAmt = rs.getBigDecimal("PaidAmount");
 				description = null;
 				payment = null;
@@ -943,8 +944,7 @@ public class FiscalDocumentPrint {
 				// 1. Imputación con un C_Payment.
 				if (paymentID > 0) {
 					// Obtiene la descripción.
-					description = getInvoicePaymentDescription(new MPayment(
-							mInvoice.getCtx(), paymentID, getTrxName()));
+					description = getInvoicePaymentDescription(new MPayment(ctx, paymentID, getTrxName()));
 				// 2. Imputación con Línea de Caja
 				} else if (cashLineID > 0) {
 					// Todas las imputaciones con líneas de caja se suman al pago
@@ -952,15 +952,15 @@ public class FiscalDocumentPrint {
 					// "Efectivo".
 					cashPayment.setAmount(cashPayment.getAmount().add(paidAmt));
 				// 3. Imputación con Factura de Crédito (NC)
-				} else if (invoiceCreditID > 0) {
-					// Obtiene la descripción.
-					description = getInvoicePaymentDescription(new MInvoice(
-							ctx, invoiceCreditID, getTrxName()));
+//				} else if (invoiceCreditID > 0) {
+//					// Obtiene la descripción.
+//					description = getInvoicePaymentDescription(new MInvoice(
+//							ctx, invoiceCreditID, getTrxName()));
 				}
 
 				// Si es un tipo que entra dentro de "Otros Pagos", se suma el importe
 				// al payment de "Otros Pagos".
-				if (OTHERS_DESC.equals(description)) {
+				if (othersDesc.equals(description)) {
 					othersPayment.setAmount(othersPayment.getAmount().add(paidAmt));
 				// Caso Contrario (Tarjeta, Cheque, Transferencia, NC, etc), se crea el pago
 				// con la descripción.
@@ -1045,7 +1045,7 @@ public class FiscalDocumentPrint {
 	 * Devuelve la descripción a imprimir para un pago según un MPayment.
 	 */
 	private String getInvoicePaymentDescription(final MPayment mPayment) {
-		Properties ctx = mPayment.getCtx();
+		//Properties ctx = mPayment.getCtx();
 		String description = null;
 		// - Tarjeta de Crédito: NombreTarjeta NroCupon.
 		//   Ej: VISA 1248
@@ -1332,7 +1332,7 @@ public class FiscalDocumentPrint {
 		*/
 
 		// Validar si la factura ya fue impresa.
-		if(mInvoice.get_ValueAsBoolean("IsFiscalPrinted")) {
+		if(mInvoice.get_ValueAsBoolean("isfiscalprinted")) {
 			log.severe("The invoice was already printed with a fiscal printer.");
 			throw new Exception(Msg.translate(ctx,"FiscalAlreadyPrintedError"));
 		}

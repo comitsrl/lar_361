@@ -42,7 +42,7 @@ import ar.com.ergio.print.fiscal.msg.FiscalMessages;
 import ar.com.ergio.print.fiscal.msg.MsgRepository;
 
 /**
- * Impresora Fiscal Hasar. Funcionalidad común a todos los modelos de Hasar. 
+ * Impresora Fiscal Hasar. Funcionalidad común a todos los modelos de Hasar.
  * Implementa la interfaz <code>HasarCommands</code>. Cualquier modelo nuevo
  * de Hasar a implementar deberá ser una especialización de esta clase,
  * permitiendo sobreescribir algunos o todos los comandos implementados
@@ -81,7 +81,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	/** Responsabilidad frente al IVA: No categorizado */
 	protected static final String NO_CATEGORIZADO = "T";
 
-	// Tipo de documento  
+	// Tipo de documento
 	/** C.U.I.T. */
 	protected static final String CUIT = "C";
 	/** C.U.I.L. */
@@ -108,13 +108,13 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	protected static final Integer UPCA  = 3;
 	/** Código de barras ITS 2 de 5 */
 	protected static final Integer ITS = 4;
-	
+
 	// Opciones de operación del comando ReturnRecharge
 	/** ReturnRecharge: Operación Devolución de Envases */
 	protected static final String CONTAINER_RETURN = "e";
 	/** ReturnRecharge: Operación Descuento / Recargo */
 	protected static final String DISCOUNT_RECHARGE = "B";
-	
+
 	/** Conjunto de caracteres para realizar la conversión a string de los paquetes fiscales */
 	private String encoding = "ISO8859_1";	// ISO 8859-1, Latin alphabet No. 1.
 	/** Año base para validación de fechas */
@@ -129,11 +129,11 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	private Map<Integer,FiscalMessage> fiscalStatusMsgs;
 	/** Códigos de mensajes de estado de la impresora */
 	private int[] printerStatusCodes = { PST_PRINTER_BUSY, PST_PRINTER_ERROR, PST_PRINTER_OFFLINE,
-										 PST_JOURNAL_PAPER_OUT, PST_TICKET_PAPER_OUT, PST_PRINT_BUFFER_FULL, 
+										 PST_JOURNAL_PAPER_OUT, PST_TICKET_PAPER_OUT, PST_PRINT_BUFFER_FULL,
 										 PST_PRINT_BUFFER_EMPTY, PST_PRINTER_COVER_OPEN, PST_MONEY_DRAWER_CLOSED
 										};
 	/** Códigos de mensajes de estado del controlador fiscal */
-	private int[] fiscalStatusCodes  = { FST_FISCAL_MEMORY_CRC_ERROR, FST_WORKING_MEMORY_CRC_ERROR, FST_UNKNOWN_COMMAND,    
+	private int[] fiscalStatusCodes  = { FST_FISCAL_MEMORY_CRC_ERROR, FST_WORKING_MEMORY_CRC_ERROR, FST_UNKNOWN_COMMAND,
 										 FST_INVALID_DATA_FIELD, FST_INVALID_COMMAND, FST_ACCUMULATOR_OVERFLOW,
 										 FST_FISCAL_MEMORY_FULL, FST_FISCAL_MEMORY_ALMOST_FULL, FST_DEVICE_CERTIFIED,
 										 FST_DEVICE_FISCALIZED, FST_DATE_ERROR, FST_FISCAL_DOCUMENT_OPEN,
@@ -146,15 +146,15 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	/** Mapeo entre los tipos de identificación de clientes de las clases
 	 * de documentos y los valores esperados por las impresoras de esta marca. */
 	private Map<Integer, String> identificationTypes;
-	/** Mapeo entre los tipos de documentos de las clases de documentos y 
+	/** Mapeo entre los tipos de documentos de las clases de documentos y
 	 * los valores esperados por las impresoras de esta marca. */
 	private Map<String, String> documentTypes;
-	
+
 
 	public HasarFiscalPrinter() {
 		super();
 	}
-	
+
 	/**
 	 * @param fiscalComm
 	 */
@@ -363,7 +363,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		int maxLength = 50;
 		return cmdPrintLineItem(description, quantity, price, ivaPercent, substract, internalTaxes, basePrice, display, maxLength);
 	}
-	
+
 	//Cuspide Computacion: metodo que permite especificar la longitud máxima de la descripcion, para los modelos que lo requieran.
 	protected FiscalPacket cmdPrintLineItem(String description, BigDecimal quantity, BigDecimal price, BigDecimal ivaPercent, boolean substract, BigDecimal internalTaxes, boolean basePrice, Integer display, int descMaxLength) {
 		FiscalPacket cmd = createFiscalPacket(CMD_PRINT_LINE_ITEM);
@@ -374,7 +374,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		if(ivaPercent == null)
 			cmd.setText(i++, "**.**", false);
 		else
-			cmd.setNumber(i++, ivaPercent, 2, 2, false);		
+			cmd.setNumber(i++, ivaPercent, 2, 2, false);
 		cmd.setBoolean(i++, substract, "m", "M", false);
 		cmd.setNumber(i++, internalTaxes, 6, 8, false);
 		cmd.setNumber(i++, display, true);
@@ -407,7 +407,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		FiscalPacket cmd = createFiscalPacket(CMD_SEND_FIRST_IVA);
 		return cmd;
 	}
-	
+
 	@Override
 	public FiscalPacket cmdNextIVATransmission() {
 		FiscalPacket cmd = createFiscalPacket(CMD_NEXT_TRANSMISSION);
@@ -499,7 +499,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		return cmdReturnRecharge(description, amount, ivaPercent, subtract,
 				internalTaxes, baseAmount, display, operation, descMaxLength);
 	}
-	
+
 
 	protected FiscalPacket cmdReturnRecharge(String description,
 			BigDecimal amount, BigDecimal ivaPercent, boolean subtract,
@@ -512,7 +512,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		if(ivaPercent == null){
 			ivaPercent = BigDecimal.ZERO;
 		}
-		cmd.setNumber(i++, ivaPercent, 2, 2, false);		
+		cmd.setNumber(i++, ivaPercent, 2, 2, false);
 		cmd.setBoolean(i++, subtract, "m", "M", false);
 		cmd.setNumber(i++, internalTaxes, 6, 8, false);
 		cmd.setNumber(i++, display, true);
@@ -524,7 +524,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	protected FiscalPacket createFiscalPacket() {
 		return new HasarFiscalPacket(getEncoding(),getBaseRolloverYear(), this);
 	}
-	
+
 	public String getEncoding() {
 		return encoding;
 	}
@@ -540,7 +540,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	public void setBaseRolloverYear(int baseRolloverYear) {
 		this.baseRolloverYear = baseRolloverYear;
 	}
-	
+
 	/**
 	 * Ejecuta un comando fiscal en la impresora y analiza la existencia
 	 * de errores en la respuesta. En caso de que se produzca algún error
@@ -555,17 +555,17 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	 */
 	protected FiscalPacket execute(FiscalPacket command) throws FiscalPrinterIOException, FiscalPrinterStatusError {
 		FiscalPacket response = createFiscalPacket();
-		
+
 		// Se guarda el comando como el último ejecutado.
 		setLastRequest(command);
 		setLastResponse(null);
-		
+
 		try {
 			// Se envía el comando a la interfaz de comunicación para
 			// ser ejecutado.
 			getFiscalComm().execute(command, response);
 			setLastResponse(response);
-			
+
 		} catch (IOException e) {
 			throw new FiscalPrinterIOException(e.getMessage(), command, response);
 		}
@@ -575,18 +575,19 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 
 		// Si se produjeron cambios en el estado de la impresora se dispara
 		// el evento correspondiente.
-		if(statusChanged)
-			fireStatusChanged(command, response);
+        if (statusChanged) {
+            fireStatusChanged(command, response);
+        }
 
 		// Si la impresora quedó en estado de error entonces se lanza una
 		// excepción.
-		if(getMessages().hasErrors()) {
-			throw new FiscalPrinterStatusError(command, response, getMessages());
-		}
-		
+        if (getMessages().hasErrors()) {
+            throw new FiscalPrinterStatusError(command, response, getMessages());
+        }
+
 		// Se informa al manejador que el comando se ejecutó satisfactoriamente.
 		fireCommandExecuted(command, response);
-		
+
 		return response;
 	}
 
@@ -596,7 +597,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 
 		try {
 			// Se obtiene los estados a partir de la respuesta.
-			newPrinterStatus = response.getPrinterStatus();	
+			newPrinterStatus = response.getPrinterStatus();
 			newFiscalStatus = response.getFiscalStatus();
 		} catch (Exception e) {
 			// Se puede producir un error de formato al querer obtener los estados
@@ -605,14 +606,14 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			throw new FiscalPrinterIOException(MsgRepository.get("ResponseFormatError"), getLastRequest(), response);
 		}
 
-		// Se comprueba si el status fue modificado. 
+		// Se comprueba si el status fue modificado.
 		boolean stsChanged = getPrinterStatus() != newPrinterStatus ||
 							 getFiscalStatus() != newFiscalStatus;
-		
+
 		// Se asignan los estados de impresora y controlador fiscal.
 		setPrinterStatus(newPrinterStatus);
 		setFiscalStatus(newFiscalStatus);
-		
+
 		FiscalMessages msgs = new FiscalMessages();
 		// Se chequea el estado del controlador fiscal.
 		for(int i = 0; i < getFiscalStatusCodes().length; i++) {
@@ -622,7 +623,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 				msgs.add(msg);
 			}
 		}
-			
+
 		// Se chequea el estado de la impresora.
 		for(int i = 0; i < getPrinterStatusCodes().length; i++) {
 			int statusCode = getPrinterStatusCodes()[i];
@@ -630,18 +631,18 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 				FiscalMessage msg = getPrinterStatusMsgs().get(statusCode);
 				msgs.add(msg);
 			}
-			// Se chequea el estado del papel de la impresora y se 
+			// Se chequea el estado del papel de la impresora y se
 			// setea el mismo.
 			if(statusCode == PST_JOURNAL_PAPER_OUT || statusCode == PST_TICKET_PAPER_OUT)
 				setWithoutPaper((getPrinterStatus() & statusCode) != 0);
 		}
-		
+
 		// Se setean los mensajes de la impresora.
 		setMessages(msgs);
-		
+
 		return stsChanged;
 	}
-	
+
 	/**
 	 * @return Returns the fiscalStatus.
 	 */
@@ -677,7 +678,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		if(fiscalStatusMsgs == null) {
 			fiscalStatusMsgs = new HashMap<Integer,FiscalMessage>();
 			Map<Integer,FiscalMessage> st = fiscalStatusMsgs; // Short Alias.
-	
+
 			// Se cargan los mensajes de estado fiscal.
 			st.put(FST_FISCAL_MEMORY_CRC_ERROR,   MsgRepository.getFiscalMsg(FST_FISCAL_MEMORY_CRC_ERROR, "FstFiscalMemoryCrcErrorTitle","FstFiscalMemoryCrcErrorDesc", true));
 			st.put(FST_WORKING_MEMORY_CRC_ERROR,  MsgRepository.getFiscalMsg(FST_WORKING_MEMORY_CRC_ERROR, "FstWorkingMemoryCrcErrorTitle","FstWorkingMemoryCrcErrorDesc", true));
@@ -704,7 +705,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		if(printerStatusMsgs == null) {
 			printerStatusMsgs = new HashMap<Integer,FiscalMessage>();
 			Map<Integer,FiscalMessage> st = printerStatusMsgs; // Short Alias.
-			
+
 			// Se cargan los mensajes de estado de la impresora.
 			st.put(PST_PRINTER_BUSY,        MsgRepository.getFiscalMsg(PST_PRINTER_BUSY, "PstPrinterBusyTitle", "PstPrinterBusyDesc", false));
 			st.put(PST_PRINTER_ERROR,       MsgRepository.getFiscalMsg(PST_PRINTER_ERROR, "PstPrinterErrorTitle", "PstPrinterErrorDesc", true));
@@ -749,27 +750,26 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			// Se carga el número de remito asignado a la factura
 			// en caso de existir.
 			// Comando: @SetEmbarkNumber
-			if(invoice.hasPackingSlipNumber())
+			if(invoice.hasPackingSlipNumber()) {
 				execute(cmdSetEmbarkNumber(1, invoice.getPackingSlipNumber()));
-			
+			}
 			//////////////////////////////////////////////////////////////
 			// Se abre el documento fiscal.
 			// Comando: @OpenFiscalReceipt
-			response = execute(cmdOpenFiscalReceipt(
-				traduceDocumentType(Document.DT_INVOICE, invoice.getLetter()))
-			);
+            response = execute(cmdOpenFiscalReceipt(traduceDocumentType(Document.DT_INVOICE,
+                    invoice.getLetter())));
 			setLastDocumentNo("");
 			setCancelAllowed(true);
 			setDocumentOpened(true);
-			
+
 			//////////////////////////////////////////////////////////////
 			// Se cargan las observaciones de la factura como texto fiscal.
 			// Comando: @PrintFiscalText
 			for (String observation : invoice.getObservations()) {
 				execute(cmdPrintFiscalText(observation,null));
 			}
-			
-			//////////////////////////////////////////////////////////////		
+
+			//////////////////////////////////////////////////////////////
 			// Se cargan los ítems de la factura.
 			// Comando: @PrintLineItem
 			loadDocumentLineItems(invoice);
@@ -777,25 +777,20 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			//////////////////////////////////////////////////////////////
 			// Se cargan los descuentos de la factura.
 			loadDocumentDiscounts(invoice);
-			
+
 			//////////////////////////////////////////////////////////////
 			// Se calcula el subtotal.
 			// Comando: @Subtotal
 			execute(cmdSubtotal(true, null));
-			
+
 			//////////////////////////////////////////////////////////////
 			// Se ingresan los pagos realizados por el comprador.
 			// Comando: @TotalTender
 			for (Payment payment : invoice.getPayments()) {
-				execute(cmdTotalTender(
-					payment.getDescription(), 
-					payment.getAmount(), 
-					false, 
-					null)
-				);
+                execute(cmdTotalTender(payment.getDescription(), payment.getAmount(), false, null));
 				setCancelAllowed(false);
 			}
-			
+
 			//////////////////////////////////////////////////////////////
 			// Se cierra el comprobante fiscal.
 			// Comando: @CloseFiscalReceipt
@@ -803,17 +798,17 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			setDocumentOpened(false);
 			// Chequeo de impuestos
 			checkTaxes(invoice);
-			
+
 			// Se obtiene el número de comprobante emitido.
 			setLastDocumentNo(response.getString(3));
 			invoice.setDocumentNo(getLastDocumentNo());
 			// Se obtiene el número del CAI.
 			if(invoice.getLetter().equals(Document.DOC_LETTER_A));
 				invoice.setCAINumber(getCAINumber(response));
-		
+
 			// Se indica al manejador de eventos que la impresión ha finalizado.
 			firePrintEnded();
-			
+
 		} catch (FiscalPrinterIOException e) {
 			// Si ocurrió algún error se intenta cancelar el documento
 			// actual y se relanza la excepción.
@@ -821,11 +816,11 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			throw e;
 		}
 	}
-	
+
 	public void fiscalClose(String closeType) throws FiscalPrinterStatusError, FiscalPrinterIOException {
 		execute(cmdDailyClose(closeType));
 	}
-	
+
 	public void printDocument(CreditNote creditNote) throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException {
 		Customer customer = creditNote.getCustomer();
 		FiscalPacket response;
@@ -855,16 +850,16 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			setLastDocumentNo("");
 			setCancelAllowed(true);
 			setDocumentOpened(true);
-			
+
 			//////////////////////////////////////////////////////////////
-			// Se cargan las observaciones de la nota de crédito 
+			// Se cargan las observaciones de la nota de crédito
 			// como texto fiscal.
 			// Comando: @PrintFiscalText
 			for (String observation : creditNote.getObservations()) {
 				execute(cmdPrintFiscalText(observation,null));
 			}
 
-			//////////////////////////////////////////////////////////////		
+			//////////////////////////////////////////////////////////////
 			// Se cargan los ítems de la nota de crédito.
 			// Comando: @PrintLineItem
 			loadDocumentLineItems(creditNote);
@@ -878,7 +873,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			// Se obtiene el número de la nota de crédito emitida.
 			setLastDocumentNo(response.getString(3));
 			creditNote.setDocumentNo(getLastDocumentNo());
-			
+
 			// Se indica al manejador de eventos que la impresión ha finalizado.
 			firePrintEnded();
 
@@ -889,7 +884,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			throw e;
 		}
 	}
-	
+
 	public void printDocument(DebitNote debitNote) throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException {
 		Customer customer = debitNote.getCustomer();
 		FiscalPacket response;
@@ -908,7 +903,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			// Comando: @SetEmbarkNumber
 			if(debitNote.hasPackingSlipNumber())
 				execute(cmdSetEmbarkNumber(1, debitNote.getPackingSlipNumber()));
-			
+
 			//////////////////////////////////////////////////////////////
 			// Se abre el documento fiscal.
 			// Comando: @OpenFiscalReceipt
@@ -920,14 +915,14 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			setDocumentOpened(true);
 
 			//////////////////////////////////////////////////////////////
-			// Se cargan las observaciones de la nota de débito 
+			// Se cargan las observaciones de la nota de débito
 			// como texto fiscal.
 			// Comando: @PrintFiscalText
 			for (String observation : debitNote.getObservations()) {
 				execute(cmdPrintFiscalText(observation,null));
 			}
 
-			//////////////////////////////////////////////////////////////		
+			//////////////////////////////////////////////////////////////
 			// Se cargan los ítems de la nota de débito.
 			// Comando: @PrintLineItem
 			loadDocumentLineItems(debitNote);
@@ -943,7 +938,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			// Se obtiene el número del CAI.
 			if(debitNote.getLetter().equals(Document.DOC_LETTER_A));
 				debitNote.setCAINumber(getCAINumber(response));
-			
+
 			// Se indica al manejador de eventos que la impresión ha finalizado.
 			firePrintEnded();
 
@@ -971,19 +966,19 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			setCancelAllowed(true);
 			setDocumentOpened(true);
 
-			//////////////////////////////////////////////////////////////		
+			//////////////////////////////////////////////////////////////
 			// Se cargan las líneas del documento no fiscal
 			// Comando: @PrintNonFiscalText
 			for (String line : nonFiscalDocument.getLines()) {
 				execute(cmdPrintNonFiscalText(line, 0));
 			}
-			
+
 			//////////////////////////////////////////////////////////////
 			// Se cierra el comprobante fiscal.
 			// Comando: @CloseFiscalReceipt
 			execute(cmdCloseNonFiscalReceipt(nonFiscalDocument.getCopies()));
 			setDocumentOpened(false);
-			
+
 			// Se indica al manejador de eventos que la impresión ha finalizado.
 			firePrintEnded();
 
@@ -998,7 +993,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	/**
 	 * Realiza la conversión entre el entero que representa a la categoría
 	 * de IVA en las clases de documentos y el string que espera la impresora
-	 * fiscal. 
+	 * fiscal.
 	 * @param ivaResponsibility Valor de la responsabilidad frente a IVA.
 	 * @return El string que representa la responsabilidad frente al IVA.
 	 */
@@ -1008,10 +1003,10 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			result = NO_CATEGORIZADO;
 		return result;
 	}
-	
+
 	/**
 	 * Realiza la conversión entre el entero que representa el tipo de identificación
-	 * en las clases de documentos y el string que espera la impresora fiscal. 
+	 * en las clases de documentos y el string que espera la impresora fiscal.
 	 * @param identificationTypes Tipo de identificación a convertir
 	 * @return Retorna el string que representa el tipo de identificación que espera
 	 * la impresora fiscal.
@@ -1024,8 +1019,8 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	}
 
 	/**
-	 * Realiza la conversión entre el el tipo de documento en las clases de 
-	 * documentos y el string que espera la impresora fiscal. 
+	 * Realiza la conversión entre el el tipo de documento en las clases de
+	 * documentos y el string que espera la impresora fiscal.
 	 * @param documentType Tipo de documento a convertir.
 	 * @param letter Letra del documento.
 	 * @return Retorna el string que representa el tipo de documento que espera
@@ -1034,7 +1029,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	protected String traduceDocumentType(String documentType, String letter) {
 		return getDocumentTypes().get(documentType + letter);
 	}
-	
+
 	/**
 	 * @return Returns the ivaResponsabilities.
 	 */
@@ -1092,7 +1087,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		}
 		return documentTypes;
 	}
-	
+
 	/**
 	 * Formatea un número de identificación de un comprador para que sea
 	 * aceptado por la impresora fiscal. En caso de ser un número de
@@ -1106,13 +1101,13 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		if(docNumber != null) {
 			if(docType.equals(DNI))
 				result = docNumber.replace(".","");
-			if(docType.equals(CUIT) || docType.equals(CUIL)) 
+			if(docType.equals(CUIT) || docType.equals(CUIL))
 				result = docNumber.replace("-","");
 			result.trim();
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Cancela el documento actualmente abierto en la impresora.
 	 * En caso positivo, se indica que la impresora no contiene un
@@ -1127,9 +1122,9 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 				// Do nothing
 			}
 	}
-	
+
 	/**
-	 * Obtiene el número del CAI de la respuesta al comando CloseFiscalReceipt. 
+	 * Obtiene el número del CAI de la respuesta al comando CloseFiscalReceipt.
 	 * @param response Respuesta obtenida de la impresora
 	 * @return El número del CAI o null en caso de que la impresora fiscal
 	 * no soporte esta opción.
@@ -1137,17 +1132,17 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	protected String getCAINumber(FiscalPacket response) {
 		return null;
 	}
-	
+
 	/**
 	 * 	Ejecuta el comando para asignar los datos del comprador en caso
 	 *	de que el comprador exista.
 	 */
-	protected FiscalPacket loadCustomerData(Customer customer) throws FiscalPrinterStatusError, FiscalPrinterIOException {
+	protected FiscalPacket loadCustomerData(final Customer customer) throws FiscalPrinterStatusError, FiscalPrinterIOException {
 		FiscalPacket response = null;
 		if(customer != null) {
 			// Según el manual de las impresoras HASAR, en este comando, si
 			// el cliente es Consumidor Final y le monto no supera el máximo
-			// los campos Nombre, DNI y Dirección son opcionales. Parece que la 
+			// los campos Nombre, DNI y Dirección son opcionales. Parece que la
 			// impresora no contempla esto y pide los valores de los campos
 			// de todos modos. Por esto, si es consumido final se reemplazan
 			// nulls en los campos por un String espacio " ".
@@ -1159,16 +1154,16 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 						.getIdentificationNumber());
 			}
 			execute(cmdSetCustomerData(
-					customer.getName(), 
-					customer.getIdentificationNumber(), 
-					traduceIvaResponsibility(customer.getIvaResponsibility()), 
-					traduceIdentificationType(customer.getIdentificationType()), 
+					customer.getName(),
+					customer.getIdentificationNumber(),
+					traduceIvaResponsibility(customer.getIvaResponsibility()),
+					traduceIdentificationType(customer.getIdentificationType()),
 					customer.getLocation())
 			);
 		}
 		return response;
 	}
-	
+
 	/**
 	 * Ejecuta los comandos necesarios para cargar las líneas de item
 	 * del documento en la impresora fiscal.
@@ -1178,13 +1173,13 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		// Comando: @PrintLineItem
 		for (DocumentLine item : document.getLines()) {
 			execute(cmdPrintLineItem(
-				item.getDescription(), 
-				item.getQuantity(), 
-				item.getAbsUnitPrice(), 
-				item.getIvaRate(), 
-				item.isSubstract(), 
+				item.getDescription(),
+				item.getQuantity(),
+				item.getAbsUnitPrice(),
+				item.getIvaRate(),
+				item.isSubstract(),
 				BigDecimal.ZERO, // Impuestos internos
-				!item.isPriceIncludeIva(), 
+				!item.isPriceIncludeIva(),
 				null)
 			);
 			// Se carga el descuento del ítem si es que posee.
@@ -1192,11 +1187,11 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			if (item.hasDiscount()) {
 				DiscountLine discount = item.getDiscount();
 				execute(cmdLastItemDiscount(
-					discount.getDescription(), 
-					discount.getAbsAmount(), 
-					false, 
+					discount.getDescription(),
+					discount.getAbsAmount(),
+					false,
 					!discount.isAmountIncludeIva(),
-					null));		
+					null));
 			}
 		}
 	}
@@ -1211,33 +1206,33 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		// Comando: @ReturnRecharge
 		for (DiscountLine discount : document.getDocumentDiscounts()) {
 			execute(cmdReturnRecharge(
-				discount.getDescription(), 
-				discount.getAmount(), 
-				discount.getTaxRate(), 
-				false, 
-				BigDecimal.ZERO, // Impuestos internos 
-				!discount.isAmountIncludeIva(), 
+				discount.getDescription(),
+				discount.getAmount(),
+				discount.getTaxRate(),
+				false,
+				BigDecimal.ZERO, // Impuestos internos
+				!discount.isAmountIncludeIva(),
 				null, // Display
 				DISCOUNT_RECHARGE));
 		}
-		
+
 		//////////////////////////////////////////////////////////////
 		// Se aplica el descuento general en caso de existir.
 		// Comando: @GeneralDiscount
 		if(document.hasGeneralDiscount()) {
 			DiscountLine generalDiscount = document.getGeneralDiscount();
 			execute(cmdGeneralDiscount(
-				generalDiscount.getDescription(), 
-				generalDiscount.getAmount(), 
-				false, 
+				generalDiscount.getDescription(),
+				generalDiscount.getAmount(),
+				false,
 				!generalDiscount.isAmountIncludeIva(),
-				null));		
+				null));
 		}
 	}
 
 	@Override
 	public String formatText(String text, int maxLength) {
-		StringBuffer result = new StringBuffer(); 
+		StringBuffer result = new StringBuffer();
 		text = super.formatText(text, maxLength);
 		if(text == null)
 			return text;
@@ -1265,7 +1260,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		}
 		return result.toString();
 	}
-	
+
 	private void checkTaxes(Document document) throws FiscalPrinterStatusError, FiscalPrinterIOException {
 		//////////////////////////////////////////////////////////////
 		// Incia la transmisión de información de IVA
@@ -1279,10 +1274,10 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			taxRate = response.getBigDecimal(4);
 			taxAmount = response.getBigDecimal(5);
 			taxBaseAmt = response.getBigDecimal(8);
-		
+
 			System.out.println("- IVA: " + taxRate + ", Importe: " + taxAmount
 					+ ", Base:" + taxBaseAmt);
-			
+
 			response = execute(cmdNextIVATransmission());
 			type = response.getInt(3);
 		}
@@ -1295,6 +1290,6 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		// diferentes.
 		return 4;
 	}
-	
-	
+
+
 }

@@ -19,19 +19,20 @@ package ar.com.ergio.print.fiscal.document;
 import java.io.Serializable;
 
 import ar.com.ergio.print.fiscal.exception.DocumentException;
+import ar.com.ergio.util.LAR_Utils;
 
 /**
- * Persona o cliente asignada a un documento fiscal. 
+ * Persona o cliente asignada a un documento fiscal.
  * @author Franco Bonafine
  * @date 11/02/2008
  */
 public class Customer implements Serializable{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	// Tipo de identificación  
+	// Tipo de identificación
 	/** C.U.I.T. */
 	public static final int CUIT = 1;
 	/** C.U.I.L. */
@@ -71,14 +72,14 @@ public class Customer implements Serializable{
 	public static final int PEQUENO_CONTRIBUYENTE_EVENTUAL_SOCIAL = 10;
 	/** Responsabilidad frente al IVA: No categorizado */
 	public static final int NO_CATEGORIZADO = 0;
-	
+
 	/** Nombre y apellido del cliente */
 	private String name = null;
 	/** Tipo de identificación del cliente */
 	private int identificationType = SIN_CALIFICADOR;
 	/** Número de identificación del cliente */
 	private String identificationNumber = null;
-	/** Responsabilidad frente al IVA del cliente */ 
+	/** Responsabilidad frente al IVA del cliente */
 	private int ivaResponsibility = NO_CATEGORIZADO;
 	/** Domicilio legal del cliente */
 	private String location = null;
@@ -86,7 +87,7 @@ public class Customer implements Serializable{
 	public Customer(){
 		super();
 	}
-	
+
 	/**
 	 * @param name Nombre y apellido.
 	 * @param documentType Tipo de documento
@@ -175,84 +176,86 @@ public class Customer implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * Validación del cliente del documento.
 	 * @throws DocumentException cuando los datos del cliente no son
 	 * válidos para la impresión del documento.
 	 */
 	public void validate() throws DocumentException {
-		Integer idType = getIdentificationType();
-		Integer ivaRes = getIvaResponsibility();
-		
+		int idType = getIdentificationType();
+		int ivaRes = getIvaResponsibility();
+
 		// Para categorías de IVA que no sea Consumidor Final y No Categorizado
 		// el tipo de identificación debe ser CUIT.
-		if(ivaRes != CONSUMIDOR_FINAL && ivaRes != NO_CATEGORIZADO
-				&& idType != CUIT)
-			throw Document.createDocumentException("IdentificationTypeMustBeCUIT");
-		
+        if (ivaRes != CONSUMIDOR_FINAL && ivaRes != NO_CATEGORIZADO && idType != CUIT) {
+            throw Document.createDocumentException("IdentificationTypeMustBeCUIT");
+        }
+
 		// Si el cliente no tiene categoría de IVA entonces debe tener
 		// algún tipo de identificación.
-		if(ivaRes == NO_CATEGORIZADO && idType == SIN_CALIFICADOR)
-			throw Document.createDocumentException("CustomerIdentificationRequired");
-		
+        if (ivaRes == NO_CATEGORIZADO && idType == SIN_CALIFICADOR) {
+            throw Document.createDocumentException("CustomerIdentificationRequired");
+        }
+
 		// Si el documento no es a Consumidor Final se deben validar
-		// la existencia del nombre, tipo de identificación, número de 
+		// la existencia del nombre, tipo de identificación, número de
 		// identificación y domicilio comercial.
-		if(ivaRes != CONSUMIDOR_FINAL) {
-			Document.validateText(getName(), "CustomerNameRequired");
-			Document.validateText(getLocation(), "CustomerLocationRequired");
-			Document.validateText(getIdentificationNumber(), "CustomerIdNumberRequired");
-		}
-		
+        if (ivaRes != CONSUMIDOR_FINAL) {
+            Document.validateText(getName(), "CustomerNameRequired");
+            Document.validateText(getLocation(), "CustomerLocationRequired");
+            Document.validateText(getIdentificationNumber(), "CustomerIdNumberRequired");
+        }
+
 		// Si el tipo de identificación es CUIT o CUIL se valida el número
 		// ingresado.
-		if(idType.equals(CUIT) || idType.equals(CUIL))
-			validateCUIT();
+        if (idType == CUIT || idType == CUIL) {
+            LAR_Utils.validateCUIT(identificationNumber);
+        }
 	}
-	
-	/**
-	 * Validación del número de CUIT / CUIL.
-	 * @param number Número a validar.
-	 * @throws DocumentException cuando el número de CUIT / CUIL no es
-	 * válido.
-	 */
-	private void validateCUIT() throws DocumentException {
-		boolean res = false;
-		String number = getIdentificationNumber();
-		
-		if (number != null && number.trim().length() != 0) {
-			number = number.trim();
-			try {
-				int[] magicValues = {5,4,3,2,7,6,5,4,3,2};
-				int[] values = new int[11];
-				int i;
-				int sum = 0;
-		
-				number = number.replace("-", "");
-				
-				if (number.length() == 11) {
-					for (i = 0; i < 11; i++)
-						values[i] = Integer.parseInt(number.substring(i, i+1));
-					
-					int checkDigit = values[10];
-					
-					for (i = 0; i < 10; i++)
-						sum = sum + values[i] * magicValues[i];
-					
-					int dividend = sum / 11;
-					int product = dividend * 11;
-					int substraction = sum - product;
-					checkDigit = (substraction > 0) ? 11 - substraction : substraction;  
-					
-					res = (checkDigit == values[i]);
-				}
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		if(!res)
-			throw Document.createDocumentException("InvalidCustomerCUIT");
-	}
+
+//	/**
+//	 * Validación del número de CUIT / CUIL.
+//	 * @param number Número a validar.
+//	 * @throws DocumentException cuando el número de CUIT / CUIL no es
+//	 * válido.
+//	 */
+//	private void validateCUIT() throws DocumentException {
+//		boolean res = false;
+//		String number = getIdentificationNumber();
+//
+//		if (number != null && number.trim().length() != 0) {
+//			number = number.trim();
+//			try {
+//				int[] magicValues = {5,4,3,2,7,6,5,4,3,2};
+//				int[] values = new int[11];
+//				int i;
+//				int sum = 0;
+//
+//				number = number.replace("-", "");
+//
+//				if (number.length() == 11) {
+//					for (i = 0; i < 11; i++)
+//						values[i] = Integer.parseInt(number.substring(i, i+1));
+//
+//					int checkDigit = values[10];
+//
+//					for (i = 0; i < 10; i++)
+//						sum = sum + values[i] * magicValues[i];
+//
+//					int dividend = sum / 11;
+//					int product = dividend * 11;
+//					int substraction = sum - product;
+//					checkDigit = (substraction > 0) ? 11 - substraction : substraction;
+//
+//					res = (checkDigit == values[i]);
+//				}
+//
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		if(!res)
+//			throw Document.createDocumentException("InvalidCustomerCUIT");
+//	}
 }

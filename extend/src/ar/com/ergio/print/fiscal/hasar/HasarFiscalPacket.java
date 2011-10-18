@@ -43,7 +43,9 @@ public class HasarFiscalPacket extends AbstractFiscalPacket
 	public HasarFiscalPacket(String encoding, int baseRolloverYear, FiscalPrinterDevice fiscalPrinter)
 	{
 		super(fiscalPrinter);
-		if (baseRolloverYear < 0) throw new IllegalArgumentException();
+		if (baseRolloverYear < 0) {
+		    throw new IllegalArgumentException();
+		}
 		this.encoding = encoding;
 		this.baseRolloverYear = baseRolloverYear;
 		rolloverYear = baseRolloverYear % 100;

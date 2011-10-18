@@ -24,14 +24,14 @@ import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.msg.MsgRepository;
 
 public class Invoice extends Document {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1702265732103996574L;
 
 	private static BigDecimal maxAmountCF = new BigDecimal(1000);
-	
+
 	/** Número del CAI*/
 	private String caiNumber;
 	/** Número del remito asociado a la factura */
@@ -46,7 +46,7 @@ public class Invoice extends Document {
 		super();
 		payments = new ArrayList<Payment>();
 	}
-		
+
 	/**
 	 * @return Returns the packingSlipNumber.
 	 */
@@ -60,9 +60,9 @@ public class Invoice extends Document {
 	public void setPackingSlipNumber(String packingSlipNumber) {
 		this.packingSlipNumber = packingSlipNumber;
 	}
-	
+
 	/**
-	 * @return Retorna verdadero si la factura tiene un 
+	 * @return Retorna verdadero si la factura tiene un
 	 * número de remito asociado.
 	 */
 	public boolean hasPackingSlipNumber() {
@@ -82,7 +82,7 @@ public class Invoice extends Document {
 	public void setCAINumber(String caiNumber) {
 		this.caiNumber = caiNumber;
 	}
-	
+
 	/**
 	 * @return Indica si la factura tiene asignado o no un número de CAI.
 	 */
@@ -98,22 +98,23 @@ public class Invoice extends Document {
 	@Override
 	public void validate() throws DocumentException {
 		super.validate();
-		
+
 		// Validar cantidad de líneas mayor que 0.
-		if(getLines().isEmpty()) 
-			throw createDocumentException("InvalidDocumentLinesCount", this);
-		
+        if (getLines().isEmpty()) {
+            throw createDocumentException("InvalidDocumentLinesCount", this);
+        }
+
 		// Validar que si la factura es a CONSUMIDOR FINAL el monto acumulado
 		// de las lineas no supere el límite definido. Si lo supera, se deben
 		// ingresar los datos del comprador.
 		validateInvoiceCFLimit();
-		
+
 		// Se validan los pagos.
 		for (Payment payment : getPayments()) {
 			payment.validate();
 		}
 	}
-	
+
 	private void validateInvoiceCFLimit() throws DocumentException {
 		// Esta validación debe hacerse línea por línea y ni bien se detecte
 		// que el acumulado supera el máximo se debe disparar un error dado
@@ -126,31 +127,31 @@ public class Invoice extends Document {
 		boolean validLocation = c.getLocation() != null && !c.getLocation().trim().equals("");
 		boolean validIdNumber = c.getIdentificationNumber() != null && !c.getIdentificationNumber().trim().equals("");
 		boolean customerDataValid = validName && validLocation && validIdNumber;
-		
+
 		// Se asume que la factura será válida.
 		setValidCFInvoice(true);
-		
+
 		if(getCustomer().getIvaResponsibility() == Customer.CONSUMIDOR_FINAL && !customerDataValid) {
 			BigDecimal total = BigDecimal.ZERO;
 			boolean amountValid = true;
 			// Por cada línea...
 			for (DocumentLine docLine : getLines()) {
-				// Se suma al total (sin descuentos / recargos).
-				total = total.add(docLine.getSubtotal());
-				// Se pregunta si sigue siendo válido el monto.
-				if(total.compareTo(getMaxAmountCF()) > 0)
-					amountValid = false;
-				// Si sigue siendo válido
-				else {
-					// Se obtiene el monto del descuento / recargo.
-					BigDecimal discountAmt = (docLine.hasDiscount()?
-							docLine.getDiscount().getAmount():
-							BigDecimal.ZERO);
-					total = total.add(discountAmt);
-					// Y se válida nuevamente el total.
-					if(total.compareTo(getMaxAmountCF()) > 0)
-						amountValid = false;
-				}
+                // Se suma al total (sin descuentos / recargos).
+                total = total.add(docLine.getSubtotal());
+                // Se pregunta si sigue siendo válido el monto.
+                if (total.compareTo(getMaxAmountCF()) > 0) {
+                    amountValid = false;
+                    // Si sigue siendo válido
+                } else {
+                    // Se obtiene el monto del descuento / recargo.
+                    BigDecimal discountAmt = (docLine.hasDiscount() ?
+                            docLine.getDiscount().getAmount() : BigDecimal.ZERO);
+                    total = total.add(discountAmt);
+                    // Y se válida nuevamente el total.
+                    if (total.compareTo(getMaxAmountCF()) > 0) {
+                        amountValid = false;
+                    }
+                }
 				// Si no fue válido en alguno de los casos, se dispara la excepcion
 				if(!amountValid) {
 					// Se arma el mensaje de respuesta.
@@ -158,18 +159,21 @@ public class Invoice extends Document {
 					msg.append(MsgRepository.get("InvalidCFInvoiceAmount"));
 					msg.append(" ($" + getMaxAmountCF() + "). ");
 					msg.append(MsgRepository.get("CompleteCustomerFields") + ": ");
-					if(!validName)
-						msg.append(MsgRepository.get("Name") + (!validLocation?",":""));
-					if(!validLocation)
-						msg.append(MsgRepository.get("Location") + (!validIdNumber?",":""));
-					if(!validIdNumber)
-						msg.append(MsgRepository.get("IdentificationNumber"));
+                    if (!validName) {
+                        msg.append(MsgRepository.get("Name") + (!validLocation ? "," : ""));
+                    }
+                    if (!validLocation) {
+                        msg.append(MsgRepository.get("Location") + (!validIdNumber ? "," : ""));
+                    }
+                    if (!validIdNumber) {
+                        msg.append(MsgRepository.get("IdentificationNumber"));
+                    }
 					throw Document.createDocumentException(msg.toString(),this);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Agrega un pago al documento.
 	 * @param payment Pago a agregar.

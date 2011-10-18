@@ -22,6 +22,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MPOS;
 import org.compiere.model.MProduct;
 import org.compiere.pos.PosOrderModel;
@@ -168,6 +169,10 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
         posModel.save();
         // POS Order Model
         MBPartner partner = new MBPartner(getCtx(), m_C_BPartner_ID, getTrxName());
+        if (partner.getTaxID() == null || partner.getTaxID().equals("")) {
+            partner.setTaxID("30-71135312-3");
+            partner.save();
+        }
         MProduct product = new MProduct(getCtx(), m_M_Product_ID, getTrxName());
         posOrder = PosOrderModel.createOrder(posModel, partner, getTrxName());
         posOrder.createLine(product, BigDecimal.valueOf(1), BigDecimal.valueOf(100));
@@ -182,12 +187,13 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
         fiscalDocumentListener = null;
         fiscalPrinterListener = null;
 
+        for (MInvoice invoice : posOrder.getInvoices()) {
+            invoice.delete(true, getTrxName());
+        }
         posOrder.delete(true, getTrxName());
         posModel.delete(true, getTrxName());
         fiscalPrinter.delete(true, getTrxName());
         fiscalPrinterType.delete(true, getTrxName());
         commit();
     }
-
-
 }
