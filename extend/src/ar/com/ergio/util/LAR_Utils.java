@@ -92,7 +92,7 @@ public final class LAR_Utils {
             }
 
             for (i = 0; i < 11; i++) {
-                numbers[i] = Integer.parseInt(cuit.substring(i, i + 1));
+                numbers[i] = Integer.parseInt(trimCuit.substring(i, i + 1));
             }
 
             int verifDigit = numbers[10];
@@ -116,15 +116,15 @@ public final class LAR_Utils {
     /**
      * Returns whether a document is fiscal or not
      *
-     * @param docType_ID
+     * @param C_docType_ID
      *            document type id
      * @return true if document is fiscal, false otherwise
      */
-    public static boolean isFiscalDocType(int docType_ID)
+    public static boolean isFiscalDocType(int C_docType_ID)
     {
 	boolean result = false;
-	if (docType_ID != 0) {
-	    LAR_MDocType docType = new LAR_MDocType(Env.getCtx(), docType_ID, null);
+	if (C_docType_ID != 0) {
+	    LAR_MDocType docType = new LAR_MDocType(Env.getCtx(), C_docType_ID, null);
 	    result = docType.isFiscal();
 	}
 	return result;

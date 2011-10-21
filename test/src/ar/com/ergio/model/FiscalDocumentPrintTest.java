@@ -16,6 +16,7 @@ package ar.com.ergio.model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -125,11 +126,22 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
                 while (true) {
                     socket = serverSocket.accept();
                     log.info("Connection accepted: " + socket);
+                    // Process request
                     BufferedReader io = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String fiscalPacket;
-                    while ((fiscalPacket = io.readLine()) != null) {
-                        log.info("Packet recived: " + fiscalPacket);
+                    String fiscalPacket = io.readLine();
+                    log.info("Packet recived: " + fiscalPacket);
+
+                    try {
+                        log.info("sleeping server...");
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
                     }
+                    // Process response
+                    byte[] code = new byte[]{0x06}; // Ack (06H)
+                    OutputStream out = socket.getOutputStream();
+                    out.write(code);
+                    out.flush();
                 }
             } catch (IOException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);

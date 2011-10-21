@@ -50,7 +50,11 @@ public class LAR_MDocType extends MDocType
             return "Y".equals(oo);
         }
         return false;
+    }
 
+    public void setIsFiscal(boolean isFiscal)
+    {
+        set_Value(COLUMNNAME_isFiscal, Boolean.valueOf(isFiscal));
     }
 
     public int getLAR_Fiscal_Printer_ID()

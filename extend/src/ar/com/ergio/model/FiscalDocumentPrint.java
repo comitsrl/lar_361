@@ -925,7 +925,7 @@ public class FiscalDocumentPrint {
 
 			int paymentID;
 			int cashLineID;
-			int invoiceCreditID;
+			//int invoiceCreditID;
 			BigDecimal paidAmt = null;
 			String description = null;
 			// Pago que se crea en caso de que la imputación no entre en la clase
@@ -1074,21 +1074,21 @@ public class FiscalDocumentPrint {
 	/**
 	 * Devuelve la descripción a imprimir para un pago según un MInvoice.
 	 */
-	private String getInvoicePaymentDescription(MInvoice mInvoice) {
-		String description = null;
-		// - Nota de Crédito: NC NroNotaCrédito
-		//   Ej: NC A000100004567
-		if (LAR_MDocType.DOCBASETYPE_ARCreditMemo.equals(MDocType.get(ctx,
-				mInvoice.getC_DocType_ID()).getDocBaseType())) {
-			description = Msg.translate(ctx, "FiscalTicketCreditNotePayment")
-					+ " " + mInvoice.getDocumentNo();
-		// - Resto de facturas (FP, Retenciones, etc): se toman como "Otros Pagos"
-		} else {
-			description = Msg.translate(ctx, "FiscalTicketOthersPayment");
-		}
-
-		return description;
-	}
+//	private String getInvoicePaymentDescription(MInvoice mInvoice) {
+//		String description = null;
+//		// - Nota de Crédito: NC NroNotaCrédito
+//		//   Ej: NC A000100004567
+//		if (LAR_MDocType.DOCBASETYPE_ARCreditMemo.equals(MDocType.get(ctx,
+//				mInvoice.getC_DocType_ID()).getDocBaseType())) {
+//			description = Msg.translate(ctx, "FiscalTicketCreditNotePayment")
+//					+ " " + mInvoice.getDocumentNo();
+//		// - Resto de facturas (FP, Retenciones, etc): se toman como "Otros Pagos"
+//		} else {
+//			description = Msg.translate(ctx, "FiscalTicketOthersPayment");
+//		}
+//
+//		return description;
+//	}
 
 	private void saveDocumentData(final MInvoice oxpDocument, final Document printeableDocument) {
         String dtType = printeableDocument.getDocumentType();
