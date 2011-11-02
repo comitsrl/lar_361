@@ -94,7 +94,6 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
     private static final String ACTION_VOID = ConfirmPanel.A_REFRESH;
     private static final String ACTION_EXPAND_INFO = ConfirmPanel.A_ZOOM;
 
-    private APanel parent;
     private ConfirmPanel confirmPanel = new ConfirmPanel(true, true, true, false, false, true,
             false);
     private CLabel iconLabel = new CLabel();
@@ -124,11 +123,13 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
     /**
      * Constructor de la clase ...
      */
-    public AInfoFiscalPrinter(APanel parent, int windowNo, String title)
+    public AInfoFiscalPrinter(final DialogActionListener dialogActionListener, int windowNo,
+                    final String title)
     {
         this((JFrame) Env.getWindow(windowNo), title, "", JOptionPane.INFORMATION_MESSAGE);
         this.windowNo = windowNo;
-        this.parent = parent;
+        setDialogActionListener(dialogActionListener);
+        // this.parent = parent;
         log.warning("AInfoFiscalPrinter");
     } // AInfoFiscalPrinter
 
@@ -762,23 +763,6 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
     public void setInfoMessage(String title)
     {
         setInfoMessage(title, null);
-    }
-
-    /**
-     * @return Returns the parent.
-     */
-    public APanel getParent()
-    {
-        return parent;
-    }
-
-    /**
-     * @param parent
-     *            The parent to set.
-     */
-    public void setParent(APanel parent)
-    {
-        this.parent = parent;
     }
 
     /**
