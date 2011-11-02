@@ -36,12 +36,11 @@ import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
-import org.compiere.util.Trx;
 
 import ar.com.ergio.model.FiscalDocumentPrint;
-import ar.com.ergio.model.MFiscalPrinter;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter.DialogActionListener;
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  *	POS Sub Panel Base Class.
@@ -155,13 +154,16 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 		{
 			try
 			{
-				//TODO: to incorporate work from Posterita
-				/*
-				if (p_pos.getAD_PrintLabel_ID() != 0)
-					PrintLabel.printLabelTicket(order.getC_Order_ID(), p_pos.getAD_PrintLabel_ID());
-				*/
-				//print standard document
-				ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
+                // TODO: to incorporate work from Posterita
+
+                // LAR Fiscal Printing
+                final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
+                final FiscalPrintWorker worker = new FiscalPrintWorker(invoice);
+                // TODO - Add some feedback to user (cursor, glasspane, something...)
+                worker.start();
+
+                // print standard document
+                ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
 
 			}
 			catch (Exception e)
@@ -174,11 +176,6 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 	/**********************************************************************************************
 	 *                            LAR Fiscal Printing Implementation
      **********************************************************************************************/
-
-    /** Fiscal Printing status window */
-    private final AInfoFiscalPrinter infoFiscalPrinter = new AInfoFiscalPrinter(null,
-            Env.createWindowNo(this),
-            Msg.parseTranslation(Env.getCtx(), "@PrintingFiscalDocument@"));
 
     /** Fiscal printing action listener */
     private final DialogActionListener dialogActionListener = new DialogActionListener()
@@ -202,37 +199,63 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
         }
     };
 
+    /** Fiscal Printing status window */
+    private final AInfoFiscalPrinter infoFiscalPrinter = new AInfoFiscalPrinter(dialogActionListener,
+            Env.createWindowNo(this),
+            Msg.parseTranslation(Env.getCtx(), "@PrintingFiscalDocument@"));
+
+
     /**
      * Thread that perform fiscal print operation
      */
     private final class FiscalPrintWorker extends SwingWorker
     {
         private final MInvoice invoice;
-        //private final String trxName = Trx.createTrxName();
-        private String errorMsg = null;
 
-        private FiscalPrintWorker(final MInvoice invoice) {
+        private FiscalPrintWorker(final MInvoice invoice)
+        {
             this.invoice = invoice;
         }
 
         @Override
         public Object construct()
         {
-            infoFiscalPrinter.setDialogActionListener(dialogActionListener);
-
-            int c_DocType_ID = invoice.get_ValueAsInt("C_DocType_ID");
-            MDocType docType = new MDocType(p_ctx, c_DocType_ID, null);
-            int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
-            try {
-                FiscalDocumentPrint fdp = new FiscalDocumentPrint(lar_Fiscal_Printer_ID, infoFiscalPrinter);
-                fdp.printDocument(invoice);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            int c_DocType_ID = invoice.getC_DocType_ID();
+            boolean success = LAR_Utils.isFiscalDocType(c_DocType_ID);
+            if (success) {
+                try {
+                    MDocType docType = new MDocType(p_ctx, c_DocType_ID, null);
+                    int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
+                    FiscalDocumentPrint fdp = new FiscalDocumentPrint(lar_Fiscal_Printer_ID,
+                            infoFiscalPrinter);
+                    fdp.printDocument(invoice);
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, "Fiscal printing error", e);
+                    success = false;
+                }
             }
-            return null;
+            return Boolean.valueOf(success);
         }
-
+        @Override
+        public void finished() {
+            boolean success = (Boolean) getValue();
+//            boolean fiscalPrintError = errorMsg != null && errorMsg.equals(FISCAL_PRINT_ERROR);
+            if(success) {
+                p_posPanel.newOrder();
+//            } else if (!fiscalPrintError) {
+//                if(errorDesc == null)
+//                    errorMsg(errorMsg);
+//                else
+//                    errorMsg(errorMsg, errorDesc);
+//                //waitingDialog.doNotWait();
+//                //waitingDialog.setVisible(false);
+//                //getFrame().setEnabled(true);
+//            }
+//            if (!fiscalPrintError) {
+//                getFrame().setBusy(false);
+//                mNormal();
+            }
+        }
     }
 
     /**
@@ -290,7 +313,7 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 //                    getStatusBar().setStatusLine(MSG_VOID_INVOICE_OK);
                 }
             }
-        };
+        }; // new SwingWorker
 
 //        String waitMsg = getMsg("VoidingInvoice") + ", " + getMsg("PleaseWait");
 //        getFrame().setBusyMessage(waitMsg);
