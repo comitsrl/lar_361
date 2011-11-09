@@ -130,7 +130,7 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
         this.windowNo = windowNo;
         setDialogActionListener(dialogActionListener);
         // this.parent = parent;
-        log.warning("AInfoFiscalPrinter");
+        log.info("AInfoFiscalPrinter instance created");
     } // AInfoFiscalPrinter
 
     /**

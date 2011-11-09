@@ -26,6 +26,7 @@ import org.compiere.apps.ADialog;
 import org.compiere.apps.AEnv;
 import org.compiere.apps.AKeyboardFocusManager;
 import org.compiere.apps.ALogin;
+import org.compiere.apps.form.FormFrame;
 import org.compiere.model.MSession;
 import org.compiere.swing.CFrame;
 import org.compiere.util.DB;
@@ -42,7 +43,7 @@ public class PosApplication {
 	PosApplication() {
 		Adempiere.startup(true);	//	needs to be here for UI
 //		Splash splash = Splash.getSplash();   not mandatory, so its removed for faster GUI testing
-		final CFrame frame = new CFrame();
+		final FormFrame frame = new FormFrame(new CFrame().getGraphicsConfiguration());
 		//  Focus Traversal
 		KeyboardFocusManager.setCurrentKeyboardFocusManager(AKeyboardFocusManager.get());
 
@@ -70,7 +71,7 @@ public class PosApplication {
 			System.exit(1);
 		MSession.get (Env.getCtx(), true);		//	Start Session
 
-		int m_WindowNo = Env.createWindowNo(frame);
+		//int m_WindowNo = Env.createWindowNo(frame); emmie
 
 	//  Default Image
 		frame.setIconImage(Adempiere.getImage16());

@@ -22,11 +22,7 @@ import java.util.logging.Level;
 
 import javax.swing.KeyStroke;
 
-import org.compiere.apps.ADialog;
 import org.compiere.apps.AppsAction;
-import org.compiere.apps.SwingWorker;
-import org.compiere.model.MDocType;
-import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPOS;
 import org.compiere.print.ReportCtl;
@@ -35,12 +31,6 @@ import org.compiere.swing.CButton;
 import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
-import org.compiere.util.Msg;
-
-import ar.com.ergio.model.FiscalDocumentPrint;
-import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter;
-import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter.DialogActionListener;
-import ar.com.ergio.util.LAR_Utils;
 
 /**
  *	POS Sub Panel Base Class.
@@ -157,13 +147,9 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 // TODO: to incorporate work from Posterita
 
                 // LAR Fiscal Printing
-                final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
-                final FiscalPrintWorker worker = new FiscalPrintWorker(invoice);
-                // TODO - Add some feedback to user (cursor, glasspane, something...)
-                worker.start();
-
+			    p_posPanel.printFiscalTicket();
                 // print standard document
-                ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
+                //ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
 
 			}
 			catch (Exception e)
@@ -173,152 +159,4 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 		}
 	}
 
-	/**********************************************************************************************
-	 *                            LAR Fiscal Printing Implementation
-     **********************************************************************************************/
-
-    /** Fiscal printing action listener */
-    private final DialogActionListener dialogActionListener = new DialogActionListener()
-    {
-
-        @Override
-        public void actionVoidPerformed()
-        {
-            // Anulación de los documentos.
-            voidDocuments();
-        }
-
-        @Override
-        public void actionReprintFinished()
-        {
-            // Al finalizar una reimpresión de ticket, se
-            // reestablece la interfaz para un nuevo pedido
-            p_posPanel.newOrder();
-            // getFrame().setBusy(false);
-            // mNormal();
-        }
-    };
-
-    /** Fiscal Printing status window */
-    private final AInfoFiscalPrinter infoFiscalPrinter = new AInfoFiscalPrinter(dialogActionListener,
-            Env.createWindowNo(this),
-            Msg.parseTranslation(Env.getCtx(), "@PrintingFiscalDocument@"));
-
-
-    /**
-     * Thread that perform fiscal print operation
-     */
-    private final class FiscalPrintWorker extends SwingWorker
-    {
-        private final MInvoice invoice;
-
-        private FiscalPrintWorker(final MInvoice invoice)
-        {
-            this.invoice = invoice;
-        }
-
-        @Override
-        public Object construct()
-        {
-            int c_DocType_ID = invoice.getC_DocType_ID();
-            boolean success = LAR_Utils.isFiscalDocType(c_DocType_ID);
-            if (success) {
-                try {
-                    MDocType docType = new MDocType(p_ctx, c_DocType_ID, null);
-                    int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
-                    FiscalDocumentPrint fdp = new FiscalDocumentPrint(lar_Fiscal_Printer_ID,
-                            infoFiscalPrinter);
-                    fdp.printDocument(invoice);
-                } catch (Exception e) {
-                    log.log(Level.SEVERE, "Fiscal printing error", e);
-                    success = false;
-                }
-            }
-            return Boolean.valueOf(success);
-        }
-        @Override
-        public void finished() {
-            boolean success = (Boolean) getValue();
-//            boolean fiscalPrintError = errorMsg != null && errorMsg.equals(FISCAL_PRINT_ERROR);
-            if(success) {
-                p_posPanel.newOrder();
-//            } else if (!fiscalPrintError) {
-//                if(errorDesc == null)
-//                    errorMsg(errorMsg);
-//                else
-//                    errorMsg(errorMsg, errorDesc);
-//                //waitingDialog.doNotWait();
-//                //waitingDialog.setVisible(false);
-//                //getFrame().setEnabled(true);
-//            }
-//            if (!fiscalPrintError) {
-//                getFrame().setBusy(false);
-//                mNormal();
-            }
-        }
-    }
-
-    /**
-     * Invoca la anulación de los documentos generados debido a un error en la
-     * impresión fiscal
-     */
-    private void voidDocuments()
-    {
-        SwingWorker worker = new SwingWorker()
-        {
-            private String errorMsg = null;
-
-            @Override
-            public Object construct()
-            {
-                // --- LY code ---
-//                try {
-//                    InvoiceGlobalVoiding voidingProcess = new InvoiceGlobalVoiding(
-//                            invoice.getC_Invoice_ID(), getCtx(), trxName);
-//                    voidingProcess.start();
-//                } catch (AdempierePOSException e) {
-//                    errorMsg = e.getMessage();
-//                }
-
-                // TODO - Assume that a pos order has only one invoice
-                final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
-                boolean success = invoice.voidIt();
-                if (!success) {
-                    errorMsg = Msg.parseTranslation(Env.getCtx(), "@ErrorVoidingInvoice@");
-                }
-                return Boolean.valueOf(success);
-            }
-
-            @Override
-            public void finished()
-            {
-                boolean success = (Boolean) getValue();
-                if (!success) {
-                    int windowNo = Env.createWindowNo(PosSubPanel.this);
-                    ADialog.error(windowNo, PosSubPanel.this, errorMsg);
-
-                    if (ADialog.ask(windowNo, PosSubPanel.this,
-                            Msg.parseTranslation(p_ctx, "@RetryVoidInvoice@"))) {
-                        // Re intenta anular los documentos.
-                        voidDocuments();
-                    } else {
-                        p_posPanel.newOrder();
-                        //getFrame().setBusy(false);
-                        //mNormal();
-                    }
-                } else {
-                    p_posPanel.newOrder();
-//                    getFrame().setBusy(false);
-//                    mNormal();
-//                    getStatusBar().setStatusLine(MSG_VOID_INVOICE_OK);
-                }
-            }
-        }; // new SwingWorker
-
-//        String waitMsg = getMsg("VoidingInvoice") + ", " + getMsg("PleaseWait");
-//        getFrame().setBusyMessage(waitMsg);
-//        getFrame().setBusyTimer(4);
-//        getFrame().setBusy(true);
-        worker.start();
-    }
 }	//	PosSubPanel
