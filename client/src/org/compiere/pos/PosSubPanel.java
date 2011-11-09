@@ -23,7 +23,6 @@ import java.util.logging.Level;
 import javax.swing.KeyStroke;
 
 import org.compiere.apps.AppsAction;
-import org.compiere.apps.SwingWorker;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPOS;
 import org.compiere.print.ReportCtl;
@@ -145,13 +144,12 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 		{
 			try
 			{
-				//TODO: to incorporate work from Posterita
-				/*
-				if (p_pos.getAD_PrintLabel_ID() != 0)
-					PrintLabel.printLabelTicket(order.getC_Order_ID(), p_pos.getAD_PrintLabel_ID());
-				*/
-				//print standard document
-				ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
+                // TODO: to incorporate work from Posterita
+
+                // LAR Fiscal Printing
+			    p_posPanel.printFiscalTicket();
+                // print standard document
+                //ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
 
 			}
 			catch (Exception e)
@@ -159,20 +157,6 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 				log.log(Level.SEVERE, "Error Printing Ticket", e);
 			}
 		}
-	}
-
-	/**
-	 * Thread that perform fiscal print operation
-	 */
-	private final class FiscalPrintWorker extends SwingWorker {
-
-	@Override
-	public Object construct()
-	{
-	    // TODO Auto-generated method stub
-	    return null;
-	}
-
 	}
 
 }	//	PosSubPanel

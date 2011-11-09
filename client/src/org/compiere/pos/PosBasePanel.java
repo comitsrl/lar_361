@@ -15,6 +15,7 @@
 package org.compiere.pos;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.MouseInfo;
@@ -28,16 +29,25 @@ import java.util.logging.Level;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
 
 import org.compiere.apps.ADialog;
+import org.compiere.apps.SwingWorker;
+import org.compiere.apps.form.FormFrame;
+import org.compiere.model.MDocType;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MPOS;
-import org.compiere.swing.CFrame;
 import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+
+import ar.com.ergio.model.FiscalDocumentPrint;
+import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter;
+import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter.DialogActionListener;
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  *	Point of Sales Main Window.
@@ -71,7 +81,7 @@ public class PosBasePanel extends CPanel
 	/**	Window No			*/
 	private int         	m_WindowNo = 0;
 	/**	FormFrame			*/
-	private CFrame 		m_frame;
+	private FormFrame 		m_frame;
 	/**	Logger				*/
 	private CLogger			log = CLogger.getCLogger(getClass());
 	/** Context				*/
@@ -102,8 +112,9 @@ public class PosBasePanel extends CPanel
 
 	private KeyboardFocusManager originalKeyboardFocusManager;
 	private boolean debug = true;
-	private CFrame frame;
 	private HashMap<Integer, POSKeyboard> keyboards = new HashMap<Integer, POSKeyboard>();
+    /** LAR - fiscal printer control window */
+	protected AInfoFiscalPrinter infoFiscalPrinter;
 
 
 	public String getTrxName(){
@@ -114,22 +125,21 @@ public class PosBasePanel extends CPanel
 	 *  @param WindowNo window
 	 *  @param frame parent frame
 	 */
-	public void init (int WindowNo, CFrame frame)
+	public void init (int WindowNo, FormFrame frame)
 	{
-		this.frame = frame;
+	    m_frame = frame;
+	    m_frame.setJMenuBar(null);
 		if ( debug )
-			frame.setPreferredSize(new Dimension(1024,768));
+			m_frame.setPreferredSize(new Dimension(1024,768));
 		else
 		{
-			frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-			frame.setResizable(false);
+			m_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			m_frame.setResizable(false);
 		}
 
 		m_SalesRep_ID = Env.getAD_User_ID(m_ctx);
 		log.info("init - SalesRep_ID=" + m_SalesRep_ID);
 		m_WindowNo = WindowNo;
-		m_frame = frame;
-		frame.setJMenuBar(null);
 		//
 		try
 		{
@@ -139,7 +149,7 @@ public class PosBasePanel extends CPanel
 				frame.dispose();
 				return;
 			}
-			frame.getContentPane().add(this, BorderLayout.CENTER);
+			m_frame.getContentPane().add(this, BorderLayout.CENTER);
 		}
 		catch(Exception e)
 		{
@@ -149,13 +159,15 @@ public class PosBasePanel extends CPanel
 
 		if ( p_pos.getAutoLogoutDelay() > 0 && logoutTimer == null )
 		{
-			logoutTimer = new javax.swing.Timer(1000,
-					new ActionListener() {
+			logoutTimer = new javax.swing.Timer(1000, new ActionListener() {
 
 				PointerInfo pi = null;
 				long lastMouseMove  = System.currentTimeMillis();
 				long lastKeyboardEvent = System.currentTimeMillis();
-				public void actionPerformed(ActionEvent e) {
+
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
 					long now = e.getWhen();
 					PointerInfo newPi = MouseInfo.getPointerInfo();
 					// mouse moved
@@ -217,6 +229,7 @@ public class PosBasePanel extends CPanel
 			m_frame.dispose();
 		m_frame = null;
 		m_ctx = null;
+		infoFiscalPrinter = null;
 	}	//	dispose
 
 
@@ -229,7 +242,7 @@ public class PosBasePanel extends CPanel
 	{
 		if (!setMPOS())
 			return false;
-		frame.setTitle("Adempiere POS: " + p_pos.getName());
+		m_frame.setTitle("Adempiere POS: " + p_pos.getName());
 		//	Create Sub Panels
 		f_order = new SubOrder (this);
 		add (f_order, "split 2, flowy, growx, spany");
@@ -239,6 +252,9 @@ public class PosBasePanel extends CPanel
 
 		f_functionKeys = new SubFunctionKeys (this);
 		add (f_functionKeys, "aligny top, h 500, growx, growy, flowy, split 2");
+
+		// LAR - Fiscal printer implementation
+		createInfoFiscalPrinter();
 
 		return true;
 	}	//	dynInit
@@ -318,6 +334,9 @@ public class PosBasePanel extends CPanel
 		f_curLine.newLine();
 		f_curLine.f_name.requestFocusInWindow();
 		updateInfo();
+		// LAR - Fiscal printer implementation
+        infoFiscalPrinter.setVisible(false);
+        infoFiscalPrinter.clearDetail();
 	}	//	newOrder
 
 	/**
@@ -391,6 +410,205 @@ public class PosBasePanel extends CPanel
 			return keyboard;
 		}
 	}
+
+    /**********************************************************************************************
+     *                            LAR Fiscal Printing Implementation
+     **********************************************************************************************/
+
+	protected void printFiscalTicket() {
+        final MInvoice invoice = m_order.getInvoices()[0];
+        log.info("Printing ticket for " + invoice);
+
+        // Se muestra la ventana en el thread de Swing.
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                infoFiscalPrinter.setVisible(true);
+            }
+        });
+
+        final SwingWorker worker = new SwingWorker() {
+            @Override
+            public Object construct()
+            {
+                int c_DocType_ID = invoice.getC_DocType_ID();
+                boolean success = LAR_Utils.isFiscalDocType(c_DocType_ID);
+                if (success) {
+                    try {
+                        final MDocType docType = new MDocType(m_ctx, c_DocType_ID, null);
+                        int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
+                        log.info("doc type asociated " + docType);
+
+                        final FiscalDocumentPrint fdp = new FiscalDocumentPrint(lar_Fiscal_Printer_ID,
+                                infoFiscalPrinter, infoFiscalPrinter);
+                        log.info("fiscal document print created: " + fdp);
+
+                        infoFiscalPrinter.setFiscalDocumentPrint(fdp);
+                        fdp.printDocument(invoice);
+                    } catch (Exception e) {
+                        log.log(Level.SEVERE, "Fiscal printing error", e);
+                        success = false;
+                    }
+                }
+                return Boolean.valueOf(success);
+            }
+            @Override
+            public void finished() {
+                boolean success = (Boolean) getValue();
+//                boolean fiscalPrintError = errorMsg != null && errorMsg.equals(FISCAL_PRINT_ERROR);
+                if(success) {
+                    newOrder();
+//                } else if (!fiscalPrintError) {
+//                    if(errorDesc == null)
+//                        errorMsg(errorMsg);
+//                    else
+//                        errorMsg(errorMsg, errorDesc);
+//                    //waitingDialog.doNotWait();
+//                    //waitingDialog.setVisible(false);
+//                    //getFrame().setEnabled(true);
+//                }
+//                if (!fiscalPrintError) {
+//                    getFrame().setBusy(false);
+//                    mNormal();
+                    m_frame.setBusy(false);
+                    m_frame.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        };
+
+        m_frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        String waitMsg = Msg.getMsg(m_ctx, "PrintingTicket") + ", " + Msg.getMsg(m_ctx, "PleaseWait");
+        m_frame.setBusyMessage(waitMsg);
+        m_frame.setBusyTimer(4);
+        m_frame.setBusy(true);
+
+        worker.start();
+
+	} // printFiscalTicket
+
+    private void createInfoFiscalPrinter()
+    {
+        // Fiscal printing action listener
+        final DialogActionListener dialogActionListener = new DialogActionListener()
+        {
+            @Override
+            public void actionVoidPerformed()
+            {
+                // Anulación de los documentos.
+                voidDocuments();
+            }
+
+            @Override
+            public void actionReprintFinished()
+            {
+                // Al finalizar una reimpresión de ticket, se
+                // reestablece la interfaz para un nuevo pedido
+                newOrder();
+                m_frame.setBusy(false);
+                m_frame.setCursor(Cursor.getDefaultCursor());
+            }
+        };
+
+        // Fiscal Printing status window
+        infoFiscalPrinter = new AInfoFiscalPrinter(dialogActionListener,
+                getWindowNo(), Msg.parseTranslation(Env.getCtx(), "@PrintingFiscalDocument@"));
+        log.info("info fiscal printer windows created");
+
+        infoFiscalPrinter.setReprintButtonActive(true);
+        infoFiscalPrinter.setVoidButtonActive(true);
+        infoFiscalPrinter.setOkButtonActive(false);
+    }
+
+//    private DocActionStatusListener docActionStatusListener = new DocActionStatusListener()
+//    {
+//        public void docActionStatusChanged(DocActionStatusEvent event)
+//        {
+//            // Evento: Impresión fiscal de documento.
+//            if (event.getDocActionStatus() == DocActionStatusEvent.ST_FISCAL_PRINT_DOCUMENT) {
+//                FiscalDocumentPrint fdp = (FiscalDocumentPrint) event.getParameter(0);
+//                // Se setea la ventana de información tanto como listener de
+//                // estado de la
+//                // impresora como el estado de la impresión del documento.
+//                fdp.addDocumentPrintListener(infoFiscalPrinter);
+//                fdp.setPrinterEventListener(infoFiscalPrinter);
+//                // Se efectúa la referencia cruzada entre el Impresor y la
+//                // ventana de información.
+//                infoFiscalPrinter.setFiscalDocumentPrint(fdp);
+//                // Se muestra la ventana en el thread de Swing.
+//                SwingUtilities.invokeLater(new Runnable()
+//                {
+//                    public void run()
+//                    {
+//                        infoFiscalPrinter.setVisible(true);
+//                    }
+//                });
+//            }
+//        }
+//    };
+
+    /**
+     * Invoca la anulación de los documentos generados debido a un error en la
+     * impresión fiscal
+     */
+    private void voidDocuments()
+    {
+        SwingWorker worker = new SwingWorker()
+        {
+            private String errorMsg = null;
+
+            @Override
+            public Object construct()
+            {
+                // --- LY code ---
+//                try {
+//                    InvoiceGlobalVoiding voidingProcess = new InvoiceGlobalVoiding(
+//                            invoice.getC_Invoice_ID(), getCtx(), trxName);
+//                    voidingProcess.start();
+//                } catch (AdempierePOSException e) {
+//                    errorMsg = e.getMessage();
+//                }
+
+                // TODO - Assume that a pos order has only one invoice
+                final MInvoice invoice = m_order.getInvoices()[0];
+                boolean success = invoice.voidIt();
+                if (!success) {
+                    errorMsg = Msg.parseTranslation(Env.getCtx(), "@ErrorVoidingInvoice@");
+                }
+                return Boolean.valueOf(success);
+            }
+
+            @Override
+            public void finished()
+            {
+                boolean success = (Boolean) getValue();
+                if (!success) {
+                    ADialog.error(getWindowNo(), PosBasePanel.this, errorMsg);
+
+                    if (ADialog.ask(getWindowNo(), PosBasePanel.this,
+                            Msg.parseTranslation(m_ctx, "@RetryVoidInvoice@"))) {
+                        // Re intenta anular los documentos.
+                        voidDocuments();
+                    } else {
+                        newOrder();
+                        m_frame.setBusy(false);
+                        m_frame.setCursor(Cursor.getDefaultCursor());
+                    }
+                } else {
+                    newOrder();
+                    m_frame.setBusy(false);
+                    m_frame.setCursor(Cursor.getDefaultCursor());
+//                    getStatusBar().setStatusLine(MSG_VOID_INVOICE_OK);
+                }
+            }
+        }; // new SwingWorker
+
+        String waitMsg = Msg.getMsg(m_ctx, "VoidingInvoice") + ", " + Msg.getMsg(m_ctx, "PleaseWait");
+        m_frame.setBusyMessage(waitMsg);
+        m_frame.setBusyTimer(4);
+        m_frame.setBusy(true);
+        worker.start();
+    } // voidDocuments
 
 }	//	PosPanel
 

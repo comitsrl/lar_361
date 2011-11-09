@@ -66,6 +66,7 @@ import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterIOException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterStatusError;
 import ar.com.ergio.print.fiscal.msg.FiscalMessages;
+import ar.com.ergio.process.DocActionStatusEvent;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
@@ -162,7 +163,7 @@ public class FiscalDocumentPrint {
     {
         this(LAR_Fiscal_Printer_ID);
         // this.printerEventListener = fpl;
-        fiscalPrinterDevice.setEventListener(fiscalPrinterListener);
+        setPrinterEventListener(fiscalPrinterListener);
     }
 
     /**
@@ -195,6 +196,7 @@ public class FiscalDocumentPrint {
 	//MFiscalPrinter cFiscal = null;
     private boolean execute(final Actions action, final Object[] args)
     {
+        log.info("Executing action: " + action);
         boolean error = false;
         String newPrinterStatus = MFiscalPrinter.STATUS_OCIOSO;
         String errorTitle = "";
@@ -219,6 +221,7 @@ public class FiscalDocumentPrint {
             fireActionStarted(FiscalDocumentListener.AC_CONNECT_PRINTER);
 
             // Se intenta conectar la impresora.
+            log.info("connecting to fiscal device");
             getFiscalPrinter().connect();
 
             // Ejecutar la acción correspondiente
@@ -331,6 +334,9 @@ public class FiscalDocumentPrint {
     // TODO - Review the parameter (i think that can be moved to contruction fase)
     public boolean printDocument(final PO document)
     {
+//        fireDocActionStatusChanged(new DocActionStatusEvent(this,
+//                DocActionStatusEvent.ST_FISCAL_PRINT_DOCUMENT, new Object[] { this }));
+
         if (document == null) {
             throw new IllegalArgumentException("Error: the document is null");
         }
@@ -391,6 +397,12 @@ public class FiscalDocumentPrint {
 //		setPrinterDocType(null);
 //		return ok;
 //	}
+
+    private void fireDocActionStatusChanged(final DocActionStatusEvent docActionStatusEvent)
+    {
+        // TODO Auto-generated method stub
+
+    }
 
     /**
      * Realiza la impresión de la factura con los parámetros correspondientes.
@@ -667,6 +679,7 @@ public class FiscalDocumentPrint {
 	 *            tiempo de ejecución.
 	 */
 	private void printInvoice(final Document document) throws FiscalPrinterStatusError, FiscalPrinterIOException, Exception {
+	    log.info("printing document " + document);
 		MInvoice mInvoice = (MInvoice)getOxpDocument();
 		// Se valida el documento OXP.
 		validateOxpDocument(mInvoice);
@@ -1190,6 +1203,7 @@ public class FiscalDocumentPrint {
 	 */
 	public void setPrinterEventListener(final FiscalPrinterListener printerEventListener) {
 		//this.printerEventListener = printerEventListener;
+	    log.info("Set printer event listener. Fiscal device: " + getFiscalPrinter());
 		if(getFiscalPrinter() != null)
 			getFiscalPrinter().setEventListener(printerEventListener);
 	}
@@ -1379,6 +1393,7 @@ public class FiscalDocumentPrint {
 	 * @param fdpl <code>FiscalDocumentListener</code> manejador de eventos.
 	 */
 	public void addDocumentPrintListener(final FiscalDocumentListener fdpl) {
+	    log.info("Set document print listener. Document listener: " + getDocumentPrintListeners());
 		if(!getDocumentPrintListeners().contains(fdpl)) {
 			getDocumentPrintListeners().add(fdpl);
 			fdpl.setFiscalDocumentPrint(this);
@@ -1570,5 +1585,14 @@ public class FiscalDocumentPrint {
 	    // Use this as description
 	    // TODO - improve this behavior (if needed)
 	    return mProduct.getValue() + " " + mProduct.getName();
+	}
+
+	@Override
+	public String toString()
+	{
+	    StringBuilder sb = new StringBuilder("FiscalDocumentPrint[");
+	    sb.append("fiscalPrinter=").append(fiscalPrinter);
+        sb.append("fiscalDevice=").append(fiscalPrinterDevice);
+	    return sb.toString();
 	}
 }

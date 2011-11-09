@@ -3,27 +3,26 @@ package ar.com.ergio.util;
 import org.compiere.model.MDocType;
 
 import test.AdempiereTestCase;
-import ar.com.ergio.model.LAR_MDocType;
 
 
 public class LAR_UtilsTest extends AdempiereTestCase
 {
 
     private int m_C_DocType_ID = 123; // AP invoice
-    private LAR_MDocType larDocType;
+    private MDocType larDocType;
     private MDocType docType;
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
-        larDocType = new LAR_MDocType(getCtx(), 0, getTrxName());
+        larDocType = new MDocType(getCtx(), 0, getTrxName());
         larDocType.setName("Test document");
         larDocType.setPrintName("Test print name");
         larDocType.setDocBaseType("API");
         larDocType.setGL_Category_ID(112);
         larDocType.setDocumentCopies(0);
-        larDocType.setIsFiscal(true);
+        larDocType.set_ValueOfColumn("IsFiscal", true);
         larDocType.save();
         docType = new MDocType(getCtx(), m_C_DocType_ID, getTrxName());
         commit();
