@@ -149,7 +149,6 @@ import ar.com.ergio.util.LAR_Utils;
          return null;
      }   //  login
 
-
      /**
       *  Get Client to be monitored
       *  @return AD_Client_ID client
@@ -158,16 +157,5 @@ import ar.com.ergio.util.LAR_Utils;
      {
          return m_AD_Client_ID;
      }   //  getAD_Client_ID
-
-
-     /**
-      *  String Representation
-      *  @return info
-      */
-     public String toString ()
-     {
-         StringBuffer sb = new StringBuffer ("LAR_Validator");
-         return sb.toString ();
-     }   //  toString
 
  }   //  LAR_Validator
