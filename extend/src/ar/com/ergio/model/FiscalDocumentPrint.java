@@ -353,9 +353,6 @@ public class FiscalDocumentPrint {
         // Se asigna el documento OXP.
         setOxpDocument(document);
 
-        // Se obtiene el controlador fiscal para chequear el status
-        // MFiscalPrinter cFiscal = MFiscalPrinter.getOfDocType(docType_ID);
-
         // Ejecutar la acción
         boolean ok = execute(Actions.ACTION_PRINT_DOCUMENT, new Object[] { document });
 
@@ -678,9 +675,10 @@ public class FiscalDocumentPrint {
 	 *            una instancia de esa clase sino se producirá un error en
 	 *            tiempo de ejecución.
 	 */
+	// TODO - Redesign this method
 	private void printInvoice(final Document document) throws FiscalPrinterStatusError, FiscalPrinterIOException, Exception {
-	    log.info("printing document " + document);
 		MInvoice mInvoice = (MInvoice)getOxpDocument();
+		log.info("FIXME - Document: " + document + " mInvoice: " + mInvoice);
 		// Se valida el documento OXP.
 		validateOxpDocument(mInvoice);
 		// Se crea la factura imprimible en caso que no exista como parámetro
@@ -1337,14 +1335,6 @@ public class FiscalDocumentPrint {
 	}
 
 	private void validateOxpDocument(final MInvoice mInvoice) throws Exception {
-		// Validar estado del documento y FiscalAlreadyPrinted
-		/*
-		if(!mInvoice.getDocStatus().equals("CO") && !mInvoice.getDocStatus().equals("CL")) {
-			log.severe("The invoice to print must be completed.");
-			throw new Exception(Msg.translate(ctx,"RequireCompletedFiscalDocument"));
-		}
-		*/
-
 		// Validar si la factura ya fue impresa.
 		if(mInvoice.get_ValueAsBoolean("isfiscalprinted")) {
 			log.severe("The invoice was already printed with a fiscal printer.");
@@ -1361,10 +1351,11 @@ public class FiscalDocumentPrint {
 //		}
 //	}
 
+	// TODO - This method should not touch sequence, but an invoice proper field
 	private void updateDocTypeSequence(final MInvoice mInvoice) {
 		// Se actualiza la secuencia del tipo de documento del documento
 		// emitido recientemento por la impresora fiscal.
-		Integer lastDocumentNo = new Integer(getFiscalPrinter().getLastDocumentNo());
+		int lastDocumentNo = new Integer(getFiscalPrinter().getLastDocumentNo());
 		MDocType docType = MDocType.get(ctx, mInvoice.getC_DocTypeTarget_ID());
 		// Se obtiene la secuencia del tipo de documento...
 		if(docType.getDocNoSequence_ID() != 0) {

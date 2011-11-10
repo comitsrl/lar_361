@@ -445,7 +445,7 @@ public class PosBasePanel extends CPanel
                         log.info("fiscal document print created: " + fdp);
 
                         infoFiscalPrinter.setFiscalDocumentPrint(fdp);
-                        fdp.printDocument(invoice);
+                        success = fdp.printDocument(invoice);
                     } catch (Exception e) {
                         log.log(Level.SEVERE, "Fiscal printing error", e);
                         success = false;
@@ -455,9 +455,10 @@ public class PosBasePanel extends CPanel
             }
             @Override
             public void finished() {
+                log.info("Finish fiscal printing thread");
                 boolean success = (Boolean) getValue();
 //                boolean fiscalPrintError = errorMsg != null && errorMsg.equals(FISCAL_PRINT_ERROR);
-                if(success) {
+                if (success) {
                     newOrder();
 //                } else if (!fiscalPrintError) {
 //                    if(errorDesc == null)
@@ -519,33 +520,6 @@ public class PosBasePanel extends CPanel
         infoFiscalPrinter.setVoidButtonActive(true);
         infoFiscalPrinter.setOkButtonActive(false);
     }
-
-//    private DocActionStatusListener docActionStatusListener = new DocActionStatusListener()
-//    {
-//        public void docActionStatusChanged(DocActionStatusEvent event)
-//        {
-//            // Evento: Impresión fiscal de documento.
-//            if (event.getDocActionStatus() == DocActionStatusEvent.ST_FISCAL_PRINT_DOCUMENT) {
-//                FiscalDocumentPrint fdp = (FiscalDocumentPrint) event.getParameter(0);
-//                // Se setea la ventana de información tanto como listener de
-//                // estado de la
-//                // impresora como el estado de la impresión del documento.
-//                fdp.addDocumentPrintListener(infoFiscalPrinter);
-//                fdp.setPrinterEventListener(infoFiscalPrinter);
-//                // Se efectúa la referencia cruzada entre el Impresor y la
-//                // ventana de información.
-//                infoFiscalPrinter.setFiscalDocumentPrint(fdp);
-//                // Se muestra la ventana en el thread de Swing.
-//                SwingUtilities.invokeLater(new Runnable()
-//                {
-//                    public void run()
-//                    {
-//                        infoFiscalPrinter.setVisible(true);
-//                    }
-//                });
-//            }
-//        }
-//    };
 
     /**
      * Invoca la anulación de los documentos generados debido a un error en la
