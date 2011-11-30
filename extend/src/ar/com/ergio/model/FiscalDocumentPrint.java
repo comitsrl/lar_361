@@ -66,7 +66,6 @@ import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterIOException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterStatusError;
 import ar.com.ergio.print.fiscal.msg.FiscalMessages;
-import ar.com.ergio.process.DocActionStatusEvent;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
@@ -394,12 +393,6 @@ public class FiscalDocumentPrint {
 //		setPrinterDocType(null);
 //		return ok;
 //	}
-
-    private void fireDocActionStatusChanged(final DocActionStatusEvent docActionStatusEvent)
-    {
-        // TODO Auto-generated method stub
-
-    }
 
     /**
      * Realiza la impresión de la factura con los parámetros correspondientes.

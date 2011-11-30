@@ -95,7 +95,7 @@ public class Customer implements Serializable{
 	 * @param ivaResponsibility Responsabilidad frente al IVA.
 	 * @param location Domicilio comercial.
 	 */
-	public Customer(String name, Integer identificationType, String identificationNumber, int ivaResponsibility, String location) {
+	public Customer(String name, int identificationType, String identificationNumber, int ivaResponsibility, String location) {
 		super();
 		this.name = name;
 		this.identificationNumber = identificationNumber;

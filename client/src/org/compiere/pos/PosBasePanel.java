@@ -534,15 +534,6 @@ public class PosBasePanel extends CPanel
             @Override
             public Object construct()
             {
-                // --- LY code ---
-//                try {
-//                    InvoiceGlobalVoiding voidingProcess = new InvoiceGlobalVoiding(
-//                            invoice.getC_Invoice_ID(), getCtx(), trxName);
-//                    voidingProcess.start();
-//                } catch (AdempierePOSException e) {
-//                    errorMsg = e.getMessage();
-//                }
-
                 // TODO - Assume that a pos order has only one invoice
                 final MInvoice invoice = m_order.getInvoices()[0];
                 boolean success = invoice.voidIt();
