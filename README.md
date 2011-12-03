@@ -9,7 +9,7 @@ To extend and adequate ADempiere to Argentine Laws and Taxing schema. To Incorpo
  
 Introduction
 ------------
-ADempiere Argentine Localization (LAR) implements a solution to the Withholdings from Income Gross and VAT, and the issuance of corresponding certificates..
+ADempiere Argentine Localization (LAR) implements a solution for Withholdings from Income Gross and VAT, and the issuance of corresponding certificates.
 Adapts Colombian Localization (LCO) to Argentine tax scheme.
 Extends JavaPOS to incorporate Fiscal Printing functionality and add features of the sales process (Product Attributes, Withholdings, Payment Rules, Stock Control, Binding and Non Binding offers Invoicing).
  
@@ -24,10 +24,11 @@ Argentine Spanish Language (es_AR) and default accounting schema developed by [A
  
 License
 -------
-Argentine Localization is licensed under [GNU GPL v2]
+Argentine Localization is licensed under [GNU GPLv2]
 
 
 
+[GNU GPLv2]: http://www.gnu.org/licenses/gpl-2.0.html
 [Adempiere ERP & CRM Business Solution]: http://www.adempiere.org
 [GlobalQSS]: http://globalqss.com/portal/index.php?lang=es
 [Libertya]:  http://www.libertya.org

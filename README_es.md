@@ -4,7 +4,7 @@
 
 Objetivo
 ---------
-Extender ADempiere y adecuarlo al esquema impositivo de Argentina, ajustándolo a la normativa legal vigente. Incorporar la Impresión fiscal, soportando los Controladores Fiscales avalados por la AFIP. Incorporar más funcionalidades del proceso de Ventas a JavaPOS. 
+Extender ADempiere y adecuarlo al esquema impositivo de Argentina, ajustándolo a la normativa legal vigente. Incorporar la Impresión fiscal, soportando los Controladores Fiscales avalados por la AFIP. Incorporar más funcionalidades del Proceso de Ventas a JavaPOS. 
 
 
 Introducción
@@ -29,11 +29,11 @@ Traducción Argentina (es_AR) y Plan de Cuentas genérico para Argentina desarro
 
 Licencia
 -------
-ADempiere Localización Argentina está regulado por la licencia [GNU GPL v2]
+ADempiere Localización Argentina está regulado por la licencia [GNU GPLv2]
 
 
 
-[GNU GPL v2]: http://www.gnu.org/licenses/gpl.html
+[GNU GPLv2]: http://www.gnu.org/licenses/gpl-2.0.html
 [ADempiere ERP & CRM Business Solution]: http://www.adempiere.org
 [GlobalQSS]: http://globalqss.com/portal/index.php?lang=es
 [Libertya]:  http://www.libertya.org
