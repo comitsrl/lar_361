@@ -29,7 +29,6 @@ import java.util.logging.Level;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -115,6 +114,7 @@ public class PosBasePanel extends CPanel
 	private HashMap<Integer, POSKeyboard> keyboards = new HashMap<Integer, POSKeyboard>();
     /** LAR - fiscal printer control window */
 	protected AInfoFiscalPrinter infoFiscalPrinter;
+    private boolean printed = false;
 
 
 	public String getTrxName(){
@@ -415,18 +415,9 @@ public class PosBasePanel extends CPanel
      *                            LAR Fiscal Printing Implementation
      **********************************************************************************************/
 
-	protected void printFiscalTicket() {
+	protected boolean printFiscalTicket() {
         final MInvoice invoice = m_order.getInvoices()[0];
         log.info("Printing ticket for " + invoice);
-
-        // Se muestra la ventana en el thread de Swing.
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                infoFiscalPrinter.setVisible(true);
-            }
-        });
 
         final SwingWorker worker = new SwingWorker() {
             @Override
@@ -456,9 +447,9 @@ public class PosBasePanel extends CPanel
             @Override
             public void finished() {
                 log.info("Finish fiscal printing thread");
-                boolean success = (Boolean) getValue();
+                printed = (Boolean) getValue();
 //                boolean fiscalPrintError = errorMsg != null && errorMsg.equals(FISCAL_PRINT_ERROR);
-                if (success) {
+                if (printed) {
                     newOrder();
 //                } else if (!fiscalPrintError) {
 //                    if(errorDesc == null)
@@ -486,7 +477,15 @@ public class PosBasePanel extends CPanel
 
         worker.start();
 
+        infoFiscalPrinter.setVisible(true); // Thread stops here until fiscal printing finished
+
+        return isPrinted();
+
 	} // printFiscalTicket
+
+	private boolean isPrinted() {
+	    return printed;
+	}
 
     private void createInfoFiscalPrinter()
     {
@@ -525,7 +524,7 @@ public class PosBasePanel extends CPanel
      * Invoca la anulación de los documentos generados debido a un error en la
      * impresión fiscal
      */
-    private void voidDocuments()
+    void voidDocuments() // TODO - Review visibility for this method
     {
         SwingWorker worker = new SwingWorker()
         {

@@ -147,9 +147,13 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 // TODO: to incorporate work from Posterita
 
                 // LAR Fiscal Printing
-			    p_posPanel.printFiscalTicket();
-                // print standard document
-                //ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
+			    if (!p_posPanel.printFiscalTicket()) {
+			        log.info("Fiscal printing fail");
+			        return;
+			    }
+			    // print standard document
+			    //ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
+			    log.info("Fiscal printing OK. Continue printing others documents...");
 
 			}
 			catch (Exception e)

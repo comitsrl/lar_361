@@ -46,7 +46,6 @@ import javax.swing.SwingUtilities;
 
 import org.compiere.apps.ADialog;
 import org.compiere.apps.AEnv;
-import org.compiere.apps.APanel;
 import org.compiere.apps.ConfirmPanel;
 import org.compiere.apps.Preference;
 import org.compiere.apps.PrintScreenPainter;
@@ -675,11 +674,9 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
                 SwingUtilities.invokeLater(action);
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            log.severe("Thread Interrupted: " + e.getMessage());
+            log.log(Level.SEVERE, "Thread Interrupted: " + e.getMessage(), e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            log.severe("Invocation error: " + e.getMessage());
+            log.log(Level.SEVERE, "Invocation error: " + e.getMessage(), e);
         }
     }
 
