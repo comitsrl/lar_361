@@ -632,7 +632,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	 */
 	public void setM_Product_ID (int M_Product_ID)
 	{
-		log.fine( "PosSubProduct.setM_Product_ID=" + M_Product_ID);
+		log.info("PosSubProduct.setM_Product_ID=" + M_Product_ID);
 		if (M_Product_ID <= 0)
 			m_product = null;
 		else

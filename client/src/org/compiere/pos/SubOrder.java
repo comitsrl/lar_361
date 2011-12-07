@@ -80,7 +80,7 @@ public class SubOrder extends PosSubPanel
 	}	//	PosSubCustomer
 
 	private CButton 		f_history;
-	private	PosTextField		f_name;
+	protected PosTextField		f_name;
 	private CButton 		f_bNew;
 	private CButton 		f_bSearch;
 	private CComboBox		f_location;
@@ -408,7 +408,7 @@ public class SubOrder extends PosSubPanel
 	 */
 	public void setC_BPartner_ID (int C_BPartner_ID)
 	{
-		log.fine( "PosSubCustomer.setC_BPartner_ID=" + C_BPartner_ID);
+		log.info("PosSubCustomer.setC_BPartner_ID=" + C_BPartner_ID);
 		if (C_BPartner_ID == 0)
 			m_bpartner = null;
 		else
