@@ -16,10 +16,6 @@
  *****************************************************************************/
 package ar.com.ergio.model;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
 import org.compiere.model.ModelValidationEngine;
@@ -29,22 +25,22 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 
 import ar.com.ergio.util.LAR_Utils;
+
 /**
  *  Validator for Localization Argentina
  *
  *  @author Emiliano Gonzalez - Ergio=energia+evolucion - http://www.ergio.com.ar
  *  @version $Id: LAR_Validator.java,v 1.0 2011/11/04  egonzalez Exp $
-**/
-
+ */
  public class LAR_Validator implements ModelValidator {
      /**
       *  Constructor.
       *  The class is instantiated when logging in and client is selected/known
       */
-     public LAR_Validator ()
+     public LAR_Validator()
      {
-         super ();
-     }   //  MyValidator
+         super();
+     }   //  LAR_Validator
 
      /** Logger          */
      private static CLogger log = CLogger.getCLogger(LAR_Validator.class);
@@ -69,54 +65,41 @@ import ar.com.ergio.util.LAR_Utils;
 
          //  Tables to be monitored
          engine.addModelChange(MBPartner.Table_Name, this);
-
-         //  Documents to be monitored
-         engine.addDocValidate(MBPartner.Table_Name, this);
-
      }   //  initialize
 
-     /**
-      *  Model Change of a monitored Table.
-      *  Called after PO.beforeSave/PO.beforeDelete
-      *  when you called addModelChange for the table
-      *  @param po persistent object
-      *  @param type TYPE_
-      *  @return error message or null
-      *  @exception Exception if the recipient wishes the change to be not accept.
-      */
+    /**
+     * Model Change of a monitored Table. Called after
+     * PO.beforeSave/PO.beforeDelete when you called addModelChange for the
+     * table
+     *
+     * @param po
+     *            persistent object
+     * @param type
+     *            TYPE_
+     * @return error message or null
+     * @exception Exception
+     *                if the recipient wishes the change to be not accept.
+     */
      public String modelChange (PO po, int type) throws Exception
      {
-         log.info(po.get_TableName() + " Type: "+type);
-         String msg="";
+         log.info(po.get_TableName() + " Type: " + type);
+         String msg;
 
          if (po.get_TableName().equals(MBPartner.Table_Name) && type == ModelValidator.TYPE_BEFORE_CHANGE) {
-             MBPartner inv = (MBPartner) po;
-             String cuit = (String) inv.get_Value("TaxID");
-             String nroIIBB = ((String) inv.get_Value("DUNS")).replace("-","").trim();
-             String tipoIIBB;
-             String sqlTipoIIBB="select value from lco_isic where " +
-             		"lco_isic_id=" + (Integer) inv.get_Value("LCO_ISIC_ID");
-             PreparedStatement psTIIBB = DB.prepareStatement(sqlTipoIIBB, inv.get_TrxName());
-             ResultSet rsTIIBB = null;
-             try {
-                 rsTIIBB = psTIIBB.executeQuery();
-                 rsTIIBB.next();
-                 tipoIIBB=rsTIIBB.getString(1).trim();
-             } catch (SQLException e) {
-                 throw e;
-             } finally {
-                 DB.close(rsTIIBB, psTIIBB);
-                 rsTIIBB = null; psTIIBB = null;
+             MBPartner bp = (MBPartner) po;
+             // Check CUIT number
+             String cuit = bp.get_ValueAsString("TaxID");
+             if (!LAR_Utils.validateCUIT(cuit)) {
+                 return "ERROR: CUIT invalido";
              }
-             if (!LAR_Utils.validateCUIT(cuit))
-                 msg = msg + "ERROR: CUIT invalido ";
-             if ((tipoIIBB.equals("D") && nroIIBB.length()!=8)
-                 || (tipoIIBB.equals("CM") && nroIIBB.length()!=10)
-                 || nroIIBB.equals(""))
-                 msg = msg + "ERROR: número de IIBB invalido ";
-             if (tipoIIBB.equals("")) msg = msg + "ERROR: tipo de IIBB invalido ";
+
+             // Check IIBB number
+             msg = checkIIBBNumber(bp);
+             if (msg != null) {
+                 return msg;
+             }
          }
-         return msg;
+         return null;
      }
 
      /**
@@ -158,4 +141,19 @@ import ar.com.ergio.util.LAR_Utils;
          return m_AD_Client_ID;
      }   //  getAD_Client_ID
 
+     private String checkIIBBNumber(final MBPartner bp)
+     {
+         String msg = null;
+         String nroIIBB = (bp.get_ValueAsString("DUNS")).replace("-", "").trim();
+         String sqlTipoIIBB = "SELECT value FROM lco_isic WHERE lco_isic_id = ?";
+         String tipoIIBB = DB.getSQLValueString(bp.get_TrxName(), sqlTipoIIBB, bp.get_ValueAsInt("LCO_ISIC_ID"));
+
+         if ((tipoIIBB == null)
+                 || (tipoIIBB.equals("D") && nroIIBB.length() != 8)
+                 || (tipoIIBB.equals("CM") && nroIIBB.length() != 10)) {
+
+             msg = "ERROR: número de IIBB invalido";
+         }
+         return msg;
+     }
  }   //  LAR_Validator
