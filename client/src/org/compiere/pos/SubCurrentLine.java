@@ -514,8 +514,8 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		MProduct product = getProduct();
 		if (product == null)
 			return false;
-		BigDecimal QtyOrdered = (BigDecimal) f_quantity.getValue();
-		BigDecimal PriceActual = (BigDecimal) f_price.getValue();
+		BigDecimal qtyOrdered = (BigDecimal) f_quantity.getValue();
+		BigDecimal priceActual = (BigDecimal) f_price.getValue();
 
 		if ( p_posPanel.m_order == null )
 		{
@@ -526,7 +526,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 
 		if ( p_posPanel.m_order != null )
 		{
-			line = p_posPanel.m_order.createLine(product, QtyOrdered, PriceActual);
+			line = p_posPanel.m_order.createLine(product, qtyOrdered, priceActual);
 
 			if (line == null)
 				return false;

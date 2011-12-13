@@ -30,6 +30,8 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.ValueNamePair;
 
+import ar.com.ergio.model.MLAROrderPerception;
+
 /**
  * Wrapper for standard order
  * @author Paul Bowden
@@ -120,8 +122,8 @@ public class PosOrderModel extends MOrder {
 	 *
 	 * @return line or null
 	 */
-	public MOrderLine createLine(MProduct product, BigDecimal QtyOrdered,
-			BigDecimal PriceActual) {
+	public MOrderLine createLine(MProduct product, BigDecimal qtyOrdered,
+			BigDecimal priceActual) {
 
 		if (!getDocStatus().equals("DR") )
 			return null;
@@ -140,12 +142,12 @@ public class PosOrderModel extends MOrder {
 				{
 					//increase qty
 					BigDecimal current = lines[i].getQtyEntered();
-					BigDecimal toadd = QtyOrdered;
+					BigDecimal toadd = qtyOrdered;
 					BigDecimal total = current.add(toadd);
 					lines[i].setQty(total);
 					lines[i].setPrice(); //	sets List/limit
-					if ( PriceActual.compareTo(Env.ZERO) > 0 )
-						lines[i].setPrice(PriceActual);
+					if ( priceActual.compareTo(Env.ZERO) > 0 )
+						lines[i].setPrice(priceActual);
 					lines[i].save();
 					return lines[i];
 				}
@@ -159,11 +161,11 @@ public class PosOrderModel extends MOrder {
         //create new line
 		MOrderLine line = new MOrderLine(this);
 		line.setProduct(product);
-		line.setQty(QtyOrdered);
+		line.setQty(qtyOrdered);
 
 		line.setPrice(); //	sets List/limit
-		if ( PriceActual.compareTo(Env.ZERO) > 0 )
-			line.setPrice(PriceActual);
+		if ( priceActual.compareTo(Env.ZERO) > 0 )
+			line.setPrice(priceActual);
 		line.save();
 		return line;
 
@@ -290,11 +292,18 @@ public class PosOrderModel extends MOrder {
 		{
 			taxAmt = taxAmt.add(tax.getTaxAmt());
 		}
+		taxAmt = taxAmt.add(getPerceptionAmt());// TODO - Think about perceptions as "other tax"
 		return taxAmt;
 	}
 
 	public BigDecimal getSubtotal() {
 		return getGrandTotal().subtract(getTaxAmt());
+	}
+
+	@Override
+	public BigDecimal getGrandTotal()
+	{
+	    return super.getGrandTotal().add(getPerceptionAmt());
 	}
 
 	public BigDecimal getPaidAmt()
@@ -310,6 +319,12 @@ public class PosOrderModel extends MOrder {
 			received = received.add(cashline);
 
 		return received;
+	}
+
+	private BigDecimal getPerceptionAmt()
+	{
+	    MLAROrderPerception perception = MLAROrderPerception.get(this, null);
+	    return perception.getTaxAmt();
 	}
 
 	public boolean payCash(BigDecimal amt) {

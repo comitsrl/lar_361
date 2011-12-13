@@ -363,14 +363,13 @@ public class PosBasePanel extends CPanel
 	public void updateInfo()
 	{
 		// reload order
-		if ( m_order != null )
-		{
+		if (m_order != null) {
 			m_order.reload();
 		}
-		if ( f_curLine != null )
+		if (f_curLine != null) {
 			f_curLine.updateTable(m_order);
-		if (f_order != null)
-		{
+		}
+		if (f_order != null) {
 			f_order.updateOrder();
 		}
 	}

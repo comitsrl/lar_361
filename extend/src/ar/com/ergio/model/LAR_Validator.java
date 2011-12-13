@@ -16,8 +16,16 @@
  *****************************************************************************/
 package ar.com.ergio.model;
 
+import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.logging.Level;
+
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
+import org.compiere.model.MOrder;
+import org.compiere.model.MOrderLine;
+import org.compiere.model.MOrderTax;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
@@ -33,6 +41,10 @@ import ar.com.ergio.util.LAR_Utils;
  *  @version $Id: LAR_Validator.java,v 1.0 2011/11/04  egonzalez Exp $
  */
  public class LAR_Validator implements ModelValidator {
+
+     // TODO - try to avoid this hardcode value
+     private static final int C_TAXCATEGORY_ID = 1000002; // Perception Tax Category
+
      /**
       *  Constructor.
       *  The class is instantiated when logging in and client is selected/known
@@ -65,6 +77,8 @@ import ar.com.ergio.util.LAR_Utils;
 
          //  Tables to be monitored
          engine.addModelChange(MBPartner.Table_Name, this);
+         engine.addModelChange(MOrderLine.Table_Name, this);
+
      }   //  initialize
 
     /**
@@ -95,6 +109,20 @@ import ar.com.ergio.util.LAR_Utils;
 
              // Check IIBB number
              msg = checkIIBBNumber(bp);
+             if (msg != null) {
+                 return msg;
+             }
+         }
+
+         if (po.get_TableName().equals(MOrderLine.Table_Name) &&
+                 (type == ModelValidator.TYPE_AFTER_NEW ||
+                  type == ModelValidator.TYPE_AFTER_CHANGE)
+                 ) {
+             MOrderLine ol = (MOrderLine) po;
+
+             int c_BPartner_ID = ol.getParent().getC_BPartner_ID();
+             MBPartner bp = new MBPartner(ol.getCtx(), c_BPartner_ID, ol.get_TrxName());
+             msg = calculatePerceptionLine(bp, ol);
              if (msg != null) {
                  return msg;
              }
@@ -155,5 +183,77 @@ import ar.com.ergio.util.LAR_Utils;
              msg = "ERROR: número de IIBB invalido";
          }
          return msg;
+     }
+
+     private String calculatePerceptionLine(final MBPartner bp, final MOrderLine line)
+     {
+         String sql =
+             "SELECT x.rate/100 AS rate" +
+             "     , r.lco_withholdingrule_id " +
+             "     , c.lco_withholdingtype_id" +
+             "     , x.c_tax_id " +
+             "  FROM C_BPartner bp " +
+             "  JOIN LCO_WithholdingRule r ON r.lco_bp_isic_id = bp.lco_isic_id " +
+             "       AND r.lco_bp_taxpayertype_id = bp.lco_taxpayertype_id" +
+             "  JOIN LCO_WithholdingCalc c ON c.lco_withholdingcalc_id = r.lco_withholdingcalc_id " +
+             "  JOIN C_Tax x on x.c_tax_id = c.c_tax_id " +
+             " WHERE bp.c_bpartner_id = ? " +
+             "   AND x.c_taxcategory_id = ?";
+
+        BigDecimal aliquot = null;
+        int lco_WithholdingRule_ID = 0;
+        int lco_WithholdingType_ID = 0;
+        int c_Tax_ID = 0;
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            pstmt = DB.prepareStatement(sql, bp.get_TrxName());
+            pstmt.setInt(1, bp.getC_BPartner_ID());
+            pstmt.setInt(2, C_TAXCATEGORY_ID);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                aliquot = rs.getBigDecimal(1).negate();
+                lco_WithholdingRule_ID = rs.getInt(2);
+                lco_WithholdingType_ID = rs.getInt(3);
+                c_Tax_ID = rs.getInt(4);
+            }
+        } catch (Exception e) {
+            log.log(Level.SEVERE, sql, e);
+            return "Error retrieve Withholding rules, values and aliquot";
+        } finally {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+        log.info(String.format("Aliquot=%f Rule Id=%d Calc Id=%d Tax Id=%d", aliquot,
+                lco_WithholdingRule_ID, lco_WithholdingType_ID, c_Tax_ID));
+
+        // Calculate perception amount from order
+        MOrder order = line.getParent();
+        BigDecimal taxAmt = BigDecimal.ZERO;
+        for (MOrderTax tax : order.getTaxes(true)) {
+            taxAmt = taxAmt.add(tax.getTaxAmt());
+        }
+        BigDecimal subtotal = order.getGrandTotal().subtract(taxAmt);
+        BigDecimal perceptionAmt = subtotal.multiply(aliquot).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+        // Create order perception
+        MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
+        perception.setC_Order_ID(line.getParent().get_ID());
+        perception.setC_Tax_ID(c_Tax_ID);
+        perception.setLCO_WithholdingRule_ID(lco_WithholdingRule_ID);
+        perception.setLCO_WithholdingType_ID(lco_WithholdingType_ID);
+        perception.setTaxAmt(perceptionAmt);
+        perception.setTaxBaseAmt(subtotal);
+        perception.setIsTaxIncluded(false);
+        if (!perception.save()) {
+            return "Can not create preception";
+        }
+        // Update order amounts
+        if (!order.save()) {
+            return "Can not update order amounts";
+        }
+        return null;
      }
  }   //  LAR_Validator
