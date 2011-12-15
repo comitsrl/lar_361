@@ -50,8 +50,8 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Trx;
-import org.globalqss.model.X_LCO_TaxPayerType;
 
+import static ar.com.ergio.model.LAR_TaxPayerType.*;
 import ar.com.ergio.print.fiscal.FiscalPrinterDevice;
 import ar.com.ergio.print.fiscal.FiscalPrinterListener;
 import ar.com.ergio.print.fiscal.document.CreditNote;
@@ -85,13 +85,6 @@ public class FiscalDocumentPrint {
 		ACTION_FISCAL_CLOSE,
 		ACTION_PRINT_DELIVERY_DOCUMENT
 	}
-
-	// TODO - Improve this behavior
-    private static final String NO_CATEGORIZADO = "NoCategorizado";
-    private static final String RESPONSABLE_MONOTRIBUTO = "ResponsableMonotributo";
-    private static final String EXENTO = "Exento";
-    private static final String RESPONSABLE_INSCRIPTO = "ResponsableInscripto";
-    private static final String CONSUMIDOR_FINAL = "ConsumidorFinal";
 
 	/** Cantidad maxima de esperas cuando la impresora se encuentra en estado ocupado */
 	private static int MAX_BSY_SLEEP_COUNT = 12;
@@ -750,10 +743,8 @@ public class FiscalDocumentPrint {
         if (bPartner != null) {
 
             // Se asigna la categoría de iva del cliente.
-            int taxpayertype_id = bPartner.get_ValueAsInt("LCO_TaxPayerType_ID");
-            X_LCO_TaxPayerType categoriaIva = new X_LCO_TaxPayerType(Env.getCtx(), taxpayertype_id,
-                    getTrxName());
-            customer.setIvaResponsibility(traduceTaxPayerType(categoriaIva.getName()));
+            LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bPartner);
+            customer.setIvaResponsibility(traduceTaxPayerType(taxPayerType.getName()));
             MInvoice mInvoice = (MInvoice) getOxpDocument();// TODO - Parametrize this method
 
             // Se asigna el nombre del cliente a partir del BPartner.
@@ -1156,11 +1147,11 @@ public class FiscalDocumentPrint {
 	protected Map<String, Integer> getTaxPayerTypes() {
 		if(taxPayerTypes == null) {
 			taxPayerTypes = new HashMap<String,Integer>();
-			taxPayerTypes.put(CONSUMIDOR_FINAL, Customer.CONSUMIDOR_FINAL);
-			taxPayerTypes.put(RESPONSABLE_INSCRIPTO, Customer.RESPONSABLE_INSCRIPTO);
-			taxPayerTypes.put(EXENTO, Customer.EXENTO);
-			taxPayerTypes.put(RESPONSABLE_MONOTRIBUTO, Customer.RESPONSABLE_MONOTRIBUTO);
-			taxPayerTypes.put(NO_CATEGORIZADO, Customer.NO_CATEGORIZADO);
+			taxPayerTypes.put(CONSUMIDOR_FINAL.getName(), Customer.CONSUMIDOR_FINAL);
+			taxPayerTypes.put(RESPONSABLE_INSCRIPTO.getName(), Customer.RESPONSABLE_INSCRIPTO);
+			taxPayerTypes.put(EXENTO.getName(), Customer.EXENTO);
+			taxPayerTypes.put(RESPONSABLE_MONOTRIBUTO.getName(), Customer.RESPONSABLE_MONOTRIBUTO);
+			taxPayerTypes.put(NO_CATEGORIZADO.getName(), Customer.NO_CATEGORIZADO);
 		}
 		return taxPayerTypes;
 	}
