@@ -42,9 +42,6 @@ import ar.com.ergio.util.LAR_Utils;
  */
  public class LAR_Validator implements ModelValidator {
 
-     // TODO - try to avoid this hardcode value
-     private static final int C_TAXCATEGORY_ID = 1000002; // Perception Tax Category
-
      /**
       *  Constructor.
       *  The class is instantiated when logging in and client is selected/known
@@ -122,7 +119,7 @@ import ar.com.ergio.util.LAR_Utils;
 
              int c_BPartner_ID = ol.getParent().getC_BPartner_ID();
              MBPartner bp = new MBPartner(ol.getCtx(), c_BPartner_ID, ol.get_TrxName());
-             msg = calculatePerceptionLine(bp, ol);
+             msg = calculatePerceptionLine(bp, ol.getParent());
              if (msg != null) {
                  return msg;
              }
@@ -185,67 +182,19 @@ import ar.com.ergio.util.LAR_Utils;
          return msg;
      }
 
-     private String calculatePerceptionLine(final MBPartner bp, final MOrderLine line)
+     private String calculatePerceptionLine(final MBPartner bp, final MOrder order)
      {
-         String sql =
-             "SELECT x.rate/100 AS rate" +
-             "     , r.lco_withholdingrule_id " +
-             "     , c.lco_withholdingtype_id" +
-             "     , x.c_tax_id " +
-             "  FROM C_BPartner bp " +
-             "  JOIN LCO_WithholdingRule r ON r.lco_bp_isic_id = bp.lco_isic_id " +
-             "       AND r.lco_bp_taxpayertype_id = bp.lco_taxpayertype_id" +
-             "  JOIN LCO_WithholdingCalc c ON c.lco_withholdingcalc_id = r.lco_withholdingcalc_id " +
-             "  JOIN C_Tax x on x.c_tax_id = c.c_tax_id " +
-             " WHERE bp.c_bpartner_id = ? " +
-             "   AND x.c_taxcategory_id = ?";
-
-        BigDecimal aliquot = null;
-        int lco_WithholdingRule_ID = 0;
-        int lco_WithholdingType_ID = 0;
-        int c_Tax_ID = 0;
-
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        try {
-            pstmt = DB.prepareStatement(sql, bp.get_TrxName());
-            pstmt.setInt(1, bp.getC_BPartner_ID());
-            pstmt.setInt(2, C_TAXCATEGORY_ID);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                aliquot = rs.getBigDecimal(1).negate();
-                lco_WithholdingRule_ID = rs.getInt(2);
-                lco_WithholdingType_ID = rs.getInt(3);
-                c_Tax_ID = rs.getInt(4);
-            }
-        } catch (Exception e) {
-            log.log(Level.SEVERE, sql, e);
-            return "Error retrieve Withholding rules, values and aliquot";
-        } finally {
-            DB.close(rs, pstmt);
-            rs = null;
-            pstmt = null;
-        }
-        log.info(String.format("Aliquot=%f Rule Id=%d Calc Id=%d Tax Id=%d", aliquot,
-                lco_WithholdingRule_ID, lco_WithholdingType_ID, c_Tax_ID));
-
-        // Calculate perception amount from order
-        MOrder order = line.getParent();
-        BigDecimal taxAmt = BigDecimal.ZERO;
-        for (MOrderTax tax : order.getTaxes(true)) {
-            taxAmt = taxAmt.add(tax.getTaxAmt());
-        }
-        BigDecimal subtotal = order.getGrandTotal().subtract(taxAmt);
-        BigDecimal perceptionAmt = subtotal.multiply(aliquot).setScale(2, BigDecimal.ROUND_HALF_UP);
+        final PerceptionConfig config = new PerceptionConfig(bp, order);
+        log.info("Perception retrieved: " + config);
 
         // Create order perception
         MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
-        perception.setC_Order_ID(line.getParent().get_ID());
-        perception.setC_Tax_ID(c_Tax_ID);
-        perception.setLCO_WithholdingRule_ID(lco_WithholdingRule_ID);
-        perception.setLCO_WithholdingType_ID(lco_WithholdingType_ID);
-        perception.setTaxAmt(perceptionAmt);
-        perception.setTaxBaseAmt(subtotal);
+        perception.setC_Order_ID(order.get_ID());
+        perception.setC_Tax_ID(config.getTax_ID());
+        perception.setLCO_WithholdingRule_ID(config.getWithholdingRule_ID());
+        perception.setLCO_WithholdingType_ID(config.getWithholdingType_ID());
+        perception.setTaxAmt(config.getTaxAmount());
+        perception.setTaxBaseAmt(config.getSubTotal());
         perception.setIsTaxIncluded(false);
         if (!perception.save()) {
             return "Can not create preception";
@@ -256,4 +205,134 @@ import ar.com.ergio.util.LAR_Utils;
         }
         return null;
      }
+
+     /**
+      * Encapsulates configuration parameters for perception
+      */
+     private class PerceptionConfig
+     {
+         // TODO - try to avoid this hardcode value
+         private final int C_TAXCATEGORY_ID = 1000002; // Perception Tax Category
+
+         private BigDecimal aliquot = BigDecimal.ZERO;
+         private BigDecimal subtotal;
+         private LAR_TaxPayerType taxPayerType;
+         private MOrder order;
+         private int lco_WithholdingRule_ID;
+         private int lco_WithholdingType_ID;
+         private int c_Tax_ID;
+
+         private String sql =
+                   "SELECT x.rate/100 AS rate"
+                 + "     , r.lco_withholdingrule_id "
+                 + "     , c.lco_withholdingtype_id"
+                 + "     , x.c_tax_id "
+                 + "  FROM C_BPartner bp "
+                 + "  JOIN LCO_WithholdingRule r ON r.lco_bp_isic_id = bp.lco_isic_id "
+                 + "       AND r.lco_bp_taxpayertype_id = bp.lco_taxpayertype_id"
+                 + "  JOIN LCO_WithholdingCalc c ON c.lco_withholdingcalc_id = r.lco_withholdingcalc_id "
+                 + "  JOIN C_Tax x on x.c_tax_id = c.c_tax_id " + " WHERE bp.c_bpartner_id = ? "
+                 + "   AND x.c_taxcategory_id = ?";
+
+
+         private PerceptionConfig(final MBPartner bp, final MOrder order)
+         {
+             this.order = order;
+             this.taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
+             retriveConfig(bp);
+         }
+
+         private int getWithholdingRule_ID()
+         {
+             return lco_WithholdingRule_ID;
+         }
+
+         private int getWithholdingType_ID()
+         {
+             return lco_WithholdingType_ID;
+         }
+
+         private int getTax_ID()
+         {
+             return c_Tax_ID;
+         }
+
+         /**
+          * Returns perception amount depending a tax payer type of a given bpartner.
+          *
+          * @return perception amount
+          */
+         private BigDecimal getTaxAmount()
+         {
+             return getSubTotal().multiply(aliquot).setScale(2, BigDecimal.ROUND_HALF_UP);
+         }
+
+         /**
+          * Returns order subtotal amount depending a tax payer type of a given bpartner.
+          *
+          * @return order subtotal amount
+          */
+         private BigDecimal getSubTotal()
+         {
+             if (subtotal == null) {
+                 BigDecimal taxAmt = BigDecimal.ZERO;
+
+                 switch (taxPayerType) {
+                 case RESPONSABLE_INSCRIPTO:
+                     for (MOrderTax tax : order.getTaxes(true)) {
+                         taxAmt = taxAmt.add(tax.getTaxAmt());
+                     }
+                     subtotal = order.getGrandTotal().subtract(taxAmt);
+                     break;
+                 default:
+                     subtotal = order.getGrandTotal();
+                 }
+             }
+             return subtotal;
+         }
+
+         /**
+          * Retrieve perception configuration variables for a given bpartner.
+          *
+          * @param bp bpartner
+          */
+         private void retriveConfig(final MBPartner bp)
+         {
+             PreparedStatement pstmt = null;
+             ResultSet rs = null;
+             try {
+                 pstmt = DB.prepareStatement(sql, bp.get_TrxName());
+                 pstmt.setInt(1, bp.getC_BPartner_ID());
+                 pstmt.setInt(2, C_TAXCATEGORY_ID);
+                 rs = pstmt.executeQuery();
+                 if (rs.next()) {
+                     aliquot = rs.getBigDecimal(1).negate();
+                     lco_WithholdingRule_ID = rs.getInt(2);
+                     lco_WithholdingType_ID = rs.getInt(3);
+                     c_Tax_ID = rs.getInt(4);
+                 }
+             } catch (Exception e) {
+                 log.log(Level.SEVERE, sql, e);
+             } finally {
+                 DB.close(rs, pstmt);
+                 rs = null;
+                 pstmt = null;
+             }
+         } // calculate
+
+         @Override
+         public String toString()
+         {
+             StringBuilder sb = new StringBuilder("PerceptionConfig[");
+             sb.append("Aliquot=").append(aliquot);
+             sb.append(",Rule=").append(getWithholdingRule_ID());
+             sb.append(",Type=").append(getWithholdingType_ID());
+             sb.append(",Tax=").append(getTax_ID());
+             sb.append(",Amt=").append(getTaxAmount());
+             sb.append(",PayerType=").append(taxPayerType);
+             sb.append("]");
+             return sb.toString();
+         }
+     } // PerceptionConfig
+
  }   //  LAR_Validator
