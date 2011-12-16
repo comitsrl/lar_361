@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/css" href="adempiereDocument.css"?>
+<adempiereDocument>
+	<header>GeografiaArgentinaCompleta Package Description</header>
+	<H1>Package Name:</H1>
+	<packagename>GeografiaArgentinaCompleta/</packagename>
+	<H1>Creator:</H1>
+	<creator>adempiere-lar@ergio.com.ar</creator>
+	<H1>Email Address:</H1>
+	<creatorcontact>adempiere-lar@ergio.com.ar</creatorcontact>
+	<H1>Created:</H1>
+	<createddate>2011-09-07 14:30:00.0</createddate>
+	<H1>Updated:</H1>
+	<updateddate>2011-09-07 14:30:00.0</updateddate>
+	<H1>Description:</H1>
+	<description>Geografía Completa Argentina</description>
+	<H1>Instructions:</H1>
+	<instructions>Simplemente instalar este paquete.</instructions>
+	<H1>Files in Package:</H1>
+	<file>File: PackOut.xml</file>
+	<filedirectory>Directory: \dict\</filedirectory>
+	<filenotes>Notes: Contains all application/object settings for package</filenotes>
+</adempiereDocument>
