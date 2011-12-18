@@ -16,6 +16,7 @@
  *****************************************************************************/
 package ar.com.ergio.model;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBPartner;
 import org.globalqss.model.X_LCO_TaxPayerType;
 
@@ -53,7 +54,7 @@ public enum LAR_TaxPayerType {
                 return e;
             }
         }
-        throw new IllegalArgumentException("Tax Payer Type configured not found");
+        throw new AdempiereException("Tax Payer Type configured not found");
     }
 
     public String getName()
