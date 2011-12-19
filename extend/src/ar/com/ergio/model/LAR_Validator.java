@@ -185,7 +185,7 @@ import ar.com.ergio.util.LAR_Utils;
      private String calculatePerceptionLine(final MBPartner bp, final MOrder order)
      {
         final PerceptionConfig config = new PerceptionConfig(bp, order);
-        log.info("Perception retrieved: " + config);
+        log.info("Perception >> " + config);
 
         // Create order perception
         MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
@@ -239,7 +239,7 @@ import ar.com.ergio.util.LAR_Utils;
          {
              this.order = order;
              this.taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
-             retriveConfig(bp);
+             retrieveConfig(bp);
          }
 
          private int getWithholdingRule_ID()
@@ -296,7 +296,7 @@ import ar.com.ergio.util.LAR_Utils;
           *
           * @param bp bpartner
           */
-         private void retriveConfig(final MBPartner bp)
+         private void retrieveConfig(final MBPartner bp)
          {
              PreparedStatement pstmt = null;
              ResultSet rs = null;

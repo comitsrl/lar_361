@@ -58,6 +58,7 @@ import org.compiere.swing.CDialog;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CPanel;
 import org.compiere.swing.CTextField;
+import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -70,7 +71,10 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 	//private NumberFormat formatter = new DecimalFormat("#0.00"); //red1 - parser to remove commas or dots separator for above '000s.
     private NumberFormat nf = NumberFormat.getInstance(Locale.getDefault()); // make locale-specific
 
-	@Override
+    /** Logger          */
+    private static CLogger log = CLogger.getCLogger(PosPayment.class);
+
+    @Override
 	public void actionPerformed(ActionEvent e) {
 
 		if ( e.getSource().equals(fTenderAmt) || e.getSource().equals(fPayAmt) )
@@ -151,14 +155,14 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 			}
 			else if ( tenderType.equals(MPayment.TENDERTYPE_Account) )
 			{
-				p_posPanel.m_order.payCash(amt);
-				p_posPanel.f_order.openCashDrawer();
+				isPaidByAccount = p_posPanel.m_order.payAccount(amt);
+				//TODO - This method must be removed from others ifs
+				//p_posPanel.f_order.openCashDrawer();
 			}
 			else
 			{
 				ADialog.warn(0, this, "Unsupported payment type");
 			}
-
 
 			p_posPanel.f_order.openCashDrawer();
 			setTotals();
@@ -202,6 +206,7 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 	private PosTextField fReturnAmt;
 	private CLabel lReturnAmt;
 	private CButton f_bCancel;
+	private boolean isPaidByAccount = false;
 
 	public PosPayment(PosBasePanel posPanel) {
 		super(Env.getFrame(posPanel),true);
@@ -256,11 +261,14 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 			if ( obj instanceof ValueNamePair )
 			{
 				ValueNamePair key = (ValueNamePair) obj;
-				if ( key.getID().equals("X"))   // Cash
+				if ( key.getID().equals("X")) { // Cash
 					tenderTypePick.setSelectedItem(key);
+				}
 
-				if ( ! "CKX".contains(key.getID() ) )
+				// TODO - Account Tender type should be parametrized in POS config window
+				if (!"CKXT".contains(key.getID())) {
 					tenderTypePick.removeItem(key);
+				}
 			}
 		}
 
@@ -413,6 +421,7 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 		boolean cash = MPayment.TENDERTYPE_Cash.equals(tenderType);
 		boolean check = MPayment.TENDERTYPE_Check.equals(tenderType);
 		boolean creditcard = MPayment.TENDERTYPE_CreditCard.equals(tenderType);
+		// TODO - Use this value to toggle visible property of componets
 		//boolean account = MPayment.TENDERTYPE_Account.equals(tenderType);
 
 		fTenderAmt.setVisible(cash);
@@ -443,12 +452,14 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 		BigDecimal received = p_order.getPaidAmt();
 		balance  = p_order.getGrandTotal().subtract(received);
 		balance = balance.setScale(MCurrency.getStdPrecision(p_ctx, p_order.getC_Currency_ID()));
-		if ( balance.compareTo(Env.ZERO) <= 0 )
+		log.info(String.format("TenderType: %s isPaidByAccount: %b", tenderType, isPaidByAccount));
+		if (balance.compareTo(Env.ZERO) <= 0 || isPaidByAccount)
 		{
 			paid = true;
 
-			if ( balance.compareTo(Env.ZERO) < 0 )
-					ADialog.warn(0, this, Msg.getMsg(p_ctx, "Change") + ": " + balance);
+			if (balance.compareTo(Env.ZERO) < 0) {
+			    ADialog.warn(0, this, Msg.getMsg(p_ctx, "Change") + ": " + balance);
+			}
 			dispose();
 		}
 
