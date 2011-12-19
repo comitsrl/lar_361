@@ -383,12 +383,13 @@ public class PosOrderModel extends MOrder {
 		else return false;
 	} // payCheck
 
-	public boolean payAccount(final BigDecimal amt)
+	public boolean payAccount(final BigDecimal amt, int C_PaymentTerm_ID)
 	{
         MPayment payment = createPayment(MPayment.TENDERTYPE_Account);
         payment.setAmount(getC_Currency_ID(), amt);
         payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
         payment.setPayAmt(amt);
+        setC_PaymentTerm_ID(C_PaymentTerm_ID);
         return payment.save();
 	}
 

@@ -23,12 +23,16 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -59,8 +63,10 @@ import org.compiere.swing.CLabel;
 import org.compiere.swing.CPanel;
 import org.compiere.swing.CTextField;
 import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
+import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
 
@@ -155,7 +161,8 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 			}
 			else if ( tenderType.equals(MPayment.TENDERTYPE_Account) )
 			{
-				isPaidByAccount = p_posPanel.m_order.payAccount(amt);
+			    KeyNamePair item = (KeyNamePair) fCPaymentTerm.getSelectedItem();
+				isPaidOnCredit = p_posPanel.m_order.payAccount(amt, item.getKey());
 				//TODO - This method must be removed from others ifs
 				//p_posPanel.f_order.openCashDrawer();
 			}
@@ -181,6 +188,7 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 	private CTextField fBalance = new CTextField(10);
 	private CComboBox tenderTypePick = new CComboBox();
 	private PosTextField fPayAmt;
+	private CLabel lPayAmt;
 	private CButton f_bProcess;
 	private boolean paid = false;
 	private BigDecimal balance = Env.ZERO;
@@ -206,7 +214,9 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 	private PosTextField fReturnAmt;
 	private CLabel lReturnAmt;
 	private CButton f_bCancel;
-	private boolean isPaidByAccount = false;
+	private CComboBox fCPaymentTerm = new CComboBox();
+	private CLabel lCPaymentTerm;
+	private boolean isPaidOnCredit = false;
 
 	public PosPayment(PosBasePanel posPanel) {
 		super(Env.getFrame(posPanel),true);
@@ -295,8 +305,41 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 
 		mainPanel.add(tenderTypePick, "wrap, h 50!, growx");
 
-		fPayAmt = new PosTextField(Msg.translate(p_ctx, "PayAmt"), p_posPanel, p_pos.getOSNP_KeyLayout_ID(),  DisplayType.getNumberFormat(DisplayType.Amount));
-		mainPanel.add(new CLabel(Msg.translate(p_ctx, "PayAmt")), "growx");
+        /**
+         *  Load Payment Terms
+         */
+        String sql = "SELECT C_PaymentTerm_ID, Name "
+                   + "  FROM C_PaymentTerm "
+                   + " WHERE IsActive='Y' AND AD_Client_ID=? ORDER BY Name";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            pstmt = DB.prepareStatement(sql, null);
+            pstmt.setInt(1, Env.getAD_Client_ID(p_ctx));
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int key = rs.getInt(1);
+                String name = rs.getString(2);
+                KeyNamePair pp = new KeyNamePair(key, name);
+                fCPaymentTerm.addItem(pp);
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, sql, e);
+        } finally {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        fCPaymentTerm.setFont(font);
+        lCPaymentTerm = new CLabel(Msg.translate(p_ctx, "PaymentTerms"));
+        mainPanel.add(lCPaymentTerm, "growx");
+        mainPanel.add(fCPaymentTerm, "wrap, h 50!, growx");
+
+        fPayAmt = new PosTextField(Msg.translate(p_ctx, "PayAmt"), p_posPanel, p_pos.getOSNP_KeyLayout_ID(),  DisplayType.getNumberFormat(DisplayType.Amount));
+		lPayAmt = new CLabel(Msg.translate(p_ctx, "PayAmt"));
+        mainPanel.add(lPayAmt, "growx");
 		fPayAmt.setFont(font);
 		fPayAmt.setHorizontalAlignment(JTextField.TRAILING);
 		fPayAmt.addActionListener(this);
@@ -421,8 +464,7 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 		boolean cash = MPayment.TENDERTYPE_Cash.equals(tenderType);
 		boolean check = MPayment.TENDERTYPE_Check.equals(tenderType);
 		boolean creditcard = MPayment.TENDERTYPE_CreditCard.equals(tenderType);
-		// TODO - Use this value to toggle visible property of componets
-		//boolean account = MPayment.TENDERTYPE_Account.equals(tenderType);
+		boolean account = MPayment.TENDERTYPE_Account.equals(tenderType);
 
 		fTenderAmt.setVisible(cash);
 		fReturnAmt.setVisible(cash);
@@ -447,13 +489,19 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 		lCCardType.setVisible(creditcard);
 		lCCardVC.setVisible(creditcard);
 
+		fCPaymentTerm.setVisible(account);
+		lCPaymentTerm.setVisible(account);
+		fPayAmt.setVisible(!account);
+		lPayAmt.setVisible(!account);
+
 		fTotal.setValue(p_order.getGrandTotal());
 
 		BigDecimal received = p_order.getPaidAmt();
 		balance  = p_order.getGrandTotal().subtract(received);
 		balance = balance.setScale(MCurrency.getStdPrecision(p_ctx, p_order.getC_Currency_ID()));
-		log.info(String.format("TenderType: %s isPaidByAccount: %b", tenderType, isPaidByAccount));
-		if (balance.compareTo(Env.ZERO) <= 0 || isPaidByAccount)
+		log.info(String.format("TenderType: %s paymentTerm: %s isPaidOnCredit: %b", tenderType,
+		        fCPaymentTerm.getSelectedItem(), isPaidOnCredit));
+		if (balance.compareTo(Env.ZERO) <= 0 || isPaidOnCredit)
 		{
 			paid = true;
 
