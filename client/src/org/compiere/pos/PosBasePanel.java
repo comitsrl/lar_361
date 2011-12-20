@@ -340,6 +340,18 @@ public class PosBasePanel extends CPanel
         infoFiscalPrinter.clearDetail();
 	}	//	newOrder
 
+    /**
+     * Loads an order into POS
+     *
+     * @param c_Order_ID order id
+     */
+    public void loadOrder(int c_Order_ID)
+    {
+        log.info(String.format("C_Order_ID: %d", c_Order_ID));
+        m_order = new PosOrderModel(m_ctx, c_Order_ID, trxName, p_pos);
+        updateInfo();
+    } // loadOrder
+
 	/**
 	 * Get the number of the window for the function calls that it needs
 	 *

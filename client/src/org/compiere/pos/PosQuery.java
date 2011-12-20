@@ -27,7 +27,6 @@ import javax.swing.event.ListSelectionListener;
 
 import org.compiere.apps.AppsAction;
 import org.compiere.apps.ConfirmPanel;
-import org.compiere.minigrid.MiniTable;
 import org.compiere.model.MPOS;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CDialog;
@@ -38,7 +37,9 @@ import org.compiere.util.Env;
 
 public abstract class PosQuery extends CDialog implements MouseListener, ListSelectionListener, ActionListener {
 
-	protected Properties p_ctx;
+    private static final long serialVersionUID = -6227838436743951898L;
+
+    protected Properties p_ctx;
 	/** POS Panel							*/
 	protected PosBasePanel p_posPanel = null;
 	/**	Underlying POS Model				*/

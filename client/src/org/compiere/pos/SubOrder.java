@@ -35,10 +35,14 @@ import net.miginfocom.swing.MigLayout;
 
 import org.adempiere.plaf.AdempierePLAF;
 import org.compiere.apps.ADialog;
+import org.compiere.apps.AppsAction;
+import org.compiere.grid.ed.VLookup;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerInfo;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCurrency;
+import org.compiere.model.MLookup;
+import org.compiere.model.MLookupFactory;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MPriceListVersion;
@@ -62,12 +66,8 @@ import org.compiere.util.Msg;
  *         *Copyright (c) Jorg Janke
  *  @version $Id: SubBPartner.java,v 1.1 2004/07/12 04:10:04 jjanke Exp $
  */
-public class SubOrder extends PosSubPanel
-	implements ActionListener, FocusListener
+public class SubOrder extends PosSubPanel implements ActionListener, FocusListener
 {
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 5895558315889871887L;
 
 	/**
@@ -87,7 +87,8 @@ public class SubOrder extends PosSubPanel
 	private CComboBox		f_user;
 	private CButton 		f_process;
 	private CButton 		f_print;
-	private CTextField 		f_DocumentNo;
+	private VLookup 		f_Order_ID;
+	private CLabel          l_Order_ID;
 	private CButton 		f_logout;
 	private JFormattedTextField f_net;
 	private JFormattedTextField f_tax;
@@ -171,12 +172,16 @@ public class SubOrder extends PosSubPanel
 //		add (f_bSearch,buttonSize + ", spany 2");
 
 		// DOC NO
-		add (new CLabel(Msg.getMsg(Env.getCtx(),"DocumentNo")), "");
-
-		f_DocumentNo = new CTextField("");
-		f_DocumentNo.setName("DocumentNo");
-		f_DocumentNo.setEditable(false);
-		add (f_DocumentNo, "growx, pushx");
+        int ad_Column_ID = 2161; // table 259 | Order
+        MLookup lookup = MLookupFactory.get(p_posPanel.getCtx(), p_posPanel.getWindowNo(), 0,
+                ad_Column_ID, DisplayType.Search);
+        f_Order_ID = new VLookup("C_Order_ID", true, false, true, lookup);
+        f_Order_ID.addActionListener(this);
+        l_Order_ID = new CLabel(Msg.getMsg(Env.getCtx(), "DocumentNo"));
+        l_Order_ID.setLabelFor(f_Order_ID);
+        l_Order_ID.setBackground(AdempierePLAF.getInfoBackground());
+        add(l_Order_ID, "");
+        add(f_Order_ID, "growx, pushx");
 
 		CLabel lTax = new CLabel (Msg.translate(Env.getCtx(), "TaxAmt"));
 		add(lTax);
@@ -288,9 +293,16 @@ public class SubOrder extends PosSubPanel
 			p_posPanel.dispose();
 			return;
 		}
+		// OrderLookup
+        else if (action.equals("comboBoxChanged"))
+        {
+            loadOrder();
+        }
 		//	Name
 		else if (e.getSource() == f_name)
+		{
 			findBPartner();
+		}
 
 		p_posPanel.updateInfo();
 	}	//	actionPerformed
@@ -309,7 +321,11 @@ public class SubOrder extends PosSubPanel
 		}
 	}
 
-
+    private void loadOrder()
+    {
+        int c_Order_ID = (Integer) f_Order_ID.getValue();
+        p_posPanel.loadOrder(c_Order_ID);
+    }
 
 	/**
 	 *
@@ -585,9 +601,10 @@ public class SubOrder extends PosSubPanel
 	/**
 	 * 	Display cash return
 	 *  Display the difference between tender amount and bill amount
+	 *
 	 *  @author Comunidad de Desarrollo OpenXpertya
- *         *Basado en Codigo Original Modificado, Revisado y Optimizado de:
- *         *Copyright � ConSerTi
+     *  Basado en Codigo Original Modificado, Revisado y Optimizado de:
+     *  Copyright (c) ConSerTi
 	 */
 	public void updateOrder()
 	{
@@ -596,7 +613,7 @@ public class SubOrder extends PosSubPanel
 			MOrder order = p_posPanel.m_order;
 			if (order != null)
 			{
-  				f_DocumentNo.setText(order.getDocumentNo());
+			    f_Order_ID.setValue(order.get_ID());
   				setC_BPartner_ID(order.getC_BPartner_ID());
   				f_bNew.setEnabled(order.getLines().length != 0);
   				f_bEdit.setEnabled(true);
@@ -606,7 +623,7 @@ public class SubOrder extends PosSubPanel
 			}
 			else
 			{
-				f_DocumentNo.setText(null);
+				f_Order_ID.setValue(null);
 				setC_BPartner_ID(0);
 				f_bNew.setEnabled(true);
 				f_bEdit.setEnabled(false);
@@ -614,7 +631,6 @@ public class SubOrder extends PosSubPanel
 				f_print.setEnabled(false);
 				f_cashPayment.setEnabled(false);
 			}
-
 		}
 	}
 
@@ -661,4 +677,5 @@ public class SubOrder extends PosSubPanel
 
 		}
 	}	//	setSums
-}	//	PosSubCustomer
+
+}	//	SubOrder
