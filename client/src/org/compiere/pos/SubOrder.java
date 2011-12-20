@@ -280,6 +280,11 @@ public class SubOrder extends PosSubPanel
 		// Logout
 		else if (action.equals("Logout"))
 		{
+		    // TODO - translate this messages
+		    String msg = "Do you want delete this order on logout?";
+	        if (p_posPanel.m_order != null && ADialog.ask(0, this, msg)) {
+	            p_posPanel.m_order.deleteOrder();
+	        }
 			p_posPanel.dispose();
 			return;
 		}
