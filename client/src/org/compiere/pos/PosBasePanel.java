@@ -333,7 +333,7 @@ public class PosBasePanel extends CPanel
 		// TODO - Review: avoid create an order with default BPartner
 		//m_order = PosOrderModel.createOrder(p_pos, f_order.getBPartner(), trxName);
 		f_curLine.newLine();
-		f_order.f_name.requestFocusInWindow();
+		f_order.f_Order_ID.requestFocusInWindow();
 		updateInfo();
 		// LAR - Fiscal printer implementation
         infoFiscalPrinter.setVisible(false);

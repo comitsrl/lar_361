@@ -22,6 +22,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Vector;
@@ -35,7 +38,6 @@ import net.miginfocom.swing.MigLayout;
 
 import org.adempiere.plaf.AdempierePLAF;
 import org.compiere.apps.ADialog;
-import org.compiere.apps.AppsAction;
 import org.compiere.grid.ed.VLookup;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerInfo;
@@ -80,14 +82,14 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	}	//	PosSubCustomer
 
 	private CButton 		f_history;
-	protected PosTextField		f_name;
+	private PosTextField	f_bpName;
 	private CButton 		f_bNew;
 	private CButton 		f_bSearch;
 	private CComboBox		f_location;
 	private CComboBox		f_user;
 	private CButton 		f_process;
 	private CButton 		f_print;
-	private VLookup 		f_Order_ID;
+	protected VLookup 		f_Order_ID;
 	private CLabel          l_Order_ID;
 	private CButton 		f_logout;
 	private JFormattedTextField f_net;
@@ -176,7 +178,18 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
         MLookup lookup = MLookupFactory.get(p_posPanel.getCtx(), p_posPanel.getWindowNo(), 0,
                 ad_Column_ID, DisplayType.Search);
         f_Order_ID = new VLookup("C_Order_ID", true, false, true, lookup);
-        f_Order_ID.addActionListener(this);
+        f_Order_ID.addVetoableChangeListener(new VetoableChangeListener() {
+
+            public void vetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
+                log.info(String.format("property changed - %s/%s", event.getPropertyName(), event.getNewValue()));
+                Integer c_Order_ID = (Integer)event.getNewValue();
+                if(c_Order_ID != null && c_Order_ID > 0) {
+                    p_posPanel.loadOrder(c_Order_ID);
+                } else {
+                    p_posPanel.newOrder();
+                }
+            }
+        });
         l_Order_ID = new CLabel(Msg.getMsg(Env.getCtx(), "DocumentNo"));
         l_Order_ID.setLabelFor(f_Order_ID);
         l_Order_ID.setBackground(AdempierePLAF.getInfoBackground());
@@ -201,12 +214,12 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 
 		// BP
 		add(new CLabel(Msg.translate(Env.getCtx(), "Customer")), "");
-		f_name =new PosTextField(Msg.translate(Env.getCtx(), "C_Partner_ID"), p_posPanel, p_pos.getOSK_KeyLayout_ID());
-		f_name.setEditable(true); //red1
-		f_name.setName("BPartner");
-		f_name.addActionListener(this);
-		f_name.addFocusListener(this);
-		add (f_name, " flowy, pushx, h 20!");
+		f_bpName =new PosTextField(Msg.translate(Env.getCtx(), "C_Partner_ID"), p_posPanel, p_pos.getOSK_KeyLayout_ID());
+		f_bpName.setEditable(true); //red1
+		f_bpName.setName("BPartner");
+		f_bpName.addActionListener(this);
+		f_bpName.addFocusListener(this);
+		add (f_bpName, " flowy, pushx, h 20!");
 
 		//
 		CLabel lTotal = new CLabel (Msg.translate(Env.getCtx(), "TOTAL"));
@@ -232,9 +245,9 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	 */
 	public void dispose()
 	{
-		if (f_name != null)
-			f_name.removeFocusListener(this);
-		f_name = null;
+		if (f_bpName != null)
+			f_bpName.removeFocusListener(this);
+		f_bpName = null;
 		removeAll();
 		super.dispose();
 	}	//	dispose
@@ -249,7 +262,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		String action = e.getActionCommand();
 		if (action == null || action.length() == 0)
 			return;
-		log.info( "PosSubCustomer - actionPerformed: " + action);
+		log.info( "actionCommand: " + action);
 		//	New
 		if (action.equals("New"))
 		{
@@ -277,7 +290,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			}
 		else if (action.equals("Print"))
 			printOrder();
-		else if (action.equals("BPartner"))
+		else if (action.equals("BPartner")) // TODO - (emmie) This action handler must be deleted (?)
 		{
 			PosQuery qt = new QueryBPartner(p_posPanel);
 			qt.setVisible(true);
@@ -293,13 +306,8 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			p_posPanel.dispose();
 			return;
 		}
-		// OrderLookup
-        else if (action.equals("comboBoxChanged"))
-        {
-            loadOrder();
-        }
 		//	Name
-		else if (e.getSource() == f_name)
+		else if (e.getSource() == f_bpName)
 		{
 			findBPartner();
 		}
@@ -320,12 +328,6 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			}
 		}
 	}
-
-    private void loadOrder()
-    {
-        int c_Order_ID = (Integer) f_Order_ID.getValue();
-        p_posPanel.loadOrder(c_Order_ID);
-    }
 
 	/**
 	 *
@@ -364,7 +366,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	private void findBPartner()
 	{
 
-		String query = f_name.getText();
+		String query = f_bpName.getText();
 
 		if (query == null || query.length() == 0)
 			return;
@@ -412,7 +414,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		else if (results.length == 1)
 		{
 			setC_BPartner_ID(results[0].getC_BPartner_ID());
-			f_name.setText(results[0].getName());
+			f_bpName.setText(results[0].getName());
 		}
 		else	//	more than one
 		{
@@ -429,7 +431,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	 */
 	public void setC_BPartner_ID (int C_BPartner_ID)
 	{
-		log.info("PosSubCustomer.setC_BPartner_ID=" + C_BPartner_ID);
+		log.info("C_BPartner_ID=" + C_BPartner_ID);
 		if (C_BPartner_ID == 0)
 			m_bpartner = null;
 		else
@@ -442,11 +444,11 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		//	Set Info
 		if (m_bpartner != null)
 		{
-			f_name.setText(m_bpartner.getName());
+			f_bpName.setText(m_bpartner.getName());
 		}
 		else
 		{
-			f_name.setText(null);
+			f_bpName.setText(null);
 		}
 		//	Sets Currency
 		m_M_PriceList_Version_ID = 0;
@@ -548,7 +550,6 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			//
 			MPriceList pl = MPriceList.get(p_ctx, M_PriceList_ID, null);
 			setCurrency(MCurrency.getISO_Code(p_ctx, pl.getC_Currency_ID()));
-			f_name.setToolTipText(pl.getName());
 			//
 			MPriceListVersion plv = pl.getPriceListVersion (p_posPanel.getToday());
 			if (plv != null && plv.getM_PriceList_Version_ID() != 0)
