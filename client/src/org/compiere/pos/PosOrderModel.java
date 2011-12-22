@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Properties;
 
+import org.compiere.model.MAttributeSetInstance;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -25,6 +26,7 @@ import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentProcessor;
 import org.compiere.model.MProduct;
+import org.compiere.model.MStorage;
 import org.compiere.process.DocAction;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -125,6 +127,10 @@ public class PosOrderModel extends MOrder {
 	 */
 	public MOrderLine createLine(MProduct product, BigDecimal qtyOrdered,
 			BigDecimal priceActual) {
+
+	    if (!hasStockAvailable(product, null, qtyOrdered.intValue())) {
+	        throw new AdempierePOSException("InsufficientQtyAvailable");
+	    }
 
 		if (!getDocStatus().equals("DR") )
 			return null;
@@ -491,5 +497,23 @@ public class PosOrderModel extends MOrder {
 			return "PurchaseCard";
 		return "?" + CreditCardType + "?";
 	}	//	getCreditCardName
+
+    boolean hasStockAvailable(final MProduct product, final MAttributeSetInstance attributes, int count)
+    {
+        boolean stockAvailable = true;
+        boolean isSaleWithoutStock = m_pos.get_ValueAsBoolean("IsSaleWithoutStock");
+        if (product.isStocked() && !isSaleWithoutStock) {
+            // TODO - Improve this feature, setting it into POS Terminal config
+            // int m_Locator_ID = Env.getContextAsInt(ctx, WindowNo, "M_Locator_ID");
+            int m_Locator_ID = 0;
+            int m_AttributeSetInstance_ID = attributes == null ? 0 : attributes.get_ID();
+            BigDecimal available = MStorage.getQtyAvailable(m_pos.getM_Warehouse_ID(), m_Locator_ID, product.get_ID(),
+                    m_AttributeSetInstance_ID, trxName);
+            if (available == null || available.compareTo(BigDecimal.valueOf(count)) < 0) {
+                stockAvailable = false;
+            }
+        }
+        return stockAvailable;
+    } // hasStockAvailable
 
 } // PosOrderModel.class

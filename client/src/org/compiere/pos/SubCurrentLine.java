@@ -81,7 +81,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	private CButton f_minus;
 	private PosTextField f_price;
 	private PosTextField f_quantity;
-	protected PosTextField	f_name;
+	protected PosTextField	f_productName;
 	private CButton			f_bSearch;
 	private int orderLineId = 0;
 
@@ -137,13 +137,13 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		CLabel productLabel = new CLabel(Msg.translate(Env.getCtx(), "M_Product_ID"));
 		add(productLabel, ", flowy, h 15");
 
-		f_name = new PosTextField(Msg.translate(Env.getCtx(), "M_Product_ID"), p_posPanel, p_pos.getOSK_KeyLayout_ID());
-		f_name.setName("ProductInput");
-		f_name.addActionListener(this);
-		f_name.addFocusListener(this);
-		f_name.requestFocusInWindow();
+		f_productName = new PosTextField(Msg.translate(Env.getCtx(), "M_Product_ID"), p_posPanel, p_pos.getOSK_KeyLayout_ID());
+		f_productName.setName("ProductInput");
+		f_productName.addActionListener(this);
+		f_productName.addFocusListener(this);
+		f_productName.requestFocusInWindow();
 
-		add (f_name, "spanx 3, growx, pushx, h 25!");
+		add (f_productName, "spanx 3, growx, pushx, h 25!");
 
  		// PAYMENT
 		add (new CLabel(),"");
@@ -241,11 +241,12 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			if ( orderLineId > 0 )
 			{
 				MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
-				if ( line != null )
+				BigDecimal newQty = line.getQtyOrdered().add(Env.ONE);
+				if (line != null && hasStock(line.getProduct(), newQty))
 				{
-					line.setQty(line.getQtyOrdered().add(Env.ONE));
+					line.setQty(newQty);
 					line.saveEx();
-					p_posPanel.updateInfo();
+					//p_posPanel.updateInfo();
 				}
 			}
 		}
@@ -267,24 +268,25 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		else if (action.equals("Payment"))
 			payOrder();
 
-		//	VNumber
+		//	VNumber - TODO - Review this behavior, seem there is a bug (set qty with price?)
 		else if (e.getSource() == f_price)		{
 			MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
 			if ( line != null )
 			{
 				line.setQty(new BigDecimal(f_price.getValue().toString()));
 				line.saveEx();
-				p_posPanel.updateInfo();
+				//p_posPanel.updateInfo();
 			}
 		}
 		else if (e.getSource() == f_quantity && orderLineId > 0 )
 		{
 			MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
-			if ( line != null )
+            BigDecimal newQty = new BigDecimal(f_quantity.getValue().toString());
+            if (line != null && hasStock(line.getProduct(), newQty))
 			{
-				line.setQty(new BigDecimal(f_quantity.getValue().toString()));
+				line.setQty(newQty);
 				line.saveEx();
-				p_posPanel.updateInfo();
+				//p_posPanel.updateInfo();
 			}
 		}
 		//	Product
@@ -302,8 +304,8 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			// https://sourceforge.net/tracker/?func=detail&atid=879332&aid=3121975&group_id=176962
 			m_table.scrollRectToVisible(m_table.getCellRect(row, 1, true)); //@Trifon - BF[3121975]
 		}
-		//	Name
-		else if (e.getSource() == f_name)
+		//	ProductName
+		else if (e.getSource() == f_productName)
 			findProduct();
 		if ("Previous".equalsIgnoreCase(e.getActionCommand()))
 		{
@@ -502,7 +504,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		setQty(Env.ONE);
 		setPrice(Env.ZERO);
 		orderLineId = 0;
-		f_name.requestFocusInWindow();
+		f_productName.requestFocusInWindow();
 	} //	newLine
 
 	/**
@@ -574,7 +576,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	 */
 	private void findProduct()
 	{
-		String query = f_name.getText();
+		String query = f_productName.getText();
 		if (query == null || query.length() == 0)
 			return;
 		query = query.toUpperCase();
@@ -612,7 +614,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		{
 			setM_Product_ID(results[0].getM_Product_ID());
 			setQty(Env.ONE);
-			f_name.setText(results[0].getName());
+			f_productName.setText(results[0].getName());
 			p_posPanel.f_curLine.setPrice(results[0].getPriceStd());
 			saveLine();
 		}
@@ -644,13 +646,13 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		//	Set String Info
 		if (m_product != null)
 		{
-			f_name.setText(m_product.getName());
-			f_name.setToolTipText(m_product.getDescription());
+			f_productName.setText(m_product.getName());
+			f_productName.setToolTipText(m_product.getDescription());
 		}
 		else
 		{
-			f_name.setText(null);
-			f_name.setToolTipText(null);
+			f_productName.setText(null);
+			f_productName.setToolTipText(null);
 		}
 	}	//	setM_Product_ID
 
@@ -712,7 +714,14 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			setPrice(ol.getPriceActual());
 			setQty(ol.getQtyOrdered());
 		}
-
 	}
 
+	private boolean hasStock(final MProduct product, final BigDecimal newQty)
+	{
+        if (!p_posPanel.m_order.hasStockAvailable(product, null, newQty.intValue())) {
+            ADialog.error(0, this, "InsufficientQtyAvailable");
+            return false;
+        }
+        return true;
+	}
 } //	PosSubCurrentLine

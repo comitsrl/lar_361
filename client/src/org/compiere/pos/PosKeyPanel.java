@@ -28,6 +28,7 @@ import javax.swing.SwingConstants;
 import net.miginfocom.swing.MigLayout;
 
 import org.adempiere.plaf.AdempierePLAF;
+import org.compiere.apps.ADialog;
 import org.compiere.model.MImage;
 import org.compiere.model.MPOSKey;
 import org.compiere.model.MPOSKeyLayout;
@@ -241,6 +242,7 @@ public class PosKeyPanel extends CPanel implements ActionListener {
 		}
 		catch (Exception ex)
 		{
+            ADialog.error(0, this, ex.getMessage());
 		}
 
 	}	//	actionPerformed

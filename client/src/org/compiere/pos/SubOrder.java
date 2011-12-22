@@ -281,7 +281,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 				deleteOrder();
 				p_posPanel.m_order = null;
 				p_posPanel.f_curLine.newLine();
-				p_posPanel.f_curLine.f_name.requestFocusInWindow();
+				p_posPanel.f_curLine.f_productName.requestFocusInWindow();
 			}
 		else if (action.equals("Preference"))
 			{
