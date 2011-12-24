@@ -167,7 +167,6 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		lNet.setLabelFor(f_net);
 		add(f_net, "wrap, growx, pushx");
 		f_net.setValue (Env.ZERO);
-		//
 
 		// BPARTNER
 //		f_bSearch = createButtonAction ("BPartner", KeyStroke.getKeyStroke(KeyEvent.VK_I, Event.SHIFT_MASK+Event.CTRL_MASK));
@@ -277,19 +276,20 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			return;
 		}
 		else if (action.equals("Delete")) //red1 more apt description
-			{
-				deleteOrder();
-				p_posPanel.m_order = null;
-				p_posPanel.f_curLine.newLine();
-				p_posPanel.f_curLine.f_productName.requestFocusInWindow();
-			}
+		{
+			deleteOrder();
+			p_posPanel.m_order = null;
+			p_posPanel.f_curLine.newLine();
+			p_posPanel.f_curLine.f_productName.requestFocusInWindow();
+		}
 		else if (action.equals("Preference"))
-			{
+		{
 			CashSubFunctions csf = new CashSubFunctions(p_posPanel);
 			csf.setVisible(true);
-			}
-		else if (action.equals("Print"))
-			printOrder();
+		}
+		else if (action.equals("Print")) {
+		    printOrder();
+		}
 		else if (action.equals("BPartner")) // TODO - (emmie) This action handler must be deleted (?)
 		{
 			PosQuery qt = new QueryBPartner(p_posPanel);
@@ -299,8 +299,8 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		else if (action.equals("Logout"))
 		{
 		    // TODO - translate this messages
-		    String msg = "Do you want delete this order on logout?";
-	        if (p_posPanel.m_order != null && ADialog.ask(0, this, msg)) {
+		    String msg = "Do you want save this order?";
+	        if (p_posPanel.m_order != null && !ADialog.ask(0, this, msg)) {
 	            p_posPanel.m_order.deleteOrder();
 	        }
 			p_posPanel.dispose();
@@ -315,29 +315,31 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		p_posPanel.updateInfo();
 	}	//	actionPerformed
 
-	/**
+    /**
 	 *
 	 */
-	private void printOrder() {
-		{
-			if (isOrderFullyPaid())
-			{
-				updateOrder();
-				printTicket();
-				openCashDrawer();
-			}
-		}
-	}
+    private void printOrder()
+    {
+        {
+            if (isOrderFullyPaid()) {
+                updateOrder();
+                printTicket();
+                openCashDrawer();
+            }
+        }
+    }
 
 	/**
 	 *
 	 */
-	private void deleteOrder() {
-		if ( p_posPanel != null && ADialog.ask(0, this, "Delete order?") )
-			p_posPanel.m_order.deleteOrder();
-		// p_posPanel.newOrder();
+    private void deleteOrder()
+    {
+        if (p_posPanel != null && ADialog.ask(0, this, "Delete order?")) {
+            p_posPanel.m_order.deleteOrder();
+        }
+        // p_posPanel.newOrder();
 
-	}
+    }
 
 	/**
 	 * 	Focus Gained
@@ -347,116 +349,106 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	{
 	}	//	focusGained
 
-	/**
-	 * 	Focus Lost
-	 *	@param e
-	 */
-	public void focusLost (FocusEvent e)
-	{
-		if (e.isTemporary())
-			return;
-		log.info(e.toString());
-		findBPartner();
-	}	//	focusLost
+    /**
+     * Focus Lost
+     *
+     * @param e
+     */
+    public void focusLost(FocusEvent e)
+    {
+        if (e.isTemporary()) {
+            return;
+        }
+        log.info(e.toString());
+        findBPartner();
+    } // focusLost
 
+    /**
+     * Find/Set BPartner
+     */
+    private void findBPartner()
+    {
+        String query = f_bpName.getText();
 
-	/**
-	 * 	Find/Set BPartner
-	 */
-	private void findBPartner()
-	{
+        if (query == null || query.length() == 0) {
+            return;
+        }
+        // unchanged
+        if (m_bpartner != null && m_bpartner.getName().equals(query)) {
+            return;
+        }
+        query = query.toUpperCase();
+        // Test Number
+        boolean allNumber = true;
+        boolean noNumber = true;
+        char[] qq = query.toCharArray();
+        for (int i = 0; i < qq.length; i++) {
+            if (Character.isDigit(qq[i])) {
+                noNumber = false;
+                break;
+            }
+        }
+        try {
+            Integer.parseInt(query);
+        } catch (Exception e) {
+            allNumber = false;
+        }
+        String value = query;
+        String name = (allNumber ? null : query);
+        String email = (query.indexOf('@') != -1 ? query : null);
+        String phone = (noNumber ? null : query);
+        String city = null;
+        //
+        // TODO: contact have been remove from rv_bpartner
+        MBPartnerInfo[] results = MBPartnerInfo.find(p_ctx, value, name,
+        /* Contact, */null, email, phone, city);
 
-		String query = f_bpName.getText();
+        // Set Result
+        if (results.length == 0) {
+            setC_BPartner_ID(0);
+        } else if (results.length == 1) {
+            setC_BPartner_ID(results[0].getC_BPartner_ID());
+            f_bpName.setText(results[0].getName());
+        } else {  // more than one
+            QueryBPartner qt = new QueryBPartner(p_posPanel);
+            qt.setResults(results);
+            qt.setVisible(true);
+        }
+    } // findBPartner
 
-		if (query == null || query.length() == 0)
-			return;
+    /**************************************************************************
+     * Set BPartner
+     *
+     * @param C_BPartner_ID
+     *            id
+     */
+    public void setC_BPartner_ID(int C_BPartner_ID)
+    {
+        log.info("C_BPartner_ID=" + C_BPartner_ID);
+        if (C_BPartner_ID == 0) {
+            m_bpartner = null;
+        }
+        else {
+            m_bpartner = new MBPartner(p_ctx, C_BPartner_ID, null);
+            if (m_bpartner.get_ID() == 0) {
+                m_bpartner = null;
+            }
+        }
 
-		// unchanged
-		if ( m_bpartner != null && m_bpartner.getName().equals(query))
-			return;
-
-		query = query.toUpperCase();
-		//	Test Number
-		boolean allNumber = true;
-		boolean noNumber = true;
-		char[] qq = query.toCharArray();
-		for (int i = 0; i < qq.length; i++)
-		{
-			if (Character.isDigit(qq[i]))
-			{
-				noNumber = false;
-				break;
-			}
-		}
-		try
-		{
-			Integer.parseInt(query);
-		}
-		catch (Exception e)
-		{
-			allNumber = false;
-		}
-		String Value = query;
-		String Name = (allNumber ? null : query);
-		String EMail = (query.indexOf('@') != -1 ? query : null);
-		String Phone = (noNumber ? null : query);
-		String City = null;
-		//
-		//TODO: contact have been remove from rv_bpartner
-		MBPartnerInfo[] results = MBPartnerInfo.find(p_ctx, Value, Name,
-			/*Contact, */null, EMail, Phone, City);
-
-		//	Set Result
-		if (results.length == 0)
-		{
-			setC_BPartner_ID(0);
-		}
-		else if (results.length == 1)
-		{
-			setC_BPartner_ID(results[0].getC_BPartner_ID());
-			f_bpName.setText(results[0].getName());
-		}
-		else	//	more than one
-		{
-			QueryBPartner qt = new QueryBPartner(p_posPanel);
-			qt.setResults (results);
-			qt.setVisible(true);
-		}
-	}	//	findBPartner
-
-
-	/**************************************************************************
-	 * 	Set BPartner
-	 *	@param C_BPartner_ID id
-	 */
-	public void setC_BPartner_ID (int C_BPartner_ID)
-	{
-		log.info("C_BPartner_ID=" + C_BPartner_ID);
-		if (C_BPartner_ID == 0)
-			m_bpartner = null;
-		else
-		{
-			m_bpartner = new MBPartner(p_ctx, C_BPartner_ID, null);
-			if (m_bpartner.get_ID() == 0)
-				m_bpartner = null;
-		}
-
-		//	Set Info
-		if (m_bpartner != null)
-		{
-			f_bpName.setText(m_bpartner.getName());
-		}
-		else
-		{
-			f_bpName.setText(null);
-		}
-		//	Sets Currency
-		m_M_PriceList_Version_ID = 0;
-		getM_PriceList_Version_ID();
-		//fillCombos();
-		if ( p_posPanel.m_order != null && m_bpartner != null )
-			p_posPanel.m_order.setBPartner(m_bpartner);  //added by ConSerTi to update the client in the request
-	}	//	setC_BPartner_ID
+        // Set Info
+        if (m_bpartner != null) {
+            f_bpName.setText(m_bpartner.getName());
+        } else {
+            f_bpName.setText(null);
+        }
+        // Sets Currency
+        m_M_PriceList_Version_ID = 0;
+        getM_PriceList_Version_ID();
+        // fillCombos();
+        if (p_posPanel.m_order != null && m_bpartner != null) {
+            p_posPanel.m_order.setBPartner(m_bpartner); // added by ConSerTi to update the client in
+        }                                               // the request
+    } // setC_BPartner_ID
 
 	/**
 	 * 	Fill Combos (Location, User)
@@ -485,16 +477,17 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	}	//	fillCombos
 
 
-	/**
-	 * 	Get BPartner
-	 *	@return C_BPartner_ID
-	 */
-	public int getC_BPartner_ID ()
-	{
-		if (m_bpartner != null)
-			return m_bpartner.getC_BPartner_ID();
-		return 0;
-	}	//	getC_BPartner_ID
+    /**
+     * Get BPartner
+     * @return C_BPartner_ID
+     */
+    public int getC_BPartner_ID()
+    {
+        if (m_bpartner != null) {
+            return m_bpartner.getC_BPartner_ID();
+        }
+        return 0;
+    } // getC_BPartner_ID
 
 	/**
 	 * 	Get BPartner
@@ -505,73 +498,72 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		return m_bpartner;
 	}	//	getBPartner
 
-	/**
-	 * 	Get BPartner Location
-	 *	@return C_BPartner_Location_ID
-	 */
-	public int getC_BPartner_Location_ID ()
-	{
-		if (m_bpartner != null)
-		{
-			KeyNamePair pp = (KeyNamePair)f_location.getSelectedItem();
-			if (pp != null)
-				return pp.getKey();
-		}
-		return 0;
-	}	//	getC_BPartner_Location_ID
+    /**
+     * Get BPartner Location
+     * @return C_BPartner_Location_ID
+     */
+    public int getC_BPartner_Location_ID()
+    {
+        if (m_bpartner != null) {
+            KeyNamePair pp = (KeyNamePair) f_location.getSelectedItem();
+            if (pp != null) {
+                return pp.getKey();
+            }
+        }
+        return 0;
+    } // getC_BPartner_Location_ID
 
-	/**
-	 * 	Get BPartner Contact
-	 *	@return AD_User_ID
-	 */
-	public int getAD_User_ID ()
-	{
-		if (m_bpartner != null)
-		{
-			KeyNamePair pp = (KeyNamePair)f_user.getSelectedItem();
-			if (pp != null)
-				return pp.getKey();
-		}
-		return 0;
-	}	//	getC_BPartner_Location_ID
+    /**
+     * Get BPartner Contact
+     * @return AD_User_ID
+     */
+    public int getAD_User_ID()
+    {
+        if (m_bpartner != null) {
+            KeyNamePair pp = (KeyNamePair) f_user.getSelectedItem();
+            if (pp != null) {
+                return pp.getKey();
+            }
+        }
+        return 0;
+    } // getC_BPartner_Location_ID
 
-	/**
-	 * 	Get M_PriceList_Version_ID.
-	 * 	Set Currency
-	 *	@return plv
-	 */
-	public int getM_PriceList_Version_ID()
-	{
-		if (m_M_PriceList_Version_ID == 0)
-		{
-			int M_PriceList_ID = p_pos.getM_PriceList_ID();
-			if (m_bpartner != null && m_bpartner.getM_PriceList_ID() != 0)
-				M_PriceList_ID = m_bpartner.getM_PriceList_ID();
-			//
-			MPriceList pl = MPriceList.get(p_ctx, M_PriceList_ID, null);
-			setCurrency(MCurrency.getISO_Code(p_ctx, pl.getC_Currency_ID()));
-			//
-			MPriceListVersion plv = pl.getPriceListVersion (p_posPanel.getToday());
-			if (plv != null && plv.getM_PriceList_Version_ID() != 0)
-				m_M_PriceList_Version_ID = plv.getM_PriceList_Version_ID();
-		}
-		return m_M_PriceList_Version_ID;
-	}	//	getM_PriceList_Version_ID
+    /**
+     * Get M_PriceList_Version_ID. Set Currency
+     * @return plv
+     */
+    public int getM_PriceList_Version_ID()
+    {
+        if (m_M_PriceList_Version_ID == 0) {
+            int M_PriceList_ID = p_pos.getM_PriceList_ID();
+            if (m_bpartner != null && m_bpartner.getM_PriceList_ID() != 0)
+                M_PriceList_ID = m_bpartner.getM_PriceList_ID();
+            //
+            MPriceList pl = MPriceList.get(p_ctx, M_PriceList_ID, null);
+            setCurrency(MCurrency.getISO_Code(p_ctx, pl.getC_Currency_ID()));
+            //
+            MPriceListVersion plv = pl.getPriceListVersion(p_posPanel.getToday());
+            if (plv != null && plv.getM_PriceList_Version_ID() != 0) {
+                m_M_PriceList_Version_ID = plv.getM_PriceList_Version_ID();
+            }
+        }
+        return m_M_PriceList_Version_ID;
+    } // getM_PriceList_Version_ID
 
-
-	/***************************************************************************
-	 * Set Currency
-	 *
-	 * @param currency
-	 *            currency
-	 */
-	public void setCurrency(String currency) {
-		if (currency == null)
-			f_currency.setText("---");
-		else
-			f_currency.setText(currency);
-	} //	setCurrency
-
+    /***************************************************************************
+     * Set Currency
+     *
+     * @param currency
+     *            currency
+     */
+    public void setCurrency(String currency)
+    {
+        if (currency == null) {
+            f_currency.setText("---");
+        } else {
+            f_currency.setText(currency);
+        }
+    } // setCurrency
 
 	/**
 	 * Is order fully pay ?

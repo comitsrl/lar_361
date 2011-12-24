@@ -717,8 +717,8 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	}
 
 
-	private void loadLine(int lineId) {
-
+	private void loadLine(int lineId)
+	{
 		if ( lineId <= 0 )
 			return;
 
