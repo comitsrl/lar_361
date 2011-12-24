@@ -33,6 +33,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 
 import org.compiere.apps.ADialog;
+import org.compiere.grid.ed.VPAttributeDialog;
 import org.compiere.minigrid.ColumnInfo;
 import org.compiere.minigrid.IDColumn;
 import org.compiere.model.MOrderLine;
@@ -76,7 +77,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	private CButton f_up;
 	private CButton f_delete;
 	private CButton f_down;
-	//
+    private CButton f_productAttr;
 	private CButton f_plus;
 	private CButton f_minus;
 	private PosTextField f_price;
@@ -143,7 +144,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		f_productName.addFocusListener(this);
 		f_productName.requestFocusInWindow();
 
-		add (f_productName, "spanx 3, growx, pushx, h 25!");
+		add (f_productName, "spanx 4, growx, pushx, h 25!");
 
  		// PAYMENT
 		add (new CLabel(),"");
@@ -160,11 +161,11 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		//	m_table.addMouseListener(this);
 		m_table.getSelectionModel().addListSelectionListener(this);
 		m_table.setColumnVisibility(m_table.getColumn(0), false);
-		m_table.getColumn(1).setPreferredWidth(175);
+		m_table.getColumn(1).setPreferredWidth(220);
 		m_table.getColumn(2).setPreferredWidth(75);
-		m_table.getColumn(3).setPreferredWidth(30);
-		m_table.getColumn(4).setPreferredWidth(75);
-		m_table.getColumn(5).setPreferredWidth(75);
+		m_table.getColumn(3).setPreferredWidth(35);
+		m_table.getColumn(4).setPreferredWidth(80);
+		m_table.getColumn(5).setPreferredWidth(80);
 		m_table.getColumn(6).setPreferredWidth(30);
 		m_table.setFocusable(false);
 		m_table.setFillsViewportHeight( true ); //@Trifon
@@ -176,7 +177,9 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		add (f_up, buttonSize);
 		f_down = createButtonAction("Next", KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
 		add (f_down, buttonSize);
-
+		// Product Attributes
+		f_productAttr = createButtonAction("PAttribute", KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
+		add (f_productAttr, buttonSize);
 
 		f_delete = createButtonAction("Cancel", KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, Event.SHIFT_MASK));
 		add (f_delete, buttonSize);
@@ -184,8 +187,6 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		//
 		f_minus = createButtonAction("Minus", null);
 		add(f_minus, buttonSize);
-
-
 
 		CLabel qtyLabel = new CLabel(Msg.translate(Env.getCtx(), "QtyOrdered"));
 		add(qtyLabel, "split 2, flowy, h 15");
@@ -265,6 +266,19 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			}
 
 		}
+        // Product Attribute
+        else if (action.equals("PAttribute"))
+        {
+           if ( orderLineId > 0 )
+           {
+               MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
+               if ( line != null )
+               {
+                   requestProductAttributes(line.getProduct());
+               }
+           }
+           return;
+        }
 		else if (action.equals("Payment"))
 			payOrder();
 
@@ -444,6 +458,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		f_plus.setEnabled(enabled);
 		f_quantity.setEnabled(enabled);
 		f_price.setEnabled(enabled);
+		f_productAttr.setEnabled(enabled);
 	}
 
 	/**
@@ -723,5 +738,34 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
             return false;
         }
         return true;
-	}
+	} // hasStock
+
+	/**
+	 * Shows the product attribute instance dialog in order to set the attributes
+	 * defined for each product (if product has any)
+	 *
+	 * @param product
+	 */
+	private void requestProductAttributes(final MProduct product)
+	{
+	    int m_AttributeSet_ID = product.getM_AttributeSet_ID();
+	    int m_AttributeSetInstance_ID = product.getM_AttributeSetInstance_ID();
+	    String logMsg = String.format("Product/Attr[Inst] - %s/%d[%d]",product, m_AttributeSet_ID
+	            , m_AttributeSetInstance_ID);
+	    log.info(logMsg);
+
+	    String msg;
+	    if (m_AttributeSet_ID != 0) {
+	        VPAttributeDialog vad = new VPAttributeDialog(Env.getFrame(this), m_AttributeSetInstance_ID,
+	                product.get_ID(), 0, false, 0, p_posPanel.getWindowNo());
+	        if (vad.isChanged()) {
+	               msg = Msg.translate(p_ctx,  "AttributSetInstanceSaved"); // TODO - Translate this msg
+	               ADialog.info(p_posPanel.getWindowNo(), this, msg);
+	        }
+	    } else {
+	        msg = Msg.translate(p_ctx,  "ProductWithouAttributSet"); // TODO - Translate this msg
+	        ADialog.warn(p_posPanel.getWindowNo(), this, msg);
+	    }
+	} // requestProductAttributes
+
 } //	PosSubCurrentLine

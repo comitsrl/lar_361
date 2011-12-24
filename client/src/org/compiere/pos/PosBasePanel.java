@@ -71,7 +71,7 @@ public class PosBasePanel extends CPanel
 	 */
 	public PosBasePanel()
 	{
-		super (new MigLayout(" fill","[500!]10[300:350:, fill]",""));
+		super (new MigLayout(" fill","[560!]10[300:350:, fill]",""));
 		originalKeyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 		m_focusMgr = new PosKeyboardFocusManager();
 		KeyboardFocusManager.setCurrentKeyboardFocusManager(m_focusMgr);
