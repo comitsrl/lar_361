@@ -75,6 +75,7 @@ import ar.com.ergio.util.LAR_Utils;
          //  Tables to be monitored
          engine.addModelChange(MBPartner.Table_Name, this);
          engine.addModelChange(MOrderLine.Table_Name, this);
+         engine.addModelChange(MOrder.Table_Name, this);
 
      }   //  initialize
 
@@ -124,7 +125,15 @@ import ar.com.ergio.util.LAR_Utils;
                  return msg;
              }
          }
-         return null;
+        // Changes on OrderLines
+        if (po.get_TableName().equals(MOrder.Table_Name) && type == ModelValidator.TYPE_BEFORE_DELETE) {
+            MOrder order = (MOrder) po;
+            msg = deletePerceptionLine(order);
+            if (msg != null) {
+                return msg;
+            }
+        }
+        return null;
      }
 
      /**
@@ -205,6 +214,26 @@ import ar.com.ergio.util.LAR_Utils;
         }
         return null;
      }
+
+    private String deletePerceptionLine(final MOrder order)
+    {
+        int c_Order_ID = order.get_ID();
+        log.info("Delete perceptions for order " + c_Order_ID);
+        String sql = "DELETE FROM LAR_OrderPerception WHERE C_ORDER_ID=?";
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = DB.prepareStatement(sql, order.get_TrxName());
+            pstmt.setInt(1, c_Order_ID);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, sql, e);
+            return e.getMessage();
+        } finally {
+            DB.close(pstmt);
+            pstmt = null;
+        }
+        return null;
+    }
 
      /**
       * Encapsulates configuration parameters for perception
