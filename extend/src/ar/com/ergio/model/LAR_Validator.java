@@ -99,16 +99,19 @@ import ar.com.ergio.util.LAR_Utils;
 
          if (po.get_TableName().equals(MBPartner.Table_Name) && type == ModelValidator.TYPE_BEFORE_CHANGE) {
              MBPartner bp = (MBPartner) po;
-             // Check CUIT number
-             String cuit = bp.get_ValueAsString("TaxID");
-             if (!LAR_Utils.validateCUIT(cuit)) {
-                 return "ERROR: CUIT invalido";
-             }
+             LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
+             if (!taxPayerType.equals(LAR_TaxPayerType.CONSUMIDOR_FINAL)) {
+                 // Check CUIT number
+                 String cuit = bp.get_ValueAsString("TaxID");
+                 if (!LAR_Utils.validateCUIT(cuit)) {
+                     return "ERROR: CUIT invalido";
+                 }
 
-             // Check IIBB number
-             msg = checkIIBBNumber(bp);
-             if (msg != null) {
-                 return msg;
+                 // Check IIBB number
+                 msg = checkIIBBNumber(bp);
+                 if (msg != null) {
+                     return msg;
+                 }
              }
          }
 
