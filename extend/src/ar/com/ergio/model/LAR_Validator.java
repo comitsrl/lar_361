@@ -96,7 +96,7 @@ import ar.com.ergio.util.LAR_Utils;
      {
          log.info(po.get_TableName() + " Type: " + type);
          String msg;
-
+         // Changes on BPartners
          if (po.get_TableName().equals(MBPartner.Table_Name) && type == ModelValidator.TYPE_BEFORE_CHANGE) {
              MBPartner bp = (MBPartner) po;
              LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
@@ -114,7 +114,7 @@ import ar.com.ergio.util.LAR_Utils;
                  }
              }
          }
-
+         // Changes on OrderLines
          if (po.get_TableName().equals(MOrderLine.Table_Name) &&
                  (type == ModelValidator.TYPE_AFTER_NEW ||
                   type == ModelValidator.TYPE_AFTER_CHANGE)
@@ -123,7 +123,7 @@ import ar.com.ergio.util.LAR_Utils;
 
              int c_BPartner_ID = ol.getParent().getC_BPartner_ID();
              MBPartner bp = new MBPartner(ol.getCtx(), c_BPartner_ID, ol.get_TrxName());
-             msg = calculatePerceptionLine(bp, ol.getParent());
+             msg = calculatePerceptionLine(bp, ol, type);
              if (msg != null) {
                  return msg;
              }
@@ -194,29 +194,42 @@ import ar.com.ergio.util.LAR_Utils;
          return msg;
      }
 
-     private String calculatePerceptionLine(final MBPartner bp, final MOrder order)
-     {
-        final PerceptionConfig config = new PerceptionConfig(bp, order);
-        log.info("Perception >> " + config);
+    private String calculatePerceptionLine(final MBPartner bp, final MOrderLine line, int type)
+    {
+        if (type == ModelValidator.TYPE_AFTER_NEW
+                || type == ModelValidator.TYPE_AFTER_DELETE
+                || (type == ModelValidator.TYPE_AFTER_CHANGE
+                    && (line.is_ValueChanged("LineNetAmt")
+                        || line.is_ValueChanged("M_Product_ID")
+                        || line.is_ValueChanged("IsActive")
+                        || line.is_ValueChanged("C_Tax_ID")
+                        )
+                    )
+           )
+        {
+            MOrder order = line.getParent();
+            final PerceptionConfig config = new PerceptionConfig(bp, order);
+            log.info("Perception >> " + config);
 
-        // Create order perception
-        MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
-        perception.setC_Order_ID(order.get_ID());
-        perception.setC_Tax_ID(config.getTax_ID());
-        perception.setLCO_WithholdingRule_ID(config.getWithholdingRule_ID());
-        perception.setLCO_WithholdingType_ID(config.getWithholdingType_ID());
-        perception.setTaxAmt(config.getTaxAmount());
-        perception.setTaxBaseAmt(config.getSubTotal());
-        perception.setIsTaxIncluded(false);
-        if (!perception.save()) {
-            return "Can not create preception";
-        }
-        // Update order amounts
-        if (!order.save()) {
-            return "Can not update order amounts";
+            // Create order perception
+            MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
+            perception.setC_Order_ID(order.get_ID());
+            perception.setC_Tax_ID(config.getTax_ID());
+            perception.setLCO_WithholdingRule_ID(config.getWithholdingRule_ID());
+            perception.setLCO_WithholdingType_ID(config.getWithholdingType_ID());
+            perception.setTaxAmt(config.getTaxAmount());
+            perception.setTaxBaseAmt(config.getSubTotal());
+            perception.setIsTaxIncluded(false);
+            if (!perception.save()) {
+                return "Can not create preception";
+            }
+            // Update order amounts
+            if (!order.save()) {
+                return "Can not update order amounts";
+            }
         }
         return null;
-     }
+    }
 
     private String deletePerceptionLine(final MOrder order)
     {
