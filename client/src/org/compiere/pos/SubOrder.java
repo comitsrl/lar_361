@@ -27,9 +27,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Vector;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -41,14 +39,12 @@ import org.compiere.apps.ADialog;
 import org.compiere.grid.ed.VLookup;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerInfo;
-import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCurrency;
 import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MPriceListVersion;
-import org.compiere.model.MUser;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CComboBox;
 import org.compiere.swing.CLabel;
@@ -84,7 +80,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	private CButton 		f_history;
 	private PosTextField	f_bpName;
 	private CButton 		f_bNew;
-	private CButton 		f_bSearch;
+	//private CButton 		f_bSearch;
 	private CComboBox		f_location;
 	private CComboBox		f_user;
 	private CButton 		f_process;
@@ -101,7 +97,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	/**	Price List Version to use	*/
 	private int			m_M_PriceList_Version_ID = 0;
 	private CTextField f_currency = new CTextField();
-	private CButton f_bEdit;
+	//private CButton f_bEdit;
 	private CButton f_bSettings;
 	/**	Logger			*/
 	private static CLogger log = CLogger.getCLogger(SubOrder.class);
@@ -126,10 +122,11 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		f_history = createButtonAction("History", null);
  		add (f_history, buttonSize);
 
- 		// EDIT
+ 		/* EDIT (emmie - useless action)
 		f_bEdit = createButtonAction("Edit", null);
 		add(f_bEdit, buttonSize);
  		f_bEdit.setEnabled(false);
+ 		*/
 
 		// CANCEL
 		f_process = createButtonAction("Delete", null);
@@ -452,7 +449,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 
 	/**
 	 * 	Fill Combos (Location, User)
-	 */
+	 *
 	private void fillCombos()
 	{
 		Vector<KeyNamePair> locationVector = new Vector<KeyNamePair>();
@@ -475,7 +472,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		DefaultComboBoxModel userModel = new DefaultComboBoxModel(userVector);
 		f_user.setModel(userModel);
 	}	//	fillCombos
-
+    */
 
     /**
      * Get BPartner
@@ -609,7 +606,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			    f_Order_ID.setValue(order.get_ID());
   				setC_BPartner_ID(order.getC_BPartner_ID());
   				f_bNew.setEnabled(order.getLines().length != 0);
-  				f_bEdit.setEnabled(true);
+  				//f_bEdit.setEnabled(true);
   				f_process.setEnabled(true);
   				f_print.setEnabled(order.isProcessed());
   				f_cashPayment.setEnabled(order.getLines().length != 0);
@@ -619,7 +616,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 				f_Order_ID.setValue(null);
 				setC_BPartner_ID(0);
 				f_bNew.setEnabled(true);
-				f_bEdit.setEnabled(false);
+				//f_bEdit.setEnabled(false);
 				f_process.setEnabled(false);
 				f_print.setEnabled(false);
 				f_cashPayment.setEnabled(false);
