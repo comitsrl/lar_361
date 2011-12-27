@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Properties;
 
-import org.compiere.model.MAttributeSetInstance;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -128,7 +127,7 @@ public class PosOrderModel extends MOrder {
 	public MOrderLine createLine(MProduct product, BigDecimal qtyOrdered,
 			BigDecimal priceActual) {
 
-	    if (!hasStockAvailable(product, null, qtyOrdered.intValue())) {
+	    if (!hasStockAvailable(product, qtyOrdered.intValue())) {
 	        throw new AdempierePOSException("InsufficientQtyAvailable");
 	    }
 
@@ -498,7 +497,16 @@ public class PosOrderModel extends MOrder {
 		return "?" + CreditCardType + "?";
 	}	//	getCreditCardName
 
-    boolean hasStockAvailable(final MProduct product, final MAttributeSetInstance attributes, int count)
+	/**
+	 * Performs stock validation according to product depending of its
+	 * attributes set instance for it.
+	 *
+	 * @param product
+	 * @param attributes
+	 * @param count
+	 * @return true if has stock avaiable. false otherwise.
+	 */
+    boolean hasStockAvailable(final MProduct product, int count)
     {
         boolean stockAvailable = true;
         boolean isSaleWithoutStock = m_pos.get_ValueAsBoolean("IsSaleWithoutStock");
@@ -506,7 +514,9 @@ public class PosOrderModel extends MOrder {
             // TODO - Improve this feature, setting it into POS Terminal config
             // int m_Locator_ID = Env.getContextAsInt(ctx, WindowNo, "M_Locator_ID");
             int m_Locator_ID = 0;
-            int m_AttributeSetInstance_ID = attributes == null ? 0 : attributes.get_ID();
+            int m_AttributeSetInstance_ID = product.getM_AttributeSetInstance_ID();
+            String msg = String.format("Product=%s AttrInstance=%d Count=%d", product, m_AttributeSetInstance_ID, count);
+            log.info(msg);
             BigDecimal available = MStorage.getQtyAvailable(m_pos.getM_Warehouse_ID(), m_Locator_ID, product.get_ID(),
                     m_AttributeSetInstance_ID, trxName);
             if (available == null || available.compareTo(BigDecimal.valueOf(count)) < 0) {

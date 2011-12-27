@@ -733,7 +733,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 
 	private boolean hasStock(final MProduct product, final BigDecimal newQty)
 	{
-        if (!p_posPanel.m_order.hasStockAvailable(product, null, newQty.intValue())) {
+        if (!p_posPanel.m_order.hasStockAvailable(product, newQty.intValue())) {
             ADialog.error(0, this, "InsufficientQtyAvailable");
             return false;
         }
