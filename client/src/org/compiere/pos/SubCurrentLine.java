@@ -48,6 +48,8 @@ import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.Trx;
+import org.compiere.util.TrxRunnable;
 
 /**
  * Current Line Sub Panel
@@ -373,25 +375,42 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	 *
 	 */
 	private void payOrder() {
-
 		//Check if order is completed, if so, print and open drawer, create an empty order and set cashGiven to zero
-
 		if( p_posPanel.m_order != null ) //red1 wrong action flow below
-		{
-			if (!PosPayment.pay(p_posPanel) )
-				return; //red1 not paid (cancelled) cannot continue process the order.
+        {
+		    // Create a transaction thread
+            final TrxRunnable trxRunnable = new TrxRunnable()
+            {
+                @Override
+                public void run(final String trxName)
+                {
+                    // set the proper trx name to order
+                    p_posPanel.m_order.set_TrxName(trxName);
 
-			if (!p_posPanel.m_order.isProcessed() && !p_posPanel.m_order.processOrder() )
-			{
-				ADialog.warn(0, p_posPanel, "PosOrderProcessFailed");
-				return;
-			}
-			else
-			{
-				printTicket();
-				p_posPanel.setOrder(0);
-			}
-		}
+                    if (!PosPayment.pay(p_posPanel)) {
+                        String msg = Msg.translate(p_ctx, "PosPaymentCancel");
+                        throw new AdempierePOSException(msg);
+                    }
+                    if (!p_posPanel.m_order.isProcessed() && !p_posPanel.m_order.processOrder()) {
+                        String msg = Msg.translate(p_ctx, "PosOrderProcessFailed");
+                        throw new AdempierePOSException(msg);
+                    }
+
+                    // set trx name to null again
+                    p_posPanel.m_order.set_TrxName(null);
+                }
+            };
+            // Execute the transaction
+            try {
+                Trx.run(trxRunnable);
+            } catch (AdempierePOSException e) {
+                ADialog.warn(0, p_posPanel, e.getLocalizedMessage());
+                return;
+            }
+            // Actions out of transaction
+            printTicket();
+            p_posPanel.setOrder(0);
+        }
 	}
 
 	/**

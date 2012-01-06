@@ -64,7 +64,8 @@ public class PosBasePanel extends CPanel
 	 *
 	 */
 	private static final long serialVersionUID = -3010214392188209281L;
-	public static String trxName = null; //Trx.createTrxName("GUIPOSTesting_"); --red1 won't persist trx for recall in display
+	// TODO - Review transaction usage
+	private String trxName = null; //Trx.createTrxName("GUIPOSTesting_"); --red1 won't persist trx for recall in display
 	//trxName for not committing test so tests does not impact DB.. temporary halt due to above issue.
 	/**
 	 * 	Constructor - see init

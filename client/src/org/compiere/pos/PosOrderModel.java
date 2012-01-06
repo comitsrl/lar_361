@@ -45,11 +45,9 @@ public class PosOrderModel extends MOrder {
 
 	private MPOS m_pos;
 
-	private String trxName;
-
 	public PosOrderModel(Properties ctx, int C_Order_ID, String trxName, MPOS pos) {
 		super(ctx, C_Order_ID, trxName);
-		this.trxName = trxName;
+		set_TrxName(trxName);
 		m_pos = pos;
 	}
 
@@ -315,12 +313,12 @@ public class PosOrderModel extends MOrder {
 	public BigDecimal getPaidAmt()
 	{
 		String sql = "SELECT sum(PayAmt) FROM C_Payment WHERE C_Order_ID = ? AND DocStatus IN ('CO','CL')";
-		BigDecimal received = DB.getSQLValueBD(null, sql, getC_Order_ID());
+		BigDecimal received = DB.getSQLValueBD(get_TrxName(), sql, getC_Order_ID());
 		if ( received == null )
 			received = Env.ZERO;
 
 		sql = "SELECT sum(Amount) FROM C_CashLine WHERE C_Invoice_ID = ? ";
-		BigDecimal cashline = DB.getSQLValueBD(null, sql, getC_Invoice_ID());
+		BigDecimal cashline = DB.getSQLValueBD(get_TrxName(), sql, getC_Invoice_ID());
 		if ( cashline != null )
 			received = received.add(cashline);
 
@@ -329,7 +327,7 @@ public class PosOrderModel extends MOrder {
 
 	private BigDecimal getPerceptionAmt()
 	{
-	    MLAROrderPerception perception = MLAROrderPerception.get(this, null);
+	    MLAROrderPerception perception = MLAROrderPerception.get(this, get_TrxName());
 	    return perception.getTaxAmt();
 	}
 
@@ -401,7 +399,7 @@ public class PosOrderModel extends MOrder {
 
 	private MPayment createPayment(String tenderType)
 	{
-		MPayment payment = new MPayment(getCtx(), 0, trxName);
+		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setAD_Org_ID(m_pos.getAD_Org_ID());
 		payment.setTenderType(tenderType);
 		payment.setC_Order_ID(getC_Order_ID());
@@ -518,7 +516,7 @@ public class PosOrderModel extends MOrder {
             String msg = String.format("Product=%s AttrInstance=%d Count=%d", product, m_AttributeSetInstance_ID, count);
             log.info(msg);
             BigDecimal available = MStorage.getQtyAvailable(m_pos.getM_Warehouse_ID(), m_Locator_ID, product.get_ID(),
-                    m_AttributeSetInstance_ID, trxName);
+                    m_AttributeSetInstance_ID, get_TrxName());
             if (available == null || available.compareTo(BigDecimal.valueOf(count)) < 0) {
                 stockAvailable = false;
             }
