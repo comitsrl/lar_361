@@ -271,12 +271,12 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
         // Product Attribute
         else if (action.equals("PAttribute"))
         {
-           if ( orderLineId > 0 )
+           if (orderLineId > 0)
            {
                MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
-               if ( line != null )
+               if (line != null)
                {
-                   requestProductAttributes(line.getProduct());
+                   requestProductAttributes(line);
                }
            }
            return;
@@ -765,10 +765,11 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	 *
 	 * @param product
 	 */
-	private void requestProductAttributes(final MProduct product)
+	private void requestProductAttributes(final MOrderLine line)
 	{
+	    MProduct product = line.getProduct();
 	    int m_AttributeSet_ID = product.getM_AttributeSet_ID();
-	    int m_AttributeSetInstance_ID = product.getM_AttributeSetInstance_ID();
+	    int m_AttributeSetInstance_ID = line.getM_AttributeSetInstance_ID();
 	    String logMsg = String.format("Product/Attr[Inst] - %s/%d[%d]",product, m_AttributeSet_ID
 	            , m_AttributeSetInstance_ID);
 	    log.info(logMsg);
@@ -778,8 +779,14 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	        VPAttributeDialog vad = new VPAttributeDialog(Env.getFrame(this), m_AttributeSetInstance_ID,
 	                product.get_ID(), 0, false, 0, p_posPanel.getWindowNo());
 	        if (vad.isChanged()) {
-	               msg = Msg.translate(p_ctx,  "AttributSetInstanceSaved"); // TODO - Translate this msg
-	               ADialog.info(p_posPanel.getWindowNo(), this, msg);
+	            line.setM_AttributeSetInstance_ID(vad.getM_AttributeSetInstance_ID());
+	            if (line.save()) {
+	                msg = Msg.translate(p_ctx,  "AttributSetInstanceSaved"); // TODO - Translate this msg
+	                ADialog.info(p_posPanel.getWindowNo(), this, msg);
+	            } else {
+                    msg = Msg.translate(p_ctx,  "AttributSetInstanceSavedError"); // TODO - Translate this msg
+	                ADialog.error(p_posPanel.getWindowNo(), this, msg);
+	            }
 	        }
 	    } else {
 	        msg = Msg.translate(p_ctx,  "ProductWithouAttributSet"); // TODO - Translate this msg
