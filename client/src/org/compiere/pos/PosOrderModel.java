@@ -29,6 +29,7 @@ import org.compiere.model.MStorage;
 import org.compiere.process.DocAction;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
 
 import ar.com.ergio.model.MLAROrderPerception;
@@ -123,10 +124,11 @@ public class PosOrderModel extends MOrder {
 	 * @return line or null
 	 */
 	public MOrderLine createLine(MProduct product, BigDecimal qtyOrdered,
-			BigDecimal priceActual) {
+			BigDecimal priceActual, int WindowNo) {
 
-	    if (!hasStockAvailable(product, qtyOrdered.intValue())) {
-	        throw new AdempierePOSException("InsufficientQtyAvailable");
+	    String stockMsg = checkStockAvailable(product, qtyOrdered.intValue(), WindowNo);
+	    if (stockMsg != null) {
+	        throw new AdempierePOSException(stockMsg);
 	    }
 
 		if (!getDocStatus().equals("DR") )
@@ -502,26 +504,32 @@ public class PosOrderModel extends MOrder {
 	 * @param product
 	 * @param attributes
 	 * @param count
-	 * @return true if has stock avaiable. false otherwise.
+	 * @return null or error stock message
 	 */
-    boolean hasStockAvailable(final MProduct product, int count)
+    String checkStockAvailable(final MProduct product, int count, int windowNo)
     {
-        boolean stockAvailable = true;
         boolean isSaleWithoutStock = m_pos.get_ValueAsBoolean("IsSaleWithoutStock");
         if (product.isStocked() && !isSaleWithoutStock) {
-            // TODO - Improve this feature, setting it into POS Terminal config
-            // int m_Locator_ID = Env.getContextAsInt(ctx, WindowNo, "M_Locator_ID");
-            int m_Locator_ID = 0;
-            int m_AttributeSetInstance_ID = product.getM_AttributeSetInstance_ID();
-            String msg = String.format("Product=%s AttrInstance=%d Count=%d", product, m_AttributeSetInstance_ID, count);
+            // TODO - Review this id lookups (m_locator_id and m_attributesetinstance_id)
+            int m_Locator_ID = Env.getContextAsInt(m_pos.getCtx(), windowNo, "M_Locator_ID");
+            int m_AttributeSetInstance_ID = Env.getContextAsInt(m_pos.getCtx(), windowNo, "M_AttributeSetInstance_ID");
+            String msg = String.format("Product=%s AttrSetInstance=%d Count=%d WindowNo=%d",
+                    product, m_AttributeSetInstance_ID, count, windowNo);
             log.info(msg);
+
             BigDecimal available = MStorage.getQtyAvailable(m_pos.getM_Warehouse_ID(), m_Locator_ID, product.get_ID(),
                     m_AttributeSetInstance_ID, get_TrxName());
-            if (available == null || available.compareTo(BigDecimal.valueOf(count)) < 0) {
-                stockAvailable = false;
+            if (available == null) {
+                available = Env.ZERO;
+            }
+            if (available.signum() == 0) {
+               return Msg.translate(p_ctx, "NoQtyAvailable") + " 0";
+            }
+            else if (available.compareTo(BigDecimal.valueOf(count)) < 0) {
+                return Msg.translate(p_ctx, "InsufficientQtyAvailable") + " " +available.toString();
             }
         }
-        return stockAvailable;
-    } // hasStockAvailable
+        return null;
+    } // checkStockAvailable
 
 } // PosOrderModel.class

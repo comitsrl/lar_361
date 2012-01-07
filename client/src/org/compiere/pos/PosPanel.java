@@ -12,7 +12,7 @@ public class PosPanel implements FormPanel {
 
 	public void init(int WindowNo, FormFrame frame) {
 		panel = new PosBasePanel();
-		panel.init(0, frame);
+		panel.init(WindowNo, frame);
 	}
 
 }

@@ -187,7 +187,7 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
         }
         MProduct product = new MProduct(getCtx(), m_M_Product_ID, getTrxName());
         posOrder = PosOrderModel.createOrder(posModel, partner, getTrxName());
-        posOrder.createLine(product, BigDecimal.valueOf(1), BigDecimal.valueOf(100));
+        posOrder.createLine(product, BigDecimal.valueOf(1), BigDecimal.valueOf(100), 0);
         posOrder.payCash(BigDecimal.valueOf(100));
         if (posOrder.processOrder()) {
             commit();

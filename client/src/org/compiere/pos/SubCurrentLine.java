@@ -562,7 +562,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 
 		if ( p_posPanel.m_order != null )
 		{
-			line = p_posPanel.m_order.createLine(product, qtyOrdered, priceActual);
+			line = p_posPanel.m_order.createLine(product, qtyOrdered, priceActual, p_posPanel.getWindowNo());
 
 			if (line == null)
 				return false;
@@ -647,10 +647,12 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		else if (results.length == 1)
 		{
 			setM_Product_ID(results[0].getM_Product_ID());
-			setQty(Env.ONE);
-			f_productName.setText(results[0].getName());
-			p_posPanel.f_curLine.setPrice(results[0].getPriceStd());
-			saveLine();
+            if (hasStock(m_product, Env.ONE)) {
+                setQty(Env.ONE);
+                f_productName.setText(results[0].getName());
+                p_posPanel.f_curLine.setPrice(results[0].getPriceStd());
+                saveLine();
+            }
 		}
 		else	//	more than one
 		{
@@ -668,7 +670,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	 */
 	public void setM_Product_ID (int M_Product_ID)
 	{
-		log.info("PosSubProduct.setM_Product_ID=" + M_Product_ID);
+		log.info("M_Product_ID=" + M_Product_ID);
 		if (M_Product_ID <= 0)
 			m_product = null;
 		else
@@ -750,10 +752,16 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		}
 	}
 
+	/**
+	 * Check stock available
+	 *
+	 * @author Emiliano Pereyra
+	 */
 	private boolean hasStock(final MProduct product, final BigDecimal newQty)
 	{
-        if (!p_posPanel.m_order.hasStockAvailable(product, newQty.intValue())) {
-            ADialog.error(0, this, "InsufficientQtyAvailable");
+	    String stockMsg = p_posPanel.m_order.checkStockAvailable(product, newQty.intValue(), p_posPanel.getWindowNo());
+        if (stockMsg != null) {
+            ADialog.error(0, this, stockMsg);
             return false;
         }
         return true;
