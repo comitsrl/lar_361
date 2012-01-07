@@ -599,6 +599,8 @@ public class VPAttributeDialog extends CDialog
             log.log(Level.SEVERE, "VPAttributeDialog", ex);
         }
         initAttributes();
+        cbNewEdit.setSelected(true);
+        cmd_newEdit();
         pack();
     } // reloadWindow
 
