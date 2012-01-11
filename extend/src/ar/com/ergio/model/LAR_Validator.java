@@ -130,7 +130,7 @@ import ar.com.ergio.util.LAR_Utils;
                  return msg;
              }
          }
-        // Changes on OrderLines
+        // Changes on Order
         if (po.get_TableName().equals(MOrder.Table_Name) && type == ModelValidator.TYPE_BEFORE_DELETE) {
             MOrder order = (MOrder) po;
             msg = deletePerceptionLine(order);

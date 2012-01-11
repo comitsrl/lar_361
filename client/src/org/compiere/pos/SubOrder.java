@@ -27,6 +27,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
@@ -171,9 +172,18 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 
 		// DOC NO
         int ad_Column_ID = 2161; // table 259 | Order
-        MLookup lookup = MLookupFactory.get(p_posPanel.getCtx(), p_posPanel.getWindowNo(), 0,
-                ad_Column_ID, DisplayType.Search);
-        f_Order_ID = new VLookup("C_Order_ID", true, false, true, lookup);
+        // TODO - if necesary, parametrize this validation rule (simil > 134 | C_Order SO to be invoiced)
+        String validation = "DocStatus = 'IP' "
+                          + "AND EXISTS (SELECT * FROM C_OrderLine WHERE C_Order.C_Order_ID=C_OrderLine.C_Order_ID AND QtyOrdered <> QtyInvoiced) AND IsSOTrx='Y' "
+                          + "AND NOT EXISTS (SELECT * FROM C_Invoice i WHERE i.C_Order_ID=C_Order.C_Order_ID AND i.DocStatus IN ('IP', 'CO', 'CL'))";
+        MLookup lookup = null;
+        try {
+            lookup = MLookupFactory.get(p_ctx, p_posPanel.getWindowNo(), ad_Column_ID, DisplayType.TableDir,
+                    Env.getLanguage(p_ctx), "C_Order_ID", 0, false, validation);
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Lookup Order", e);
+        }
+        f_Order_ID = new VLookup("C_Order_ID", false, false, true, lookup);
         f_Order_ID.addVetoableChangeListener(new VetoableChangeListener() {
 
             public void vetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
