@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,7 +31,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
-import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLocation;
@@ -42,7 +40,6 @@ import org.compiere.model.MPayment;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MProduct;
 import org.compiere.model.MRefList;
-import org.compiere.model.MSequence;
 import org.compiere.model.MTax;
 import org.compiere.model.PO;
 import org.compiere.util.CLogger;
@@ -397,7 +394,7 @@ public class FiscalDocumentPrint {
     private void doPrintDocument(final Object[] args) throws Exception
     {
         // Argumentos
-        MInvoice document = (MInvoice) args[0];
+        //MInvoice document = (MInvoice) args[0];
         Document documentPrintable = null;
         MInvoice originalInvoice = null;
         // Factura imprimible por la impresora creada a partir del documento oxp
@@ -430,7 +427,7 @@ public class FiscalDocumentPrint {
         fireDocumentPrintEndedOk();
 
         // Se actualiza la secuencia del tipo de documento emitido.
-        updateDocTypeSequence(document);
+        //updateDocTypeSequence(document);
     }
 
 	// *************************
@@ -1085,7 +1082,7 @@ public class FiscalDocumentPrint {
 //		return description;
 //	}
 
-	private void saveDocumentData(final MInvoice oxpDocument, final Document printeableDocument) {
+	private void saveDocumentData(final MInvoice mInvoice, final Document printeableDocument) {
         String dtType = printeableDocument.getDocumentType();
 
         /////////////////////////////////////////////////////////////////
@@ -1101,9 +1098,9 @@ public class FiscalDocumentPrint {
             // Solo se actualiza el documento de oxp en caso de que el
             // número de comprobante emitido por la impresora fiscal
             // sead distinto al que le había asignado oxp.
-            String fiscalReceiptNumber = oxpDocument.get_ValueAsString("ReceiptNumber");
+            String fiscalReceiptNumber = mInvoice.get_ValueAsString("FiscalReceiptNumber");
             if (printedFiscalReceiptNumber != fiscalReceiptNumber) {
-                oxpDocument.set_ValueOfColumn("ReceiptNumber", printedFiscalReceiptNumber);
+                mInvoice.set_ValueOfColumn("FiscalReceiptNumber", printedFiscalReceiptNumber);
                 // Se modifica el número de documento de OXP acorde al número de
                 // comprobante fiscal.
                 // String documentNo = CalloutInvoiceExt.GenerarNumeroDeDocumento(
@@ -1120,9 +1117,9 @@ public class FiscalDocumentPrint {
                 Invoice invoiceOrDN = (Invoice) printeableDocument;
                 if (invoiceOrDN.hasCAINumber()) {
                     // Se asigna el número del CAI.
-                    oxpDocument.set_ValueOfColumn("CAI", invoiceOrDN.getCAINumber());
+                    mInvoice.set_ValueOfColumn("CAI", invoiceOrDN.getCAINumber());
                     // Se asigna la fecha del CAI como la fecha actual.
-                    oxpDocument.set_ValueOfColumn("CAIDate", new Timestamp(System.currentTimeMillis()));
+                    mInvoice.set_ValueOfColumn("CAIDate", new Timestamp(System.currentTimeMillis()));
                 }
             }
 
@@ -1130,11 +1127,11 @@ public class FiscalDocumentPrint {
             // -- Documento Impreso por Impresora fiscal --
             // Se marca el documento como impreso fiscalmente para que no pueda
             // volver a imprimirse.
-            oxpDocument.set_ValueOfColumn("IsFiscalPrinted", true);
+            mInvoice.set_ValueOfColumn("IsFiscalPrinted", true);
 
             // Se guardan los cambios realizados.
-            if (canSaveOxpDocument()) {
-                oxpDocument.save();
+            if (canSaveDocument()) {
+                mInvoice.save();
             }
         }
     }
@@ -1335,7 +1332,7 @@ public class FiscalDocumentPrint {
 //		}
 //	}
 
-	// TODO - This method should not touch sequence, but an invoice proper field
+	/* TODO - This method should not touch sequence, but an invoice proper field
 	private void updateDocTypeSequence(final MInvoice mInvoice) {
 		// Se actualiza la secuencia del tipo de documento del documento
 		// emitido recientemento por la impresora fiscal.
@@ -1360,7 +1357,7 @@ public class FiscalDocumentPrint {
 				seq.save();
 			}
 		}
-	}
+	}*/
 
 	/**
 	 * Agrega un manejador de impresió de documentos al cual se le reportan
@@ -1498,7 +1495,7 @@ public class FiscalDocumentPrint {
 	/**
 	 * @return true si se debe guardar el documento oxp, false caso contrario
 	 */
-	protected boolean canSaveOxpDocument(){
+	protected boolean canSaveDocument(){
 		return true;
 	}
 
