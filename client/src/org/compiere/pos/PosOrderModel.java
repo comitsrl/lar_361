@@ -77,7 +77,6 @@ public class PosOrderModel extends MOrder {
 		order.setM_PriceList_ID(pos.getM_PriceList_ID());
 		order.setM_Warehouse_ID(pos.getM_Warehouse_ID());
 		order.setSalesRep_ID(pos.getSalesRep_ID());
-		order.setPaymentRule(MOrder.PAYMENTRULE_Cash);
 		if (!order.save())
 		{
 			order = null;
@@ -339,6 +338,7 @@ public class PosOrderModel extends MOrder {
 		payment.setC_CashBook_ID(m_pos.getC_CashBook_ID());
 		payment.setAmount(getC_Currency_ID(), amt);
 		payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
+		setPaymentRule(MOrder.PAYMENTRULE_Cash);
 		payment.save();
 		payment.setDocAction(MPayment.DOCACTION_Complete);
 		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
@@ -358,6 +358,7 @@ public class PosOrderModel extends MOrder {
 		payment.setAccountNo(accountNo);
 		payment.setRoutingNo(routingNo);
 		payment.setCheckNo(checkNo);
+		setPaymentRule(MOrder.PAYMENTRULE_Check);
 		payment.saveEx();
 		payment.setDocAction(MPayment.DOCACTION_Complete);
 		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
@@ -378,6 +379,7 @@ public class PosOrderModel extends MOrder {
 		payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
 		payment.setCreditCard(MPayment.TRXTYPE_Sales, cardtype,
 				cardNo, cvc, month, year);
+		setPaymentRule(MOrder.PAYMENTRULE_CreditCard);
 		payment.saveEx();
 		payment.setDocAction(MPayment.DOCACTION_Complete);
 		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
@@ -396,6 +398,7 @@ public class PosOrderModel extends MOrder {
         payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
         payment.setPayAmt(amt);
         setC_PaymentTerm_ID(C_PaymentTerm_ID);
+        setPaymentRule(MOrder.PAYMENTRULE_OnCredit);
         return payment.save();
 	}
 
