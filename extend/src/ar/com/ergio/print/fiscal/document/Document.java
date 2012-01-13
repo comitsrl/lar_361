@@ -30,6 +30,7 @@ import ar.com.ergio.print.fiscal.exception.DocumentException;
  * especialice esta clase abstracta.
  * @author Franco Bonafine
  * @date 11/02/2008
+ * @contributor Emiliano Pereyra - http://www.ergio.com.ar
  */
 public abstract class Document implements Serializable{
 
@@ -59,6 +60,8 @@ public abstract class Document implements Serializable{
 	private String documentNo;
 	/** Líneas del documento */
 	private List<DocumentLine> lines;
+	/** Percepcion general (emmie) */
+    private PerceptionLine perceptionLine;
 	/** Descuento general */
 	private DiscountLine generalDiscount;
 	/** Observaciones o descripciónes del documento */
@@ -126,6 +129,16 @@ public abstract class Document implements Serializable{
 	public List<DocumentLine> getLines() {
 		return lines;
 	}
+
+    public void setPerceptionLine(PerceptionLine perceptionLine)
+    {
+        this.perceptionLine = perceptionLine;
+    }
+
+    public PerceptionLine getPerceptionLine()
+    {
+        return perceptionLine;
+    }
 
 	/**
 	 * @return Returns the generalDiscount.

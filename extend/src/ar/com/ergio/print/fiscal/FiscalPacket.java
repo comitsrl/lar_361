@@ -20,11 +20,15 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 
-/** A request to or response from a fiscal device.
-A packet is a vector of byte arrays called fields. Fields cannot be null.
-Fields are accessed using a zero-based index up to getSize() - 1.
-All operations that set values of fields may grow the size of the vector as needed,
-adding empty fields if necessary. */
+/**
+ * A request to or response from a fiscal device. A packet is a vector of byte
+ * arrays called fields. Fields cannot be null. Fields are accessed using a
+ * zero-based index up to getSize() - 1. All operations that set values of
+ * fields may grow the size of the vector as needed, adding empty fields if
+ * necessary.
+ *
+ * @contributor Emiliano Pereyra - http://www.ergio.com.ar
+ */
 public interface FiscalPacket extends Serializable
 {
 	/** Normal text style. */
@@ -232,7 +236,15 @@ public interface FiscalPacket extends Serializable
 	 */
 	public void setAmount(int field, BigDecimal amount, boolean optional);
 
-	/**
+    /**
+     * Set an amount field.
+     * @param field: field number to set.
+     * @param amount: amount value.
+     * @param optional: the field is optional.
+     */
+    public void setPerceptionAmount(int field, BigDecimal amount, boolean optional);
+
+    /**
 	 * Set a text field.
 	 * @param field: field number to set.
 	 * @param text: text value.

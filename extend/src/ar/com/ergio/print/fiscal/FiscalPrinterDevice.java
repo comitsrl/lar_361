@@ -35,6 +35,7 @@ import ar.com.ergio.print.fiscal.msg.FiscalMessages;
  * esta interfaz.
  * @author Franco Bonafine
  * @date 22/01/2008
+ * @contributor Emiliano Pereyra - http://www.ergio.com.ar
  */
 public interface FiscalPrinterDevice {
 
@@ -52,7 +53,15 @@ public interface FiscalPrinterDevice {
 	 */
 	public String formatAmount(BigDecimal amount);
 
-	/**
+    /**
+     * Da formato de monto a un número para las percepciones (nnnnnnnnn.nn)
+     * @author Emiliano Pereyra
+     * @param amount: número a formatear
+     * @return <code>String</code> que contiene el monto formateado.
+     */
+    public String formatPerceptionAmount(BigDecimal amount);
+
+    /**
 	 * Formatea un texto.
 	 * @param text: texto a formatear.
 	 * @param maxLength: longitud máxima para el texto.

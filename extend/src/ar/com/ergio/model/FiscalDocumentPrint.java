@@ -59,6 +59,7 @@ import ar.com.ergio.print.fiscal.document.DocumentLine;
 import ar.com.ergio.print.fiscal.document.Invoice;
 import ar.com.ergio.print.fiscal.document.NonFiscalDocument;
 import ar.com.ergio.print.fiscal.document.Payment;
+import ar.com.ergio.print.fiscal.document.PerceptionLine;
 import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterIOException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterStatusError;
@@ -70,7 +71,7 @@ import ar.com.ergio.util.LAR_Utils;
  * openXpertya a documentos aceptados por las impresoras fiscales.
  *
  * @author Franco Bonafine
- * @author Emiliano Pereyra
+ * @contributor Emiliano Pereyra - http://www.ergio.com.ar
  *
  */
 public class FiscalDocumentPrint {
@@ -763,18 +764,18 @@ public class FiscalDocumentPrint {
 	}
 
 	/**
-	 * Carga las líneas que se encuentran en el documento de OXP hacia
+	 * Carga las líneas que se encuentran en el documento de ADempiere hacia
 	 * el documento de impresoras fiscales.
-	 * @param oxpDocument Documento de OXP.
+	 * @param mInvoice Documento de ADempiere.
 	 * @param document Documento de impresoras fiscales.
 	 */
-	private void loadDocumentLines(final MInvoice oxpDocument, final Document document) {
+	private void loadDocumentLines(final MInvoice mInvoice, final Document document) {
 		// Se obtiene el indicador de si los precios contienen los impuestos incluido
-		boolean taxIncluded = MPriceList.get(ctx, oxpDocument.getM_PriceList_ID(), getTrxName()).isTaxIncluded();
+		boolean taxIncluded = MPriceList.get(ctx, mInvoice.getM_PriceList_ID(), getTrxName()).isTaxIncluded();
 		// Se obtiene el redondeo para precios de la moneda de la factura
 		//int scale = MCurrency.get(oxpDocument.getCtx(), oxpDocument.getC_Currency_ID()).getCostingPrecision();
 
-		MInvoiceLine[] lines = oxpDocument.getLines();
+		MInvoiceLine[] lines = mInvoice.getLines();
 		BigDecimal unitPrice = null;
 		//String description = "";
 		for (int i = 0; i < lines.length; i++) {
@@ -817,7 +818,10 @@ public class FiscalDocumentPrint {
 			// Se agrega la línea al documento.
 			document.addLine(docLine);
 		}
-
+		// TODO - Improve this behavior
+		BigDecimal amt = ((BigDecimal) mInvoice.get_Value("WithHoldingAmt")).negate(); // LAR perception are negative
+		PerceptionLine perceptionLine = new PerceptionLine("Percepci\u00f3n", amt, null);
+		document.setPerceptionLine(perceptionLine);
 	}
 
 	/**

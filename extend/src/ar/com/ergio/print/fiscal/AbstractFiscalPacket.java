@@ -27,7 +27,11 @@ import java.util.List;
 
 import ar.com.ergio.print.fiscal.util.ByteFormatter;
 
-/** An abstract base class for FiscalPacket implementations. */
+/**
+ * An abstract base class for FiscalPacket implementations.
+
+ * @contributor Emiliano Pereyra - http://www.ergio.com.ar
+ */
 public abstract class AbstractFiscalPacket implements FiscalPacket
 {
 
@@ -407,7 +411,17 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 			setString(field, amtStr);
 	}
 
-	public void setText(int field, String text, int maxLength, boolean optional) {
+    public void setPerceptionAmount(int field, BigDecimal amount, boolean optional) {
+        String amtStr = amount.toString();
+        if(getFiscalPrinter() != null)
+            amtStr = getFiscalPrinter().formatPerceptionAmount(amount);
+        if(optional)
+            setOptionalField(field,amtStr);
+        else
+            setString(field, amtStr);
+    }
+
+    public void setText(int field, String text, int maxLength, boolean optional) {
 		if(getFiscalPrinter() != null)
 			text = getFiscalPrinter().formatText(text, maxLength);
 

@@ -34,6 +34,7 @@ import ar.com.ergio.print.fiscal.document.DocumentLine;
 import ar.com.ergio.print.fiscal.document.Invoice;
 import ar.com.ergio.print.fiscal.document.NonFiscalDocument;
 import ar.com.ergio.print.fiscal.document.Payment;
+import ar.com.ergio.print.fiscal.document.PerceptionLine;
 import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterIOException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterStatusError;
@@ -49,6 +50,7 @@ import ar.com.ergio.print.fiscal.msg.MsgRepository;
  * por defecto en esta clase.
  * @author Franco Bonafine
  * @date 24/01/2008
+ * @contributor Emiliano Pereyra - http://www.ergio.com.ar
  */
 public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements HasarCommands, HasarConstants {
 
@@ -325,7 +327,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		else
 			cmd.setNumber(i++, alicuotaIVA, 2, 2, false);
 		cmd.setText(i++, description, 20,false);
-		cmd.setAmount(i++, amount, false);
+		cmd.setPerceptionAmount(i++, amount, false);
 		return cmd;
 	}
 
@@ -778,6 +780,10 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			// Se cargan los descuentos de la factura.
 			loadDocumentDiscounts(invoice);
 
+            //////////////////////////////////////////////////////////////
+            // load invoice perception
+            loadDocumentPerception(invoice);
+
 			//////////////////////////////////////////////////////////////
 			// Se calcula el subtotal.
 			// Comando: @Subtotal
@@ -1196,6 +1202,17 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		}
 	}
 
+    private void loadDocumentPerception(final Document document) throws FiscalPrinterStatusError,
+            FiscalPrinterIOException
+    {
+        PerceptionLine item = document.getPerceptionLine();
+        execute(cmdPerceptions(
+                item.getDescription(),
+                item.getAmt(),
+                item.getTaxRate())
+            );
+    }
+
 	/**
 	 * Ejecuta los comandos necesarios para cargar todos los descuentos del
 	 * documento sobre la impresora fiscal.
@@ -1259,6 +1276,13 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			result.append(ch);
 		}
 		return result.toString();
+	}
+
+	@Override
+	public String formatPerceptionAmount(BigDecimal amount)
+	{
+        amount = amount.setScale(2, BigDecimal.ROUND_HALF_UP);
+        return amount.toString();
 	}
 
 	private void checkTaxes(Document document) throws FiscalPrinterStatusError, FiscalPrinterIOException {
