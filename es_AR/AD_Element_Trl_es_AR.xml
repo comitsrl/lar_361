@@ -14568,8 +14568,8 @@ de proyecto - capacidad de publicar el material</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2246" trl="Y">
-  <value column="Name" original="Due &gt; 31"><![CDATA[Vencido > 31]]></value>
-  <value column="PrintName" original="Due &gt; 31"><![CDATA[Vencido > 31]]></value>
+  <value column="Name" original="Due &gt; 31">Vencido > 31</value>
+  <value column="PrintName" original="Due &gt; 31">Vencido > 31</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -25298,9 +25298,7 @@ Clase plenamente calificada que implementa la interfaz InfoFactory. Esta puede s
 </row>
 <row id="53350" trl="Y">
 <value column="Name" original="Migration Script">Script de migración</value>
-<value column="PrintName" original="Migration Script">
-Tabla de chequeo si el script de migración ha sido aplicado.
-</value>
+<value column="PrintName" original="Migration Script">Script de migración</value>
 <value column="Description" original="Table to check whether the migration script has been applied"/>
 <value column="Help" original=""/>
 <value column="PO_Description" original=""/>
@@ -26663,12 +26661,8 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
 <value column="PO_PrintName" original=""/>
 </row>
 <row id="53535" trl="Y">
-<value column="Name" original="Revaluation Accumulated Depreciation Offset for Prior Year">
-Compensación Revaluación Depreciación Acumulada Año Anterior
-</value>
-<value column="PrintName" original="Revaluation Accumulated Depreciation Offset for Prior Year">
-Compensación Revaluación Depreciación Acumulada Año Anterior
-</value>
+<value column="Name" original="Revaluation Accumulated Depreciation Offset for Prior Year">Compensación Reval Deprec Acum Año Anterior</value>
+<value column="PrintName" original="Revaluation Accumulated Depreciation Offset for Prior Year">Compensación Revaluación Depreciación Acumulada Año Anterior</value>
 <value column="Description" original=""/>
 <value column="Help" original=""/>
 <value column="PO_Description" original=""/>
@@ -29148,7 +29142,7 @@ El tipo de período para reportes en: Período, Año, Total o Natural, donde Nat
 <value column="Name" original="Amount Type">Tipo Cantidad</value>
 <value column="PrintName" original="Amount Type">Tipo Cantidad</value>
 <value column="Description" original="PA Amount Type for reporting">Tipo Cantidad para reportes</value>
-<value column="Help" original="The amount type to report on: Quantity, Credit Only, Debit Only, Balance (expected sign) or Balance (accounted sign). "Expected sign" adjusts the sign of the result based on the Account Type and Expected Sign of each Account Element, whereas "accounted sign" always returns DR-CR.">
+<value column="Help" original="The amount type to report on: Quantity, Credit Only, Debit Only, Balance (expected sign) or Balance (accounted sign). Expected sign adjusts the sign of the result based on the Account Type and Expected Sign of each Account Element, whereas accounted sign always returns DR-CR.">
 El tipo de cantidad a mostrar en los reportes es: Cantidad, Sólo Créditos, Sólo Débitos, Balance (signo esperado) o Balance (DB-CR). Balance (signo esperado) ajusta el signo del resultado basado en el tipo de cuenta y signo esperado de cada elemento contable.
 </value>
 <value column="PO_Description" original=""/>
@@ -29201,7 +29195,7 @@ Si se define, este rol será utilizado como rótulo para el destino a acercar en
 <row id="54074" trl="Y">
 <value column="Name" original="Directed">Dirigido</value>
 <value column="PrintName" original="Directed">Dirigido</value>
-<value column="Description" original="Tells whether one "sees" the other end of the relation from each end or just from the source">
+<value column="Description" original="Tells whether one sees the other end of the relation from each end or just from the source">
 Indica si uno "ve" el otro lado de la relación para cada punta, o solo para el origen
 </value>
 <value column="Help" original=""/>

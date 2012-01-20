@@ -4194,7 +4194,7 @@ Indica que el costo asociado con esta entrada es capital
 </row>
 <row id="53441" trl="Y">
 <value column="Name" original="Natural Balance">Balance Natural</value>
-<value column="Description" original="BY for P & L account, BT for Balance Sheet account">
+<value column="Description" original="BY for P &amp; L account, BT for Balance Sheet account">
 <![CDATA[ BY for P & L account, BT for Balance Sheet account ]]>
 </value>
 </row>
@@ -4263,7 +4263,7 @@ Crear una orden de manufactura, recibir el producdto final y emitir los componen
 <value column="Description" original=""/>
 </row>
 <row id="53463" trl="Y">
-<value column="Name" original="<=">
+<value column="Name" original="&lt;=">
 <![CDATA[ <= ]]>
 </value>
 <value column="Description" original=""/>
@@ -4338,8 +4338,8 @@ Crear una orden de manufactura, recibir el producdto final y emitir los componen
 </row>
 <row id="53503" trl="Y">
 <value column="Name" original="Broadcast">Difundir</value>
-<value column="Description" original="Broadcast <<->>">
-<![CDATA[ Difundir <<->> ]]>
+<value column="Description" original="Broadcast &lt;&lt;-&gt;&gt;">
+<![CDATA[ Difundir ((-))]]>
 </value>
 </row>
 <row id="53504" trl="Y">

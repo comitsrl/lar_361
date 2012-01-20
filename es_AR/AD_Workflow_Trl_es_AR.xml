@@ -199,12 +199,8 @@ Este flujo de trabajo define Configuración Listas de Materiales y Fórmula
   <value column="Help" original="Before the production processes can be done, it is necessary to plan the activities which must be accomplished to assure the products can be gotten at the right time in order not to remain a long time in the warehouse, or at the contrary, to cause delays in shipments because components shortages in the manufacturing order.&#10;&#10;Another subject to take into account are the production cost and the capacity of shipping good quality products.&#10;&#10;Using Planning Management you answer the question: When and How Many products we must get?">Antes de hacer el proceso de producción es necesario planear las actividades que deben ser logradas para asegurar que los productos pueden obtenerse en el momento correcto para no mantenerlos largo tiempo en el depósito, o por el contrario, causar demoras en los despachos por escasez de componentes en la orden de manufactura. Otro aspecto a tener en cuenta son los costos de producción y la capacidad de despachar productos de buena calidad. Usando Administración de Planeación contesta la siguiente pregunta: ¿Cuándo y Cuántos productos debemos obtener?</value>
  </row>
 <row id="50004" trl="Y">
-<value column="Name" original="Material Requirement Planning Setup">
-Configuración Planeación Requerimientos de Materiales (MRP)
-</value>
-<value column="Description" original="MRP is a set of techniques which uses Bills of Material, Inventory Data, and the Master Production Schedule to calculate requirements for materials.">
-MRP es un conjunto de técnicas que usan las listas de materiales, datos de inventarios, y el plan maestro de producción para calcular requerimientos de materiales.
-</value>
+<value column="Name" original="Material Requirement Planning Setup">Config Planeación Requerimientos de Materiales (MRP)</value>
+<value column="Description" original="Description">Description</value>
 <value column="Help" original="MRP is a set of techniques which uses Bills of Material, Inventory Data, and the Master Production Schedule to calculate requirements for materials. It create planned orders to balance demand ans supply for products and it issues recommendations to receipt material with the right quantities and at the right dates to satisfy the Master Production Schedule in the most efficient way.">
 MRP es un conjunto de técnicas que usan las listas de materiales, datos de inventarios, y el plan maestro de producción para calcular requerimientos de materiales. Este crea ordenes planeadas de productos para balancear la demanda con la oferta y emite recomendaciones para recibir materiales con las cantidades correctas y en las fechas apropiadas para satisfacer el Plan Maestro de Producción en la forma más eficiente.
 </value>
@@ -224,9 +220,7 @@ Es un conjunto de técnicas que usan las órdenes planeadas por el MRP, orden de
 <value column="Name" original="Distribution Resource Planning Setup">
 Configuración Planeación Distribución de Recursos (DRP)
 </value>
-<value column="Description" original="is a method used in business administration for planning orders within a supply chain. DRP enables the user to set certain inventory control parameters (like a safety stock) and calculate the time-phased inventory requirements.">
-DRP es usado en administración para planeación de órdenes en una cadena de suministro. DRP permite al usuario fijar ciertos parámetros de control de inventarios (ej: existencia de seguridad) y calcular los requerimientos de inventarios por fases de tiempo
-</value>
+<value column="Description" original="is a method used in business administration for planning orders within a supply chain. DRP enables the user to set certain inventory control parameters (like a safety stock) and calculate the time-phased inventory requirements.">DRP es usado en administración para planeación de órdenes en una cadena de suministro. Permite al usuario fijar ciertos parámetros de control de inventarios y calcular los requerimientos de inventarios por fases de tiempo.</value>
 <value column="Help" original="is a method used in business administration for planning orders within a supply chain. DRP enables the user to set certain inventory control parameters (like a safety stock) and calculate the time-phased inventory requirements.">
 Es un método usado en administración de negocios para planeación de órdenes dentro de una cadena de suministro. DRP habilita al usuario para fijar ciertos parámetros de control de inventarios (como una existencia de seguridad) y calcular los requerimientos de inventarios por fases de tiempo.
 </value>

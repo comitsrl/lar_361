@@ -5254,7 +5254,7 @@ Esta Utilidad es para importar una lista de cheque sin fondos desde una archivo 
   <value column="MsgTip" original="Indicates that there is an unsatisfied material requirement inside the planning time fence for this product. You should either manually schedule and expedite orders to fill this demand or delay fulfillment of the requirement that created the demand.">Indicates that there is an unsatisfued material requirement inside the planning time fence for this item. You sould either manually schedule and expedite orders to fill this demand or delay fulfillment of the requirement that created the demand.</value>
  </row>
  <row id="53020" trl="Y">
-  <value column="MsgText" original="Deuda Pasada"></value>
+  <value column="MsgText" original="Deuda Pasada">Deuda Pasada</value>
   <value column="MsgTip" original="Indicates that a schedule supply order receipt is past due.">indicates that the product planining is not set Demand </value>
  </row>
  <row id="53021" trl="Y">
