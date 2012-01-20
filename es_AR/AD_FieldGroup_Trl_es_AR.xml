@@ -107,40 +107,40 @@
  <row id="135" trl="Y">
   <value column="Name" original="Access">Acceso</value>
  </row>
- <row id="50000" trl="N">
+ <row id="50000" trl="Y">
   <value column="Name" original="Allow Info In Role">Permite Info en Rol</value>
  </row>
- <row id="50001" trl="N">
+ <row id="50001" trl="Y">
   <value column="Name" original="Accounts">Cuentas</value>
  </row>
- <row id="50002" trl="N">
+ <row id="50002" trl="Y">
   <value column="Name" original="Setup">Setup</value>
  </row>
- <row id="50003" trl="N">
+ <row id="50003" trl="Y">
   <value column="Name" original="Dates">Fechas</value>
  </row>
- <row id="50004" trl="N">
-  <value column="Name" original="Revaluation Accounts">Revaluation Accounts</value>
+ <row id="50004" trl="Y">
+  <value column="Name" original="Revaluation Accounts">Cuentas de Reevaluación</value>
  </row>
- <row id="50005" trl="N">
+ <row id="50005" trl="Y">
   <value column="Name" original="Contract">Contrato</value>
  </row>
- <row id="50006" trl="N">
+ <row id="50006" trl="Y">
   <value column="Name" original="Options">Opciones</value>
  </row>
- <row id="50007" trl="N">
+ <row id="50007" trl="Y">
   <value column="Name" original="General Ledger">Contabilidad General</value>
  </row>
- <row id="50008" trl="N">
+ <row id="50008" trl="Y">
   <value column="Name" original="Machines">Máquinas</value>
  </row>
- <row id="50009" trl="N">
+ <row id="50009" trl="Y">
   <value column="Name" original="Database">Base Datos</value>
  </row>
- <row id="50010" trl="N">
+ <row id="50010" trl="Y">
   <value column="Name" original="Manufacturing">Fabricación</value>
  </row>
- <row id="50012" trl="N">
+ <row id="50012" trl="Y">
   <value column="Name" original="Logo">Logo</value>
  </row>
 </adempiereTrl>

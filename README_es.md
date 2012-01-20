@@ -23,7 +23,7 @@ Créditos
 [ADempiere ERP & CRM Business Solution].
 Localización Colombia (LCO), desarrollada por [Carlos Ruiz] - [GlobalQSS].
 Soporte para impresiones Fiscales mediante Punto de Venta, desarrollado por [Libertya].
-Traducción Argentina (es_AR) y Plan de Cuentas genérico para Argentina desarrollado por [Alejandro Falcone] - [Openbiz].
+Plan de Cuentas genérico para Argentina desarrollado por [Alejandro Falcone] - [Openbiz].
 [JavaPOS]: Oscar/LOFX - [OpenXpertya], [Low Heng Sin], [Joseph Brower], [Carlos Ruiz], [Mario Calderon], [Red1] (Redhuan D. Oon), [Adaxa].
 
 

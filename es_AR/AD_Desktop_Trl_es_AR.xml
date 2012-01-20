@@ -3,8 +3,8 @@
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Desktop">
  <row id="100" trl="Y">
-  <value column="Name" original="FrontOffice">FrontOffice</value>
-  <value column="Description" original="Front Office Desktop">Front Office Desktop</value>
+  <value column="Name" original="FrontOffice">Oficina</value>
+  <value column="Description" original="Front Office Desktop">Escritorio Oficina</value>
   <value column="Help" original=""/>
  </row>
 </adempiereTrl>

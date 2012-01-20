@@ -18,7 +18,7 @@ Credits
 [Adempiere ERP & CRM Business Solution].
 Colombian Localization (LCO), developed by [Carlos Ruiz] - [GlobalQSS].
 Fiscal Printing support, developed by [Libertya].
-Argentine Spanish Language (es_AR) and default accounting schema developed by [Alejandro Falcone] - [Openbiz].
+Default accounting schema developed by [Alejandro Falcone] - [Openbiz].
 [JavaPOS]: Oscar/LOFX - [OpenXpertya], [Low Heng Sin], [Joseph Brower], [Carlos Ruiz], [Mario Calderon], [Red1] (Redhuan D. Oon), [Adaxa].
  
  

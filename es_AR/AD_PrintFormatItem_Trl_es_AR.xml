@@ -22,7 +22,7 @@
   <value column="PrintName" original=""/>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="50477" trl="N">
+ <row id="50477" trl="Y">
   <value column="PrintName" original="VendorProductNo">No. de Producto del Proveedor</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
@@ -30,23 +30,23 @@
   <value column="PrintName" original="Setup"/>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="51001" trl="N">
-  <value column="PrintName" original="Cost T">Costo</value>
+ <row id="51001" trl="Y">
+  <value column="PrintName" original="Cost T">Costo T</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="51005" trl="N">
+ <row id="51005" trl="Y">
   <value column="PrintName" original="Cost TL">Costo Actual</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="51006" trl="N">
-  <value column="PrintName" original="Cost LL">CurrentCostPriceLL</value>
+ <row id="51006" trl="Y">
+  <value column="PrintName" original="Cost LL">Costo NT</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="51013" trl="N">
+ <row id="51013" trl="Y">
   <value column="PrintName" original="Levels">Niveles</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="51018" trl="N">
+ <row id="51018" trl="Y">
   <value column="PrintName" original="Parent">Producto</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
@@ -54,15 +54,15 @@
   <value column="PrintName" original=""/>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="51066" trl="N">
-  <value column="PrintName" original="F  Cost">Future Cost price Lower Level</value>
-  <value column="PrintNameSuffix" original=""/>
- </row>
- <row id="51067" trl="N">
-  <value column="PrintName" original="F  Cost LL">Future Cost price Lower Level</value>
-  <value column="PrintNameSuffix" original=""/>
- </row>
- <row id="51068" trl="N">
+ <row id="51066" trl="Y">
+<value column="PrintName" original="F Cost">Costo Futuro</value>
+<value column="PrintNameSuffix" original=""/>
+</row>
+<row id="51067" trl="Y">
+<value column="PrintName" original="F Cost LL">Costo Fututo Nivel Menor</value>
+<value column="PrintNameSuffix" original=""/>
+</row>
+ <row id="51068" trl="Y">
   <value column="PrintName" original="S Cost">Costo Estándar</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
@@ -70,11 +70,11 @@
   <value column="PrintName" original=""/>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="51074" trl="N">
+ <row id="51074" trl="Y">
   <value column="PrintName" original="Description">Descripción</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="51075" trl="N">
+ <row id="51075" trl="Y">
   <value column="PrintName" original="Help">Ayuda</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
@@ -86,7 +86,7 @@
   <value column="PrintName" original=""/>
   <value column="PrintNameSuffix" original=""/>
  </row>
- <row id="1000074" trl="N">
+ <row id="1000074" trl="Y">
   <value column="PrintName" original="VendorProductNo">No. de Producto del Proveedor</value>
   <value column="PrintNameSuffix" original=""/>
  </row>
