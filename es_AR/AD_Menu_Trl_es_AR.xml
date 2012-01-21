@@ -155,36 +155,36 @@
   <value column="Description" original=""/>
  </row>
  <row id="566" trl="Y">
-  <value column="Name" original="Collaboration">Colaboracion</value>
-  <value column="Description" original="Collaboration and Content Management">Colaboracion y Administracion de Contenido</value>
+  <value column="Name" original="Collaboration">Colaboración</value>
+  <value column="Description" original="Collaboration and Content Management">Colaboración y Administracion de Contenido</value>
  </row>
  <row id="50001" trl="Y">
   <value column="Name" original="Application Packaging">Aplicaciones Manejo de Paquetes</value>
   <value column="Description" original="Import and export packaging">Importar y exportar paquetes</value>
  </row>
  <row id="52001" trl="Y">
-  <value column="Name" original="Web POS">Web POS</value>
+  <value column="Name" original="Web POS">PDV Web</value>
   <value column="Description" original=""/>
  </row>
  <row id="53014" trl="Y">
-  <value column="Name" original="Manufacturing Management">Gestión de Fabricacion</value>
-  <value column="Description" original="Manufacturing">Fabricacion</value>
+  <value column="Name" original="Manufacturing Management">Gestión de Producción</value>
+  <value column="Description" original="Manufacturing">Producción</value>
  </row>
  <row id="53016" trl="Y">
-  <value column="Name" original="Engineering Management">Engineering Management</value>
-  <value column="Description" original="Engineering management involves the overall management of organizations with an orientation to manufacturing, engineering, technology or production.">Engineering management involves the overall management of organizations with an orientation to manufacturing, engineering, technology or production.</value>
+  <value column="Name" original="Engineering Management">Gestión de Ingeniería</value>
+  <value column="Description" original="Engineering management involves the overall management of organizations with an orientation to manufacturing, engineering, technology or production.">Mantener la Ingeniería de Producción</value>
  </row>
  <row id="53017" trl="Y">
-  <value column="Name" original="Resource Manufacturing">Recursos de Fabricacion</value>
-  <value column="Description" original="Resource Manufacturing">Recursos de Fabricacion</value>
+  <value column="Name" original="Resource Manufacturing">Recursos de Producción</value>
+  <value column="Description" original="Resource Manufacturing">Recursos de Producción</value>
  </row>
  <row id="53019" trl="Y">
-  <value column="Name" original="Manufacturing Workflow">Workflow de Fabricacion</value>
+  <value column="Name" original="Manufacturing Workflow">Workflow de Producción</value>
   <value column="Description" original=""/>
  </row>
  <row id="53022" trl="Y">
-  <value column="Name" original="Bill of Material &amp; Formulas"><![CDATA[Lista de Materiales & Fórmulas]]></value>
-  <value column="Description" original="Bill of Material &amp; Formulas"><![CDATA[Lista de Materiales & Fórmulas]]></value>
+  <value column="Name" original="Bill of Material &amp; Formulas">Lista de Materiales y Fórmulas</value>
+  <value column="Description" original="Bill of Material &amp; Formulas">Lista de Materiales y Fórmulas</value>
  </row>
  <row id="53029" trl="Y">
   <value column="Name" original="Planning Management">Gestión de Planificacion</value>
@@ -204,14 +204,14 @@
  </row>
  <row id="53048" trl="Y">
   <value column="Name" original="DRP">DRP</value>
-  <value column="Description" original="Distribution Resource Planning">Planificacion de Distribucion de Recursos</value>
+  <value column="Description" original="Distribution Resource Planning">Planificación de Distribución de Recursos</value>
  </row>
  <row id="53052" trl="Y">
   <value column="Name" original="Production Management">Gestión de Produccion</value>
   <value column="Description" original="Production Management">Gestión de Produccion</value>
  </row>
  <row id="53053" trl="Y">
-  <value column="Name" original="Discreet Manufacturing">Fabricacion Discreta</value>
+  <value column="Name" original="Discreet Manufacturing">Producción Discreta</value>
   <value column="Description" original=""/>
  </row>
  <row id="53061" trl="Y">
@@ -223,7 +223,7 @@
   <value column="Description" original="Activity Control">Shop Floor Control</value>
  </row>
  <row id="53066" trl="Y">
-  <value column="Name" original="Distribution Management">Gestión de Distribucion</value>
+  <value column="Name" original="Distribution Management">Gestión de Distribución</value>
   <value column="Description" original="Distribution Resource Planning (DRP) is a method used in business administration for planning orders within a supply chain. ">Distribution Resource Planning (DRP) is a method used in business administration for planning orders within a supply chain. </value>
  </row>
  <row id="53071" trl="Y">
@@ -275,7 +275,7 @@
   <value column="Description" original="Process Assets Splits Transfers and Disposals">Procesar Divisiones, Transferencias y Desechos de Activos</value>
  </row>
  <row id="53149" trl="Y">
-  <value column="Name" original="Depreciation Processing">Procesamiento de Depreciacion</value>
+  <value column="Name" original="Depreciation Processing">Procesamiento de Devaluación</value>
   <value column="Description" original="Applications to Process Fixed Assets to the GL">Aplicaciones para procesar Activos Fijos a la Contabilidad General</value>
  </row>
  <row id="53155" trl="Y">
@@ -291,8 +291,8 @@
   <value column="Description" original="Setup and Maintain Fixed Assets">Configura y Mantiene Activos Fijos</value>
  </row>
  <row id="53171" trl="Y">
-  <value column="Name" original="Depreciation Setup">Configuración de Depreciacion</value>
-  <value column="Description" original="Applications to setup and maintain depreciation">Aplicaciones para configurar y mantener la despreciacion</value>
+  <value column="Name" original="Depreciation Setup">Configuración de Devaluación</value>
+  <value column="Description" original="Applications to setup and maintain depreciation">Aplicaciones para configurar y mantener la devaluación</value>
  </row>
  <row id="53180" trl="Y">
   <value column="Name" original="Forecast Management">Gestión de Pronóstico</value>
