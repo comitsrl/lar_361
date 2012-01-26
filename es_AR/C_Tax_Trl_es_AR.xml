@@ -32,4 +32,44 @@
   <value column="Description" original="Used when Business Partners are exempt from tax">Used when Business Partners are exempt from tax</value>
   <value column="TaxIndicator" original=""/>
  </row>
+ <row id="1000000" trl="N">
+  <value column="Name" original="Standard">Standard</value>
+  <value column="Description" original=""/>
+  <value column="TaxIndicator" original=""/>
+ </row>
+ <row id="1000001" trl="N">
+  <value column="Name" original="IVA 21%">IVA 21%</value>
+  <value column="Description" original="IVA tasa 21%">IVA tasa 21%</value>
+  <value column="TaxIndicator" original=""/>
+ </row>
+ <row id="1000002" trl="N">
+  <value column="Name" original="Percepción 0,5%">Percepción 0,5%</value>
+  <value column="Description" original=""/>
+  <value column="TaxIndicator" original=""/>
+ </row>
+ <row id="1000003" trl="N">
+  <value column="Name" original="Percepción 1%">Percepción 1%</value>
+  <value column="Description" original=""/>
+  <value column="TaxIndicator" original=""/>
+ </row>
+ <row id="1000004" trl="N">
+  <value column="Name" original="Percepción 5%">Percepción 5%</value>
+  <value column="Description" original=""/>
+  <value column="TaxIndicator" original=""/>
+ </row>
+ <row id="1000005" trl="N">
+  <value column="Name" original="Percepción Exentos">Percepción Exentos</value>
+  <value column="Description" original=""/>
+  <value column="TaxIndicator" original=""/>
+ </row>
+ <row id="1000006" trl="Y">
+  <value column="Name" original="Retención 1%">Retención 1%</value>
+  <value column="Description" original=""/>
+  <value column="TaxIndicator" original=""/>
+ </row>
+ <row id="1000007" trl="N">
+  <value column="Name" original="Retención 5%">Retención 5%</value>
+  <value column="Description" original=""/>
+  <value column="TaxIndicator" original=""/>
+ </row>
 </adempiereTrl>

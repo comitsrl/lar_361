@@ -3516,7 +3516,7 @@ Son usados también para manufacturar dos o más, sin embargo el cambio de tiemp
   <value column="Name" original="Variant">Variante</value>
   <value column="Description" original=""/>
  </row>
- <row id="53265" trl="N">
+ <row id="53265" trl="Y">
   <value column="Name" original="Issue">Emisión</value>
   <value column="Description" original="Components issue manuality">Componentes que se emiten en forma manual</value>
  </row>

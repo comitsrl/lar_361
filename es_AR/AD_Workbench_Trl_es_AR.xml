@@ -7,4 +7,9 @@
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
+ <row id="1000000" trl="Y">
+  <value column="Name" original="ERGIO_LAR_WORKBENCH">ERGIO_LAR_GURPODETRABAJO</value>
+  <value column="Description" original="Ventanas afectadas por la Localización Argentina">Ventanas afectadas por la Localización Argentina</value>
+  <value column="Help" original=""/>
+ </row>
 </adempiereTrl>

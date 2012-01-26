@@ -2483,8 +2483,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="469" trl="Y">
-  <value column="Name" original="Name">Razón Social</value>
-  <value column="PrintName" original="Name">Razón Social</value>
+  <value column="Name" original="Name">Nombre</value>
+  <value column="PrintName" original="Name">Nombre</value>
   <value column="Description" original="Alphanumeric identifier of the entity">Identificador alfanumérico de la entidad.</value>
   <value column="Help" original="The name of an entity (record) is used as an default search option in addition to the search key. The name is up to 60 characters in length.">El nombre de una entidad (registro) se usa como una opción de búsqueda predeterminada adicional a la Código. El nombre es de hasta 60 caracteres de longitud.</value>
   <value column="PO_Description" original=""/>
@@ -22741,7 +22741,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50001" trl="Y">
-  <value column="Name" original="Package Imp. Inst.">AD_PACKAGE_IMP_INST_ID</value>
+  <value column="Name" original="Package Imp. Inst.">Paquete Importado Instalado</value>
   <value column="PrintName" original="Package Imp. Inst.">AD_PACKAGE_IMP_INST_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22821,7 +22821,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50009" trl="Y">
-  <value column="Name" original="Imp. Package Backup">AD_Package_Imp_Backup_ID</value>
+  <value column="Name" original="Imp. Package Backup">Backup Paquete importado</value>
   <value column="PrintName" original="Imp. Package Backup">AD_Package_Imp_Backup_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22831,7 +22831,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50010" trl="Y">
-  <value column="Name" original="Imp. Package Detail">AD_Package_Imp_Detail_ID</value>
+  <value column="Name" original="Imp. Package Detail">Detalle Paquete Importado</value>
   <value column="PrintName" original="Imp. Package Detail">AD_Package_Imp_Detail_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22841,7 +22841,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50011" trl="Y">
-  <value column="Name" original="Package Imp. Org. Dir.">AD_Package_Imp_Org_Dir</value>
+  <value column="Name" original="Package Imp. Org. Dir.">Paquete Importado original</value>
   <value column="PrintName" original="Package Imp. Org. Dir.">AD_Package_Imp_Org_Dir</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22861,7 +22861,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50013" trl="Y">
-  <value column="Name" original="Package Imp.">AD_Package_Imp_ID</value>
+  <value column="Name" original="Package Imp.">Importar Paquete</value>
   <value column="PrintName" original="Package Imp.">AD_Package_Imp_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22871,7 +22871,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50014" trl="Y">
-  <value column="Name" original="Package Imp. Bck. Directory">AD_Package_Imp_Bck_Dir</value>
+  <value column="Name" original="Package Imp. Bck. Directory">Directorio Backup Paquete importado</value>
   <value column="PrintName" original="Package Imp. Bck. Directory">AD_Package_Imp_Bck_Dir</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22881,7 +22881,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50015" trl="Y">
-  <value column="Name" original="Original">AD_Original_ID</value>
+  <value column="Name" original="Original">Original</value>
   <value column="PrintName" original="Original">AD_Original_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22911,7 +22911,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50018" trl="Y">
-  <value column="Name" original="Package Exp.">AD_Package_Exp_ID</value>
+  <value column="Name" original="Package Exp.">Paquete Exportado</value>
   <value column="PrintName" original="Package Exp.">AD_Package_Exp_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22921,7 +22921,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50019" trl="Y">
-  <value column="Name" original="Package Type">AD_Package_Type</value>
+  <value column="Name" original="Package Type">Tipo Paquete</value>
   <value column="PrintName" original="Package Type">AD_Package_Type</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -22951,7 +22951,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50023" trl="Y">
-  <value column="Name" original="Package Exp. Detail">AD_Package_Exp_Detail_ID</value>
+  <value column="Name" original="Package Exp. Detail">Detalle Paquete Exportado</value>
   <value column="PrintName" original="Package Exp. Detail">AD_Package_Exp_Detail_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -23011,7 +23011,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50029" trl="Y">
-  <value column="Name" original="New Package Code">AD_Package_Code_New</value>
+  <value column="Name" original="New Package Code">Código Paquete Nuevo</value>
   <value column="PrintName" original="New Package Code">AD_Package_Code_New</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -23021,7 +23021,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50030" trl="Y">
-  <value column="Name" original="Old Package Code">AD_Package_Code_Old</value>
+  <value column="Name" original="Old Package Code">Código Paquete Anterior</value>
   <value column="PrintName" original="Old Package Code">AD_Package_Code_Old</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -23031,7 +23031,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50031" trl="Y">
-  <value column="Name" original="Common Package Exp.">AD_Package_Exp_Common_ID</value>
+  <value column="Name" original="Common Package Exp.">Paquete común Exportar</value>
   <value column="PrintName" original="Common Package Exp.">AD_Package_Exp_Common_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -23041,7 +23041,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50032" trl="Y">
-  <value column="Name" original="Update System Maintained Application Dictionary">AD_Override_Dict</value>
+  <value column="Name" original="Update System Maintained Application Dictionary">Sobreescribir Diccionario</value>
   <value column="PrintName" original="AD_Override_Dict">AD_Override_Dict</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -23051,7 +23051,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50033" trl="Y">
-  <value column="Name" original="Package Directory">AD_Package_Dir</value>
+  <value column="Name" original="Package Directory">Directorio Paquete</value>
   <value column="PrintName" original="Package Directory">AD_Package_Dir</value>
   <value column="Description" original="Package directory, default to AdempiereHome/packages"/>
   <value column="Help" original=""/>
@@ -23061,7 +23061,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50034" trl="Y">
-  <value column="Name" original="Package Imp. Proc.">AD_Package_Imp_Proc_ID</value>
+  <value column="Name" original="Package Imp. Proc.">Proceso Importación Paquete</value>
   <value column="PrintName" original="Package Imp. Proc.">AD_Package_Imp_Proc_ID</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -23071,7 +23071,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50035" trl="Y">
-  <value column="Name" original="Package Source">AD_Package_Source</value>
+  <value column="Name" original="Package Source">Fuente Paquete</value>
   <value column="PrintName" original="Package Source">AD_Package_Source</value>
   <value column="Description" original="Fully qualified package source file name"/>
   <value column="Help" original=""/>
@@ -23081,7 +23081,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50036" trl="Y">
-  <value column="Name" original="Package Source Type">AD_Package_Source_Type</value>
+  <value column="Name" original="Package Source Type">Tipo Fuente Paquete</value>
   <value column="PrintName" original="Package Source Type">AD_Package_Source_Type</value>
   <value column="Description" original="Type of package source - file, ftp, webservice etc"/>
   <value column="Help" original=""/>
@@ -26037,7 +26037,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53473" trl="Y">
-  <value column="Name" original="Depreciation Type">Tipo Depreciación</value>
+  <value column="Name" original="Depreciation Type">Tipo Devaluación</value>
   <value column="PrintName" original="Depreciation Type">Tipo Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26067,7 +26067,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53476" trl="Y">
-  <value column="Name" original="Depreciation Table Detail">Detalle Table Depreciación</value>
+  <value column="Name" original="Depreciation Table Detail">Detalle Tabla Devaluación</value>
   <value column="PrintName" original="Depreciation Table Detail">Detalle Table Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26107,7 +26107,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53480" trl="Y">
-  <value column="Name" original="Depreciation Code">Código Depreciación</value>
+  <value column="Name" original="Depreciation Code">Código Devaluación</value>
   <value column="PrintName" original="Depreciation Code">Código Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26117,7 +26117,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53481" trl="Y">
-  <value column="Name" original="Depreciation Table Header">Encabezado Tabla Depreciación</value>
+  <value column="Name" original="Depreciation Table Header">Encabezado Tabla Devaluación</value>
   <value column="PrintName" original="Depreciation Table Header">Encabezado Tabla Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26177,7 +26177,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53487" trl="Y">
-  <value column="Name" original="Depreciation Workfile">Archivo Trabajo Depreciación</value>
+  <value column="Name" original="Depreciation Workfile">Archivo Trabajo Devaluación</value>
   <value column="PrintName" original="Depreciation Workfile">Archivo Trabajo Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26347,7 +26347,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53504" trl="Y">
-  <value column="Name" original="Depreciation Forecast">Pronóstico Depreciación</value>
+  <value column="Name" original="Depreciation Forecast">Pronóstico Devaluación</value>
   <value column="PrintName" original="Depreciation Forecast">Pronóstico Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26467,7 +26467,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53516" trl="Y">
-  <value column="Name" original="Depreciation Entry">Entrada Depreciación</value>
+  <value column="Name" original="Depreciation Entry">Entrada Devaluación</value>
   <value column="PrintName" original="Depreciation Entry">Entrada Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26607,7 +26607,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53530" trl="Y">
-  <value column="Name" original="Depreciation Expense Account">Cuenta Gastos Depreciación</value>
+  <value column="Name" original="Depreciation Expense Account">Cuenta Gastos Devaluación</value>
   <value column="PrintName" original="Depreciation Expense Account">Cuenta Gastos Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26617,7 +26617,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53531" trl="Y">
-  <value column="Name" original="Depreciation Manual Period">Período Manual Depreciación</value>
+  <value column="Name" original="Depreciation Manual Period">Período Manual Devaluación</value>
   <value column="PrintName" original="Depreciation Manual Period">Período Manual Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26741,7 +26741,7 @@ Compensación Revaluación Depreciación Acumulada Año Actual
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53543" trl="Y">
-  <value column="Name" original="Depreciation Variable Perc.">Porcentaje Variable Depreciación</value>
+  <value column="Name" original="Depreciation Variable Perc.">Porcentaje Variable Devaluación</value>
   <value column="PrintName" original="Depreciation Variable Perc.">Porcentaje Variable Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26751,7 +26751,7 @@ Compensación Revaluación Depreciación Acumulada Año Actual
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53544" trl="Y">
-  <value column="Name" original="Depreciation Calculation Type">Tipo Cálculo Depreciación</value>
+  <value column="Name" original="Depreciation Calculation Type">Tipo Cálculo Devaluación</value>
   <value column="PrintName" original="Depreciation Calculation Type">Tipo Cálculo Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26761,7 +26761,7 @@ Compensación Revaluación Depreciación Acumulada Año Actual
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53545" trl="Y">
-  <value column="Name" original="Depreciation Manual Amount">Cantidad Manual Depreciación</value>
+  <value column="Name" original="Depreciation Manual Amount">Cantidad Manual Devaluación</value>
   <value column="PrintName" original="Depreciation Manual Amount">Cantidad Manual Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26891,7 +26891,7 @@ Compensación Revaluación Depreciación Acumulada Año Actual
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53558" trl="Y">
-  <value column="Name" original="Old Depreciation Exp Acct">Cuenta Exp Antigua Depreciación</value>
+  <value column="Name" original="Old Depreciation Exp Acct">Cuenta Exp Antigua Devaluación</value>
   <value column="PrintName" original="Old Depreciation Exp Acct">Cuenta Exp Antigua Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26951,7 +26951,7 @@ Compensación Revaluación Depreciación Acumulada Año Actual
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53564" trl="Y">
-  <value column="Name" original="New Depreciation Exp Acct">Cuenta Nueva Depreciación Exp</value>
+  <value column="Name" original="New Depreciation Exp Acct">Cuenta Nueva Devaluación Exp</value>
   <value column="PrintName" original="New Depreciation Exp Acct">Cuenta Nueva Depreciación Exp</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -26991,7 +26991,7 @@ Compensación Revaluación Depreciación Acumulada Año Actual
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53568" trl="Y">
-  <value column="Name" original="Depreciation Build">Construcción Depreciación</value>
+  <value column="Name" original="Depreciation Build">Construcción Devaluación</value>
   <value column="PrintName" original="Depreciation Build">Construcción Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -27151,7 +27151,7 @@ Compensación Revaluación Depreciación Acumulada Año Actual
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53584" trl="Y">
-  <value column="Name" original="Depreciation Convention">Convención Depreciación</value>
+  <value column="Name" original="Depreciation Convention">Convención Devaluación</value>
   <value column="PrintName" original="Depreciation Convention">Convención Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -27181,7 +27181,7 @@ Compensación Revaluación Depreciación Acumulada Año Actual
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53588" trl="Y">
-  <value column="Name" original="Depreciation Calculation Type">Tipo Cálculo Depreciación</value>
+  <value column="Name" original="Depreciation Calculation Type">Tipo Cálculo Devaluación</value>
   <value column="PrintName" original="Depreciation Calculation Type">Tipo Cálculo Depreciación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -28424,9 +28424,9 @@ La cuenta Desperdicio es usada en órdenes de manufactura
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="53760" trl="Y">
-  <value column="Name" original="Gross Requirements Quantity">Cantidad Bruta Requerimiento</value>
-  <value column="PrintName" original="Gross Req. Qty">Cantidad Bruta Requerimiento</value>
+ <row id="53760" trl="N">
+  <value column="Name" original="Gross Requirements Quantity">Gross Requirements Quantity</value>
+  <value column="PrintName" original="Gross Req. Qty">Gross Req. Qty</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -28434,9 +28434,9 @@ La cuenta Desperdicio es usada en órdenes de manufactura
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="53761" trl="Y">
-  <value column="Name" original="Scheduled Receipts Quantity">Cantidad Recepciones Programadas</value>
-  <value column="PrintName" original="Scheduled Receipts Qty">Cantidad Recepciones Programadas</value>
+ <row id="53761" trl="N">
+  <value column="Name" original="Scheduled Receipts Quantity">Scheduled Receipts Quantity</value>
+  <value column="PrintName" original="Scheduled Receipts Qty">Scheduled Receipts Qty</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -28444,9 +28444,9 @@ La cuenta Desperdicio es usada en órdenes de manufactura
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="53762" trl="Y">
-  <value column="Name" original="On Hand Projected Quantity">Cantidad Disponible Proyectada</value>
-  <value column="PrintName" original="On Hand Projected Qty">Cantidad Disponible Proyectada</value>
+ <row id="53762" trl="N">
+  <value column="Name" original="On Hand Projected Quantity">On Hand Projected Quantity</value>
+  <value column="PrintName" original="On Hand Projected Qty">On Hand Projected Qty</value>
   <value column="Description" original="On Hand Projected Quantity">On Hand Projected Quantity</value>
   <value column="Help" original="The On Hand Projected Quantity indicates the quantity of a product that is on hand in time line.">The On Hand Projected Quantity indicates the quantity of a product that is on hand in time line.</value>
   <value column="PO_Description" original=""/>
@@ -29244,7 +29244,7 @@ Asignación de porcentaje de costo en caso de un co-producto.
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="54079" trl="Y">
+ <row id="54079" trl="N">
   <value column="Name" original="Manufacturer">Manufacturer</value>
   <value column="PrintName" original="Manufacturer">Manufacturer</value>
   <value column="Description" original=""/>
@@ -30406,9 +30406,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000068" trl="N">
-  <value column="Name" original="nullclause">nullclause</value>
-  <value column="PrintName" original="nullclause">nullclause</value>
+ <row id="1000068" trl="Y">
+  <value column="Name" original="nullclause">Clase Null</value>
+  <value column="PrintName" original="nullclause">Clase Null</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>

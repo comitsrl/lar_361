@@ -12,6 +12,11 @@
   <value column="Description" original="Language for this Business Partner if Multi-Language enabled">Lenguaje para este Socio del Negocio</value>
   <value column="Help" original="The Language identifies the language to use for display and formatting documents. It requires, that on Client level, Multi-Lingual documents are selected and that you have created/loaded the language.">El lenguaje identifica el lenguaje a usar para el despliegue y formato de documentos. Esto requiere que a nivel de compañía se seleccione documentos multi-lenguaje, y que se haya creado/cargado el lenguaje</value>
  </row>
+ <row id="2144" trl="Y">
+  <value column="Name" original="NAICS/SIC">NAICS/SIC</value>
+  <value column="Description" original="Standard Industry Code or its successor NAIC - http://www.osha.gov/oshstats/sicser.html">Codigo estándard de la industria ó sucesor NAIC - http://www.osha.gov/oshstats/sicser.html</value>
+  <value column="Help" original="The NAICS/SIC identifies either of these codes that may be applicable to this Business Partner.">El NAICS/SIC identifica cualquiera de esos códigos que puedan ser aplicables a este socio de negocio</value>
+ </row>
  <row id="3665" trl="Y">
   <value column="Name" original="Start Node">Nodo Inicial</value>
   <value column="Description" original="Workflow Node, step or process">Nodo de Flujo de Trabajo, paso o proceso</value>

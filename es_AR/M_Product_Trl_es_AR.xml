@@ -269,4 +269,9 @@ Información acerca de cómo plantar mejor su futuro.
   <value column="Description" original=""/>
   <value column="DocumentNote" original=""/>
  </row>
+ <row id="1000000" trl="N">
+  <value column="Name" original="Estándar">Estándar</value>
+  <value column="Description" original=""/>
+  <value column="DocumentNote" original=""/>
+ </row>
 </adempiereTrl>

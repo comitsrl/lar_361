@@ -6,4 +6,20 @@
   <value column="Name" original="Standard">Estándar</value>
   <value column="Description" original=""/>
  </row>
+ <row id="1000000" trl="N">
+  <value column="Name" original="Estándar">Estándar</value>
+  <value column="Description" original=""/>
+ </row>
+ <row id="1000001" trl="N">
+  <value column="Name" original="IVA">IVA</value>
+  <value column="Description" original=""/>
+ </row>
+ <row id="1000002" trl="Y">
+  <value column="Name" original="Percepciones IIBB">Percepciones IIBB</value>
+  <value column="Description" original="Percepciones de IIBB efectuadas en la Venta">Percepciones de IIBB efectuadas en la Venta</value>
+ </row>
+ <row id="1000003" trl="N">
+  <value column="Name" original="Retenciones IIBB">Retenciones IIBB</value>
+  <value column="Description" original="Retenciones de IIBB sufridas en los pagos">Retenciones de IIBB sufridas en los pagos</value>
+ </row>
 </adempiereTrl>

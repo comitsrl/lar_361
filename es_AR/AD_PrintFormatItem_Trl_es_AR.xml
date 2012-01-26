@@ -86,4 +86,8 @@
   <value column="PrintName" original=""/>
   <value column="PrintNameSuffix" original=""/>
  </row>
+ <row id="1000074" trl="Y">
+  <value column="PrintName" original="VendorProductNo">No. de Producto del Proveedor</value>
+  <value column="PrintNameSuffix" original=""/>
+ </row>
 </adempiereTrl>
