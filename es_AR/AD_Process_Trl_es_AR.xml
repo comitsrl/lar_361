@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) Release 3.6.0LTS_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20100901-2107 - ${ADEMPIERE_VENDOR}-->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120123-0812 - ${ADEMPIERE_VENDOR}-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Process">
  <row id="100" trl="Y">
@@ -1226,10 +1226,10 @@ y Recibi/Línea o directamente para el producto. </value>
   <value column="Help" original="You can register the four character extension with Adempiere. This makes sure that your extension can be automatically distributed and implemented.  You will also be able to certify extensions.  Contact Adempiere for details.">You can register the four character extension with Adempiere. This makes sure that your extension can be automatically distributed and implemented.  You will also be able to certify extensions.  Contact Adempiere for details.</value>
  </row>
  <row id="349" trl="Y">
-<value column="Name" original="Validate">Validar</value>
-<value column="Description" original="Validate Info Window SQL">validación de información de ventana SQL</value>
-<value column="Help" original="Validate generated Info Window SQL">validación de información generada de ventana SQL</value>
-</row>
+  <value column="Name" original="Validate">Validar</value>
+  <value column="Description" original="Validate Info Window SQL">validación de información de ventana SQL</value>
+  <value column="Help" original="Validate generated Info Window SQL">validación de información generada de ventana SQL</value>
+ </row>
  <row id="350" trl="Y">
   <value column="Name" original="Rebuild Index">Reconstruir Indice</value>
   <value column="Description" original=""/>
@@ -1240,25 +1240,25 @@ y Recibi/Línea o directamente para el producto. </value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
-<row id="50002" trl="Y">
-<value column="Name" original="PackRoll">Reversar Paquete</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="50004" trl="Y">
-<value column="Name" original="PackOut">Exportar Paquete</value>
-<value column="Description" original="Process to create package export">Proceso para crear exportación de paquete.</value>
-<value column="Help" original=""/>
-</row>
+ <row id="50002" trl="Y">
+  <value column="Name" original="PackRoll">Reversar Paquete</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="50004" trl="Y">
+  <value column="Name" original="PackOut">Exportar Paquete</value>
+  <value column="Description" original="Process to create package export">Proceso para crear exportación de paquete.</value>
+  <value column="Help" original=""/>
+ </row>
  <row id="50006" trl="Y">
-  <value column="Name" original="File_Select">Selecciona Archivo</value>
-  <value column="Description" original="Select a file">Selecciona un archivo</value>
+  <value column="Name" original="File_Select">Seleccionar archivo</value>
+  <value column="Description" original="Select a file">Seleccionar un archivo</value>
   <value column="Help" original=""/>
  </row>
  <row id="50008" trl="Y">
-  <value column="Name" original="PackIn">PackIn</value>
+  <value column="Name" original="PackIn">Importar Paquete</value>
   <value column="Description" original="Import Package">Importar Paquete</value>
-  <value column="Help" original="Import a package">Importa un paquete</value>
+  <value column="Help" original="Import a package">Importar un Paquete</value>
  </row>
  <row id="50010" trl="Y">
   <value column="Name" original="Copy Role">Copiar Rol</value>
@@ -1267,7 +1267,9 @@ y Recibi/Línea o directamente para el producto. </value>
  </row>
  <row id="50011" trl="Y">
   <value column="Name" original="Copy Columns from Table">Copiar Columnas desde Tabla</value>
-  <value column="Description" original="Create Dictionary Columns for a Table taking another as base">Crear columnas del diccionario para una tabla tomando otra como base</value>
+  <value column="Description" original="Create Dictionary Columns for a Table taking another as base">
+Crear columnas del diccionario para una tabla tomando otra como base
+</value>
   <value column="Help" original=""/>
  </row>
  <row id="50012" trl="Y">
@@ -1285,43 +1287,56 @@ y Recibi/Línea o directamente para el producto. </value>
   <value column="Description" original="Generate Shipments from open vendor RMA based on selection.">Generate Shipments from open vendor RMA based on selection.</value>
   <value column="Help" original=""/>
  </row>
-<row id="50002" trl="Y">
-<value column="Name" original="PackRoll">Reversar Paquete</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="50004" trl="Y">
-<value column="Name" original="PackOut">Exportar Paquete</value>
-<value column="Description" original="Process to create package export">Proceso para crear exportación de paquete.</value>
-<value column="Help" original=""/>
-</row>
-<row id="50006" trl="Y">
-<value column="Name" original="File_Select">Seleccionar archivo</value>
-<value column="Description" original="Select a file">Seleccionar un archivo</value>
-<value column="Help" original=""/>
-</row>
-<row id="50008" trl="Y">
-<value column="Name" original="PackIn">Importar Paquete</value>
-<value column="Description" original="Import Package">Importar Paquete</value>
-<value column="Help" original="Import a package">Importar un Paquete</value>
-</row>
-<row id="50010" trl="Y">
-<value column="Name" original="Copy Role">Copiar Rol</value>
-<value column="Description" original="Copy Role">Copiar Rol</value>
-<value column="Help" original="Copy role access records from one role to another. The existing access records for the destination role will be deleted."/>
-</row>
-<row id="50011" trl="Y">
-<value column="Name" original="Copy Columns from Table">Copiar Columnas desde Tabla</value>
-<value column="Description" original="Create Dictionary Columns for a Table taking another as base">
-Crear columnas del diccionario para una tabla tomando otra como base
-</value>
-<value column="Help" original=""/>
-</row>
-<row id="50012" trl="Y">
-<value column="Name" original="Request EMail Processor">Procesador de solicitudes de EMail</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
+ <row id="52002" trl="Y">
+  <value column="Name" original="Generate Invoices for Vendor RMA">Generar Facturas de Proveedor RMA</value>
+  <value column="Description" original="Generate Invoices from open vendor RMA based on selection.">Genera facturas de Proveedor para Devoluciones abiertas, basado en la selección</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="52003" trl="Y">
+  <value column="Name" original="Update Role Menu">Actualizar Menú de Rol</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53002" trl="Y">
+  <value column="Name" original="Setup Web POS">Configurar PDV Web</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53004" trl="Y">
+  <value column="Name" original="PP_Product_BOM CopyFrom">Copiar desde LDM producto</value>
+  <value column="Description" original=""/>
+  <value column="Help" original="This process copies BOM Lines from the Selected BOM to the Current BOM. The BOM being copied to must have any existing BOM Lines">This process copies BOM Lines from the Selected BOM to the Current BOM. The BOM being copied to must have any existing BOM Lines</value>
+ </row>
+ <row id="53006" trl="Y">
+  <value column="Name" original="Multi Level BOM &amp; Formula Detail">Detalle Multi Nivel y Fórmul</value>
+  <value column="Description" original="Shows in two different panels the parent-component relationship for the product entered in the Product field.">Shows in two different panels the parent-component relationship for the product entered in the Product field.</value>
+  <value column="Help" original="The BOM &amp; Formula Review option menu shows in two different panels the parent-component relationship for the product entered in the Product field.&#10;&#10;You need to introduce the parent product you want to see its components then click the OK button, next drag the left margin of the panel to the right and you will have the two panels.&#10;&#10;When you need to consult an implosion, click the implosion check box and enter the component you wish to consult and tick the Implosion check box.&#10;&#10;You need to introduce the parent product you want to see its components then click the OK button, next drag the left margin of the panel to the right and you will have the two panels.&#10;&#10;The left panel shows the BOM hierarchies in a tree form. The right panel shows the information connected with the BOM for every product in it."><![CDATA[The BOM & Formula Review option menu shows in two different panels the parent-component relationship for the product entered in the Product field.
+
+You need to introduce the parent product you want to see its components then click the OK button, next drag the left margin of the panel to the right and you will have the two panels.
+
+When you need to consult an implosion, click the implosion check box and enter the component you wish to consult and tick the Implosion check box.
+
+You need to introduce the parent product you want to see its components then click the OK button, next drag the left margin of the panel to the right and you will have the two panels.
+
+The left panel shows the BOM hierarchies in a tree form. The right panel shows the information connected with the BOM for every product in it.]]></value>
+ </row>
+ <row id="53008" trl="Y">
+  <value column="Name" original="Mutiple Components Change">Cambio Componentes Múltiples</value>
+  <value column="Description" original="This option allows the change of any component into BOM or Formula">This option allows the change of any component into BOM or Formula</value>
+  <value column="Help" original="This option allows the change of any component into BOM or Formula">This option allows the change of any component into BOM or Formula</value>
+ </row>
+ <row id="53010" trl="Y">
+  <value column="Name" original="Create Product Planning">Crear Planeamiento producto</value>
+  <value column="Description" original="This process will create the data plannig register for every product">This process will create the data plannig register for every product</value>
+  <value column="Help" original="In order to facilitate to load the data planning of similar products, you can run the process Create product Planning and this process will create the data plannig register for every product which fits the parameters: Product category, Warehouse and Resource.&#10;&#10;You must indicate the planning parameters defined in the last section for every Product category, Warehouse, and Resource set. Every product which fit these three parameters will have a data planning record with the same data planning values you enter in this form.">In order to facilitate to load the data planning of similar products, you can run the process Create product Planning and this process will create the data plannig register for every product which fits the parameters: Product category, Warehouse and Resource.
+
+You must indicate the planning parameters defined in the last section for every Product category, Warehouse, and Resource set. Every product which fit these three parameters will have a data planning record with the same data planning values you enter in this form.</value>
+ </row>
+ <row id="53012" trl="Y">
+  <value column="Name" original="Calculate Low Level">Calcular Bajo Nivel</value>
+  <value column="Description" original="This process calculate and register the lowest level of a product inside any BOM. It is used in the MRP calculations and should be executed when you enter a new BOM.">This process calculate and register the lowest level of a product inside any BOM. It is used in the MRP calculations and should be executed when you enter a new BOM.</value>
+  <value column="Help" original="This process calculate and register the lowest level of a product inside any BOM. It is used in the MRP calculations and should be executed when you enter a new BOM.">This process calculate and register the lowest level of a product inside any BOM. It is used in the MRP calculations and should be executed when you enter a new BOM.</value>
+ </row>
  <row id="53014" trl="Y">
   <value column="Name" original="Create Record MRP">Crear Registro MRP</value>
   <value column="Description" original="This process recreate the demand, approved and open orders for a product.">This process recreate the demand, approved and open orders for a product.</value>
@@ -1344,20 +1359,20 @@ Generally, this process is only performed during the implementation of MRP</valu
   <value column="Description" original="Calculate Capacity Plan">Calcular Plan de Capacidad</value>
   <value column="Help" original="The process of Capacity Plan Calculation allows us to know the available time in each manufacturing resource, as well as the required time to satisfy the Master Production Schedule.">The process of Capacity Plan Calculation allows us to know the available time in each manufacturing resource, as well as the required time to satisfy the Master Production Schedule.</value>
  </row>
-<row id="53022" trl="Y">
-<value column="Name" original="Calculate Distribution Plan">Calcular Plan Distribución</value>
-<value column="Description" original="Distribution Resource Planning (DRP) is a method used in business administration for planning orders within a supply chain. ">
+ <row id="53022" trl="Y">
+  <value column="Name" original="Calculate Distribution Plan">Calcular Plan Distribución</value>
+  <value column="Description" original="Distribution Resource Planning (DRP) is a method used in business administration for planning orders within a supply chain. ">
 Planeación de Distribución de Recursos (DRP) es un método usado en administración de negocios para planeación de órdenes dentro de una cadena de suministros.
 </value>
-<value column="Help" original="Distribution Resource Planning (DRP) is a method used in business administration for planning orders within a supply chain. DRP enables the user to set certain inventory control parameters (like a safety stock) and calculate the time-phased inventory requirements. DRP uses several variables: the on-hand inventory at the end of a period. the backordered demand at the end of a period. the required quantity of product needed at the beginning of a period. the constrained quantity of product available at the beginning of a period. the recommended order quantity at the beginning of a period. DRP needs the following information: the demand in a future period. the scheduled receipts at the beginning of a period. the safety stock requirement for a period. the on-hand inventory at the beginning of a period. ">
+  <value column="Help" original="Distribution Resource Planning (DRP) is a method used in business administration for planning orders within a supply chain. &#10;&#10;DRP enables the user to set certain inventory control parameters (like a safety stock) and calculate the time-phased inventory requirements.&#10;&#10;DRP uses several variables:&#10;the on-hand inventory at the end of a period.&#10;the backordered demand at the end of a period.&#10;the required quantity of product needed at the beginning of a period.&#10;the constrained quantity of product available at the beginning of a period.&#10;the recommended order quantity at the beginning of a period.&#10;&#10;DRP needs the following information:&#10;the demand in a future period.&#10;the scheduled receipts at the beginning of a period.&#10;the safety stock requirement for a period.&#10;the on-hand inventory at the beginning of a period.&#10;">
 Planeación de Distribución de Recursos (DRP) es un método usado en administración de negocios para planeación de órdenes dentro de una cadena de suministros. DRP habilita al usuario para fijar ciertos parámetros de control de inventarios (como una existencia de seguridad) y calcular los requerimientos de inventarios por fases de tiempo. DRP usa varias variables: el inventario existente al final del período. la demanda pendiente de entrega al final del período. la cantidad requerida de producto necesitada al inicio del período. la cantidad limitada de producto disponible al inicio del período. la cantidad de orden recomendada al inicio del período. DRP necesita la siguiente información: la demanda e un período futuro. los recibos agendados al inicio del período. el requerimiento de existencia de seguridad para un período. el inventario existente al inicio del período.
 </value>
-</row>
-<row id="53024" trl="Y">
-<value column="Name" original="DRP Details">Detalles DRP</value>
-<value column="Description" original="Show the detail of DRP calculation">Muestra el detalle de cálculo de DRP</value>
-<value column="Help" original="Show the detail of DRP calculation">Muestra el detalle de cálculo de DRP</value>
-</row>
+ </row>
+ <row id="53024" trl="Y">
+  <value column="Name" original="DRP Details">Detalles DRP</value>
+  <value column="Description" original="Show the detail of DRP calculation">Muestra el detalle de cálculo de DRP</value>
+  <value column="Help" original="Show the detail of DRP calculation">Muestra el detalle de cálculo de DRP</value>
+ </row>
  <row id="53026" trl="Y">
   <value column="Name" original="Process Manufacturing Order">Proceso de Orden de Fabricación</value>
   <value column="Description" original=""/>
@@ -1378,40 +1393,40 @@ Planeación de Distribución de Recursos (DRP) es un método usado en administra
   <value column="Description" original="Show if  components are available in the warehouse to Manufacturing Order">Show if  components are available in the warehouse to Manufacturing Order</value>
   <value column="Help" original="Before you complete a MO it is necessary to validate the components are available in the warehouse, in order to track the components availability you get a report which shows among other data: the Required Quantity for the MO, the Reserved Quantity, the On Hand Quantity and the Available Quantity.">Before you complete a MO it is necessary to validate the components are available in the warehouse, in order to track the components availability you get a report which shows among other data: the Required Quantity for the MO, the Reserved Quantity, the On Hand Quantity and the Available Quantity.</value>
  </row>
-<row id="53034" trl="Y">
-<value column="Name" original="Print &amp; Release Order">Imprimir y Liberar Orden</value>
-<value column="Description" original="Once the planned orders of manufacture generated by MRP, have been aprobed, has been reached the date of liberation and has been verified that the required components are in existence, the orders are emitted to the plant for its manufacture.">Una vez que las órdenes planeadas de manufactura generadas por el MRP han sido aprobadas, se ha alcanzado la fecha de liberación y verificado que los componentes requeridos están en existencia,las órdenes son emitidas a la planta para manufactura</value>
-<value column="Help" original="Once the planned orders of manufacture generated by MRP, have been aprobed, has been reached the date of liberation and has been verified that the required components are in existence, the orders are emitted to the plant for its manufacture. If you wish to print the warehouse and shop floor documentation you must tick the adequate check box: If you tick the Print Pick List check box you will get a report with the required components and quantities to help the warehouse clerk to issue the material to the shop floor. The next report is an example of this: If you tick the Print Pack List check box you will get a report with the required components and containing the material with a Component Type of Packing and Tools recorded in the BOM Window. Another report which is part of the Manufacturing Order Release Package is the Workflow(Routing). You can print this report with tick in the Print Workflow check box and it shows to the shop floor personnel the necessary steps for the manufacture of the product. This Report contains the place where the product should be made, the standard times, the tools and necessary devices. If you wish to print this report tick the check box Print Workflow.">
+ <row id="53034" trl="Y">
+  <value column="Name" original="Print &amp; Release Order">Imprimir y Liberar Orden</value>
+  <value column="Description" original="Once the planned orders of manufacture generated by MRP, have been aprobed, has been reached the date of liberation and has been verified that the required components are in existence, the orders are emitted to the plant for its manufacture.">Una vez que las órdenes planeadas de manufactura generadas por el MRP han sido aprobadas, se ha alcanzado la fecha de liberación y verificado que los componentes requeridos están en existencia,las órdenes son emitidas a la planta para manufactura</value>
+  <value column="Help" original="Once the planned orders of manufacture generated by MRP, have been aprobed, has been reached the date of liberation and has been verified that the required components are in existence, the orders are emitted to the plant for its manufacture. If you wish to print the warehouse and shop floor documentation you must tick the adequate check box:&#10;&#10;If you tick the Print Pick List check box you will get a report with the required components and quantities to help the warehouse clerk to issue the material to the shop floor. The next report is an example of this:&#10;&#10;If you tick the Print Pack List check box you will get a report with the required components and containing the material with a Component Type of Packing and Tools recorded in the BOM Window.&#10;&#10;Another report which is part of the Manufacturing Order Release Package is the Workflow(Routing). &#10;&#10;You can print this report with tick in the Print Workflow check box and it shows to the shop floor personnel the necessary steps for the manufacture of the product. &#10;&#10;This Report contains the place where the product should be made, the standard times, the tools and necessary devices. &#10;&#10;If you wish to print this report tick the check box Print Workflow.">
 Una vez que las órdenes planeadas de manufactura generadas por el MRP han sido aprobadas, se ha alcanzado la fecha de liberación y ha sido verificado que los componentes requeridos están en existencia, las órdenes son emitidas a la planta para su manufactura. Si desea imprimir la documentación del almacén y control de piso debe marcar la bandera adecuada: Si chequea la bandera Imprimir Lista de Recogida obtendrá un reporte con los componentes requeridos y las cantidades para ayudar al operario de almacén a emitir los materiales al control de piso. Si chequea la bandera Imprimir Lista de Empaque obtendrá un reporte con los componentes requeridos y conteniendo el material con un Tipo Componente de Empaque registrado en la ventana LDM. Otro reporte que es parte de Imprimir y Liberar Orden es el de Flujo de Trabajo (Enrutamiento). Puede imprimir este reporte chequeando la bandera de Imprimir Flujo de Trabajo y muestra al personal de control de piso los pasos necesarios para manufacturar el producto. Este reporte contiene el lugar donde el producto debe ser hecho, los tiempos estándar, las herramientas y dispositivos necesarios.
 </value>
-</row>
+ </row>
  <row id="53036" trl="Y">
   <value column="Name" original="Inventory in Process">Inventario en Proceso</value>
   <value column="Description" original="This report show the inventory in process">Este reporte muestra el inventario en proceso</value>
   <value column="Help" original="This report show the inventory in process">Este reporte muestra el inventario en proceso</value>
  </row>
  <row id="53038" trl="Y">
-<value column="Name" original="Process Cost Collector">Procesar Colector de Costos</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="53040" trl="Y">
-<value column="Name" original="Shop Floor Transaction Details">Detalles Transacción Control Piso</value>
-<value column="Description" original="Show the Shop Floor Transaction Details">
+  <value column="Name" original="Process Cost Collector">Procesar Colector de Costos</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53040" trl="Y">
+  <value column="Name" original="Shop Floor Transaction Details">Detalles Transacción Control Piso</value>
+  <value column="Description" original="Show the Shop Floor Transaction Details">
 Muestra el detalle de transacción de control de piso
 </value>
-<value column="Help" original=""/>
-</row>
-<row id="53042" trl="Y">
-<value column="Name" original="Process Distribution Order">Procesar Orden de Distribución</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="53044" trl="Y">
-<value column="Name" original="Distribution Order Print">Imprimir Orden de Distribución</value>
-<value column="Description" original="** Special ** Do not change **">** Especial ** No cambiar **</value>
-<value column="Help" original=""/>
-</row>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53042" trl="Y">
+  <value column="Name" original="Process Distribution Order">Procesar Orden de Distribución</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53044" trl="Y">
+  <value column="Name" original="Distribution Order Print">Imprimir Orden de Distribución</value>
+  <value column="Description" original="** Special ** Do not change **">** Especial ** No cambiar **</value>
+  <value column="Help" original=""/>
+ </row>
  <row id="53046" trl="Y">
   <value column="Name" original="Generate Movement">Generar Movimiento</value>
   <value column="Description" original="Generate and print Movement from open Distribution Orders">Generate and print Movement from open Distribution Orders</value>
@@ -1538,17 +1553,17 @@ Total BOM Cost = Sum every Element Cost]]></value>
   <value column="Help" original=""/>
  </row>
  <row id="53085" trl="Y">
-<value column="Name" original="Export Format Generator">Generador Formato Exportación</value>
-<value column="Description" original="Create multiple Export Format based in a Window">
+  <value column="Name" original="Export Format Generator">Generador Formato Exportación</value>
+  <value column="Description" original="Create multiple Export Format based in a Window">
 Crea múltiples formatos de exportación basado en una ventana
 </value>
-<value column="Help" original=""/>
-</row>
-<row id="53089" trl="Y">
-<value column="Name" original="Test Export Model">Prueba Modelo Exportación</value>
-<value column="Description" original="Test Export of XML files">Prueba la exportación de archivos XML</value>
-<value column="Help" original=""/>
-</row>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53089" trl="Y">
+  <value column="Name" original="Test Export Model">Prueba Modelo Exportación</value>
+  <value column="Description" original="Test Export of XML files">Prueba la exportación de archivos XML</value>
+  <value column="Help" original=""/>
+ </row>
  <row id="53091" trl="Y">
   <value column="Name" original="Import FA Journal">Importar Jornal FA</value>
   <value column="Description" original="Import FA Batch/Journal/Line">Import FA Batch/Journal/Line</value>
@@ -1575,20 +1590,20 @@ Crea múltiples formatos de exportación basado en una ventana
   <value column="Help" original=""/>
  </row>
  <row id="53101" trl="Y">
-<value column="Name" original="A_Asset_Split">División Activo</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="53103" trl="Y">
-<value column="Name" original="A_Asset_Disposal">Desecho Activo</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="53105" trl="Y">
-<value column="Name" original="A_Depreciation_Transfer">Transferencia Depreciación</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
+  <value column="Name" original="A_Asset_Split">División Activo</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53103" trl="Y">
+  <value column="Name" original="A_Asset_Disposal">Desecho Activo</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53105" trl="Y">
+  <value column="Name" original="A_Depreciation_Transfer">Transferencia Depreciación</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
  <row id="53107" trl="Y">
   <value column="Name" original="Asset Split Entry">Entrada Division Activos</value>
   <value column="Description" original="Used to review Assets Split Entry ">Utilizado para revisar la Entrada de Division de Activos </value>
@@ -1610,20 +1625,20 @@ Crea múltiples formatos de exportación basado en una ventana
   <value column="Help" original=""/>
  </row>
  <row id="53115" trl="Y">
-<value column="Name" original="RV_Asset_Parent_Report">Reporte Padre Activo</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="53117" trl="Y">
-<value column="Name" original="RV_Depreciation_Table">Tabla Depreciación</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="53119" trl="Y">
-<value column="Name" original="Spread Report">Reporte Propagación</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
+  <value column="Name" original="RV_Asset_Parent_Report">Reporte Padre Activo</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53117" trl="Y">
+  <value column="Name" original="RV_Depreciation_Table">Tabla Depreciación</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53119" trl="Y">
+  <value column="Name" original="Spread Report">Reporte Propagación</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
  <row id="53121" trl="Y">
   <value column="Name" original="RV_Asset_Depreciation_Method">Lista Métodos Depreciacion</value>
   <value column="Description" original="List Depreciation Methods">Lista los Métodos de Depreciacion</value>
@@ -1649,13 +1664,13 @@ Crea múltiples formatos de exportación basado en una ventana
   <value column="Description" original="List Depreciation Calculation Methods Available">Lista de Metodos de Calculo Depreciacion Disponible</value>
   <value column="Help" original=""/>
  </row>
-<row id="53131" trl="Y">
-<value column="Name" original="RV_Asset_Group_Defaults">Valores por Defecto Grupo Activos</value>
-<value column="Description" original="Lists Asset Group Settings &amp; Defaults">
+ <row id="53131" trl="Y">
+  <value column="Name" original="RV_Asset_Group_Defaults">Valores por Defecto Grupo Activos</value>
+  <value column="Description" original="Lists Asset Group Settings &amp; Defaults">
 Lista la configuración de grupos de activos y valores por defecto
 </value>
-<value column="Help" original=""/>
-</row>
+  <value column="Help" original=""/>
+ </row>
  <row id="53133" trl="Y">
   <value column="Name" original="Inbound Charges for GL">Entrada Cargos por CG</value>
   <value column="Description" original="Process invoice charges from GL">Procesa facturas de cargos desde CG</value>
@@ -1712,16 +1727,16 @@ The Parameters are default values for null import record values they do not over
   <value column="Description" original="Bank Transfer let money tranfer between Banks">Permite transferir dinero entre bancos</value>
   <value column="Help" original=""/>
  </row>
-<row id="53154" trl="Y">
-<value column="Name" original="HouseKeeping">Recorte de Información</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
-<row id="53155" trl="Y">
-<value column="Name" original="House Keeping">Recorte de Información</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
+ <row id="53154" trl="Y">
+  <value column="Name" original="HouseKeeping">Recorte de Información</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53155" trl="Y">
+  <value column="Name" original="House Keeping">Recorte de Información</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
  <row id="53156" trl="Y">
   <value column="Name" original="Enable Native Sequence">Habilita Secuencia Nativa</value>
   <value column="Description" original="Enable Native Sequence">Habilita Secuencia Nativa</value>
@@ -1774,6 +1789,11 @@ This process should be implemented when the users are not connected.</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
+ <row id="53197" trl="Y">
+  <value column="Name" original="Import Payroll Movement">Importar Movimiento de Nómina</value>
+  <value column="Description" original="Import Payroll Movement">Import Payroll Movement</value>
+  <value column="Help" original=""/>
+ </row>
  <row id="53199" trl="Y">
   <value column="Name" original="Reset Allocation Direct">Ajustar Alocacion Directa</value>
   <value column="Description" original="Reset (delete) allocation of invoices to payments">Borra alocacion de facturas a pagos.</value>
@@ -1783,5 +1803,35 @@ This process should be implemented when the users are not connected.</value>
   <value column="Name" original="Import Product Planning and Forecast">Importar Planificacion y Proyeccion Producto</value>
   <value column="Description" original="Import Product Planning and Forecast">Importar Planificacion y Proyeccion Producto</value>
   <value column="Help" original="Import and update  product planning data and forecast">Importa y actualiza datos de planificacion de producto y proyecciones.</value>
+ </row>
+ <row id="53202" trl="Y">
+  <value column="Name" original="POS Key Generate">Generar teclado PDV</value>
+  <value column="Description" original="Generate POS Keys from products.">Generarar teclado PDV desde productos</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53245" trl="Y">
+  <value column="Name" original="Validate">Validar</value>
+  <value column="Description" original="Validate Payment Schedule">Validar Programa Pagos</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53246" trl="Y">
+  <value column="Name" original="Copy from Cash Plan">Copiar desde Plan de Efectivo</value>
+  <value column="Description" original="Copy Lines from other Cash Plan">Copia líneas desde otro Plan de Efectivo</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53247" trl="Y">
+  <value column="Name" original="Generate Periodic Plan">Genera Plan Periódico</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53248" trl="Y">
+  <value column="Name" original="Cash Flow Report">Informe Cash Flow </value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000000" trl="Y">
+  <value column="Name" original="Generate Withholding">Generar Retención</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
  </row>
 </adempiereTrl>

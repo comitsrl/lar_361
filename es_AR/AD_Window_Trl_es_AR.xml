@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) Release 3.6.0LTS_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20100901-2107 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120123-0812 - ${ADEMPIERE_VENDOR}-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Window">
  <row id="100" trl="Y">
@@ -35,7 +35,7 @@
  <row id="106" trl="Y">
   <value column="Name" original="Language">Lenguaje</value>
   <value column="Description" original="Maintain Languages">Mantener Lenguajes</value>
-  <value column="Help" original="The Language Window allows you to define multiple parallel language for users. This allows users to access the same data but have the windows, tabs and fields appear in different languages.&#10;If a language is a System Language, you can change the User Interface to this language (after translation).  Otherwise the language is only used for printing documents.&#10;&#10;For the language code, we suggest using the Java convention of country and language (e.g. fr_CN - Canadian French).&#10;&#10;Verify the translation creates missing translation records. Start this process after creating a new language.">La ventana de lenguaje permite definir múltiples lenguajes paralelos para los usuarios. Esto permite a los usuarios acceder a los mismos datos pero tener ventanas; pestañas y campos desplegados en lenguajes. Si un lenguaje es un lenguaje del sistema; se puede cambiar la interfase de usuario a este lenguaje (después de traducirlo); de otra manera; el lenguaje será usado solo para imprimir documentos. Para códigos de lenguaje; se sugiere usar la convención Java de país y lenguaje (ej. fr_CN para francés de Canada). El verificar el lenguaje crea los registros de traducción faltantes. Comience este proceso después de crear un nuevo lenguaje.</value>
+  <value column="Help" original="The Language Window allows you to define multiple parallel language for users. This allows users to access the same data but have the windows, tabs and fields appear in different languages.&#10;If a language is a System Language, you can change the User Interface to this language (after translation).  Otherwise the language is only used for printing documents.&#10;&#10;For the language code, we suggest using the Java convention of country and language (e.g. fr_CN - Canadian French).&#10;&#10;Verify the translation creates missing translation records. Start this process after creating a new language.">La ventana de lenguaje permite definir múltiples idiomas paralelos para los usuarios. Esto permite a los usuarios acceder a los mismos datos pero tener ventanas; pestañas y campos desplegados en lenguajes. Si un idioma es un idioma del sistema; se puede cambiar la interfase de usuario a este idioma (después de traducirlo); de otra manera; el idioma será usado solo para imprimir documentos. Para códigos de idioma; se sugiere usar la convención Java de país e idioma (ej. fr_CN para francés de Canada). El verificar el idioma crea los registros de traducción faltantes. Comience este proceso después de crear un nuevo Idioma.</value>
  </row>
  <row id="107" trl="Y">
   <value column="Name" original="Matched Invoices">Facturas Cotejadas</value>
@@ -105,7 +105,7 @@
  <row id="121" trl="Y">
   <value column="Name" original="Location">Localización</value>
   <value column="Description" original="Maintain Location Address">Mantener dirección de localización</value>
-  <value column="Help" original="The Location Window defines the address data within the system.  This window is for System Admin only.  Users would access location entries using the location button or tab on the appropriate window (i.e Order Entry or Business Partner)">Esta ventana permite definir información sobre direcciones dentro del sistema. Esta ventana es para uso del administrador del sistema solamente. Los usuarios acceden a esta información desde otras ventanas y pestañas (ej. Entrada de ordenes ó socio del negocio)</value>
+  <value column="Help" original="The Location Window defines the address data within the system.  This window is for System Admin only.  Users would access location entries using the location button or tab on the appropriate window (i.e Order Entry or Business Partner)">Esta ventana permite definir información sobre direcciones dentro del sistema. Esta ventana es para uso del administrador del sistema solamente. Los usuarios acceden a esta información desde otras ventanas y pestañas (ej. Entrada de Órdenes ó socio del negocio)</value>
  </row>
  <row id="122" trl="Y">
   <value column="Name" original="Country Region and City">País, Región y Ciudad</value>
@@ -194,8 +194,8 @@
  </row>
  <row id="143" trl="Y">
   <value column="Name" original="Sales Order">Órdenes de Venta</value>
-  <value column="Description" original="Enter and change sales orders">Entrar y cambiar ordenes de ventas</value>
-  <value column="Help" original="The Order Window allows you to enter and modify Sales Orders.  ">La ventana permite entrar y modificar ordenes de venta</value>
+  <value column="Description" original="Enter and change sales orders">Entrar y cambiar Órdenes de ventas</value>
+  <value column="Help" original="The Order Window allows you to enter and modify Sales Orders.  ">La ventana permite entrar y modificar Órdenes de venta</value>
  </row>
  <row id="144" trl="Y">
   <value column="Name" original="Product Category">Categoría de Producto</value>
@@ -253,7 +253,7 @@
   <value column="Help" original="The Dunning Window defines the parameters that will be used when generating Dunning Letters.  Each customer can be associated with a Dunning Code.  ">Define los parámetros que serán usados en las cartas de morosidad. Cada cliente puede ser asociado con un código de morosidad.</value>
  </row>
  <row id="160" trl="Y">
-  <value column="Name" original="Withholding (1099)">Retención (1099)</value>
+  <value column="Name" original="Withholding (1099)">Retención (1099)**sin Uso**</value>
   <value column="Description" original="Maintain Withholding Certificates">Mantener certificados de retención</value>
   <value column="Help" original="The Withholding Window defines the rule used for calculating withholding amounts.">La ventana permite definir la regla usada para calcular totales de retención.</value>
  </row>
@@ -329,7 +329,7 @@
  </row>
  <row id="181" trl="Y">
   <value column="Name" original="Purchase Order">Órdenes de Compra</value>
-  <value column="Description" original="Manage Purchase Orders">Administrar Ordenes de Compra</value>
+  <value column="Description" original="Manage Purchase Orders">Administrar Órdenes de Compra</value>
   <value column="Help" original="The Purchase Order Window defines a purchase order for an organization.  When a Purchase Order has been entered you can generate a Shipment Document or Invoice from this Purchase Order">La ventana define una orden de compra para una organización. Cuando una orden de compra ya ha sido entrada; es posible generar un documento de despacho ó factura desde esta orden.</value>
  </row>
  <row id="183" trl="Y">
@@ -518,8 +518,8 @@
   <value column="Help" original=""/>
  </row>
  <row id="228" trl="Y">
-  <value column="Name" original="Matched Purchase Orders">Cotejar Ordenes de Compra</value>
-  <value column="Description" original="View Matched Purchase Orders">Ver ordenes de compra cotejadas</value>
+  <value column="Name" original="Matched Purchase Orders">Cotejar Órdenes de Compra</value>
+  <value column="Description" original="View Matched Purchase Orders">Ver Órdenes de compra cotejadas</value>
   <value column="Help" original="View detals of matched purchase order lines to invoice lines and material receipt lines"/>
  </row>
  <row id="229" trl="Y">
@@ -660,7 +660,7 @@
  <row id="257" trl="Y">
   <value column="Name" original="Lot">Lote</value>
   <value column="Description" original="Product Lot Definition">Lote definido para producto.</value>
-  <value column="Help" original="Maintain the individual Lot of a Product">Mantenga la porcion individual de un producto.</value>
+  <value column="Help" original="Maintain the individual Lot of a Product">Mantener la porcion individual de un producto.</value>
  </row>
  <row id="258" trl="Y">
   <value column="Name" original="Lot Control">Lote Control</value>
@@ -720,7 +720,7 @@
  <row id="269" trl="Y">
   <value column="Name" original="Advertisement">Anuncio</value>
   <value column="Description" original="Web Advertisement">Anuncio Web</value>
-  <value column="Help" original="Maintain Advertisements on the Web">Mantenga los anuncios en el Web</value>
+  <value column="Help" original="Maintain Advertisements on the Web">Mantener los anuncios en el Web</value>
  </row>
  <row id="270" trl="Y">
   <value column="Name" original="Change Audit">Histórico de Cambios</value>
@@ -734,12 +734,12 @@
  </row>
  <row id="272" trl="Y">
   <value column="Name" original="Time Type">Tipo de Hora</value>
-  <value column="Description" original="Maintain Time Recording Type">Mantenga el tipo de grabación del tiempo</value>
+  <value column="Description" original="Maintain Time Recording Type">Mantener el tipo de grabación del tiempo</value>
   <value column="Help" original="Maintain different types of time for reporting">Mantega diversos tipos de hora para los reportes</value>
  </row>
  <row id="273" trl="Y">
   <value column="Name" original="Click">Click</value>
-  <value column="Description" original="Maintain Web Click">Mantenga el tecleo del Web</value>
+  <value column="Description" original="Maintain Web Click">Mantener el tecleo del Web</value>
   <value column="Help" original="Web Clicks allow you to track number of clicks.  Example:&#10;&amp;lt;a href=&quot;http://www.adempiere.com/wstore/click?http://www.adempiere.de&quot; target=&quot;_blank&quot;&amp;gt;&#10;where &quot;http://www.adempiere.com/wstore/click&quot; is your side and &quot;http://www.adempiere.de&quot; is the target page.&#10;If you created a web click for http://www.adempiere.de, you will be able to see details and total of web clicks."/>
  </row>
  <row id="274" trl="Y">
@@ -750,11 +750,11 @@
  <row id="275" trl="Y">
   <value column="Name" original="Invoice Payment Schedule">Programa de Pagos de Facturas</value>
   <value column="Description" original="Maintain Invoice Payment Schedule">Mantener el Programa de Pagos de Facturas</value>
-  <value column="Help" original="Maintain Payment Schedule of unpaid invoices">Mantenga el programa de pagos de facturas sin pagar</value>
+  <value column="Help" original="Maintain Payment Schedule of unpaid invoices">Mantener el programa de pagos de facturas sin pagar</value>
  </row>
  <row id="276" trl="Y">
   <value column="Name" original="Alert">Alerta</value>
-  <value column="Description" original="Adempiere Alert">Alterta Adempiere</value>
+  <value column="Description" original="Adempiere Alert">Alterta ADempiere</value>
   <value column="Help" original="Adempiere Alerts allow you define system conditions you want to be alerted of">Las alarmas de Adempiere le permiten definen condiciones de sistema que usted desea ser alertado</value>
  </row>
  <row id="277" trl="Y">
@@ -778,8 +778,8 @@
   <value column="Help" original=""/>
  </row>
  <row id="281" trl="Y">
-  <value column="Name" original="Import Order">Importar Ordenes</value>
-  <value column="Description" original="Import Orders">Importar Ordenes</value>
+  <value column="Name" original="Import Order">Importar Órdenes</value>
+  <value column="Description" original="Import Orders">Importar Órdenes</value>
   <value column="Help" original="Please set Y/N selections in the import loader format explicitly (e.g. as constants) and no not leave them NULL. A NULL value stands for &quot;don't know&quot;.&#10;In general, selection boxes are not selected if the value is not &quot;Y&quot; (i.e. could be null or any other value). All tests are made on &quot;Y&quot; or &quot;not Y&quot; - i.e. NULL values are not &quot;not Y&quot;, but NULL (don't know) - see SQL Language introductions.">Las selecciones Y/N en el cargador de la importación ajustando al formato explícitamente (ej. como constantes) y ningún para no dejarlas NULAS. Un valor NULO estándar "Saber ó no Saber";. En general, las cajas de la selección no se seleccionan si el valor no es "Y" (es decir podría estar la falta de información ó cualquier otro valor). Todas las pruebas se hacen en "Y" ó "No" - es decir los valores NULOS no son "No", pero anula (no saber) - ven las introducciones de la lengua del SQL.</value>
  </row>
  <row id="282" trl="Y">
@@ -810,13 +810,13 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  </row>
  <row id="287" trl="Y">
   <value column="Name" original="Knowledge Category">Categoría Conocimiento</value>
-  <value column="Description" original="Maintain Knoweledge Categories and Values">Mantenga las categorías y los valores de Conocimiento</value>
+  <value column="Description" original="Maintain Knoweledge Categories and Values">Mantener las categorías y los valores de Conocimiento</value>
   <value column="Help" original="Set up knowledge categories and values as a search aid. Examples are Release Version, Product Area, etc. Knowledge Category values act like keyworks.">Instale las categorías y los valores del conocimiento como una ayuda de la búsqueda. Los ejemplos son versión del lanzamiento, área del producto, etc. Los valores de la categoría del conocimiento actúan como llaves de trabajo.</value>
  </row>
  <row id="288" trl="Y">
   <value column="Name" original="Knowledge Base">Base de Conocimiento</value>
-  <value column="Description" original="Maintain Knowledge Base">Mantenga la base de conocimiento</value>
-  <value column="Help" original="Maintain Type, Topics, Entries and theit Comments, Categories, Related Entries">Mantenga el tipo, los asuntos, las entradas y los comentarios, categorías, entradas relacionadas.</value>
+  <value column="Description" original="Maintain Knowledge Base">Mantener la base de conocimiento</value>
+  <value column="Help" original="Maintain Type, Topics, Entries and theit Comments, Categories, Related Entries">Mantener el tipo, los asuntos, las entradas y los comentarios, categorías, entradas relacionadas.</value>
  </row>
  <row id="289" trl="Y">
   <value column="Name" original="Knowledge Source">Inicio Conocimiento</value>
@@ -824,7 +824,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
   <value column="Help" original="The Source of a Knowlegde Entry is a pointer to the originating system. The Knowledge Entry has an additional entry (Description URL)  for more detailed info.">La fuente de una entrada de conocimiento es un indicador al sistema que origina. La entrada del conocimiento tiene una entrada adicional (URL de la descripción) para un Info más detallado.</value>
  </row>
  <row id="290" trl="Y">
-  <value column="Name" original="Knowledge Synonym">Sinonimo Conocimiento</value>
+  <value column="Name" original="Knowledge Synonym">Sinónimo Conocimiento</value>
   <value column="Description" original="Knowlege Keyword Synonym">Conocer sinonimo de la palabra clave</value>
   <value column="Help" original="Search Synonyms for Knowledge Keywords; Example: Product = Item"/>
  </row>
@@ -835,7 +835,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  </row>
  <row id="292" trl="Y">
   <value column="Name" original="Label Printer">Etiqueta Impresión</value>
-  <value column="Description" original="Maintain Label Printer Definition">Mantenga la definición de la impresion de la etiqueta.</value>
+  <value column="Description" original="Maintain Label Printer Definition">Mantener la definición de la impresion de la etiqueta.</value>
   <value column="Help" original=""/>
  </row>
  <row id="293" trl="Y">
@@ -915,17 +915,17 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  </row>
  <row id="308" trl="Y">
   <value column="Name" original="Auction Topic Type">Tipo del Asunto de la Subasta</value>
-  <value column="Description" original="Maintain Auction Topic Type and Categories">Mantenga el tipo y las categorías del asunto de la subasta</value>
+  <value column="Description" original="Maintain Auction Topic Type and Categories">Mantener el tipo y las categorías del asunto de la subasta</value>
   <value column="Help" original="The Auction Topic Type determines what kind of auction is used for a particular area">El tipo del asunto de la subasta se determina qué clase de subasta se utiliza para un área particular</value>
  </row>
  <row id="309" trl="Y">
   <value column="Name" original="Auction Seller">Vendedor de la Subasta</value>
-  <value column="Description" original="Maintain Auction Seller Information">Mantenga la Información del Vendedor de la Subasta</value>
+  <value column="Description" original="Maintain Auction Seller Information">Mantener la Información del Vendedor de la Subasta</value>
   <value column="Help" original="A seller is a User in the system participating in Auctions">Un vendedor es un usuario en el sistema que participa en subastas</value>
  </row>
  <row id="310" trl="Y">
   <value column="Name" original="Auction Buyer">Comprador De la Subasta</value>
-  <value column="Description" original="Maintain Auction Buyer Information">Mantenga la Información del comprador de la subasta</value>
+  <value column="Description" original="Maintain Auction Buyer Information">Mantener la Información del comprador de la subasta</value>
   <value column="Help" original="A buyer is a User in the system participating in Auctions">Un comprador es un usuario en el sistema que participa en subastas</value>
  </row>
  <row id="311" trl="Y">
@@ -946,7 +946,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  <row id="314" trl="Y">
   <value column="Name" original="RfQ Topic">Asunto SPC (RfQ)</value>
   <value column="Description" original="Maintain RfQ Topics and Subscribers">Mantenimiento al asunto SPC (RfQ) y los subscriptores</value>
-  <value column="Help" original="A Request for Quotation Topic allows you to maintain a subscriber list of potential Vendors to respond to RfQs">Un asunto de solicitud para cotización, permite que usted mantenga una lista del suscriptor de proveedores potenciales para responder a la SPC (RfQ)</value>
+  <value column="Help" original="A Request for Quotation Topic allows you to maintain a subscriber list of potential Vendors to respond to RfQs">Un asunto de solicitud para cotización, permite que usted Mantener una lista del suscriptor de proveedores potenciales para responder a la SPC (RfQ)</value>
  </row>
  <row id="315" trl="Y">
   <value column="Name" original="RfQ">SPC (RfQ)</value>
@@ -986,7 +986,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  <row id="322" trl="Y">
   <value column="Name" original="Requisition">Requisición</value>
   <value column="Description" original="Material Requisition">Requisición de Material</value>
-  <value column="Help" original="Enter and maintain Material Requisitions. Material Requisition can be created automatically via Replenishment.  You create generate optionally consolidated Purchase Orders.">Incorpore y mantenga las demandas materiales.</value>
+  <value column="Help" original="Enter and maintain Material Requisitions. Material Requisition can be created automatically via Replenishment.  You create generate optionally consolidated Purchase Orders.">Incorporar y Mantener las demandas materiales.</value>
  </row>
  <row id="323" trl="Y">
   <value column="Name" original="GL Distribution">Distribución CG</value>
@@ -1010,17 +1010,17 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  </row>
  <row id="327" trl="Y">
   <value column="Name" original="Counter Document">Contra Documentos</value>
-  <value column="Description" original="Maintain Counter Document Types">Mantenga los tipos contra documento</value>
+  <value column="Description" original="Maintain Counter Document Types">Mantener los tipos contra documento</value>
   <value column="Help" original="When using explicit documents for inter-org transaction (after linking a Business Partner to an Organization), you can determine what document type the counter document is based on the document type of the original transaction.  Example: a &quot;Standard Order&quot; creates a &quot;Standard PO&quot;. &#10;If you define a relationship here, you overwrite the default counter document type in the Document Type definition. This allows you to define a specific mapping.&#10;If not defined, the first matching document type is used (e.g. AR Invoice - first AP Invoice document type)">Al usar los documentos explícitos para la inter-org transacción (después de ligar a un socio del negocio a una organización), usted puede determinar qué tipo del documento se basa el documento contrario en el tipo del documento de la transacción original. Ejemplo: un "Orden Estándar" crea un "OC Estándar". Si usted define una relación aquí, usted sobreescribe el documento del contador por default dentro de la definición del tipo de documento. Esto permite que usted defina traz específico. Si no ha definido, se utiliza el primer tipo del documento que empareja (ej. factura de CXC - primer tipo del documento de la factura del CXP)</value>
  </row>
  <row id="328" trl="Y">
   <value column="Name" original="Forecast">Pronosticar</value>
-  <value column="Description" original="Maintain Material Forecast">Mantenga el pronóstico del material</value>
+  <value column="Description" original="Maintain Material Forecast">Mantener el pronóstico del material</value>
   <value column="Help" original="Material Forecast">Pronóstico de material</value>
  </row>
  <row id="329" trl="Y">
   <value column="Name" original="Demand">Petición</value>
-  <value column="Description" original="Maintain Material Demand">Mantenga la demanda material</value>
+  <value column="Description" original="Maintain Material Demand">Mantener la solicitud material</value>
   <value column="Help" original="Material Demand can be based on Forecast, Requisitions, Open Orders">La demanda material se puede basar en el pronóstico, demandas, órdenes abiertas.</value>
  </row>
  <row id="330" trl="Y">
@@ -1056,7 +1056,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  <row id="336" trl="Y">
   <value column="Name" original="SLA by Partner">ANS por Socio</value>
   <value column="Description" original="Service Level Agreement">Acuerdo del porcentaje de disponibilidad</value>
-  <value column="Help" original="Maintain Service Level Agreements for Business Partners">Mantenga los acuerdos del porcentaje de disponibilidad para los socios del negocio</value>
+  <value column="Help" original="Maintain Service Level Agreements for Business Partners">Mantener los acuerdos del porcentaje de disponibilidad para los socios del negocio</value>
  </row>
  <row id="337" trl="Y">
   <value column="Name" original="Price List Schema">Esquema De Lista De precios</value>
@@ -1069,8 +1069,8 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
   <value column="Help" original="The POS Terminal defines the defaults and functions available for the POS Form">La terminal de PDV define los datos por omisión y las funciones disponibles para las formas de PDV.</value>
  </row>
  <row id="339" trl="Y">
-  <value column="Name" original="POS Key Layout">PDV llave Disposición</value>
-  <value column="Description" original="POS Function Key Layout">PDV Función de llave de disposición</value>
+  <value column="Name" original="POS Key Layout">Disposición del Teclado PDV</value>
+  <value column="Description" original="POS Function Key Layout">Disposición del Teclado PDV</value>
   <value column="Help" original=""/>
  </row>
  <row id="340" trl="Y">
@@ -1090,7 +1090,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  </row>
  <row id="343" trl="Y">
   <value column="Name" original="Cost Element">Elemento de Costo</value>
-  <value column="Description" original="Maintain Product Cost Element">Mantenga el elemento de costo de producto</value>
+  <value column="Description" original="Maintain Product Cost Element">Mantener el elemento de costo de producto</value>
   <value column="Help" original="You can define your own product cost elements.">Usted puede definir sus propios elementos de costo del producto.</value>
  </row>
  <row id="344" trl="Y">
@@ -1099,9 +1099,9 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
   <value column="Help" original="Maintain Product Cost Elements"/>
  </row>
  <row id="345" trl="Y">
-  <value column="Name" original="Request Category">Categoria de la Solicitud</value>
-  <value column="Description" original="Maintain Request Category">Mantener categoria de solicitud</value>
-  <value column="Help" original="Category or Topic of the Request ">Categoria ó asunto de la solicitud</value>
+  <value column="Name" original="Request Category">Categoría de la Solicitud</value>
+  <value column="Description" original="Maintain Request Category">Mantener Categoría de solicitud</value>
+  <value column="Help" original="Category or Topic of the Request ">Categoría ó asunto de la solicitud</value>
  </row>
  <row id="346" trl="Y">
   <value column="Name" original="Request Group">Grupo de Solicitud</value>
@@ -1134,8 +1134,8 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
   <value column="Help" original="Maintain internal (employee) or external positions"/>
  </row>
  <row id="352" trl="Y">
-  <value column="Name" original="Position Category">Categoria de posición</value>
-  <value column="Description" original="Maintain Job Position Categories">Categoria de posición</value>
+  <value column="Name" original="Position Category">Categoría de posición</value>
+  <value column="Description" original="Maintain Job Position Categories">Categoría de posición</value>
   <value column="Help" original=""/>
  </row>
  <row id="353" trl="Y">
@@ -1150,7 +1150,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
  </row>
  <row id="355" trl="Y">
   <value column="Name" original="BOM Change Notice">LDM aviso de cambio</value>
-  <value column="Description" original="Maintain Bill of Materials (Engineering) Change Notice (Version)">Mantenga la cuenta del aviso de cambio de los materiales (ingeniería) (versión)</value>
+  <value column="Description" original="Maintain Bill of Materials (Engineering) Change Notice (Version)">Mantener la cuenta del aviso de cambio de los materiales (ingeniería) (versión)</value>
   <value column="Help" original="Change notices can be linked to BOMs or be stand alone.">Los avisos del cambio pueden ser ligados a LDMs ó ser soporte solamente.</value>
  </row>
  <row id="356" trl="Y">
@@ -1178,12 +1178,12 @@ Segmentos Contables de la organización deseada, Cuentas, Productos pueden tener
  <row id="361" trl="Y">
   <value column="Name" original="Budget Control">Control de Presupuesto</value>
   <value column="Description" original="Maintain Budget Controls">Mantener Control de Presupuesto</value>
-  <value column="Help" original="Budget Control allows you to restrict the use of expenditures, commitments (Purchase Orders) and reservations (Requisitions). If defined, you mey not be able to approve Requisitions, Purchse Orders, or AP Invoices.">Control de Presupuesto le permite restringir Gastos, Compromisos (Ordenes de Compra) y reservados (Requisiciónes). Si definió no podrá aprobar Requisiciones, Ordenes de Compra, o CxP Facturas.
+  <value column="Help" original="Budget Control allows you to restrict the use of expenditures, commitments (Purchase Orders) and reservations (Requisitions). If defined, you mey not be able to approve Requisitions, Purchse Orders, or AP Invoices.">Control de Presupuesto le permite restringir Gastos, Compromisos (Órdenes de Compra) y reservados (Requisiciónes). Si definió no podrá aprobar Requisiciones, Órdenes de Compra, o CxP Facturas.
 </value>
  </row>
  <row id="362" trl="Y">
-  <value column="Name" original="GL Fund (Alpha)">GL Fund (Alpha)</value>
-  <value column="Description" original="Maintain Fund Controls">Maintain Fund Controls</value>
+  <value column="Name" original="GL Fund (Alpha)">Fondos CG (Alpha)</value>
+  <value column="Description" original="Maintain Fund Controls">Mantener Fondos Contabilidad General</value>
   <value column="Help" original="General Ledger Funds Control allows you to restrict the use of funds.  This is independent from budget control.">General Ledger Funds Control allows you to restrict the use of funds.  This is independent from budget control.</value>
  </row>
  <row id="363" trl="Y">
@@ -1499,7 +1499,7 @@ MRP - 110	 No exists Dem</value>
  <row id="53021" trl="Y">
   <value column="Name" original="Tax Definition">Definición de Impuestos</value>
   <value column="Description" original="Lets you define different tax combinations.">Permite definir combinación de impuestos</value>
-  <value column="Help" original="You can use the tax dfinition information to create the logic necessary to get the tax rate to your document">You can use the tax dfinition information to create the logic necessary to get the tax rate to your document</value>
+  <value column="Help" original="You can use the tax dfinition information to create the logic necessary to get the tax rate to your document">You can use the tax definition information to create the logic necessary to get the tax rate to your document</value>
  </row>
  <row id="53022" trl="Y">
   <value column="Name" original="Tax Rate Parent">Impuesto Padre</value>
@@ -1792,14 +1792,44 @@ MRP - 110	 No exists Dem</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
+ <row id="53134" trl="Y">
+  <value column="Name" original="Cash Plan">Plan de Caja</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
  <row id="1000000" trl="Y">
-  <value column="Name" original="Clase Documento">Clase Documento</value>
-  <value column="Description" original="Clases de Documentos">Clases de Documentos</value>
-  <value column="Help" original="Esta ventana permite definir las diferentes clases de documento que se asignan a los socios de negocio (CUIT, CUIL, DNI, etc.)">Esta ventana permite definir las diferentes clases de documento que se asignan a los socios del negocio (CUIT, CUIL, DNI, etc.)</value>
+  <value column="Name" original="ISIC">IIBB</value>
+  <value column="Description" original="">Impuesto sobre los Ingresos Brutos</value>
+  <value column="Help" original="">Esta ventana permite definir las diferentes opciones de Inscripción en el Impuesto sobre los Ingresos Brutos.</value>
  </row>
  <row id="1000001" trl="Y">
-  <value column="Name" original="Tipo Contribuyente">Tipo Contribuyente</value>
-  <value column="Description" original="Tipo de contribuyente">Tipo de contribuyente</value>
-  <value column="Help" original="Almacena los tipos de contribuyentes segun AFIP">Almacena los tipos de contribuyentes segun AFIP</value>
+  <value column="Name" original="Withholding Category">Categoría Retención</value>
+  <value column="Description" original="">Categoría Retención</value>
+  <value column="Help" original="">Establece la categoría de Retención IIBB</value>
+ </row>
+ <row id="1000002" trl="Y">
+  <value column="Name" original="Tax Payer Type">Tipo Contribuyente</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000003" trl="Y">
+  <value column="Name" original="Withholding Type">Tipo Retención</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000004" trl="Y">
+  <value column="Name" original="TaxId Type">Tipo Impuesto</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000009" trl="Y">
+  <value column="Name" original="lar_fiscal_printer_type">Tipo Impresora Fiscal</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000012" trl="Y">
+  <value column="Name" original="lar_fiscal_printer">Impresora Fiscal</value>
+  <value column="Description" original="lar_fiscal_printer"/>
+  <value column="Help" original=""/>
  </row>
 </adempiereTrl>

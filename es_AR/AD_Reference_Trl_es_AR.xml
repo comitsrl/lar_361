@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) Release 3.6.0LTS_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20100901-2107 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120123-0812 - ${ADEMPIERE_VENDOR}-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Reference">
  <row id="1" trl="Y">
@@ -158,37 +158,37 @@
   <value column="Help" original=""/>
  </row>
  <row id="36" trl="Y">
-<value column="Name" original="Text Long">Texto Largo</value>
-<value column="Description" original="Text (Long) - Text > 2000 characters">
-<![CDATA[ Texto (Largo) - Texto > 2000 caracteres ]]>
-</value>
-<value column="Help" original=""/>
-</row>
+  <value column="Name" original="Text Long">Texto Largo</value>
+  <value column="Description" original="Text (Long) - Text &gt; 2000 characters"><![CDATA[
+ Texto (Largo) - Texto > 2000 caracteres 
+]]></value>
+  <value column="Help" original=""/>
+ </row>
  <row id="37" trl="Y">
   <value column="Name" original="Costs+Prices">Costs+Prices</value>
   <value column="Description" original="Costs + Prices (minimum currency precision but if exists more)">Costs + Prices (minimum currency precision, but if exists more)</value>
   <value column="Help" original=""/>
  </row>
-<row id="38" trl="Y">
-<value column="Name" original="FilePath">Ruta de Archivo</value>
-<value column="Description" original="Local File Path">Ruta de Archivo Local</value>
-<value column="Help" original=""/>
-</row>
-<row id="39" trl="Y">
-<value column="Name" original="FileName">Nombre de Archivo</value>
-<value column="Description" original="Local File">Archivo Local</value>
-<value column="Help" original=""/>
-</row>
-<row id="40" trl="Y">
-<value column="Name" original="URL">Dirección Web</value>
-<value column="Description" original="URL">Dirección Web</value>
-<value column="Help" original=""/>
-</row>
-<row id="42" trl="Y">
-<value column="Name" original="Printer Name">Nombre Impresora</value>
-<value column="Description" original=""/>
-<value column="Help" original=""/>
-</row>
+ <row id="38" trl="Y">
+  <value column="Name" original="FilePath">Ruta de Archivo</value>
+  <value column="Description" original="Local File Path">Ruta de Archivo Local</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="39" trl="Y">
+  <value column="Name" original="FileName">Nombre de Archivo</value>
+  <value column="Description" original="Local File">Archivo Local</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="40" trl="Y">
+  <value column="Name" original="URL">Dirección Web</value>
+  <value column="Description" original="URL">Dirección Web</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="42" trl="Y">
+  <value column="Name" original="Printer Name">Nombre Impresora</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
  <row id="100" trl="Y">
   <value column="Name" original="AD_Validation Rules Parent">AD_Validation Rules Parent</value>
   <value column="Description" original="Validation rule Parent selection">Selección Maestra de Regla de Validación</value>
@@ -2094,6 +2094,16 @@
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
+ <row id="53350" trl="N">
+  <value column="Name" original="C_POSKeyLayout">C_POSKeyLayout</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53351" trl="N">
+  <value column="Name" original="POSKeyLayoutType">POSKeyLayoutType</value>
+  <value column="Description" original="POS Key layout types">POS Key layout types</value>
+  <value column="Help" original=""/>
+ </row>
  <row id="53352" trl="Y">
   <value column="Name" original="RelType C_BPartner &lt;= Vendor/Customer Return"><![CDATA[RelType C_BPartner_ID->Customer_RMA]]></value>
   <value column="Description" original=""/>
@@ -2109,9 +2119,84 @@
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
+ <row id="53382" trl="N">
+  <value column="Name" original="C_PaymentTerm PaymentTermUsage">C_PaymentTerm PaymentTermUsage</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53383" trl="N">
+  <value column="Name" original="C_PaymentTerm Sales">C_PaymentTerm Sales</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53384" trl="N">
+  <value column="Name" original="C_PaymentTerm Purchases">C_PaymentTerm Purchases</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53385" trl="N">
+  <value column="Name" original="C_CashPlan CashFlowType">C_CashPlan CashFlowType</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53386" trl="N">
+  <value column="Name" original="Generate Cash Plan Periodicity">Generate Cash Plan Periodicity</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="53387" trl="N">
+  <value column="Name" original="T_CashFlow CashFlowSource">T_CashFlow CashFlowSource</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
  <row id="1000000" trl="Y">
-  <value column="Name" original="LAR_ClaseDocumento">LAR_ClaseDocumento</value>
-  <value column="Description" original="Clase de Documento">Clase de Documento</value>
-  <value column="Help" original="Clase de Documento (DNI, CUIT, CUIL, etc.)">Clase de Documento (DNI, CUIT, CUIL, etc.)</value>
+  <value column="Name" original="LCO_WithholdingType BaseType">LAR_ClaseDocumento</value>
+  <value column="Description" original="">Clase de Documento</value>
+  <value column="Help" original="">Clase de Documento (DNI, CUIT, CUIL, etc.)</value>
+ </row>
+ <row id="1000001" trl="N">
+  <value column="Name" original="LCO_ISIC_ID">LCO_ISIC_ID</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000002" trl="N">
+  <value column="Name" original="LCO_TaxPayerType_ID">LCO_TaxPayerType_ID</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000003" trl="N">
+  <value column="Name" original="LCO_C_City_ID">LCO_C_City_ID</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000004" trl="N">
+  <value column="Name" original="LCO_GenerateWithdHolding on DocType">LCO_GenerateWithdHolding on DocType</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000005" trl="N">
+  <value column="Name" original="lar_onprintproductformat">lar_onprintproductformat</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000006" trl="N">
+  <value column="Name" original="lar_status">lar_status</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000007" trl="N">
+  <value column="Name" original="lar_documentsubtype">lar_documentsubtype</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000008" trl="N">
+  <value column="Name" original="lar_fiscaldocument">lar_fiscaldocument</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000009" trl="N">
+  <value column="Name" original="lar_docsubtypecae">lar_docsubtypecae</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
  </row>
 </adempiereTrl>

@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) Release 3.6.0LTS_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20100901-2107 - ${ADEMPIERE_VENDOR}-->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120123-0812 - ${ADEMPIERE_VENDOR}-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Menu">
  <row id="100" trl="Y">
@@ -47,7 +47,7 @@
   <value column="Description" original=""/>
  </row>
  <row id="165" trl="Y">
-  <value column="Name" original="Business Partner Rules">Reglas de Socio del Negocio</value>
+  <value column="Name" original="Business Partner Rules">Reglas Socios del Negocio</value>
   <value column="Description" original=""/>
  </row>
  <row id="166" trl="Y">
@@ -179,7 +179,7 @@
   <value column="Description" original="Resource Manufacturing">Recursos de Producción</value>
  </row>
  <row id="53019" trl="Y">
-  <value column="Name" original="Manufacturing Workflow">Workflow de Producción</value>
+  <value column="Name" original="Manufacturing Workflow">Flujo de Trabajo Producción</value>
   <value column="Description" original=""/>
  </row>
  <row id="53022" trl="Y">
@@ -219,8 +219,8 @@
   <value column="Description" original="Management Maintenance">Gestión de Mantenimiento</value>
  </row>
  <row id="53063" trl="Y">
-  <value column="Name" original="Activity Control">Shop Floor Control</value>
-  <value column="Description" original="Activity Control">Shop Floor Control</value>
+  <value column="Name" original="Activity Control">Control Actividad</value>
+  <value column="Description" original="Activity Control">Control Actvidad</value>
  </row>
  <row id="53066" trl="Y">
   <value column="Name" original="Distribution Management">Gestión de Distribución</value>
@@ -239,7 +239,7 @@
   <value column="Description" original=""/>
  </row>
  <row id="53098" trl="Y">
-  <value column="Name" original="Replication Data">Replicacion Datos</value>
+  <value column="Name" original="Replication Data">Duplicación Datos</value>
   <value column="Description" original=""/>
  </row>
  <row id="53108" trl="Y">
