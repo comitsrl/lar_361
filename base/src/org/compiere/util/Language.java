@@ -261,7 +261,7 @@ public class Language implements Serializable
 
 	/**************************************************************************
 	 *  Get Language.
-	 * 	If language does not exist, create it on the fly assuming that it is valid
+	 * 	If language does not exist, create it on the fly assuming that it is valid 
 	 *  @param langInfo either language (en) or locale (en-US) or display name
 	 *  @return Name (e.g. Deutsch)
 	 */
@@ -279,23 +279,23 @@ public class Language implements Serializable
 				|| lang.equals(s_languages[i].getAD_Language()))
 				return s_languages[i];
 		}
-
-		//	Create Language on the fly
-		if (lang.length() == 5)		//	standard format <language>_<Country>
-		{
-			String language = lang.substring(0,2);
-			String country = lang.substring(3);
-			Locale locale = new Locale(language, country);
-			log.info ("Adding Language=" + language + ", Country=" + country + ", Locale=" + locale);
-			Language ll = new Language (lang, lang, locale);
+		//Marcos Zúñiga - Ergio: (This causes unwanted entries on Login Language Combo)  
+		//	Create Language on the fly 
+		//if (lang.length() == 5)		//	standard format <language>_<Country>
+		//{
+		//	String language = lang.substring(0,2);
+		//	String country = lang.substring(3);
+		//	Locale locale = new Locale(language, country);
+		//	log.info ("Adding Language=" + language + ", Country=" + country + ", Locale=" + locale);
+		//	Language ll = new Language (lang, lang, locale);
 			//	Add to Languages
-			ArrayList<Language> list = new ArrayList<Language>(Arrays.asList(s_languages));
-			list.add(ll);
-			s_languages = new Language [list.size()];
-			list.toArray(s_languages);
-			//	Return Language
-			return ll;
-		}
+		//	ArrayList<Language> list = new ArrayList<Language>(Arrays.asList(s_languages));
+		//	list.add(ll);
+		//	s_languages = new Language [list.size()];
+		//	list.toArray(s_languages);
+		//	//	Return Language
+		//	return ll;
+		//}
 		//	Get the default one
 		return s_loginLanguage;
 	}   //  getLanguage
