@@ -32,6 +32,7 @@ import org.compiere.model.PO;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 
+import static ar.com.ergio.model.LAR_TaxPayerType.RESPONSABLE_INSCRIPTO;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
@@ -210,17 +211,31 @@ import ar.com.ergio.util.LAR_Utils;
            )
         {
             MOrder order = line.getParent();
-            final PerceptionConfig config = new PerceptionConfig(bp, order);
-            log.info("Perception >> " + config);
+            final WithholdingConfig wc = new WithholdingConfig(bp);
+            log.info("Withholding conf >> " + wc);
+
+            // Calculates subtotal and perception amounts
+            BigDecimal subtotal = BigDecimal.ZERO;
+            BigDecimal taxAmt = BigDecimal.ZERO;
+            if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType.getTaxPayerType(bp))) {
+                for (MOrderTax tax : order.getTaxes(true)) {
+                    taxAmt = taxAmt.add(tax.getTaxAmt());
+                }
+                subtotal = order.getGrandTotal().subtract(taxAmt);
+            } else {
+                subtotal = order.getGrandTotal();
+            }
+
+            BigDecimal perceptionAmt =  subtotal.multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_UP);
 
             // Create order perception
             MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
             perception.setC_Order_ID(order.get_ID());
-            perception.setC_Tax_ID(config.getTax_ID());
-            perception.setLCO_WithholdingRule_ID(config.getWithholdingRule_ID());
-            perception.setLCO_WithholdingType_ID(config.getWithholdingType_ID());
-            perception.setTaxAmt(config.getTaxAmount());
-            perception.setTaxBaseAmt(config.getSubTotal());
+            perception.setC_Tax_ID(wc.getTax_ID());
+            perception.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
+            perception.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
+            perception.setTaxAmt(perceptionAmt);
+            perception.setTaxBaseAmt(subtotal);
             perception.setIsTaxIncluded(false);
             if (!perception.save()) {
                 return "Can not create preception";
@@ -254,17 +269,14 @@ import ar.com.ergio.util.LAR_Utils;
     }
 
      /**
-      * Encapsulates configuration parameters for perception
+      * Encapsulates configuration parameters for withholdings
       */
-     private class PerceptionConfig
+     private class WithholdingConfig
      {
          // TODO - try to avoid this hardcode value
          private final int C_TAXCATEGORY_ID = 1000002; // Perception Tax Category
 
          private BigDecimal aliquot = BigDecimal.ZERO;
-         private BigDecimal subtotal;
-         private LAR_TaxPayerType taxPayerType;
-         private MOrder order;
          private int lco_WithholdingRule_ID;
          private int lco_WithholdingType_ID;
          private int c_Tax_ID;
@@ -282,10 +294,8 @@ import ar.com.ergio.util.LAR_Utils;
                  + "   AND x.c_taxcategory_id = ?";
 
 
-         private PerceptionConfig(final MBPartner bp, final MOrder order)
+         private WithholdingConfig(final MBPartner bp)
          {
-             this.order = order;
-             this.taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
              retrieveConfig(bp);
          }
 
@@ -304,38 +314,9 @@ import ar.com.ergio.util.LAR_Utils;
              return c_Tax_ID;
          }
 
-         /**
-          * Returns perception amount depending a tax payer type of a given bpartner.
-          *
-          * @return perception amount
-          */
-         private BigDecimal getTaxAmount()
+         private BigDecimal getAliquot()
          {
-             return getSubTotal().multiply(aliquot).setScale(2, BigDecimal.ROUND_HALF_UP);
-         }
-
-         /**
-          * Returns order subtotal amount depending a tax payer type of a given bpartner.
-          *
-          * @return order subtotal amount
-          */
-         private BigDecimal getSubTotal()
-         {
-             if (subtotal == null) {
-                 BigDecimal taxAmt = BigDecimal.ZERO;
-
-                 switch (taxPayerType) {
-                 case RESPONSABLE_INSCRIPTO:
-                     for (MOrderTax tax : order.getTaxes(true)) {
-                         taxAmt = taxAmt.add(tax.getTaxAmt());
-                     }
-                     subtotal = order.getGrandTotal().subtract(taxAmt);
-                     break;
-                 default:
-                     subtotal = order.getGrandTotal();
-                 }
-             }
-             return subtotal;
+             return aliquot;
          }
 
          /**
@@ -365,21 +346,19 @@ import ar.com.ergio.util.LAR_Utils;
                  rs = null;
                  pstmt = null;
              }
-         } // calculate
+         } // retrieveConfig
 
          @Override
          public String toString()
          {
-             StringBuilder sb = new StringBuilder("PerceptionConfig[");
+             StringBuilder sb = new StringBuilder("WithholdingConfig[");
              sb.append("Aliquot=").append(aliquot);
              sb.append(",Rule=").append(getWithholdingRule_ID());
              sb.append(",Type=").append(getWithholdingType_ID());
              sb.append(",Tax=").append(getTax_ID());
-             sb.append(",Amt=").append(getTaxAmount());
-             sb.append(",PayerType=").append(taxPayerType);
              sb.append("]");
              return sb.toString();
          }
-     } // PerceptionConfig
+     } // WithholndigConfig
 
  }   //  LAR_Validator
