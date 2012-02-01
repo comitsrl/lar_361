@@ -342,8 +342,12 @@ import ar.com.ergio.util.LAR_Utils;
     private String calculateWithholdingOnPayment(MBPartner bp, MPayment payment, int type)
     {
         // TODO - improve this way to avoid process reversal payments
-        if ((type == TYPE_AFTER_NEW && !payment.getDescription().contains("{->"))
-             || (type == TYPE_AFTER_CHANGE) && payment.is_ValueChanged("PayAmt"))
+        if (payment.getDescription() != null
+                && payment.getDescription().contains("{->")
+                && payment.getDescription().endsWith(")")) {
+            // do nothing - is reversal payment
+        }
+        else if (type == TYPE_AFTER_NEW || (type == TYPE_AFTER_CHANGE && payment.is_ValueChanged("PayAmt")))
         {
             final WithholdingConfig wc = new WithholdingConfig(bp, RETENCION_ID);
             log.info("Withholding conf >> " + wc);
@@ -407,7 +411,12 @@ import ar.com.ergio.util.LAR_Utils;
     private String createWithholdingCertificate(final MPayment payment, int timing)
     {
         // TODO - improve this way to avoid process reversal payments
-        if (timing == TIMING_AFTER_COMPLETE && !payment.getDescription().contains("{->"))
+        if (payment.getDescription() != null
+                && payment.getDescription().contains("{->")
+                && payment.getDescription().endsWith(")")) {
+            // do nothing - is reversal payment
+        }
+        else if (timing == TIMING_AFTER_COMPLETE)
         {
             log.info("Payment: " + payment.get_ID());
 
@@ -428,7 +437,12 @@ import ar.com.ergio.util.LAR_Utils;
     private String deactivateWithholding(final MPayment payment, int timing)
     {
         // TODO - improve this way to avoid process reversal payments
-        if (timing == TIMING_AFTER_COMPLETE && !payment.getDescription().contains("{->"))
+        if (payment.getDescription() != null
+                && payment.getDescription().contains("{->")
+                && payment.getDescription().endsWith(")")) {
+            // do nothing - is reversal payment
+        }
+        else if (timing == TIMING_AFTER_COMPLETE)
         {
             MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
             pwh.setIsActive(false);
