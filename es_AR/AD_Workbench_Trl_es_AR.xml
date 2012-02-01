@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120123-0812 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120127-1829 - ${ADEMPIERE_VENDOR}-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Workbench">
  <row id="100" trl="Y">
   <value column="Name" original="Sales">Ventas</value>
   <value column="Description" original=""/>
-  <value column="Help" original=""/>
- </row>
- <row id="1000000" trl="Y">
-  <value column="Name" original="ERGIO_LAR_WORKBENCH">ERGIO_LAR_GURPODETRABAJO</value>
-  <value column="Description" original="Ventanas afectadas por la Localización Argentina">Ventanas afectadas por la Localización Argentina</value>
   <value column="Help" original=""/>
  </row>
 </adempiereTrl>

@@ -1,25 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120123-0812 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120127-1829 - ${ADEMPIERE_VENDOR}-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="C_TaxCategory">
  <row id="107" trl="Y">
   <value column="Name" original="Standard">Estándar</value>
   <value column="Description" original=""/>
- </row>
- <row id="1000000" trl="N">
-  <value column="Name" original="Estándar">Estándar</value>
-  <value column="Description" original=""/>
- </row>
- <row id="1000001" trl="N">
-  <value column="Name" original="IVA">IVA</value>
-  <value column="Description" original=""/>
- </row>
- <row id="1000002" trl="Y">
-  <value column="Name" original="Percepciones IIBB">Percepciones IIBB</value>
-  <value column="Description" original="Percepciones de IIBB efectuadas en la Venta">Percepciones de IIBB efectuadas en la Venta</value>
- </row>
- <row id="1000003" trl="N">
-  <value column="Name" original="Retenciones IIBB">Retenciones IIBB</value>
-  <value column="Description" original="Retenciones de IIBB sufridas en los pagos">Retenciones de IIBB sufridas en los pagos</value>
  </row>
 </adempiereTrl>

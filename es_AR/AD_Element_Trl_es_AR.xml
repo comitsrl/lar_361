@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120123-0812 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120127-1829 - ${ADEMPIERE_VENDOR}-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Element">
  <row id="101" trl="Y">
@@ -453,8 +453,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="157" trl="Y">
-  <value column="Name" original="Address 2">Colonía</value>
-  <value column="PrintName" original="Address 2">Colonía</value>
+  <value column="Name" original="Address 2">Dirección 2</value>
+  <value column="PrintName" original="Address 2">Dirección 2</value>
   <value column="Description" original="Address line 2 for this location">Dirección 2 para esta ubicación</value>
   <value column="Help" original="The Address 2 provides additional address information for an entity.  It can be used for building location, apartment number or similar information.">La Dirección 2 provee información de la dirección adicional para una entidad. Puede ser usada para integrar la ubicación; número de apartamento; ó información similar</value>
   <value column="PO_Description" original=""/>
@@ -1153,10 +1153,10 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="260" trl="Y">
-  <value column="Name" original="D-U-N-S">DUNS</value>
-  <value column="PrintName" original="D-U-N-S">DUNS</value>
-  <value column="Description" original="Dun &amp; Bradstreet Number">DUNS</value>
-  <value column="Help" original="Used for EDI - For details see   www.dnb.com/dunsno/list.htm">Usado por EDI - para detalles ver www.dnb.com/dunsno/list.htm</value>
+  <value column="Name" original="D-U-N-S">No IIBB</value>
+  <value column="PrintName" original="D-U-N-S">No IIBB</value>
+  <value column="Description" original="Dun &amp; Bradstreet Number">Número de Inscripción en IIBB</value>
+  <value column="Help" original="Used for EDI - For details see   www.dnb.com/dunsno/list.htm">Número de Inscripción en el Impuesto sobre los Ingresos Brutos</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
   <value column="PO_Name" original=""/>
@@ -1503,8 +1503,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="307" trl="Y">
-  <value column="Name" original="GAAP">GAAP</value>
-  <value column="PrintName" original="GAAP">GAAP</value>
+  <value column="Name" original="GAAP">GAAP (PCGA)</value>
+  <value column="PrintName" original="GAAP">GAAP (PCGA)</value>
   <value column="Description" original="Generally Accepted Accounting Principles">Principios de Contabilidad Generalmente Aceptados.</value>
   <value column="Help" original="The GAAP identifies the account principles that this accounting schema will adhere to.">El GAAP identifica los principios contables en que este esquema contable esta basado.</value>
   <value column="PO_Description" original=""/>
@@ -2323,8 +2323,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="439" trl="Y">
-  <value column="Name" original="Line No">No. Línea</value>
-  <value column="PrintName" original="Line No">No. Línea</value>
+  <value column="Name" original="Line No">No Línea</value>
+  <value column="PrintName" original="Line No">No Línea</value>
   <value column="Description" original="Unique line for this document">No. Línea único para este documento</value>
   <value column="Help" original="Indicates the unique line for a document.  It will also control the display order of the lines within a document.">Indica el No. Línea para un documento. También controlará el orden de despliegue de las líneas dentro de un documento</value>
   <value column="PO_Description" original=""/>
@@ -5933,8 +5933,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1259" trl="Y">
-  <value column="Name" original="Base Pricelist">Lista de Precio Base</value>
-  <value column="PrintName" original="Base">Lista de precio base</value>
+  <value column="Name" original="Base Pricelist">Lista de Precios Base</value>
+  <value column="PrintName" original="Base">Lista de Precios base</value>
   <value column="Description" original="Pricelist to be used, if product not found on this pricelist">Lista de precios a ser usada; si el producto no se encontró en esta lista de precios</value>
   <value column="Help" original="The Base Price List identifies the default price list to be used if a product is not found on the selected price list">La lista de precio base identifica la lista de precio predeterminado a ser usado si un producto no se encuentra en la lista de precios seleccionada.</value>
   <value column="PO_Description" original=""/>
@@ -8604,8 +8604,8 @@
  </row>
  <row id="1599" trl="Y">
   <value column="Name" original="Sql SELECT">Cláusula Select </value>
-  <value column="PrintName" original="Select Clause">Cláusula Select</value>
-  <value column="Description" original="SQL SELECT clause">Seleccione la cláusula</value>
+  <value column="PrintName" original="Select Clause">Cláusula Select </value>
+  <value column="Description" original="SQL SELECT clause">Cláusula Select </value>
   <value column="Help" original="The Select Clause indicates the SQL SELECT clause to use for selecting the record for a measure calculation. Do not include the SELECT itself.">La Cláusula Select indica la cláusula SQL SELECT a usar para seleccionar el registro en un cálculo de medida</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -11373,9 +11373,9 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1906" trl="Y">
-  <value column="Name" original="Business Partner Key">Clave de S.N.</value>
-  <value column="PrintName" original="Partner Key">Clave de S.N.</value>
-  <value column="Description" original="The Key of the Business Partner">La clave del S.N.</value>
+  <value column="Name" original="Business Partner Key">Clave de SdN</value>
+  <value column="PrintName" original="Partner Key">Clave de SdN</value>
+  <value column="Description" original="The Key of the Business Partner">La clave del SdN</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -11413,9 +11413,9 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1910" trl="Y">
-  <value column="Name" original="Element Key">Llave de Elemento</value>
-  <value column="PrintName" original="Element Key">Llave de Elemento</value>
-  <value column="Description" original="Key of the element">Llave del elemento.</value>
+  <value column="Name" original="Element Key">Valor del Elemento</value>
+  <value column="PrintName" original="Element Key">Valor del Elemento</value>
+  <value column="Description" original="Key of the element">Valor del Elemento</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -12103,8 +12103,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1982" trl="Y">
-  <value column="Name" original="Level no">No. Nivel</value>
-  <value column="PrintName" original="Level no">No. Nivel</value>
+  <value column="Name" original="Level no">No Nivel</value>
+  <value column="PrintName" original="Level no">No Nivel</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -12864,8 +12864,8 @@ Si no se incorpora ninguna, se utiliza la impresora por default. Usted especific
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2064" trl="Y">
-  <value column="Name" original="Log">Log</value>
-  <value column="PrintName" original="Log">Log</value>
+  <value column="Name" original="Log">Registro</value>
+  <value column="PrintName" original="Log">Registro</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -13204,8 +13204,8 @@ Si no se incorpora ninguna, se utiliza la impresora por default. Usted especific
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2101" trl="Y">
-  <value column="Name" original="Sql FROM">De Clausula</value>
-  <value column="PrintName" original="From Clause">De Clausula</value>
+  <value column="Name" original="Sql FROM">Clausula Desde</value>
+  <value column="PrintName" original="From Clause">Clausula Desde</value>
   <value column="Description" original="SQL FROM clause">SQL de clausula</value>
   <value column="Help" original="The Select Clause indicates the SQL FROM clause to use for selecting the record for a measure calculation. It can have JOIN clauses. Do not include the FROM itself."/>
   <value column="PO_Description" original=""/>
@@ -13485,8 +13485,8 @@ El honorario está por 10 usuarios internos. El número de las unidades de ayuda
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2130" trl="Y">
-  <value column="Name" original="Replication">Réplica</value>
-  <value column="PrintName" original="Replication">Réplica</value>
+  <value column="Name" original="Replication">Duplicación</value>
+  <value column="PrintName" original="Replication">Duplicación</value>
   <value column="Description" original="Data Replication Target">Réplica de datos en tarjeta</value>
   <value column="Help" original="Data Replication Target Details. Maintained on the central server.">Detalles de réplica de datos. Mantenido en el servidor central.</value>
   <value column="PO_Description" original=""/>
@@ -13495,8 +13495,8 @@ El honorario está por 10 usuarios internos. El número de las unidades de ayuda
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2131" trl="Y">
-  <value column="Name" original="Replication Log">Registro Replicación </value>
-  <value column="PrintName" original="Replication Log">Registro Replicación </value>
+  <value column="Name" original="Replication Log">Registro Duplicación</value>
+  <value column="PrintName" original="Replication Log">Registro Duplicación</value>
   <value column="Description" original="Data Replication Log Details">Detalles de datos de reg. de la réplica.</value>
   <value column="Help" original="Data Replication Run Log">Registro del funcionamiento de la réplica de datos.</value>
   <value column="PO_Description" original=""/>
@@ -13505,8 +13505,8 @@ El honorario está por 10 usuarios internos. El número de las unidades de ayuda
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2132" trl="Y">
-  <value column="Name" original="Replication Run">Ejecución de Replicación</value>
-  <value column="PrintName" original="Replication Run">Ejecución de Replicación</value>
+  <value column="Name" original="Replication Run">Ejecución de Duplicación</value>
+  <value column="PrintName" original="Replication Run">Ejecución de Duplicación</value>
   <value column="Description" original="Data Replication Run">Funcionamiento de la réplica de los datos</value>
   <value column="Help" original="Data Replication Run information"/>
   <value column="PO_Description" original=""/>
@@ -13515,8 +13515,8 @@ El honorario está por 10 usuarios internos. El número de las unidades de ayuda
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2133" trl="Y">
-  <value column="Name" original="Replication Strategy">Estrategía de Replicación</value>
-  <value column="PrintName" original="Replication Strategy">Estrategía de Replicación</value>
+  <value column="Name" original="Replication Strategy">Estrategía de Duplicación</value>
+  <value column="PrintName" original="Replication Strategy">Estrategía de Duplicación</value>
   <value column="Description" original="Data Replication Strategy">Estrategia de replicación de los datos.</value>
   <value column="Help" original="The Data Replication Strategy determines what and how tables are replicated ">La estrategia de la réplica de los datos es determinada, lo que y cómo se repliegan las tablas.</value>
   <value column="PO_Description" original=""/>
@@ -13525,8 +13525,8 @@ El honorario está por 10 usuarios internos. El número de las unidades de ayuda
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2134" trl="Y">
-  <value column="Name" original="Replication Table">Tabla de Replicación</value>
-  <value column="PrintName" original="Replication Table">Tabla de Replicación</value>
+  <value column="Name" original="Replication Table">Tabla de Duplicación</value>
+  <value column="PrintName" original="Replication Table">Tabla de Duplicación</value>
   <value column="Description" original="Data Replication Strategy Table Info">Tabla de Replicación estrategica de datos.</value>
   <value column="Help" original="Determines how the table is replicated">Se determina cómo se repliega la tabla.</value>
   <value column="PO_Description" original=""/>
@@ -13535,8 +13535,8 @@ El honorario está por 10 usuarios internos. El número de las unidades de ayuda
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2135" trl="Y">
-  <value column="Name" original="Replicated">Replicado</value>
-  <value column="PrintName" original="Replicated">Replicado</value>
+  <value column="Name" original="Replicated">Duplicado</value>
+  <value column="PrintName" original="Replicated">Duplicado</value>
   <value column="Description" original="The data is successfully replicated">Los datos son replicados con exito.</value>
   <value column="Help" original="The data replication was successful.">El dato de replicación es acertado.</value>
   <value column="PO_Description" original=""/>
@@ -15538,8 +15538,8 @@ de proyecto - capacidad de publicar el material</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2354" trl="Y">
-  <value column="Name" original="Linked Organization">Liga Organización</value>
-  <value column="PrintName" original="Linked Org">Liga Org</value>
+  <value column="Name" original="Linked Organization">Vincular con Organización</value>
+  <value column="PrintName" original="Linked Org">Vicnular con Org</value>
   <value column="Description" original="The Business Partner is another Organization for explicit Inter-Org transactions">El Socio del negocio es otra organización para las Inter-Org transacciones explícitas.</value>
   <value column="Help" original="The business partner is another organization in the system. So when performing transactions, the counter-document is created automatically. Example: You have BPartnerA linked to OrgA and BPartnerB linked to OrgB.  If you create a sales order for BPartnerB in OrgA a purchase order is created for BPartnerA in OrgB.  This allows to have explicit documents for Inter-Org transactions.">El Socio del negocio es otra organización en el sistema. Que al realizar transacciones, el contador-documento se crea automáticamente. Ejemplo: usted tiene Socio del negocio A ligado a org. A y Socio del negocio B ligado a Org. B. Si usted crea una orden de ventas para Socio del negocio B en Org. A, una orden de compra se crea para Socio del negocio A en Org. B. Esto permite tener documentos explícitos para las Inter-Org transacciones.</value>
   <value column="PO_Description" original=""/>
@@ -15948,9 +15948,9 @@ de proyecto - capacidad de publicar el material</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2397" trl="Y">
-  <value column="Name" original="In Transit">En Transito</value>
-  <value column="PrintName" original="In Transit">En Transito</value>
-  <value column="Description" original="Movement is in transit">El Movimiento está en transito</value>
+  <value column="Name" original="In Transit">En Tránsito</value>
+  <value column="PrintName" original="In Transit">En Tránsito</value>
+  <value column="Description" original="Movement is in transit">El Movimiento está en tránsito</value>
   <value column="Help" original="Material Movement is in transit - shipped, but not received.&#10;The transaction is completed, if confirmed.">El movimiento de material está en tránsito - enviado, pero no recibido.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -16408,7 +16408,7 @@ de proyecto - capacidad de publicar el material</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2443" trl="Y">
-  <value column="Name" original="Decision date">F. Decisión</value>
+  <value column="Name" original="Decision date">Fecha Decisión</value>
   <value column="PrintName" original="Decision date">F. Decisión</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -17049,8 +17049,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2510" trl="Y">
-  <value column="Name" original="BP Name">Nombre S. Negocio</value>
-  <value column="PrintName" original="BP Name">Nombre S. Negocio</value>
+  <value column="Name" original="BP Name">Razón Social</value>
+  <value column="PrintName" original="BP Name">Razón Social</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -17059,8 +17059,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2511" trl="Y">
-  <value column="Name" original="BP Name2">Nombre S. Negocio 2</value>
-  <value column="PrintName" original="BP Name2">Nombre S. Negocio 2</value>
+  <value column="Name" original="BP Name2">Nombre Comercial</value>
+  <value column="PrintName" original="BP Name2">Nombre Comercial</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -20011,9 +20011,9 @@ org.compiere.util.ReplenishInterface y ajustarlo sobre nivel de Depósito.</valu
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2820" trl="Y">
-  <value column="Name" original="Adjust COGS">Ajustar CDV</value>
-  <value column="PrintName" original="Adjust COGS">Ajustar CDV</value>
-  <value column="Description" original="Adjust Cost of Good Sold">Ajusta Costo DE Venta</value>
+  <value column="Name" original="Adjust COGS">Ajustar CDBV</value>
+  <value column="PrintName" original="Adjust COGS">Ajustar CDBV</value>
+  <value column="Description" original="Adjust Cost of Good Sold">Ajusta Costo de Bienes Vendidos</value>
   <value column="Help" original="For Invoice costing methods, you can adjust the cost of goods sold. At the time of shipment, you may not have received the invoice for the receipt or cost adjustments like freight, customs, etc.">Para métodos de costeo de facturas, usted puede ajustar el costo de la venta al momento de la entrega, pudo no haber recibido la factura para el ajuste del costo como es flete,  gastos, etc.
 </value>
   <value column="PO_Description" original=""/>
@@ -20175,8 +20175,8 @@ Note que usted puede  Sobre o Sub Asignar el Pago.Durante el procesamiento  del 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2836" trl="Y">
-  <value column="Name" original="User BP Access">Usuario SN Acceso</value>
-  <value column="PrintName" original="User BP Access">Usuario SN Acceso</value>
+  <value column="Name" original="User BP Access">Acceso Usuario SdN</value>
+  <value column="PrintName" original="User BP Access">Acceso Usuario SdN</value>
   <value column="Description" original="User/contact access to Business Partner information and resources">Usuario/contacto acceso información Socio del Negocio y recursos</value>
   <value column="Help" original="If on User level, &quot;Full BP Access&quot; is NOT selected, you need to give access explicitly here. ">Si en Nivel de Usuario, "Acceso Total SN" NO es seleccionado, usted debe dar acceso explicítamente aquí.
  </value>
@@ -20278,9 +20278,9 @@ Note que usted puede  Sobre o Sub Asignar el Pago.Durante el procesamiento  del 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2847" trl="Y">
-  <value column="Name" original="Inventory Clearing">Inventory Clearing</value>
-  <value column="PrintName" original="Inventory Clearing">Inventory Clearing</value>
-  <value column="Description" original="Product Inventory Clearing Account">Product Inventory Clearing Account</value>
+  <value column="Name" original="Inventory Clearing">Compensación de Inventario</value>
+  <value column="PrintName" original="Inventory Clearing">Compensación de Inventario</value>
+  <value column="Description" original="Product Inventory Clearing Account">Cuenta de Compensación de Inventario</value>
   <value column="Help" original="Account used for posting matched product (item) expenses (e.g. AP Invoice, Invoice Match).  You would use a different account then Product Expense, if you want to differentiate service related costs from item related costs. The balance on the clearing account should be zero and accounts for the timing difference between invoice receipt and matching.">Account used for posting matched product (item) expenses (e.g. AP Invoice, Invoice Match).  You would use a different account then Product Expense, if you want to differentate service related costs from item related costs. The balance on the clearing account should be zero and accounts for the timing difference between invoice receipt and matching.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -20412,9 +20412,9 @@ Note que usted puede  Sobre o Sub Asignar el Pago.Durante el procesamiento  del 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2861" trl="Y">
-  <value column="Name" original="Commitment Offset">Commitment Offset</value>
-  <value column="PrintName" original="Commitment Offset">Commitment Offset</value>
-  <value column="Description" original="Budgetary Commitment Offset Account">Budgetary Commitment Offset Account</value>
+  <value column="Name" original="Commitment Offset">Compensación de Presupuesto</value>
+  <value column="PrintName" original="Commitment Offset">Compensación de Presupuesto</value>
+  <value column="Description" original="Budgetary Commitment Offset Account">Cuenta de Compensación de Presupuesto</value>
   <value column="Help" original="The Commitment Offset Account is used for posting Commitments and Reservations.  It is usually an off-balance sheet and gain-and-loss account.">The Commitment Offset Account is used for posting Commitments and Reservations.  It is usually an off-balance sheet and gain-and-loss account.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -20548,9 +20548,9 @@ Segmentos contables deseadosm Organizaciones, Cuentas, Productos pueden tener al
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2875" trl="Y">
-  <value column="Name" original="Fund Restriction">Fund Restriction</value>
-  <value column="PrintName" original="Fund Restriction">Fund Restriction</value>
-  <value column="Description" original="Restriction of Funds">Restriction of Funds</value>
+  <value column="Name" original="Fund Restriction">Restricción de Fondos</value>
+  <value column="PrintName" original="Fund Restriction">Restricción de Fondos</value>
+  <value column="Description" original="Restriction of Funds">Restricción de Fondos</value>
   <value column="Help" original="If defined, you can use the fund only for the accounts selected.">If defined, you can use the fund only for the accounts selected.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -21379,7 +21379,7 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2962" trl="Y">
-  <value column="Name" original="Cost Value">Cost Value</value>
+  <value column="Name" original="Cost Value">Valor Costo</value>
   <value column="PrintName" original="Cost Value">Cost Value</value>
   <value column="Description" original="Value with Cost">Value with Cost</value>
   <value column="Help" original=""/>
@@ -21459,9 +21459,9 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2971" trl="Y">
-  <value column="Name" original="Barcode Type">Barcode Type</value>
-  <value column="PrintName" original="Barcode">Barcode</value>
-  <value column="Description" original="Type of barcode">Type of barcode</value>
+  <value column="Name" original="Barcode Type">Tipo Código de Barras</value>
+  <value column="PrintName" original="Barcode">Tipo Código de Barras</value>
+  <value column="Description" original="Type of barcode">Tipo Código de Barras</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -21529,8 +21529,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2978" trl="Y">
-  <value column="Name" original="Template">Template</value>
-  <value column="PrintName" original="Template">Template</value>
+  <value column="Name" original="Template">Plantilla</value>
+  <value column="PrintName" original="Template">Plantilla</value>
   <value column="Description" original="Template defines how content is displayed">Template defines how content is displayed</value>
   <value column="Help" original="A template describes how content should get displayed, it contains layout and maybe also scripts on how to handle the content">A template describes how content should get displayed, it contains layout and maybe also scripts on how to handle the content</value>
   <value column="PO_Description" original=""/>
@@ -21539,8 +21539,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2980" trl="Y">
-  <value column="Name" original="Included">Included</value>
-  <value column="PrintName" original="Included">Included</value>
+  <value column="Name" original="Included">Incluído</value>
+  <value column="PrintName" original="Included">Incluido</value>
   <value column="Description" original="Defines whether this content / template is included into another one">Defines whether this content / template is included into another one</value>
   <value column="Help" original="Templates can be independent or included. Included Templates are also called subtemplates">Templates can be independent or included. Included Templates are also called subtemplates</value>
   <value column="PO_Description" original=""/>
@@ -21569,7 +21569,7 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2983" trl="Y">
-  <value column="Name" original="Elements">Elements</value>
+  <value column="Name" original="Elements">Elementos</value>
   <value column="PrintName" original="Elements">Elements</value>
   <value column="Description" original="Contains list of elements separated by CR">Contains list of elements seperated by CR</value>
   <value column="Help" original="Contains a list of elements this template uses separated by a Carriage Return. Last line should be empty">Contains a list of elements this template uses seperated by a Carriage Return. Last line should be empty</value>
@@ -21640,7 +21640,7 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2990" trl="Y">
-  <value column="Name" original="Indexed">Indexed</value>
+  <value column="Name" original="Indexed">Indexado</value>
   <value column="PrintName" original="Indexed">Indexed</value>
   <value column="Description" original="Index the document for the internal search engine">Index the document for the internal search engine</value>
   <value column="Help" original="For cross document search, the document can be indexed for faster search (Container, Document Type, Request Type)">For cross document search, the document can be indexed for faster search (Container, Document Type, Request Type)</value>
@@ -21680,8 +21680,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2994" trl="Y">
-  <value column="Name" original="StructureXML">StructureXML</value>
-  <value column="PrintName" original="StructureXML">StructureXML</value>
+  <value column="Name" original="StructureXML">Estructura XML</value>
+  <value column="PrintName" original="StructureXML">Estructura XML</value>
   <value column="Description" original="Autogenerated Containerdefinition as XML Code">Autogenerated Containerdefinition as XML Code</value>
   <value column="Help" original="Autogenerated Containerdefinition as XML Code">Autogenerated Containerdefinition as XML Code</value>
   <value column="PO_Description" original=""/>
@@ -21710,8 +21710,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2997" trl="Y">
-  <value column="Name" original="Media Item">Media Item</value>
-  <value column="PrintName" original="Media Item">Media Item</value>
+  <value column="Name" original="Media Item">Item Media</value>
+  <value column="PrintName" original="Media Item">Item Media</value>
   <value column="Description" original="Contains media content like images, flash movies etc.">Contains media content like images, flash movies etc.</value>
   <value column="Help" original="This table contains all the media content like images, flash movies etc.">This table contains all the media content like images, flas movies etc.</value>
   <value column="PO_Description" original=""/>
@@ -21790,8 +21790,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3005" trl="Y">
-  <value column="Name" original="Start Count Impression">Start Count Impression</value>
-  <value column="PrintName" original="Start Count Impression">Start Count Impression</value>
+  <value column="Name" original="Start Count Impression">Iniciar Conteo de Impresión</value>
+  <value column="PrintName" original="Start Count Impression">Iniciar Conteo de Impresión</value>
   <value column="Description" original="For rotation we need a start count">For rotation we need a start count</value>
   <value column="Help" original="If we run banners in rotation we always show the one with the min of impressions, so if a new banner is added to impressions we don't want it to show up so often we set a startimpressions value. StartImpression+ActualImpression=CurrentImpression">If we run banners in rotation we always show the one with the min of impressions, so if a new banner is added to impressions we don't want it to show up so often we set a startimpressions value. StartImpression+ActualImpression=CurrentImpression</value>
   <value column="PO_Description" original=""/>
@@ -21810,8 +21810,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3007" trl="Y">
-  <value column="Name" original="Special AD Flag">Special AD Flag</value>
-  <value column="PrintName" original="Special AD Flag">Special AD Flag</value>
+  <value column="Name" original="Special AD Flag">Activar Aviso Especial</value>
+  <value column="PrintName" original="Special AD Flag">Activar Aviso Especial</value>
   <value column="Description" original="Do we need to specially mention this ad?">Do we need to specially mention this ad?</value>
   <value column="Help" original="If we have a block in content where announce content and also sponsored links we should mention the sponsored ones">If we have a block in content where anounce content and also sponsored links we should mention the sponsored ones</value>
   <value column="PO_Description" original=""/>
@@ -21830,8 +21830,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3009" trl="Y">
-  <value column="Name" original="Media Server">Media Server</value>
-  <value column="PrintName" original="Media Server">Media Server</value>
+  <value column="Name" original="Media Server">Servidor Media</value>
+  <value column="PrintName" original="Media Server">Servidor Media</value>
   <value column="Description" original="Media Server list to which content should get transfered">Media Server list to which content should get transfered</value>
   <value column="Help" original="Media Server list to which content should get transferred">For performance optimization we save media content on static servers</value>
   <value column="PO_Description" original=""/>
@@ -21850,7 +21850,7 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3011" trl="Y">
-  <value column="Name" original="IP Address">IP Address</value>
+  <value column="Name" original="IP Address">Dirección IP</value>
   <value column="PrintName" original="IP Address">IP Address</value>
   <value column="Description" original="Defines the IP address to transfer data to">Defines the IP address to transfer data to</value>
   <value column="Help" original="Contains info on the IP address to which we will transfer data">Contains info on the IP address to which we will transfer data</value>
@@ -21870,8 +21870,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3013" trl="Y">
-  <value column="Name" original="Container Element">Container Element</value>
-  <value column="PrintName" original="Container Element">Container Element</value>
+  <value column="Name" original="Container Element">Elemento Contenedor</value>
+  <value column="PrintName" original="Container Element">Elemento Contenedor</value>
   <value column="Description" original="Container element i.e. Headline, Content, Footer etc.">Container element i.e. Headline, Content, Footer etc.</value>
   <value column="Help" original="A container element defines the smallest definition of content, i.e. the headline, the content etc.">A container element defines the smalles definition of content, i.e. the headline, the content etc.</value>
   <value column="PO_Description" original=""/>
@@ -21900,8 +21900,8 @@ El tiempo representa un valor en un tiempo dado (ej Cantidad Facturada en 1/1 ) 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3020" trl="Y">
-  <value column="Name" original="Status">Status</value>
-  <value column="PrintName" original="Status">Status</value>
+  <value column="Name" original="Status">Estado</value>
+  <value column="PrintName" original="Status">Estado</value>
   <value column="Description" original="Status of the currently running check">Status of the currently running check</value>
   <value column="Help" original="Status of the currently running check">Status of the currently running check</value>
   <value column="PO_Description" original=""/>
@@ -21951,8 +21951,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3025" trl="Y">
-  <value column="Name" original="Link">Link</value>
-  <value column="PrintName" original="Link">Link</value>
+  <value column="Name" original="Link">Vínculo</value>
+  <value column="PrintName" original="Link">Vínculo</value>
   <value column="Description" original="Contains URL to a target">Contains URL to a target</value>
   <value column="Help" original="A Link should contain info on how to get to more information">A Link should contain info on how to get to more information</value>
   <value column="PO_Description" original=""/>
@@ -21971,8 +21971,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3027" trl="Y">
-  <value column="Name" original="LinkURL">LinkURL</value>
-  <value column="PrintName" original="LinkURL">LinkURL</value>
+  <value column="Name" original="LinkURL">Vínculo URL</value>
+  <value column="PrintName" original="LinkURL">Vínculo URL</value>
   <value column="Description" original="Contains URL to a target">Contains URL to a target</value>
   <value column="Help" original="A Link should contain info on how to get to more information">A Link should contain info on how to get to more information</value>
   <value column="PO_Description" original=""/>
@@ -22001,9 +22001,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3030" trl="Y">
-  <value column="Name" original="Fully Qualified Domain Name">Fully Qualified Domain Name</value>
-  <value column="PrintName" original="Fully Qualified Domain Name">Fully Qualified Domain Name</value>
-  <value column="Description" original="Fully Qualified Domain Name i.e. www.comdivision.com">Fully Qualified Domain Name i.e. www.comdivision.com</value>
+  <value column="Name" original="Fully Qualified Domain Name">Nombre Completo Dominio</value>
+  <value column="PrintName" original="Fully Qualified Domain Name">Nombre Completo Dominio</value>
+  <value column="Description" original="Fully Qualified Domain Name i.e. www.comdivision.com">Nombre Completo Dominio</value>
   <value column="Help" original="This field contains the so called fully qualified domain name including host and domain, but not anything protocol specific like http or the document path.">This field contains the so called fully qualified domain name including host and domain, but not anything protocol specific like http or the document path.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22021,9 +22021,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3032" trl="Y">
-  <value column="Name" original="Revenue Recognition Start">Revenue Recognition Start</value>
-  <value column="PrintName" original="RR Start">RR Start</value>
-  <value column="Description" original="Revenue Recognition Start Date">Revenue Recognition Start Date</value>
+  <value column="Name" original="Revenue Recognition Start">Inici Reconocimiento de Ingresos</value>
+  <value column="PrintName" original="RR Start">Inicio RI</value>
+  <value column="Description" original="Revenue Recognition Start Date">Fecha Inicio Reconocimiento de Ingresos</value>
   <value column="Help" original="The date the revenue recognition starts.">The date the revenue reconition starts.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22031,9 +22031,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3033" trl="Y">
-  <value column="Name" original="Revenue Recognition Amt">Revenue Recognition Amt</value>
-  <value column="PrintName" original="RR Amt">RR Amt</value>
-  <value column="Description" original="Revenue Recognition Amount">Revenue Recognition Amount</value>
+  <value column="Name" original="Revenue Recognition Amt">Importe Reconocimiento de Ingresos</value>
+  <value column="PrintName" original="RR Amt">Importe RI</value>
+  <value column="Description" original="Revenue Recognition Amount">Importe Reconocimiento de Ingresos</value>
   <value column="Help" original="The amount for revenue recognition calculation.  If empty, the complete invoice amount is used.  The difference between Revenue Recognition Amount and Invoice Line Net Amount is immediately recognized as revenue.">The amount for revenue recognition calculation.  If empty, the complete invoice amount is used.  The difference between Revenue Recognition Amount and Invoice Line Net Amount is immediately recognized as revenue.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22041,9 +22041,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3035" trl="Y">
-  <value column="Name" original="Line Level">Line Level</value>
-  <value column="PrintName" original="Line Level">Line Level</value>
-  <value column="Description" original="Project Line Level">Project Line Level</value>
+  <value column="Name" original="Line Level">Nivel de Línea</value>
+  <value column="PrintName" original="Line Level">Nivel de Línea</value>
+  <value column="Description" original="Project Line Level">Nivel de Línea del Proyecto</value>
   <value column="Help" original="Level on which Project Lines are maintained">Level on which Project Lines are maintained</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22051,8 +22051,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3036" trl="Y">
-  <value column="Name" original="Stylesheet">Stylesheet</value>
-  <value column="PrintName" original="Stylesheet">Stylesheet</value>
+  <value column="Name" original="Stylesheet">Estilo de Hoja</value>
+  <value column="PrintName" original="Stylesheet">Estilo de Hoja</value>
   <value column="Description" original="CSS (Stylesheet) used">CSS (Stylesheet) used</value>
   <value column="Help" original="Base Stylesheet (.css file) to use - if empty, the default (standard.css) is used. The Style sheet can be a URL.">Base Stylesheet (.css file) to use - if empty, the default (standard.css) is used. The Style sheet can be a URL.</value>
   <value column="PO_Description" original=""/>
@@ -22091,9 +22091,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3040" trl="Y">
-  <value column="Name" original="Container Tree">Container Árbol</value>
-  <value column="PrintName" original="Container Tree">Container Árbol</value>
-  <value column="Description" original="Container Tree">Container Tree</value>
+  <value column="Name" original="Container Tree">Árbol Contenedor</value>
+  <value column="PrintName" original="Container Tree">Árbol Contenedor</value>
+  <value column="Description" original="Container Tree">Árbol Contenedor</value>
   <value column="Help" original="Container Tree">Container Tree</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22101,9 +22101,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3041" trl="Y">
-  <value column="Name" original="Stage Tree">Stage Tree</value>
-  <value column="PrintName" original="Stage Tree">Stage Tree</value>
-  <value column="Description" original="Stage Tree">Stage Tree</value>
+  <value column="Name" original="Stage Tree">Árbol Etapa</value>
+  <value column="PrintName" original="Stage Tree">Árbol Etapa</value>
+  <value column="Description" original="Stage Tree">Árbol Etapa</value>
   <value column="Help" original="Stage Tree">Stage Tree</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22111,9 +22111,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3042" trl="Y">
-  <value column="Name" original="Media Tree">Media Tree</value>
-  <value column="PrintName" original="Media Tree">Media Tree</value>
-  <value column="Description" original="Media Tree">Media Tree</value>
+  <value column="Name" original="Media Tree">Árbol de Medios</value>
+  <value column="PrintName" original="Media Tree">Árbol de Medios</value>
+  <value column="Description" original="Media Tree">Árbol de Medios</value>
   <value column="Help" original="Media Tree">Media Tree</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22121,9 +22121,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3043" trl="Y">
-  <value column="Name" original="Template Tree">Template Tree</value>
-  <value column="PrintName" original="Template Tree">Template Tree</value>
-  <value column="Description" original="Template Tree">Template Tree</value>
+  <value column="Name" original="Template Tree">Árbol Plantilla</value>
+  <value column="PrintName" original="Template Tree">Árbol Plantilla</value>
+  <value column="Description" original="Template Tree">Árbol Plantilla</value>
   <value column="Help" original="Template Tree">Template Tree</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22171,8 +22171,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3048" trl="Y">
-  <value column="Name" original="Template Table">Template Table</value>
-  <value column="PrintName" original="Template Table">Template Table</value>
+  <value column="Name" original="Template Table">Tabla Plantilla</value>
+  <value column="PrintName" original="Template Table">Tabla Plantilla</value>
   <value column="Description" original="CM Template Table Link">CM Template Table Link</value>
   <value column="Help" original="Link a Template with a Table">Link a Template with a Table</value>
   <value column="PO_Description" original=""/>
@@ -22191,8 +22191,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3050" trl="Y">
-  <value column="Name" original="Stage T.Table">Stage T.Table</value>
-  <value column="PrintName" original="Stage T.Table">Stage T.Table</value>
+  <value column="Name" original="Stage T.Table">Tabla Plantilla Etapa</value>
+  <value column="PrintName" original="Stage T.Table">Tabla Plantilla Etapa</value>
   <value column="Description" original="Container Stage Template Table">Containet Stage Template Table</value>
   <value column="Help" original="Link to individual Record">Link to individual Record</value>
   <value column="PO_Description" original=""/>
@@ -22201,9 +22201,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3051" trl="Y">
-  <value column="Name" original="Re-Validate">Re-Validate</value>
-  <value column="PrintName" original="Re-Validate">Re-Validate</value>
-  <value column="Description" original="Re-Validate entries">Re-Validate entries</value>
+  <value column="Name" original="Re-Validate">Re-Validar</value>
+  <value column="PrintName" original="Re-Validate">Re-Validar</value>
+  <value column="Description" original="Re-Validate entries">Re-Validar entradas</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22291,8 +22291,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3060" trl="Y">
-  <value column="Name" original="Broadcast Server">Broadcast Server</value>
-  <value column="PrintName" original="Broadcast Server">Broadcast Server</value>
+  <value column="Name" original="Broadcast Server">Servidor Broadcast</value>
+  <value column="PrintName" original="Broadcast Server">Servidor Broadcast</value>
   <value column="Description" original="Web Broadcast Server">Web Broadcast Server</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -22351,8 +22351,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3066" trl="Y">
-  <value column="Name" original="Status Code">Status Code</value>
-  <value column="PrintName" original="Status Code">Status Code</value>
+  <value column="Name" original="Status Code">Código Estado</value>
+  <value column="PrintName" original="Status Code">Código Estado</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -22411,8 +22411,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3072" trl="Y">
-  <value column="Name" original="Index Query">Index Query</value>
-  <value column="PrintName" original="Query">Query</value>
+  <value column="Name" original="Index Query">Índice Consulta</value>
+  <value column="PrintName" original="Query">Índice Consulta</value>
   <value column="Description" original="Text Search Query ">Text Search Query </value>
   <value column="Help" original="Text search query entered">Text search query entered</value>
   <value column="PO_Description" original=""/>
@@ -22551,9 +22551,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3086" trl="Y">
-  <value column="Name" original="Account Usage">Account Usage</value>
-  <value column="PrintName" original="Account Usage">Account Usage</value>
-  <value column="Description" original="Business Partner Bank Account usage">Business Partner Bank Account usage</value>
+  <value column="Name" original="Account Usage">Uso de la Cuenta</value>
+  <value column="PrintName" original="Account Usage">Uso de la Cuenta</value>
+  <value column="Description" original="Business Partner Bank Account usage">Uso de la Cuenta del Socio del Negocio</value>
   <value column="Help" original="Determines how the bank account is used.">Determines how the bank account is used.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -22631,7 +22631,7 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3094" trl="Y">
-  <value column="Name" original="Ldap Port">Ldap Puerto</value>
+  <value column="Name" original="Ldap Port">LDAP Puerto</value>
   <value column="PrintName" original="Ldap Port">Ldap Puerto</value>
   <value column="Description" original="The port the server is listening">The port the server is listening</value>
   <value column="Help" original="The default LDAP port is 389">The default LDAP port is 389</value>
@@ -22901,8 +22901,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50017" trl="Y">
-  <value column="Name" original="Success">Success</value>
-  <value column="PrintName" original="Success">Success</value>
+  <value column="Name" original="Success">Éxito</value>
+  <value column="PrintName" original="Success">Éxito</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -22981,8 +22981,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50026" trl="Y">
-  <value column="Name" original="DBType">Tipo DB</value>
-  <value column="PrintName" original="DBType">Tipo DB</value>
+  <value column="Name" original="DBType">Tipo Base de Datos</value>
+  <value column="PrintName" original="DBType">Tipo BD</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23121,8 +23121,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50041" trl="Y">
-  <value column="Name" original="Store Attachments On File System">Store Attachments On File System</value>
-  <value column="PrintName" original="Store Attachments On File System">Store Attachments On File System</value>
+  <value column="Name" original="Store Attachments On File System">Almacenar Adjuntos en Sistema</value>
+  <value column="PrintName" original="Store Attachments On File System">Almacenar Adjuntos en Sistema</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23141,8 +23141,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50043" trl="Y">
-  <value column="Name" original="Unix Attachment Path">Unix Attachment Path</value>
-  <value column="PrintName" original="Unix Attachment Path">Unix Attachment Path</value>
+  <value column="Name" original="Unix Attachment Path">Ruta al Adjunto (Unix)</value>
+  <value column="PrintName" original="Unix Attachment Path">Ruta al Adjunto (Unix)</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23271,8 +23271,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50056" trl="Y">
-  <value column="Name" original="Inbox Folder">Inbox Folder</value>
-  <value column="PrintName" original="Inbox Folder">Inbox Folder</value>
+  <value column="Name" original="Inbox Folder">Carpeta de Entrada</value>
+  <value column="PrintName" original="Inbox Folder">Carpeta de Entrada</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23291,8 +23291,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50058" trl="Y">
-  <value column="Name" original="IMAP User">IMAP User</value>
-  <value column="PrintName" original="IMAP User">IMAP User</value>
+  <value column="Name" original="IMAP User">IMAP Usuario</value>
+  <value column="PrintName" original="IMAP User">IMAP Usuario</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23341,8 +23341,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50063" trl="Y">
-  <value column="Name" original="Error Folder">Error Folder</value>
-  <value column="PrintName" original="Error Folder">Error Folder</value>
+  <value column="Name" original="Error Folder">Carpeta Error</value>
+  <value column="PrintName" original="Error Folder">Carpeta Error</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23401,8 +23401,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="50073" trl="Y">
-  <value column="Name" original="Unix Archive Path">Ruta al archivo (Unix)</value>
-  <value column="PrintName" original="Unix Archive Path">Ruta al archivo (Unix)</value>
+  <value column="Name" original="Unix Archive Path">Ruta al Archivo (Unix)</value>
+  <value column="PrintName" original="Unix Archive Path">Ruta al Archivo (Unix)</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23511,8 +23511,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52002" trl="Y">
-  <value column="Name" original="Bank Name">Bank Name</value>
-  <value column="PrintName" original="Bank Name">Bank Name</value>
+  <value column="Name" original="Bank Name">Nombre del Banco</value>
+  <value column="PrintName" original="Bank Name">Nombre del Banco</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23641,8 +23641,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52015" trl="Y">
-  <value column="Name" original="CashDrawer">CashDrawer</value>
-  <value column="PrintName" original="CashDrawer">CashDrawer</value>
+  <value column="Name" original="CashDrawer">Caja Registradora</value>
+  <value column="PrintName" original="CashDrawer">Caja Registradora</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23651,8 +23651,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52016" trl="Y">
-  <value column="Name" original="Sequence">Sequence</value>
-  <value column="PrintName" original="Sequence">Sequence</value>
+  <value column="Name" original="Sequence">Secuencia</value>
+  <value column="PrintName" original="Sequence">Secuencia</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23661,8 +23661,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52017" trl="Y">
-  <value column="Name" original="Category">Category</value>
-  <value column="PrintName" original="Category">Category</value>
+  <value column="Name" original="Category">Categoría</value>
+  <value column="PrintName" original="Category">Categoría</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23761,9 +23761,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52028" trl="Y">
-  <value column="Name" original="Bank for transfers">Bank for transfers</value>
-  <value column="PrintName" original="Bank for transfers">Bank for transfers</value>
-  <value column="Description" original="Bank account depending on currency will be used from this bank for doing transfers">Bank account depending on currency will be used from this bank for doing transfers</value>
+  <value column="Name" original="Bank for transfers">Banco para Transferencias</value>
+  <value column="PrintName" original="Bank for transfers">Banco para Transferencias</value>
+  <value column="Description" original="Bank account depending on currency will be used from this bank for doing transfers">Cuenta de Banco para Transferencias dependiendo de la Moneda.</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -23771,8 +23771,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52029" trl="Y">
-  <value column="Name" original="CashBook for transfers">CashBook for transfers</value>
-  <value column="PrintName" original="CashBook for transfers">CashBook for transfers</value>
+  <value column="Name" original="CashBook for transfers">Libro de Efectivo para Transferencias</value>
+  <value column="PrintName" original="CashBook for transfers">Libro de Efectivo para Transferencias</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23791,8 +23791,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52031" trl="Y">
-  <value column="Name" original="Cash Book Transfer Type">Cash Book Transfer Type</value>
-  <value column="PrintName" original="Cash Book Transfer Type">Cash Book Transfer Type</value>
+  <value column="Name" original="Cash Book Transfer Type">Tipo Transferencia Libro de Efectivo</value>
+  <value column="PrintName" original="Cash Book Transfer Type">Tipo Transferencia Libro de Efectivo</value>
   <value column="Description" original="Where the money in the cash book should be transfered to. Either a Bank Account or another Cash Book">Where the money in the cash book should be transfered to. Either a Bank Account or another Cash Book</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23821,9 +23821,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52034" trl="Y">
-  <value column="Name" original="Cash BPartner">Cash BPartner</value>
-  <value column="PrintName" original="Cash BPartner">Cash BPartner</value>
-  <value column="Description" original="BPartner to be used for Cash transactions">BPartner to be used for Cash transactions</value>
+  <value column="Name" original="Cash BPartner">SdN Efectivo</value>
+  <value column="PrintName" original="Cash BPartner">SdN Efectivo</value>
+  <value column="Description" original="BPartner to be used for Cash transactions">Socio del Negocio usado para transacciones en efectivo.</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -23921,9 +23921,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52044" trl="Y">
-  <value column="Name" original="Locked">Locked</value>
-  <value column="PrintName" original="Locked">Locked</value>
-  <value column="Description" original="Whether the terminal is locked">Whether the terminal is locked</value>
+  <value column="Name" original="Locked">Bloqueado</value>
+  <value column="PrintName" original="Locked">Bloqueado</value>
+  <value column="Description" original="Whether the terminal is locked">Cuando la Terminal es bloqueada</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -23931,9 +23931,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52045" trl="Y">
-  <value column="Name" original="Lock Time">Lock Time</value>
-  <value column="PrintName" original="Lock Time">Lock Time</value>
-  <value column="Description" original="Time in minutes the terminal should be kept in a locked state.">Time in minutes the terminal should be kept in a locked state.</value>
+  <value column="Name" original="Lock Time">Timpo de Bloqueo</value>
+  <value column="PrintName" original="Lock Time">Tiempo de Bloqueo</value>
+  <value column="Description" original="Time in minutes the terminal should be kept in a locked state.">Tiempo en Minutos que la Terminal debe permanecer bloqueada.</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -23941,8 +23941,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52046" trl="Y">
-  <value column="Name" original="Sales Pricelist">Sales Pricelist</value>
-  <value column="PrintName" original="Sales Pricelist">Sales Pricelist</value>
+  <value column="Name" original="Sales Pricelist">Lista de Precios de Venta</value>
+  <value column="PrintName" original="Sales Pricelist">Lista de Precios de Venta</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -23951,9 +23951,9 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52047" trl="Y">
-  <value column="Name" original="UnlockingTime">UnlockingTime</value>
-  <value column="PrintName" original="UnlockingTime">UnlockingTime</value>
-  <value column="Description" original="Time at which the terminal should be unlocked">Time at which the terminal should be unlocked</value>
+  <value column="Name" original="UnlockingTime">Hora Desbloqueo</value>
+  <value column="PrintName" original="UnlockingTime">Hora Desbloqueo</value>
+  <value column="Description" original="Time at which the terminal should be unlocked">Hora a la que la terminal será Desbloqueada.</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -25407,8 +25407,8 @@ La existencia de seguridad es definida como unidades extra de inventario manteni
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53366" trl="Y">
-  <value column="Name" original="Replication Document">Documento Replicación</value>
-  <value column="PrintName" original="Replication Document">Documento Replicación</value>
+  <value column="Name" original="Replication Document">Documento Duplicación</value>
+  <value column="PrintName" original="Replication Document">Documento Duplicación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -26097,8 +26097,8 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53479" trl="Y">
-  <value column="Name" original="Rate">Tasa</value>
-  <value column="PrintName" original="Rate">Tasa</value>
+  <value column="Name" original="Rate">Tasa Devaluación</value>
+  <value column="PrintName" original="Rate">Tasa Devaluación</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -26287,7 +26287,7 @@ La implosión de una Lista de Materiales se refiere a buscar todas las LDM en la
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53498" trl="Y">
-  <value column="Name" original="Base Amount">Monto Base</value>
+  <value column="Name" original="Base Amount">Importe Base</value>
   <value column="PrintName" original="Base Amount">Monto Base</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -28211,8 +28211,8 @@ El Método Cambio Varianza es utilizado en costeo estándar. Refleja la diferenc
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53723" trl="Y">
-  <value column="Name" original="Usage Variance">Varianza Uso</value>
-  <value column="PrintName" original="Account for Usage Variance">Cuenta para Varianza Uso</value>
+  <value column="Name" original="Usage Variance">Variación Uso</value>
+  <value column="PrintName" original="Account for Usage Variance">Cuenta para Variación Uso</value>
   <value column="Description" original="The Usage Variance account is the account used Manufacturing Order">
 La cuenta varianza uso es la cuenta usada para órdenes de manufactura
 </value>
@@ -28465,8 +28465,8 @@ La cuenta Desperdicio es usada en órdenes de manufactura
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53764" trl="Y">
-  <value column="Name" original="Cost Frozen">Es Costo Congelado</value>
-  <value column="PrintName" original="Cost Frozen">Es Costo Congelado</value>
+  <value column="Name" original="Cost Frozen">Costo Congelado</value>
+  <value column="PrintName" original="Cost Frozen">Costo Congelado</value>
   <value column="Description" original="Indicated that the Standard Cost is frozen">Indica que el costo estándar es congelado</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -29419,8 +29419,8 @@ Sumatoria de la cantidad disponible de productos en todas las localizaciones
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="54123" trl="Y">
-  <value column="Name" original="Ignore Processing Time">Ignore Tiempo Procesamiento</value>
-  <value column="PrintName" original="Ignore Proccessing Time">Ignore Tiempo Procesamiento</value>
+  <value column="Name" original="Ignore Processing Time">Ignorar Tiempo Procesamiento</value>
+  <value column="PrintName" original="Ignore Proccessing Time">Ignorar Tiempo Procesamiento</value>
   <value column="Description" original="Do not include processing time for the DateNextRun calculation">
 No incluye tiempo de procesamiento al calcular la fecha de siguiente ejecución
 </value>
@@ -29747,9 +29747,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1000002" trl="Y">
-  <value column="Name" original="Generate Withholding">Validacion requerida</value>
-  <value column="PrintName" original="Generate Withholding">Validacion requerida</value>
-  <value column="Description" original="">Documento requiere validacion</value>
+  <value column="Name" original="Generate Withholding">Genera Retención</value>
+  <value column="PrintName" original="Generate Withholding">Genera Retención</value>
+  <value column="Description" original=""/>
   <value column="Help" original="">Indica que para este tipo de documento se requiere validar el numero ingresado</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -29887,7 +29887,7 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1000016" trl="Y">
-  <value column="Name" original="ISIC">IIBB</value>
+  <value column="Name" original="ISIC">Tipo IIBB</value>
   <value column="PrintName" original="ISIC">Ingresos Brutos</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -29897,7 +29897,7 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1000017" trl="Y">
-  <value column="Name" original="ISIC Business Partner">IIBB Socio del Negocio</value>
+  <value column="Name" original="ISIC Business Partner">Tipo IIBB Socio del Negocio</value>
   <value column="PrintName" original="ISIC Business Partner">IIBB Socio del Negocio</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -29907,7 +29907,7 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1000018" trl="Y">
-  <value column="Name" original="ISIC Organization">IIBB Organización</value>
+  <value column="Name" original="ISIC Organization">Tipo IIBB Organización</value>
   <value column="PrintName" original="ISIC Organization">IIBB Organización</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -30037,7 +30037,7 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1000031" trl="Y">
-  <value column="Name" original="Tax ID Type">Tipo Impuesto</value>
+  <value column="Name" original="Tax ID Type">Tipo Identificación</value>
   <value column="PrintName" original="Tax ID Type">Tipo Impuesto</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
