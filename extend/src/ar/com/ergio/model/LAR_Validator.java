@@ -21,11 +21,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
+import org.compiere.model.MPayment;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
@@ -42,6 +44,9 @@ import ar.com.ergio.util.LAR_Utils;
  *  @version $Id: LAR_Validator.java,v 1.0 2011/11/04  egonzalez Exp $
  */
  public class LAR_Validator implements ModelValidator {
+     // TODO - try to avoid this hardcode value
+     private static final int PERCEPCION_ID = 1000002; // Perception Tax Category
+     private static final int RETENCION_ID = 1000003; // Withholding Tax Category
 
      /**
       *  Constructor.
@@ -77,6 +82,10 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addModelChange(MBPartner.Table_Name, this);
          engine.addModelChange(MOrderLine.Table_Name, this);
          engine.addModelChange(MOrder.Table_Name, this);
+         engine.addModelChange(MPayment.Table_Name, this);
+
+         // Documents to be monitored
+         engine.addDocValidate(MPayment.Table_Name, this);
 
      }   //  initialize
 
@@ -93,12 +102,13 @@ import ar.com.ergio.util.LAR_Utils;
      * @exception Exception
      *                if the recipient wishes the change to be not accept.
      */
-     public String modelChange (PO po, int type) throws Exception
+     public String modelChange(final PO po, int type) throws Exception
      {
          log.info(po.get_TableName() + " Type: " + type);
          String msg;
          // Changes on BPartners
-         if (po.get_TableName().equals(MBPartner.Table_Name) && type == ModelValidator.TYPE_BEFORE_CHANGE) {
+         if (po.get_TableName().equals(MBPartner.Table_Name) && type == TYPE_BEFORE_CHANGE)
+         {
              MBPartner bp = (MBPartner) po;
              LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
              if (!taxPayerType.equals(LAR_TaxPayerType.CONSUMIDOR_FINAL)) {
@@ -117,10 +127,7 @@ import ar.com.ergio.util.LAR_Utils;
          }
          // Changes on OrderLines
          if (po.get_TableName().equals(MOrderLine.Table_Name) &&
-                 (type == ModelValidator.TYPE_AFTER_NEW
-                    || type == ModelValidator.TYPE_AFTER_DELETE
-                    || type == ModelValidator.TYPE_AFTER_CHANGE)
-             )
+                 (type == TYPE_AFTER_NEW || type == TYPE_AFTER_DELETE || type == TYPE_AFTER_CHANGE))
          {
              MOrderLine ol = (MOrderLine) po;
 
@@ -132,13 +139,36 @@ import ar.com.ergio.util.LAR_Utils;
              }
          }
         // Changes on Order
-        if (po.get_TableName().equals(MOrder.Table_Name) && type == ModelValidator.TYPE_BEFORE_DELETE) {
+        if (po.get_TableName().equals(MOrder.Table_Name) && type == TYPE_BEFORE_DELETE)
+        {
             MOrder order = (MOrder) po;
             msg = deletePerceptionLine(order);
             if (msg != null) {
                 return msg;
             }
         }
+        // Creates withholding on payments
+        if (po.get_TableName().equals(MPayment.Table_Name)
+                && (type == TYPE_AFTER_NEW || type == TYPE_AFTER_CHANGE))
+        {
+            MPayment payment = (MPayment) po;
+            int c_BPartner_ID = payment.getC_BPartner_ID();
+            MBPartner bp = new MBPartner(payment.getCtx(), c_BPartner_ID, payment.get_TrxName());
+            msg = calculateWithholdingOnPayment(bp, payment, type);
+            if (msg != null) {
+                return msg;
+            }
+        }
+        // Delete withholding related to deleted payment
+        if (po.get_TableName().equals(MPayment.Table_Name) && type == TYPE_BEFORE_DELETE)
+        {
+            MPayment payment = (MPayment) po;
+            msg = deleteWithholdingOnPayment(payment);
+            if (msg != null) {
+                return msg;
+            }
+        }
+
         return null;
      }
 
@@ -151,9 +181,31 @@ import ar.com.ergio.util.LAR_Utils;
       *  @param timing see TIMING_ constants
       *  @return error message or null
       */
-     public String docValidate (PO po, int timing)
+     public String docValidate(final PO po, int timing)
      {
          log.info(po.get_TableName() + " Timing: "+timing);
+         String msg;
+
+         // create withholding certificate on complete payment
+         if (po.get_TableName().equals(MPayment.Table_Name) && timing == TIMING_AFTER_COMPLETE)
+         {
+             MPayment payment = (MPayment) po;
+             msg = createWithholdingCertificate(payment, timing);
+             if (msg != null) {
+                 return msg;
+             }
+         }
+         // deactivate the withholding and its certificate when payment is voided
+         if (po.get_TableName().equals(MPayment.Table_Name)
+                 && (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT))
+         {
+             MPayment payment  = (MPayment) po;
+             msg = deactivateWithholding(payment, timing);
+             if (msg != null) {
+                 return msg;
+             }
+         }
+
          return null;
      }   //  docValidate
 
@@ -199,9 +251,8 @@ import ar.com.ergio.util.LAR_Utils;
 
     private String calculatePerceptionLine(final MBPartner bp, final MOrderLine line, int type)
     {
-        if (type == ModelValidator.TYPE_AFTER_NEW
-                || type == ModelValidator.TYPE_AFTER_DELETE
-                || (type == ModelValidator.TYPE_AFTER_CHANGE
+        if (type == TYPE_AFTER_NEW || type == TYPE_AFTER_DELETE
+                || (type == TYPE_AFTER_CHANGE
                     && (line.is_ValueChanged("LineNetAmt")
                         || line.is_ValueChanged("M_Product_ID")
                         || line.is_ValueChanged("IsActive")
@@ -211,7 +262,7 @@ import ar.com.ergio.util.LAR_Utils;
            )
         {
             MOrder order = line.getParent();
-            final WithholdingConfig wc = new WithholdingConfig(bp);
+            final WithholdingConfig wc = new WithholdingConfig(bp, PERCEPCION_ID);
             log.info("Withholding conf >> " + wc);
 
             // Calculates subtotal and perception amounts
@@ -268,15 +319,142 @@ import ar.com.ergio.util.LAR_Utils;
         return null;
     }
 
+    private String deleteWithholdingOnPayment(final MPayment payment)
+    {
+        int c_Payment_ID = payment.get_ID();
+        log.info("Delete withholding for payment " + c_Payment_ID);
+        String sql = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = DB.prepareStatement(sql, payment.get_TrxName());
+            pstmt.setInt(1, c_Payment_ID);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, sql, e);
+            return e.getMessage();
+        } finally {
+            DB.close(pstmt);
+            pstmt = null;
+        }
+        return null;
+    }
+
+    private String calculateWithholdingOnPayment(MBPartner bp, MPayment payment, int type)
+    {
+        // TODO - improve this way to avoid process reversal payments
+        if ((type == TYPE_AFTER_NEW && !payment.getDescription().contains("{->"))
+             || (type == TYPE_AFTER_CHANGE) && payment.is_ValueChanged("PayAmt"))
+        {
+            final WithholdingConfig wc = new WithholdingConfig(bp, RETENCION_ID);
+            log.info("Withholding conf >> " + wc);
+
+            // if payment amt is greater than the limit, create a withholding
+            if (wc.isCalcFromPayment())
+            {
+                if (payment.getPayAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+                {
+                    // create withholding
+                    BigDecimal taxAmt = payment.getPayAmt().multiply(wc.getAliquot())
+                            .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+
+                    MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
+                    pwh.setC_Payment_ID(payment.get_ID());
+                    pwh.setC_Invoice_ID(payment.getC_Invoice_ID());
+                    pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
+                    pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
+                    pwh.setDateAcct(payment.getDateAcct());
+                    pwh.setDateTrx(payment.getDateTrx());
+                    pwh.setPercent(wc.getAliquot());
+                    pwh.setProcessed(false);
+                    pwh.setTaxAmt(taxAmt);
+                    pwh.setTaxBaseAmt(payment.getPayAmt());
+                    if (!pwh.save()) {
+                        return "Can not create withholding on payment";
+                    }
+
+                    // update payment amounts (with sql in order to avoid circular events)
+                    // TODO - Review WriteOffAmt for withholding on invoices (IVA)
+                    String sql = "UPDATE C_Payment"
+                               + "   SET WriteOffAmt=?"
+                               + "     , WithholdingAmt=?"
+                               + "     , WithholdingPercent=?"
+                               + " WHERE C_Payment_ID=?";
+
+                    PreparedStatement pstmt = null;
+                    try {
+                        pstmt = DB.prepareStatement(sql, payment.get_TrxName());
+                        pstmt.setBigDecimal(1, taxAmt);
+                        pstmt.setBigDecimal(2, taxAmt);
+                        pstmt.setBigDecimal(3, wc.getAliquot());
+                        pstmt.setInt(4, payment.get_ID());
+                        pstmt.executeUpdate();
+                    } catch (Exception e) {
+                        log.log(Level.SEVERE, sql, e);
+                        return e.getMessage();
+                    } finally {
+                        DB.close(pstmt);
+                        pstmt = null;
+                    }
+                } else {
+                    // if exists a withholding, deleted
+                    deleteWithholdingOnPayment(payment);
+                }
+            }
+        }
+        return null;
+    }
+
+    private String createWithholdingCertificate(final MPayment payment, int timing)
+    {
+        // TODO - improve this way to avoid process reversal payments
+        if (timing == TIMING_AFTER_COMPLETE && !payment.getDescription().contains("{->"))
+        {
+            log.info("Payment: " + payment.get_ID());
+
+            X_LAR_WithholdingCertificate whc = new X_LAR_WithholdingCertificate(payment.getCtx(),
+                    0, payment.get_TrxName());
+            whc.setC_DocType_ID(payment.getC_DocType_ID());
+            whc.setC_Payment_ID(payment.get_ID());
+            whc.setC_Invoice_ID(payment.getC_Invoice_ID());
+            whc.setC_DocTypeTarget_ID(payment.getC_DocType_ID());
+            whc.setDocumentNo(payment.getDocumentNo());
+            if (!whc.save()) {
+                return "Can not create a withholding certificate";
+            }
+        }
+        return null;
+    }
+
+    private String deactivateWithholding(final MPayment payment, int timing)
+    {
+        // TODO - improve this way to avoid process reversal payments
+        if (timing == TIMING_AFTER_COMPLETE && !payment.getDescription().contains("{->"))
+        {
+            MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
+            pwh.setIsActive(false);
+            if (!pwh.save()) {
+                return "Can not deactivate payment withholding";
+            }
+            MLARWithholdingCertificate whc = MLARWithholdingCertificate.get(payment);
+            whc.setIsActive(false);
+            if (!whc.save()) {
+                return "Can not deactivate payment withholding";
+            }
+        }
+        return null;
+    }
+
      /**
       * Encapsulates configuration parameters for withholdings
       */
+     // TODO - Allow retrive individual configuration, depending withholding type
+     //        and using config values defined into lco tables (see LCO_Validator)
      private class WithholdingConfig
      {
-         // TODO - try to avoid this hardcode value
-         private final int C_TAXCATEGORY_ID = 1000002; // Perception Tax Category
-
+         private int c_TaxCategory_ID;
+         private boolean isCalcFromPayment;
          private BigDecimal aliquot = BigDecimal.ZERO;
+         private BigDecimal paymentThresholdMin = BigDecimal.ZERO;
          private int lco_WithholdingRule_ID;
          private int lco_WithholdingType_ID;
          private int c_Tax_ID;
@@ -286,6 +464,8 @@ import ar.com.ergio.util.LAR_Utils;
                  + "     , r.lco_withholdingrule_id "
                  + "     , c.lco_withholdingtype_id"
                  + "     , x.c_tax_id "
+                 + "     , c.iscalcfrompayment"
+                 + "     , c.paymentthresholdmin"
                  + "  FROM C_BPartner bp "
                  + "  JOIN LCO_WithholdingRule r ON r.lco_bp_isic_id = bp.lco_isic_id "
                  + "       AND r.lco_bp_taxpayertype_id = bp.lco_taxpayertype_id"
@@ -294,8 +474,9 @@ import ar.com.ergio.util.LAR_Utils;
                  + "   AND x.c_taxcategory_id = ?";
 
 
-         private WithholdingConfig(final MBPartner bp)
+         private WithholdingConfig(final MBPartner bp, int c_TaxCategory_ID)
          {
+             this.c_TaxCategory_ID = c_TaxCategory_ID;
              retrieveConfig(bp);
          }
 
@@ -316,7 +497,18 @@ import ar.com.ergio.util.LAR_Utils;
 
          private BigDecimal getAliquot()
          {
-             return aliquot;
+             // TODO - Review the way to calculate aliquot
+             return c_TaxCategory_ID == PERCEPCION_ID ? aliquot.negate() : aliquot;
+         }
+
+         private BigDecimal getPaymentThresholdMin()
+         {
+             return paymentThresholdMin;
+         }
+
+         private boolean isCalcFromPayment()
+         {
+             return isCalcFromPayment;
          }
 
          /**
@@ -331,13 +523,17 @@ import ar.com.ergio.util.LAR_Utils;
              try {
                  pstmt = DB.prepareStatement(sql, bp.get_TrxName());
                  pstmt.setInt(1, bp.getC_BPartner_ID());
-                 pstmt.setInt(2, C_TAXCATEGORY_ID);
+                 pstmt.setInt(2, c_TaxCategory_ID);
                  rs = pstmt.executeQuery();
                  if (rs.next()) {
-                     aliquot = rs.getBigDecimal(1).negate();
+                     aliquot = rs.getBigDecimal(1).setScale(4, BigDecimal.ROUND_HALF_EVEN);
                      lco_WithholdingRule_ID = rs.getInt(2);
                      lco_WithholdingType_ID = rs.getInt(3);
                      c_Tax_ID = rs.getInt(4);
+                     isCalcFromPayment = rs.getString(5).equals("Y");
+                     paymentThresholdMin = rs.getBigDecimal(6);
+                 } else {
+                     throw new AdempiereException("Withholding configuration not found");
                  }
              } catch (Exception e) {
                  log.log(Level.SEVERE, sql, e);
