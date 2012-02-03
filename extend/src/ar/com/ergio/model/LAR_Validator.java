@@ -323,11 +323,24 @@ import ar.com.ergio.util.LAR_Utils;
     {
         int c_Payment_ID = payment.get_ID();
         log.info("Delete withholding for payment " + c_Payment_ID);
-        String sql = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
+        String sql = "";
         PreparedStatement pstmt = null;
         try {
+            sql = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
             pstmt = DB.prepareStatement(sql, payment.get_TrxName());
             pstmt.setInt(1, c_Payment_ID);
+            pstmt.executeUpdate();
+
+            sql = "UPDATE C_Payment"
+                + "   SET WriteOffAmt=?"
+                + "     , WithholdingAmt=?"
+                + "     , WithholdingPercent=?"
+                + " WHERE C_Payment_ID=?";
+            pstmt = DB.prepareStatement(sql, payment.get_TrxName());
+            pstmt.setBigDecimal(1, BigDecimal.ZERO);
+            pstmt.setBigDecimal(2, BigDecimal.ZERO);
+            pstmt.setBigDecimal(3, BigDecimal.ZERO);
+            pstmt.setInt(4, payment.get_ID());
             pstmt.executeUpdate();
         } catch (Exception e) {
             log.log(Level.SEVERE, sql, e);
@@ -378,8 +391,10 @@ import ar.com.ergio.util.LAR_Utils;
 
                     // update payment amounts (with sql in order to avoid circular events)
                     // TODO - Review WriteOffAmt for withholding on invoices (IVA)
+                    // NewPayAmt = PayAmt - taxAmt
                     String sql = "UPDATE C_Payment"
                                + "   SET WriteOffAmt=?"
+                               + "     , PayAmt=?"
                                + "     , WithholdingAmt=?"
                                + "     , WithholdingPercent=?"
                                + " WHERE C_Payment_ID=?";
@@ -388,9 +403,11 @@ import ar.com.ergio.util.LAR_Utils;
                     try {
                         pstmt = DB.prepareStatement(sql, payment.get_TrxName());
                         pstmt.setBigDecimal(1, taxAmt);
-                        pstmt.setBigDecimal(2, taxAmt);
-                        pstmt.setBigDecimal(3, wc.getAliquot());
-                        pstmt.setInt(4, payment.get_ID());
+                        pstmt.setBigDecimal(2, payment.getPayAmt().subtract(taxAmt));
+                        pstmt.setBigDecimal(3, taxAmt);
+                        // save aliquot as percentage
+                        pstmt.setBigDecimal(4, wc.getAliquot().multiply(BigDecimal.valueOf(100L)));
+                        pstmt.setInt(5, payment.get_ID());
                         pstmt.executeUpdate();
                     } catch (Exception e) {
                         log.log(Level.SEVERE, sql, e);
@@ -419,16 +436,24 @@ import ar.com.ergio.util.LAR_Utils;
         else if (timing == TIMING_AFTER_COMPLETE)
         {
             log.info("Payment: " + payment.get_ID());
+            MBPartner bp = new MBPartner(payment.getCtx(), payment.getC_BPartner_ID(), payment.get_TrxName());
+            WithholdingConfig wc = new WithholdingConfig(bp, RETENCION_ID);
 
-            X_LAR_WithholdingCertificate whc = new X_LAR_WithholdingCertificate(payment.getCtx(),
-                    0, payment.get_TrxName());
-            whc.setC_DocType_ID(payment.getC_DocType_ID());
-            whc.setC_Payment_ID(payment.get_ID());
-            whc.setC_Invoice_ID(payment.getC_Invoice_ID());
-            whc.setC_DocTypeTarget_ID(payment.getC_DocType_ID());
-            whc.setDocumentNo(payment.getDocumentNo());
-            if (!whc.save()) {
-                return "Can not create a withholding certificate";
+            if (wc.isCalcFromPayment())
+            {
+                if (payment.getPayAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+                {
+                    X_LAR_WithholdingCertificate whc = new X_LAR_WithholdingCertificate(
+                            payment.getCtx(), 0, payment.get_TrxName());
+                    whc.setC_DocType_ID(payment.getC_DocType_ID());
+                    whc.setC_Payment_ID(payment.get_ID());
+                    whc.setC_Invoice_ID(payment.getC_Invoice_ID());
+                    whc.setC_DocTypeTarget_ID(payment.getC_DocType_ID());
+                    whc.setDocumentNo(payment.getDocumentNo());
+                    if (!whc.save()) {
+                        return "Can not create a withholding certificate";
+                    }
+                }
             }
         }
         return null;
@@ -442,8 +467,10 @@ import ar.com.ergio.util.LAR_Utils;
                 && payment.getDescription().endsWith(")")) {
             // do nothing - is reversal payment
         }
-        else if (timing == TIMING_AFTER_COMPLETE)
+        else if (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT)
         {
+            log.info("Payment: " + payment.get_ID());
+
             MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
             pwh.setIsActive(false);
             if (!pwh.save()) {
