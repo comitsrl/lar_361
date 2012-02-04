@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
@@ -44,9 +45,6 @@ import ar.com.ergio.util.LAR_Utils;
  *  @version $Id: LAR_Validator.java,v 1.0 2011/11/04  egonzalez Exp $
  */
  public class LAR_Validator implements ModelValidator {
-     // TODO - try to avoid this hardcode value
-     private static final int PERCEPCION_ID = 1000002; // Perception Tax Category
-     private static final int RETENCION_ID = 1000003; // Withholding Tax Category
 
      /**
       *  Constructor.
@@ -261,8 +259,8 @@ import ar.com.ergio.util.LAR_Utils;
                     )
            )
         {
-            MOrder order = line.getParent();
-            final WithholdingConfig wc = new WithholdingConfig(bp, PERCEPCION_ID);
+            final MOrder order = line.getParent();
+            final WithholdingConfig wc = new WithholdingConfig(bp, order.isSOTrx());
             log.info("Withholding conf >> " + wc);
 
             // Calculates subtotal and perception amounts
@@ -282,7 +280,7 @@ import ar.com.ergio.util.LAR_Utils;
             // Create order perception
             MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
             perception.setC_Order_ID(order.get_ID());
-            perception.setC_Tax_ID(wc.getTax_ID());
+            perception.setC_Tax_ID(wc.getC_Tax_ID());
             perception.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
             perception.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
             perception.setTaxAmt(perceptionAmt);
@@ -362,7 +360,8 @@ import ar.com.ergio.util.LAR_Utils;
         }
         else if (type == TYPE_AFTER_NEW || (type == TYPE_AFTER_CHANGE && payment.is_ValueChanged("PayAmt")))
         {
-            final WithholdingConfig wc = new WithholdingConfig(bp, RETENCION_ID);
+            final MInvoice invoice = new MInvoice(payment.getCtx(), payment.getC_Invoice_ID(), payment.get_TrxName());
+            final WithholdingConfig wc = new WithholdingConfig(bp, invoice.isSOTrx());
             log.info("Withholding conf >> " + wc);
 
             // if payment amt is greater than the limit, create a withholding
@@ -436,8 +435,9 @@ import ar.com.ergio.util.LAR_Utils;
         else if (timing == TIMING_AFTER_COMPLETE)
         {
             log.info("Payment: " + payment.get_ID());
-            MBPartner bp = new MBPartner(payment.getCtx(), payment.getC_BPartner_ID(), payment.get_TrxName());
-            WithholdingConfig wc = new WithholdingConfig(bp, RETENCION_ID);
+            final MBPartner bp = new MBPartner(payment.getCtx(), payment.getC_BPartner_ID(), payment.get_TrxName());
+            final MInvoice invoice = new MInvoice(payment.getCtx(), payment.getC_Invoice_ID(), payment.get_TrxName());
+            final WithholdingConfig wc = new WithholdingConfig(bp, invoice.isSOTrx());
 
             if (wc.isCalcFromPayment())
             {
@@ -445,10 +445,10 @@ import ar.com.ergio.util.LAR_Utils;
                 {
                     X_LAR_WithholdingCertificate whc = new X_LAR_WithholdingCertificate(
                             payment.getCtx(), 0, payment.get_TrxName());
-                    whc.setC_DocType_ID(payment.getC_DocType_ID());
+                    whc.setC_DocType_ID(wc.getC_DocType_ID());
                     whc.setC_Payment_ID(payment.get_ID());
                     whc.setC_Invoice_ID(payment.getC_Invoice_ID());
-                    whc.setC_DocTypeTarget_ID(payment.getC_DocType_ID());
+                    whc.setC_DocTypeTarget_ID(wc.getC_DocType_ID());
                     whc.setDocumentNo(payment.getDocumentNo());
                     if (!whc.save()) {
                         return "Can not create a withholding certificate";
@@ -492,32 +492,37 @@ import ar.com.ergio.util.LAR_Utils;
      //        and using config values defined into lco tables (see LCO_Validator)
      private class WithholdingConfig
      {
-         private int c_TaxCategory_ID;
          private boolean isCalcFromPayment;
          private BigDecimal aliquot = BigDecimal.ZERO;
          private BigDecimal paymentThresholdMin = BigDecimal.ZERO;
          private int lco_WithholdingRule_ID;
          private int lco_WithholdingType_ID;
          private int c_Tax_ID;
+         private int c_DocType_ID;
+         private boolean isSOTrx;
 
          private String sql =
-                   "SELECT x.rate/100 AS rate"
-                 + "     , r.lco_withholdingrule_id "
-                 + "     , c.lco_withholdingtype_id"
-                 + "     , x.c_tax_id "
-                 + "     , c.iscalcfrompayment"
-                 + "     , c.paymentthresholdmin"
-                 + "  FROM C_BPartner bp "
-                 + "  JOIN LCO_WithholdingRule r ON r.lco_bp_isic_id = bp.lco_isic_id "
-                 + "       AND r.lco_bp_taxpayertype_id = bp.lco_taxpayertype_id"
-                 + "  JOIN LCO_WithholdingCalc c ON c.lco_withholdingcalc_id = r.lco_withholdingcalc_id "
-                 + "  JOIN C_Tax x on x.c_tax_id = c.c_tax_id " + " WHERE bp.c_bpartner_id = ? "
-                 + "   AND x.c_taxcategory_id = ?";
+                   "SELECT X.Rate/100 AS Rate"
+                 + "     , R.LCO_WithholdingRule_ID"
+                 + "     , C.LCO_WithholdingType_ID"
+                 + "     , X.C_Tax_ID"
+                 + "     , F.IsCalcFromPayment"
+                 + "     , F.PaymentThresholdMin"
+                 + "     , F.C_DocType_ID"
+                 + "  FROM C_BPartner B"
+                 + "  JOIN LCO_WithholdingRule R ON R.LCO_BP_ISIC_ID = B.LCO_ISIC_ID"
+                 + "       AND R.LCO_BP_TaxPayerType_ID = B.LCO_TaxPayerType_ID"
+                 + "  JOIN LCO_WithholdingRuleConf F ON F.LCO_WithholdingType_ID = R.LCO_WithholdingType_ID"
+                 + "  JOIN LCO_WithholdingCalc C ON C.LCO_WithholdingCalc_ID = R.LCO_WithholdingCalc_ID"
+                 + "  JOIN LCO_WithholdingType T ON T.LCO_WithholdingType_ID = R.LCO_WithholdingType_ID"
+                 + "  JOIN C_Tax X on X.C_Tax_ID = C.C_Tax_ID"
+                 + " WHERE B.C_BPartner_ID=?"
+                 + "   AND T.IsSOTrx=?";
 
 
-         private WithholdingConfig(final MBPartner bp, int c_TaxCategory_ID)
+         private WithholdingConfig(final MBPartner bp, boolean isSOTrx)
          {
-             this.c_TaxCategory_ID = c_TaxCategory_ID;
+             this.isSOTrx = isSOTrx;
              retrieveConfig(bp);
          }
 
@@ -531,15 +536,14 @@ import ar.com.ergio.util.LAR_Utils;
              return lco_WithholdingType_ID;
          }
 
-         private int getTax_ID()
+         private int getC_Tax_ID()
          {
              return c_Tax_ID;
          }
 
          private BigDecimal getAliquot()
          {
-             // TODO - Review the way to calculate aliquot
-             return c_TaxCategory_ID == PERCEPCION_ID ? aliquot.negate() : aliquot;
+             return isSOTrx ? aliquot.negate() : aliquot;
          }
 
          private BigDecimal getPaymentThresholdMin()
@@ -550,6 +554,11 @@ import ar.com.ergio.util.LAR_Utils;
          private boolean isCalcFromPayment()
          {
              return isCalcFromPayment;
+         }
+
+         private int getC_DocType_ID()
+         {
+             return c_DocType_ID;
          }
 
          /**
@@ -564,7 +573,7 @@ import ar.com.ergio.util.LAR_Utils;
              try {
                  pstmt = DB.prepareStatement(sql, bp.get_TrxName());
                  pstmt.setInt(1, bp.getC_BPartner_ID());
-                 pstmt.setInt(2, c_TaxCategory_ID);
+                 pstmt.setString(2, isSOTrx ? "Y" : "N");
                  rs = pstmt.executeQuery();
                  if (rs.next()) {
                      aliquot = rs.getBigDecimal(1).setScale(4, BigDecimal.ROUND_HALF_EVEN);
@@ -573,6 +582,7 @@ import ar.com.ergio.util.LAR_Utils;
                      c_Tax_ID = rs.getInt(4);
                      isCalcFromPayment = rs.getString(5).equals("Y");
                      paymentThresholdMin = rs.getBigDecimal(6);
+                     c_DocType_ID = rs.getInt(7);
                  } else {
                      throw new AdempiereException("Withholding configuration not found");
                  }
@@ -590,9 +600,10 @@ import ar.com.ergio.util.LAR_Utils;
          {
              StringBuilder sb = new StringBuilder("WithholdingConfig[");
              sb.append("Aliquot=").append(aliquot);
-             sb.append(",Rule=").append(getWithholdingRule_ID());
-             sb.append(",Type=").append(getWithholdingType_ID());
-             sb.append(",Tax=").append(getTax_ID());
+             sb.append(",IsSOTrx=").append(isSOTrx);
+             sb.append(",IsCalcFromPayment=").append(isCalcFromPayment);
+             sb.append(",C_DocType_ID=").append(c_DocType_ID);
+             sb.append(",C_Tax_ID=").append(c_Tax_ID);
              sb.append("]");
              return sb.toString();
          }
