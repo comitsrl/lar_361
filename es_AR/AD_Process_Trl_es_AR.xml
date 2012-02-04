@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120127-1829 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 360LTS.013_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ADempiere - Supported by ADempiere community-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Process">
  <row id="100" trl="Y">
@@ -493,8 +493,8 @@
   <value column="Help" original="The Parameters are default values for null import record values, they do not overwrite any data.&#10;Note that only Prepare and Complete are valid document actions.">Los parámetros son valores prefijados para los valores nulos del expediente de la importación, ellos no sobreescriben ningunos datos.</value>
  </row>
  <row id="207" trl="Y">
-  <value column="Name" original="Import Invoice">Importación de Factura</value>
-  <value column="Description" original="Import Invoice">Importación de Factura</value>
+  <value column="Name" original="Import Invoice">Importar Facturas</value>
+  <value column="Description" original="Import Invoice">Importar Facturas</value>
   <value column="Help" original="The Parameters are default values for null import record values, they do not overwrite any data.&#10;Note that only Prepare and Complete are valid document actions.">Los parámetros son valores prefijados para los valores nulos del expediente de la importación, ellos no sobreescriben ningunos datos.</value>
  </row>
  <row id="208" trl="Y">
@@ -1153,7 +1153,7 @@ y Recibi/Línea o directamente para el producto. </value>
   <value column="Help" original="The report list details of Business Partner, Addresses and Contacts for any active Business Partner with an Address and Contact">Los detalles de Lista de Reporte de Socio del Negocio, Dirección, Contacto para cualquier Socio del Negocio Activo con una dirección y  Contacto.</value>
  </row>
  <row id="335" trl="Y">
-  <value column="Name" original="Create Costing Records"> Crear Registro de Costeo</value>
+  <value column="Name" original="Create Costing Records">Crear Registro de Costeo</value>
   <value column="Description" original="Create Costing Records">Crear Registro de Costeo</value>
   <value column="Help" original="The costing records are created when needed or by batch processes. You can force the creation of the costing information here.">Los registro de costeo se cran cuando los necesita mediante proceso por lotes. Usted puede forzar la creación de la información de costeo aqui. </value>
  </row>
@@ -1580,7 +1580,7 @@ Crea múltiples formatos de exportación basado en una ventana
   <value column="Help" original=""/>
  </row>
  <row id="53097" trl="Y">
-  <value column="Name" original="Asset Disposal Expense Entry Rpt">Asset Disposal Expense Entry Rpt</value>
+  <value column="Name" original="Asset Disposal Expense Entry Rpt">Asset Disposal Expense Entry</value>
   <value column="Description" original="Used to review Assets Disposed Entry">Used to review Assets Disposed Entry</value>
   <value column="Help" original=""/>
  </row>
@@ -1795,7 +1795,7 @@ This process should be implemented when the users are not connected.</value>
   <value column="Help" original=""/>
  </row>
  <row id="53199" trl="Y">
-  <value column="Name" original="Reset Allocation Direct">Ajustar Alocacion Directa</value>
+  <value column="Name" original="Reset Allocation Direct">Ajustar Asignación Directa</value>
   <value column="Description" original="Reset (delete) allocation of invoices to payments">Borra alocacion de facturas a pagos.</value>
   <value column="Help" original="Delete individual allocation. In contrast to &quot;Reverse&quot;, the allocation is deleted (no trace), if the period is open.">Borra alocacion individual. A diferencia de "Revierte", si el periodo esta abierto, la alocacion es borrada (sin rastros).</value>
  </row>

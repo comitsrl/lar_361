@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120127-1829 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 360LTS.013_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ADempiere - Supported by ADempiere community-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Element">
  <row id="101" trl="Y">
@@ -1153,7 +1153,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="260" trl="Y">
-  <value column="Name" original="D-U-N-S">No IIBB</value>
+  <value column="Name" original="D-U-N-S">No. IIBB</value>
   <value column="PrintName" original="D-U-N-S">No IIBB</value>
   <value column="Description" original="Dun &amp; Bradstreet Number">Número de Inscripción en IIBB</value>
   <value column="Help" original="Used for EDI - For details see   www.dnb.com/dunsno/list.htm">Número de Inscripción en el Impuesto sobre los Ingresos Brutos</value>
@@ -1173,8 +1173,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="263" trl="Y">
-  <value column="Name" original="Account Date">Fecha de Aplicación CG</value>
-  <value column="PrintName" original="Acct Date">F. Aplicación CG</value>
+  <value column="Name" original="Account Date">Fecha de Contabilización</value>
+  <value column="PrintName" original="Acct Date">F. Contabilización</value>
   <value column="Description" original="Accounting Date">Fecha contable</value>
   <value column="Help" original="The Accounting Date indicates the date to be used on the General Ledger account entries generated from this document. It is also used for any currency conversion.">La fecha contable indica la fecha a ser usada en las cuentas de contabilidad general generadas desde este documento</value>
   <value column="PO_Description" original=""/>
@@ -2713,7 +2713,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="508" trl="Y">
-  <value column="Name" original="Post Actual">Aplicar Reales</value>
+  <value column="Name" original="Post Actual">Contabilizar Reales</value>
   <value column="PrintName" original="Post Actual">Aplicar Reales</value>
   <value column="Description" original="Actual Values can be posted">Valores reales pueden ser aplicados</value>
   <value column="Help" original="The Post Actual indicates if actual values can be posted to this element value.">El campo Aplicar Reales indica si valores reales pueden ser aplicados a este elemento contable</value>
@@ -2723,7 +2723,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="509" trl="Y">
-  <value column="Name" original="Post Budget">Aplicar Presupuesto</value>
+  <value column="Name" original="Post Budget">Contabilizar Presupuesto</value>
   <value column="PrintName" original="Post Budget">Aplicar a Presupuesto</value>
   <value column="Description" original="Budget values can be posted">Valores del presupuesto pueden ser aplicados</value>
   <value column="Help" original="The Post Budget indicates if budget values can be posted to this element value.">Presupuesto Aplicado indica si los valores del presupuesto pueden ser aplicados a este valor de elemento</value>
@@ -2733,7 +2733,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="510" trl="Y">
-  <value column="Name" original="Post Encumbrance">Aplicar Gravámenes</value>
+  <value column="Name" original="Post Encumbrance">Contabilizar Gravámenes</value>
   <value column="PrintName" original="Post Encumbrance">Aplicar a Gravámenes</value>
   <value column="Description" original="Post commitments to this account">Registro de gravámenes a esta cuenta</value>
   <value column="Help" original=""/>
@@ -2743,7 +2743,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="511" trl="Y">
-  <value column="Name" original="Post Statistical">Aplicar Estadísticas</value>
+  <value column="Name" original="Post Statistical">Contabilizar Estadísticas</value>
   <value column="PrintName" original="Post Statistical">Aplicar a Estadísticas</value>
   <value column="Description" original="Post statistical quantities to this account?">Registro de cantidades estadísticas a esta cuenta</value>
   <value column="Help" original=""/>
@@ -2773,8 +2773,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="514" trl="Y">
-  <value column="Name" original="PostingType">Tipo de Aplicación</value>
-  <value column="PrintName" original="PostingType">Tipo de Registro</value>
+  <value column="Name" original="PostingType">Tipo de Contabilización</value>
+  <value column="PrintName" original="PostingType">Tipo de Contabilización</value>
   <value column="Description" original="The type of posted amount for the transaction">El tipo de total que esta póliza actualizó</value>
   <value column="Help" original="The Posting Type indicates the type of amount (Actual, Budget, Reservation, Commitment, Statistical) the transaction.">El tipo de aplicación indica el tipo de total (actual; gravamen; presupuesto) que esta póliza actualizó</value>
   <value column="PO_Description" original=""/>
@@ -4263,7 +4263,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="950" trl="Y">
-  <value column="Name" original="Payment Rule">Regla de Pago</value>
+  <value column="Name" original="Payment Rule">Forma de Pago</value>
   <value column="PrintName" original="Payment Rule">Regla de Pago</value>
   <value column="Description" original="Purchase payment option">Opción de pago por compras</value>
   <value column="Help" original="The Payment Rule indicates the method of purchase payment.">La Regla de Pago indica el método de pago de las compras</value>
@@ -4783,7 +4783,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1058" trl="Y">
-  <value column="Name" original="Vendor Prepayment">Prepago del proveedor</value>
+  <value column="Name" original="Vendor Prepayment">Prepago del Proveedor</value>
   <value column="PrintName" original="Vendor Prepayment">Prepago del Proveedor</value>
   <value column="Description" original="Account for Vendor Prepayments">Cuenta para prepagos del proveedor</value>
   <value column="Help" original="The Vendor Prepayment Account indicates the account used to record prepayments from a vendor.">La cuenta de prepagos del proveedor indica la cuenta usada para registrar pagos anticipados a un proveedor</value>
@@ -5473,7 +5473,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1143" trl="Y">
-  <value column="Name" original="Payment Rule">Regla de Pago</value>
+  <value column="Name" original="Payment Rule">Forma de Pago</value>
   <value column="PrintName" original="Payment Rule">Regla de Pago</value>
   <value column="Description" original="How you pay the invoice">Como se pagará la factura</value>
   <value column="Help" original="The Payment Rule indicates the method of invoice payment.">La Regla de Pagos indica el método de pago de la factura</value>
@@ -7363,7 +7363,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1441" trl="Y">
-  <value column="Name" original="Tender type">Tipo de Pago</value>
+  <value column="Name" original="Tender type">Forma de Pago</value>
   <value column="PrintName" original="Tender type">Tipo de Pago</value>
   <value column="Description" original="Method of Payment">Método de pago</value>
   <value column="Help" original="The Tender Type indicates the method of payment (ACH or Direct Deposit, Credit Card, Check, Direct Debit)">El Tipo de Pago indica el método de pago  (ACH; Tarjeta de Crédito; Cheque)</value>
@@ -7523,10 +7523,10 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1462" trl="Y">
-  <value column="Name" original="Cash Journal">Caja Chica</value>
-  <value column="PrintName" original="Cash Journal">Caja Chica</value>
-  <value column="Description" original="Cash Journal">Caja Chica</value>
-  <value column="Help" original="The Cash Journal uniquely identifies a Cash Journal.  The Cash Journal will record transactions for the cash bank account">La caja chica identifica únicamente una caja chica. La caja chica registrará las transacciones para la cuenta de bancos</value>
+  <value column="Name" original="Cash Journal">Efectivo</value>
+  <value column="PrintName" original="Cash Journal">Efectivo</value>
+  <value column="Description" original="Cash Journal">Efectivo</value>
+  <value column="Help" original="The Cash Journal uniquely identifies a Cash Journal.  The Cash Journal will record transactions for the cash bank account"/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
   <value column="PO_Name" original=""/>
@@ -12103,7 +12103,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1982" trl="Y">
-  <value column="Name" original="Level no">No Nivel</value>
+  <value column="Name" original="Level no">No. Nivel</value>
   <value column="PrintName" original="Level no">No Nivel</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
@@ -13024,9 +13024,9 @@ Si no se incorpora ninguna, se utiliza la impresora por default. Usted especific
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2083" trl="Y">
-  <value column="Name" original="Account Key">Clave de Cuenta</value>
-  <value column="PrintName" original="Account Key">Clave de Cuenta</value>
-  <value column="Description" original="Key of Account Element">Clave del elemento cuenta</value>
+  <value column="Name" original="Account Key">Código de Cuenta</value>
+  <value column="PrintName" original="Account Key">Código de Cuenta</value>
+  <value column="Description" original="Key of Account Element">Código del elemento cuenta</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -16889,8 +16889,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2494" trl="Y">
-  <value column="Name" original="Counter Document Type">Tipo Contador de Documento</value>
-  <value column="PrintName" original="Counter Doc Type">Tipo Contador de Documento</value>
+  <value column="Name" original="Counter Document Type">Tipo Contra Documento</value>
+  <value column="PrintName" original="Counter Doc Type">Tipo Contra Documento</value>
   <value column="Description" original="Generated Counter Document Type (To)">Tipo Generado de Contador de Documento.</value>
   <value column="Help" original="The Document Type of the generated counter document">El tipo de documento del documento contrario generado.</value>
   <value column="PO_Description" original=""/>
@@ -17119,7 +17119,7 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2517" trl="Y">
-  <value column="Name" original="Default Counter Document">Contador de Documento predeterminado</value>
+  <value column="Name" original="Default Counter Document">Contra Documento Predeterminado</value>
   <value column="PrintName" original="Default Counter Doc">Contador de Doc predeterminado</value>
   <value column="Description" original="The document type is the default counter document type">El tipo del documento es el tipo de contador de documento predeterminado</value>
   <value column="Help" original="When using explicit documents for inter-org transaction (after linking a Business Partner to an Organization), you can determine what document type the counter document is based on the document type of the original transaction.  Example: when generating a Sales Order, use this Sales Order document type.&#10;This default can be overwritten by defining explicit counter document relationships.">Al usar los documentos explícitos para la inter-org transacción (después de ligar a un Socio del negocio a una organización), usted puede determinar en qué tipo de documento se basa el documento contrario en el tipo de documento de la transacción original. Ejemplo: cuando la generación las ventas pide, utiliza este tipo de documento de la orden de las ventas. Este defecto puede ser sobreescrito definiendo relaciones contrarias explícitas del documento.</value>
@@ -17359,8 +17359,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2545" trl="Y">
-  <value column="Name" original="Create Counter Document">Crea Contador de Documento</value>
-  <value column="PrintName" original="Create Counter">Crea Contador</value>
+  <value column="Name" original="Create Counter Document">Crea Contra Documento</value>
+  <value column="PrintName" original="Create Counter">Crea Contra Documento</value>
   <value column="Description" original="Create Counter Document">Crea Contador de documento</value>
   <value column="Help" original="If selected, create specified counter document.  If not selected, no counter document is created for the document type.">Si es seleccionado, crea un contador de documento especifico. Si no esta seleccionado, no crea contador de documento para el tipo de documento.</value>
   <value column="PO_Description" original=""/>
@@ -20237,7 +20237,7 @@ Note que usted puede  Sobre o Sub Asignar el Pago.Durante el procesamiento  del 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2843" trl="Y">
-  <value column="Name" original="Post Immediately (Deprecated)">Aplicar Inmediatamente</value>
+  <value column="Name" original="Post Immediately (Deprecated)">Contabilizarr Inmediatamente</value>
   <value column="PrintName" original="Post Immediate">Aplicar Inmediatamente</value>
   <value column="Description" original="Post the accounting immediately for testing (Deprecated)">Aplique la Contabilidad inmediatamente para comprobación</value>
   <value column="Help" original="If selected, the accounting consequences are immediately generated when completing a document.  Otherwise the document is posted by a batch process.  You should select this only if you are testing.&#10;Deprecated column - use instead the functionality Client Accounting.">Si seleccionó, las consecuencias contables son generadas inmediatamente al completar un documento. Sino el documento es aplicado mediante un proceso por lotes. Esto sólo debe ser seleccionádo si usted está comprobando.</value>
@@ -20298,8 +20298,8 @@ Note que usted puede  Sobre o Sub Asignar el Pago.Durante el procesamiento  del 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2849" trl="Y">
-  <value column="Name" original="Post Services Separately">Aplicar Servicios Separadamente</value>
-  <value column="PrintName" original="Post Services">Aplicar Servicios Separadamente</value>
+  <value column="Name" original="Post Services Separately">Conmtabilizar Servicios Separadamente</value>
+  <value column="PrintName" original="Post Services">Contabilizar Servicios Separadamente</value>
   <value column="Description" original="Differentiate between Services and Product Receivable/Payables">Diferenciación entre Servicios y Productos Cobranzas/Pagos</value>
   <value column="Help" original="If selected, you will post service related revenue to a different receivables account and service related cost to a different payables account.">Si seleccionó, usted aplicará ingresos a servicios relacionados a diferentes cuentas por cobrar y costos relacionados a servicios a diferentes cuentas por pagar.</value>
   <value column="PO_Description" original=""/>
@@ -28623,7 +28623,7 @@ La bandera de promoción obligatoria indica que la orden debe tener esta línea 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="53807" trl="Y">
-  <value column="Name" original="Usage Counter">Contador Uso</value>
+  <value column="Name" original="Usage Counter">Contador Promoción</value>
   <value column="PrintName" original="Usage Counter">Contador Uso</value>
   <value column="Description" original="Usage counter">Contador Uso</value>
   <value column="Help" original="Counter to record how many times this promotion have been used">
@@ -29787,7 +29787,7 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1000006" trl="Y">
-  <value column="Name" original="Is Modifiable On Payment">Es Modificable en Pago</value>
+  <value column="Name" original="Is Modifiable On Payment">Modificable en Pago</value>
   <value column="PrintName" original="Is Modifiable On Payment">Es Modificable en Pago</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
