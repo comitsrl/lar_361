@@ -64,6 +64,8 @@ import org.compiere.util.Msg;
  *         *Basado en Codigo Original Modificado, Revisado y Optimizado de:
  *         *Copyright (c) Jorg Janke
  *  @version $Id: SubBPartner.java,v 1.1 2004/07/12 04:10:04 jjanke Exp $
+ *
+ *  @contributor Emiliano Pereyra - http://www.ergio.com.ar
  */
 public class SubOrder extends PosSubPanel implements ActionListener, FocusListener
 {
@@ -272,6 +274,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		//	New
 		if (action.equals("New"))
 		{
+	        deleteOrder();
 			p_posPanel.newOrder(); //red1 New POS Order instead - B_Partner already has direct field
 			return;
 		}
@@ -284,10 +287,11 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		}
 		else if (action.equals("Delete")) //red1 more apt description
 		{
-			deleteOrder();
-			p_posPanel.m_order = null;
-			p_posPanel.f_curLine.newLine();
-			p_posPanel.f_curLine.f_productName.requestFocusInWindow();
+            if (deleteOrder()) {
+                p_posPanel.m_order = null;
+                p_posPanel.f_curLine.newLine();
+                p_posPanel.f_curLine.f_productName.requestFocusInWindow();
+            }
 		}
 		else if (action.equals("Preference"))
 		{
@@ -308,9 +312,12 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		    // TODO - translate this messages
 		    String msg = "Do you want save this order?";
 	        if (p_posPanel.m_order != null && !ADialog.ask(0, this, msg)) {
-	            p_posPanel.m_order.deleteOrder();
+	            if (!p_posPanel.m_order.deleteOrder()) {
+	                msg = "Can not delete order";
+	                ADialog.error(0, this, msg);
+	            }
 	        }
-			p_posPanel.dispose();
+	        p_posPanel.dispose();
 			return;
 		}
 		//	Name
@@ -339,13 +346,12 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	/**
 	 *
 	 */
-    private void deleteOrder()
+    private boolean deleteOrder()
     {
         if (p_posPanel != null && ADialog.ask(0, this, "Delete order?")) {
-            p_posPanel.m_order.deleteOrder();
+            return p_posPanel.m_order.deleteOrder();
         }
-        // p_posPanel.newOrder();
-
+        return false;
     }
 
 	/**

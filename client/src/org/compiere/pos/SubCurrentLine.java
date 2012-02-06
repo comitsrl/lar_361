@@ -236,7 +236,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		String action = e.getActionCommand();
 		if (action == null || action.length() == 0)
 			return;
-		log.info( "SubCurrentLine - actionPerformed: " + action);
+		log.info( "actionPerformed: " + action);
 
 		//	Plus
 		if (action.equals("Plus"))
@@ -392,7 +392,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                         throw new AdempierePOSException(msg);
                     }
                     if (!p_posPanel.m_order.isProcessed() && !p_posPanel.m_order.processOrder()) {
-                        String msg = Msg.translate(p_ctx, "PosOrderProcessFailed");
+                        String msg = Msg.translate(p_ctx, p_posPanel.m_order.getProcessMsg());
                         throw new AdempierePOSException(msg);
                     }
 
@@ -403,7 +403,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
             // Execute the transaction
             try {
                 Trx.run(trxRunnable);
-            } catch (AdempierePOSException e) {
+            } catch (Exception e) {
                 ADialog.warn(0, p_posPanel, e.getLocalizedMessage());
                 return;
             }
@@ -632,9 +632,8 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		MWarehousePrice[] results = null;
 		setParameter();
 		//
-		results = MWarehousePrice.find (p_ctx,
-			m_M_PriceList_Version_ID, m_M_Warehouse_ID,
-			Value, Name, UPC, SKU, null);
+		results = MWarehousePrice.find (p_ctx, m_M_PriceList_Version_ID, m_M_Warehouse_ID, Value,
+		        Name, UPC, SKU, null);
 
 		//	Set Result
 		if (results.length == 0)
@@ -647,12 +646,10 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		else if (results.length == 1)
 		{
 			setM_Product_ID(results[0].getM_Product_ID());
-            if (hasStock(m_product, Env.ONE)) {
-                setQty(Env.ONE);
-                f_productName.setText(results[0].getName());
-                p_posPanel.f_curLine.setPrice(results[0].getPriceStd());
-                saveLine();
-            }
+            setQty(Env.ONE);
+            f_productName.setText(results[0].getName());
+            p_posPanel.f_curLine.setPrice(results[0].getPriceStd());
+            saveLine();
 		}
 		else	//	more than one
 		{
@@ -743,7 +740,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		if ( lineId <= 0 )
 			return;
 
-		log.fine("SubCurrentLine - loading line " + lineId);
+		log.fine("loading line " + lineId);
 		MOrderLine ol = new MOrderLine(p_ctx, lineId, null);
 		if ( ol != null )
 		{
