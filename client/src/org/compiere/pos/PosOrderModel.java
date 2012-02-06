@@ -36,9 +36,9 @@ import ar.com.ergio.model.MLAROrderPerception;
 
 /**
  * Wrapper for standard order
- * @author Paul Bowden
- * Adaxa Pty Ltd
+ * @author Paul Bowden - Adaxa Pty Ltd
  *
+ * @contributor Emiliano Pereyra - http://www.ergio.com.ar
  */
 public class PosOrderModel extends MOrder {
 
@@ -181,8 +181,8 @@ public class PosOrderModel extends MOrder {
 	 * Delete order from database
 	 *
 	 * @author Comunidad de Desarrollo OpenXpertya
- *         *Basado en Codigo Original Modificado, Revisado y Optimizado de:
- *         *Copyright (c) ConSerTi
+     *         Basado en Codigo Original Modificado, Revisado y Optimizado de:
+     *         Copyright (c) ConSerTi
 	 */
 	public boolean deleteOrder () {
 		if (getDocStatus().equals("DR"))
@@ -214,7 +214,8 @@ public class PosOrderModel extends MOrder {
 				}
 
 				getLines(true, null);		// requery order
-				setDocStatus("VO");//delete(true); red1 -- should not delete but void the order
+				setDocStatus("VO"); //delete(true); red1 -- should not delete but void the order
+				setDocAction("--"); // emmie
 				setProcessed(true); //red1 -- to avoid been in history during query
 				save();
 				return true;
