@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 360LTS.013_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ADempiere - Supported by ADempiere community-->
+<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120206-1215 - ${ADEMPIERE_VENDOR}-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Message">
  <row id="101" trl="Y">
@@ -131,7 +131,7 @@
   <value column="MsgTip" original=""/>
  </row>
  <row id="133" trl="Y">
-  <value column="MsgText" original="This action is not supported">Ésta acción no es soportada</value>
+  <value column="MsgText" original="This action is not supported">Esta acción no es soportada</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="134" trl="Y">
@@ -855,7 +855,7 @@
   <value column="MsgTip" original=""/>
  </row>
  <row id="314" trl="Y">
-  <value column="MsgText" original="Document must be completed first">Documento debe ser convertido primero</value>
+  <value column="MsgText" original="Document must be completed first">El Documento debe ser convertido primero</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="315" trl="Y">
@@ -1227,7 +1227,7 @@
   <value column="MsgTip" original=""/>
  </row>
  <row id="407" trl="Y">
-  <value column="MsgText" original="Document must be Complete or Closed to view Accounting">Documento debe estar completo ó cerrado para ver la contabilidad</value>
+  <value column="MsgText" original="Document must be Complete or Closed to view Accounting">El Documento debe estar completo ó cerrado para ver la contabilidad</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="408" trl="Y">
@@ -2446,8 +2446,7 @@
   <value column="MsgTip" original=""/>
  </row>
  <row id="719" trl="Y">
-  <value column="MsgText" original="Document has Lines without MANDATORY Product Attribute Set Instance - complete first">Documento sin línea MANDATORIA de grupo de atributos de instancia - Primero Completelo
-</value>
+  <value column="MsgText" original="Document has Lines without MANDATORY Product Attribute Set Instance - complete first">Documento sin línea OBLIGATORIA de grupo de atributos de instancia. Completar primero</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="720" trl="Y">
@@ -2922,7 +2921,7 @@ El multiplicador debe ser>= 1 y siempre resultado en una UM válido.]]></value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="837" trl="Y">
-  <value column="MsgText" original="Document Status changed - Requery Record">Document Status changed - Requery Record</value>
+  <value column="MsgText" original="Document Status changed - Requery Record">El Estado del Documento ha cambiado - Recargue el registro</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="838" trl="Y">
@@ -3173,7 +3172,7 @@ Do you want to continue?</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="50010" trl="Y">
-  <value column="MsgText" original="If you change the attachment storage method, the old attachments are no longer available to your client.">If you change the attachment storage method, the old attachments are no longer available to your client.</value>
+  <value column="MsgText" original="If you change the attachment storage method, the old attachments are no longer available to your client.">Si cambia el método de almacenamiento de archivos adjuntos, los archivos antiguos ya no estarán disponible para la Compañía</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="50011" trl="Y">
@@ -3185,7 +3184,7 @@ Do you want to continue?</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="50015" trl="Y">
-  <value column="MsgText" original="If you change the archive storage method, the old archive entries are no longer available to your client.">If you change the archive storage method, the old archive entries are no longer available to your client.</value>
+  <value column="MsgText" original="If you change the archive storage method, the old archive entries are no longer available to your client.">Si cambia el método de almacenamiento de archivos, los archivos antiguos ya no estarán disponible para su Compañía</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="50016" trl="Y">
@@ -3285,11 +3284,11 @@ Do you want to continue?</value>
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52023" trl="Y">
-  <value column="MsgText" original="Due 0">Due 0</value>
+  <value column="MsgText" original="Due 0">Deuda 0</value>
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52024" trl="Y">
-  <value column="MsgText" original="Due 0-30">Due 0-30</value>
+  <value column="MsgText" original="Due 0-30">Deuda 0-30</value>
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52025" trl="Y">
@@ -3867,7 +3866,7 @@ Un error ha ocurrido mientras se intentaba comunicación con el servidor. Por fa
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52168" trl="Y">
-  <value column="MsgText" original="(excl. VAT)">(excl. VAT)</value>
+  <value column="MsgText" original="(excl. VAT)">(excl. IVA)</value>
   <value column="MsgTip" original=" "/>
  </row>
  <row id="52169" trl="Y">
