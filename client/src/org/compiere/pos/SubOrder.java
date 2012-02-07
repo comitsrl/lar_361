@@ -193,8 +193,6 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
                 Integer c_Order_ID = (Integer)event.getNewValue();
                 if(c_Order_ID != null && c_Order_ID > 0) {
                     p_posPanel.loadOrder(c_Order_ID);
-                } else {
-                    p_posPanel.newOrder();
                 }
             }
         });
@@ -222,7 +220,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 
 		// BP
 		add(new CLabel(Msg.translate(Env.getCtx(), "Customer")), "");
-		f_bpName =new PosTextField(Msg.translate(Env.getCtx(), "C_Partner_ID"), p_posPanel, p_pos.getOSK_KeyLayout_ID());
+		f_bpName =new PosTextField(Msg.translate(Env.getCtx(), "C_BPartner_ID"), p_posPanel, p_pos.getOSK_KeyLayout_ID());
 		f_bpName.setEditable(true); //red1
 		f_bpName.setName("BPartner");
 		f_bpName.addActionListener(this);
@@ -290,7 +288,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
             if (deleteOrder()) {
                 p_posPanel.m_order = null;
                 p_posPanel.f_curLine.newLine();
-                p_posPanel.f_curLine.f_productName.requestFocusInWindow();
+                //p_posPanel.f_curLine.f_productName.requestFocusInWindow();
             }
 		}
 		else if (action.equals("Preference"))
@@ -324,6 +322,8 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		else if (e.getSource() == f_bpName)
 		{
 			findBPartner();
+            p_posPanel.f_curLine.f_productName.requestFocusInWindow();
+			return;
 		}
 
 		p_posPanel.updateInfo();
@@ -348,7 +348,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	 */
     private boolean deleteOrder()
     {
-        if (p_posPanel != null && ADialog.ask(0, this, "Delete order?")) {
+        if (p_posPanel.m_order != null && ADialog.ask(0, this, "Delete order?")) {
             return p_posPanel.m_order.deleteOrder();
         }
         return false;

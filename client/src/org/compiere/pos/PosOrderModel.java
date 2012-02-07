@@ -185,7 +185,7 @@ public class PosOrderModel extends MOrder {
      *         Copyright (c) ConSerTi
 	 */
 	public boolean deleteOrder () {
-		if (getDocStatus().equals("DR"))
+		if (getDocStatus().equals("DR") || getDocStatus().equals("IP"))
 			{
 				MOrderLine[] lines = getLines();
 				if (lines != null)
