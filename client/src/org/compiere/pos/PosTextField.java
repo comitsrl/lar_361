@@ -18,7 +18,6 @@ import java.awt.event.MouseListener;
 import java.text.Format;
 
 import javax.swing.JFormattedTextField;
-import javax.swing.text.DefaultFormatterFactory;
 
 
 /**
@@ -32,7 +31,7 @@ public class PosTextField extends JFormattedTextField implements MouseListener {
 	 *
 	 */
 	private static final long serialVersionUID = -2453719110038264481L;
-	private DefaultFormatterFactory formatFactory = new DefaultFormatterFactory();
+	//private DefaultFormatterFactory formatFactory = new DefaultFormatterFactory(); emmie
 	PosBasePanel pos = null;
 	int keyLayoutId = 0;
 	private String title;
