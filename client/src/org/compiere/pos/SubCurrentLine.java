@@ -286,12 +286,12 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			payOrder();
 		}
 		//	VNumber - TODO - Review this behavior, seem there is a bug (set qty with price?)
-		else if (e.getSource() == f_price)
+		else if (e.getSource() == f_price && orderLineId > 0)
 		{
 			MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
 			if ( line != null )
 			{
-				line.setQty(new BigDecimal(f_price.getValue().toString()));
+				line.setPrice(new BigDecimal(f_price.getValue().toString()));
 				line.saveEx();
 				//p_posPanel.updateInfo();
 			}
