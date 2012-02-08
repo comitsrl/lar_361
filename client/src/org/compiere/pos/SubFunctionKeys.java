@@ -87,7 +87,7 @@ public class SubFunctionKeys extends PosSubPanel implements PosKeyListener
 		p_posPanel.f_curLine.setQty(key.getQty());
 		if ( !p_posPanel.f_curLine.saveLine() )
 		{
-			ADialog.error(0, this, "Could not save order line");
+			ADialog.error(0, this, "CannotSavePosOrderLine");
 		}
 		p_posPanel.updateInfo();
 		return;

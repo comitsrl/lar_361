@@ -307,12 +307,9 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		// Logout
 		else if (action.equals("Logout"))
 		{
-		    // TODO - translate this messages
-		    String msg = "Do you want save this order?";
-	        if (p_posPanel.m_order != null && !ADialog.ask(0, this, msg)) {
+	        if (p_posPanel.m_order != null && !ADialog.ask(0, this, "SavePosOrderChanges?")) {
 	            if (!p_posPanel.m_order.deleteOrder()) {
-	                msg = "Can not delete order";
-	                ADialog.error(0, this, msg);
+	                ADialog.error(0, this, "CannotDeletePosOrder");
 	            }
 	        }
 	        p_posPanel.dispose();
@@ -348,7 +345,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	 */
     private boolean deleteOrder()
     {
-        if (p_posPanel.m_order != null && ADialog.ask(0, this, "Delete order?")) {
+        if (p_posPanel.m_order != null && ADialog.ask(0, this, "DeletePosOrder?")) {
             return p_posPanel.m_order.deleteOrder();
         }
         return false;
