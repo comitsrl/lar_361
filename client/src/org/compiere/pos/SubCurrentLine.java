@@ -282,10 +282,12 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
            return;
         }
 		else if (action.equals("Payment"))
+		{
 			payOrder();
-
+		}
 		//	VNumber - TODO - Review this behavior, seem there is a bug (set qty with price?)
-		else if (e.getSource() == f_price)		{
+		else if (e.getSource() == f_price)
+		{
 			MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
 			if ( line != null )
 			{
@@ -306,24 +308,29 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			}
 		}
 		//	Product
-		if (action.equals("Product"))
+		else if (action.equals("Product"))
 		{
 			setParameter();
 			QueryProduct qt = new QueryProduct(p_posPanel);
 			qt.setQueryData(m_M_PriceList_Version_ID, m_M_Warehouse_ID);
 			qt.setVisible(true);
-			findProduct();
-
-			int row = m_table.getSelectedRow();
-			if (row < 0) row = 0;
-//			m_table.getSelectionModel().setSelectionInterval(row, row); --red1 - use product window first will gives out of bound error
-			// https://sourceforge.net/tracker/?func=detail&atid=879332&aid=3121975&group_id=176962
-			m_table.scrollRectToVisible(m_table.getCellRect(row, 1, true)); //@Trifon - BF[3121975]
+			if (findProduct()) {
+			    int row = m_table.getSelectedRow();
+			    if (row < 0) row = 0;
+			    //m_table.getSelectionModel().setSelectionInterval(row, row); --red1 - use product window first will gives out of bound error
+			    //https://sourceforge.net/tracker/?func=detail&atid=879332&aid=3121975&group_id=176962
+			    m_table.scrollRectToVisible(m_table.getCellRect(row, 1, true)); //@Trifon - BF[3121975]
+			}
 		}
 		//	ProductName
 		else if (e.getSource() == f_productName)
-			findProduct();
-		if ("Previous".equalsIgnoreCase(e.getActionCommand()))
+		{
+			if (findProduct()) {
+		        p_posPanel.updateInfo();
+			}
+			return;
+		}
+		else if ("Previous".equalsIgnoreCase(e.getActionCommand()))
 		{
 			int rows = m_table.getRowCount();
 			if (rows == 0)
@@ -483,6 +490,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	/**
 	 * 	Set Query Parameter
 	 */
+	//TODO - Review this method, I think that is unuseful
 	private void setParameter()
 	{
 		//	What PriceList ?
@@ -608,11 +616,11 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	/**************************************************************************
 	 * 	Find/Set Product & Price
 	 */
-	private void findProduct()
+	private boolean findProduct()
 	{
 		String query = f_productName.getText();
 		if (query == null || query.length() == 0)
-			return;
+			return false;
 		query = query.toUpperCase();
 		//	Test Number
 		boolean allNumber = true;
@@ -642,6 +650,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			ADialog.warn(0, p_posPanel, message + query);
 			setM_Product_ID(0);
 			p_posPanel.f_curLine.setPrice(Env.ZERO);
+			return false;
 		}
 		else if (results.length == 1)
 		{
@@ -649,7 +658,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
             setQty(Env.ONE);
             f_productName.setText(results[0].getName());
             p_posPanel.f_curLine.setPrice(results[0].getPriceStd());
-            saveLine();
+            return saveLine();
 		}
 		else	//	more than one
 		{
@@ -657,6 +666,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			qt.setResults(results);
 			qt.setQueryData(m_M_PriceList_Version_ID, m_M_Warehouse_ID);
 			qt.setVisible(true);
+			return true;
 		}
 	}	//	findProduct
 
@@ -693,12 +703,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	 * 	Focus Gained
 	 *	@param e
 	 */
-	public void focusGained (FocusEvent e)
-	{
-
-
-	}	//	focusGained
-
+	public void focusGained (FocusEvent e) {}
 
 	/**
 	 * 	Focus Lost
@@ -709,9 +714,9 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		if (e.isTemporary())
 			return;
 		log.info( "PosSubProduct - focusLost");
-		findProduct();
-
-		p_posPanel.updateInfo();
+		if (findProduct()) {
+		    p_posPanel.updateInfo();
+		}
 	}	//	focusLost
 
 

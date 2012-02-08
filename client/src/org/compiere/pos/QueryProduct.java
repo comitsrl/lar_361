@@ -274,7 +274,7 @@ public class QueryProduct extends PosQuery
 			}
 		}
 		f_ok.setEnabled(enabled);
-		log.fine("M_Product_ID=" + m_M_Product_ID + " - " + m_ProductName + " - " + m_Price);
+		log.info("M_Product_ID=" + m_M_Product_ID + " - " + m_ProductName + " - " + m_Price);
 	}	//	enableButtons
 
 
@@ -285,7 +285,7 @@ public class QueryProduct extends PosQuery
 	 */
 	protected void close()
 	{
-		log.fine("M_Product_ID=" + m_M_Product_ID);
+		log.info("M_Product_ID=" + m_M_Product_ID);
 
 		if (m_M_Product_ID > 0)
 		{
