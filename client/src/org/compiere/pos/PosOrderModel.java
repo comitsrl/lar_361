@@ -130,8 +130,9 @@ public class PosOrderModel extends MOrder {
 	        throw new AdempierePOSException(stockMsg);
 	    }
 
-		if (!getDocStatus().equals("DR") )
-			return null;
+		if (!(getDocStatus().equals("DR") || getDocStatus().equals("IP"))) {
+		    return null;
+		}
 		//add new line or increase qty
 
 		// catch Exceptions at order.getLines()
