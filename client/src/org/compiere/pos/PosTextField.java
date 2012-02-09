@@ -13,11 +13,19 @@
  *****************************************************************************/
 package org.compiere.pos;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.Format;
+import java.util.Locale;
+import java.util.logging.Level;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.text.BadLocationException;
+
+import org.compiere.util.CLogger;
+import org.compiere.util.Language;
 
 
 /**
@@ -26,51 +34,34 @@ import javax.swing.JFormattedTextField;
  * Adaxa Pty Ltd
  *
  */
-public class PosTextField extends JFormattedTextField implements MouseListener {
+public class PosTextField extends JFormattedTextField implements MouseListener, KeyListener
+{
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -2453719110038264481L;
+	private static CLogger log = CLogger.getCLogger(PosTextField.class);
 	//private DefaultFormatterFactory formatFactory = new DefaultFormatterFactory(); emmie
-	PosBasePanel pos = null;
-	int keyLayoutId = 0;
+	private PosBasePanel pos = null;
+	private int keyLayoutId = 0;
 	private String title;
+	// emmie - workaround to decimal key (numpad) with spanish language
+	private boolean isSpanish = false;
 
 	public PosTextField(String title, PosBasePanel pos, final int posKeyLayout_ID, Format format ) {
 		super(format);
-
-		if ( posKeyLayout_ID > 0 )
-			addMouseListener(this);
-
-		keyLayoutId = posKeyLayout_ID;
-		this.pos = pos;
-		this.title = title;
-
+		init(title, pos, posKeyLayout_ID);
 	}
 
 	public PosTextField(String title, PosBasePanel pos, final int posKeyLayout_ID, AbstractFormatter formatter ) {
 		super(formatter);
-
-		if ( posKeyLayout_ID > 0 )
-			addMouseListener(this);
-
-		keyLayoutId = posKeyLayout_ID;
-		this.pos = pos;
-		this.title = title;
-
+		init(title, pos, posKeyLayout_ID);
 	}
 
 
 	public PosTextField(String title, PosBasePanel pos, final int posKeyLayout_ID) {
 		super();
-
-		if ( posKeyLayout_ID > 0 )
-			addMouseListener(this);
-
-		keyLayoutId = posKeyLayout_ID;
-		this.pos = pos;
-		this.title = title;
-
+		init(title, pos, posKeyLayout_ID);
 	}
 
 	public void mouseReleased(MouseEvent arg0) {}
@@ -89,4 +80,60 @@ public class PosTextField extends JFormattedTextField implements MouseListener {
 			fireActionPerformed();
 		}
 	}
+
+	/***************************************************************
+	 * Decimal Key Workaround (spanish language only)
+	 */
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void keyPressed(KeyEvent e)
+    {
+        if (isSpanish && e.getKeyLocation() == KeyEvent.KEY_LOCATION_NUMPAD &&
+                e.getKeyCode() == KeyEvent.VK_DECIMAL)
+        {
+             try {
+                getDocument().insertString(getDocument().getLength(), ",", null);
+            } catch (BadLocationException ex) {
+                log.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e)
+    {
+        if (isSpanish && e.getKeyLocation() == KeyEvent.KEY_LOCATION_NUMPAD &&
+                e.getKeyCode() == KeyEvent.VK_DECIMAL)
+        {
+            try {
+                getDocument().remove(getDocument().getLength() -1, 1);
+            } catch (BadLocationException ex) {
+                log.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+    }
+
+    /**
+     * Init pos text field
+     * @param title
+     * @param pos
+     * @param posKeyLayout_ID
+     */
+    private void init(String title, PosBasePanel pos, final int posKeyLayout_ID)
+    {
+        keyLayoutId = posKeyLayout_ID;
+        this.pos = pos;
+        this.title = title;
+
+        // only apply "decimal key workaround" if no key layout configurated
+        if (posKeyLayout_ID > 0) {
+            addMouseListener(this);
+        } else {
+            addKeyListener(this);
+            Locale locale = Language.getLoginLanguage().getLocale();
+            isSpanish = locale.getLanguage().equals(new Locale("es", "", "").getLanguage());
+        }
+    }
 }

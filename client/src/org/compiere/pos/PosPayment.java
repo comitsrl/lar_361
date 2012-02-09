@@ -19,9 +19,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -67,15 +64,18 @@ import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
+import org.compiere.util.Language;
 import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
 
-public class PosPayment extends CDialog implements PosKeyListener, VetoableChangeListener, ActionListener {
+public class PosPayment extends CDialog implements PosKeyListener, ActionListener
+{
 
 	private static final long serialVersionUID = 1961106531807910948L;
 	// TODO - review this formatter (added by red1)
 	//private NumberFormat formatter = new DecimalFormat("#0.00"); //red1 - parser to remove commas or dots separator for above '000s.
-    private NumberFormat nf = NumberFormat.getInstance(Locale.getDefault()); // make locale-specific
+	private Locale locale = Language.getLoginLanguage().getLocale();
+    private NumberFormat nf = NumberFormat.getInstance(locale);
 
     /** Logger          */
     private static CLogger log = CLogger.getCLogger(PosPayment.class);
@@ -494,7 +494,7 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 		fPayAmt.setVisible(!account);
 		lPayAmt.setVisible(!account);
 
-		fTotal.setValue(p_order.getGrandTotal());
+		fTotal.setValue(nf.format(p_order.getGrandTotal()));
 
 		BigDecimal received = p_order.getPaidAmt();
 		balance  = p_order.getGrandTotal().subtract(received);
@@ -511,7 +511,7 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 			dispose();
 		}
 
-		fBalance.setValue(balance);
+		fBalance.setValue(nf.format(balance));
 		fPayAmt.setValue(balance);
 		if ( !MPayment.TENDERTYPE_Cash.equals(tenderType) )
 		{
@@ -571,12 +571,4 @@ public class PosPayment extends CDialog implements PosKeyListener, VetoableChang
 	private boolean isPaid() {
 		return paid ;
 	}
-
-	public void vetoableChange(PropertyChangeEvent arg0)
-			throws PropertyVetoException {
-		// TODO Auto-generated method stub
-
-	}
-
-
 }
