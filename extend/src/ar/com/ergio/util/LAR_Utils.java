@@ -20,6 +20,7 @@ import java.util.logging.Level;
 
 import org.compiere.model.MInvoice;
 import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 import ar.com.ergio.model.LAR_MDocType;
@@ -40,26 +41,30 @@ public final class LAR_Utils {
     /**
      * Calculates the letter from a given invoice using its document number.
      *
-     * @param mInvoice
+     * @param invoice
      *            invoice to process
      * @return the letter from a given invoice
      */
-    public static String getLetter(final MInvoice mInvoice)
+    public static String getLetter(final MInvoice invoice)
     {
-        return String.valueOf(mInvoice.getDocumentNo().charAt(0));
+        String sql = "SELECT Letter FROM LAR_DocumentLetter WHERE LAR_DocumentLetter_ID=?";
+        String letter = DB.getSQLValueString(invoice.get_TrxName(), sql,
+                invoice.get_ValueAsInt("LAR_DocumentLetter_ID"));
+        return letter;
     }
 
     /**
      * Calculates the point of sale from a given invoice using its document
      * number.
      *
-     * @param mInvoice
+     * @param invoice
      *            invoice to process
      * @return the point of sale from a given invoice
      */
-    public static String getPosNumber(final MInvoice mInvoice)
+    public static String getPosNumber(final MInvoice invoice)
     {
-        return mInvoice.getDocumentNo().substring(1,5);
+        String posNumber = "0000" + invoice.get_ValueAsInt("PosNumber");
+        return posNumber.substring(posNumber.length() - 4);
     }
 
     /**

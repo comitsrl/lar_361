@@ -24,16 +24,20 @@ import java.util.logging.Level;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
+import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPayment;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
+import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 
 import static ar.com.ergio.model.LAR_TaxPayerType.RESPONSABLE_INSCRIPTO;
 import ar.com.ergio.util.LAR_Utils;
@@ -81,6 +85,7 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addModelChange(MOrderLine.Table_Name, this);
          engine.addModelChange(MOrder.Table_Name, this);
          engine.addModelChange(MPayment.Table_Name, this);
+         engine.addModelChange(MInvoice.Table_Name, this);
 
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
@@ -166,9 +171,87 @@ import ar.com.ergio.util.LAR_Utils;
                 return msg;
             }
         }
-
+        // Determine letter for sales invoices (from PosOrders)
+        if (po.get_TableName().equals(MInvoice.Table_Name) && type == TYPE_AFTER_NEW)
+        {
+            MInvoice invoice = (MInvoice) po;
+            msg = changeDocTypeForInvoice(invoice);
+            if (msg != null) {
+                return msg;
+            }
+        }
         return null;
      }
+
+    private String changeDocTypeForInvoice(final MInvoice invoice)
+    {
+        if (invoice.isSOTrx() && !invoice.isReversal())
+        {
+            final MBPartner bp = new MBPartner(invoice.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
+            int ad_Client_ID = Env.getAD_Client_ID(invoice.getCtx());
+            int ad_Org_ID = Env.getAD_Org_ID(invoice.getCtx());
+            final MOrgInfo orgInfo = MOrgInfo.get(invoice.getCtx(), ad_Org_ID, invoice.get_TrxName());
+            int lco_TaxPayerType_Vendor_ID = orgInfo.get_ValueAsInt("LCO_TaxPayerType_ID");
+            int lco_TaxPayerType_Customer_ID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
+            int posNumber = Env.getContextAsInt(invoice.getCtx(), "PosNumber");
+
+            // Check vendor taxpayertype
+            if (lco_TaxPayerType_Vendor_ID == 0) {
+                return "VendorTaxPayerTypeNotFound";
+            }
+            // Check customer taxpayertype
+            if (lco_TaxPayerType_Customer_ID == 0) {
+                return "CustomerTaxPayerTypeNotFound";
+            }
+            // Check posnumber
+            if (posNumber == 0) {
+                return "PosNumberNotFound";
+            }
+
+            // Determines document letter to bill
+            // Vendor > AD_Org | Customer > BPartner
+            String sql = "SELECT L.LAR_DocumentLetter_ID"
+                       + "  FROM LAR_DocumentLetter L"
+                       + "  JOIN LAR_LetterRule R ON R.LAR_DocumentLetter_ID = L.LAR_DocumentLetter_ID"
+                       + " WHERE R.LCO_TaxPayerType_Vendor_ID=?"
+                       + "   AND R.LCO_TaxPayerType_Customer_ID=?";
+
+            int lar_DocumentLetter_ID = DB.getSQLValue(invoice.get_TrxName(), sql,
+                    lco_TaxPayerType_Vendor_ID, lco_TaxPayerType_Customer_ID);
+
+            // Check document letter config
+            if (lar_DocumentLetter_ID == 0) {
+                return "LetterRuleNotFount";
+            }
+
+            // Retrieve and asign proper doctype to invoice
+            StringBuilder whereClause = new StringBuilder("AD_Client_ID=?")
+                                                  .append(" AND AD_Org_ID=?")
+                                                  .append(" AND IsActive=?")
+                                                  .append(" AND DocBaseType=?")
+                                                  .append(" AND FiscalDocument=?") // 'F' > Factura
+                                                  .append(" AND LAR_DocumentLetter_ID=?")
+                                                  .append(" AND PosNumber=?");
+            Object[] params = new Object[]{ad_Client_ID, ad_Org_ID, "Y", MDocType.DOCBASETYPE_ARInvoice,
+                                           LAR_MDocType.FISCALDOCUMENT_Factura, lar_DocumentLetter_ID, posNumber};
+            MDocType docType = new Query(invoice.getCtx(), MDocType.Table_Name, whereClause.toString(), invoice.get_TrxName())
+                    .setParameters(params)
+                    .firstOnly();
+            // Check retrieved doctype
+            if (docType == null) {
+                return "DocTypeNotFound";
+            }
+
+            // Change invoice docytype target (TODO - review this asignation)
+            invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
+            invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
+            invoice.set_ValueOfColumn("PosNumber", posNumber);
+            if (!invoice.save()) {
+                return "CannotChangeInvoiceDocType";
+            }
+        }
+        return null;
+    }
 
      /**
       *  Validate Document.
