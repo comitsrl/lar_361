@@ -338,13 +338,12 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		//	to display panel with initial change
 		if (action.equals("InitialChange"))
 		{
-		    // TODO - Define if this behavior is useful or not
 			cmd_displayInitialChange();
-			cInitial.setVisible(false);
 		}
 		//  to display panel with cash closing
 		else if (action.equals("CashClosing"))
 		{
+		    dispose();
 			Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
 
 			MCash cash = MCash.get(p_pos.getCtx(), /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
@@ -352,17 +351,16 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 			MQuery query = new MQuery(MCash.Table_Name);
 			query.addRestriction("C_Cash_ID", MQuery.EQUAL, cash.getC_Cash_ID());
 			AEnv.zoom(query);
-			dispose();
 		}
 		//	to open window with inputs and outputs of cash
 		else if (action.equals("InputsOutputs"))
 		{
+		    dispose();
 			Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
 
 			MCash cash = MCash.get(p_pos.getCtx(), /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
 
 			AEnv.zoom(MCash.Table_ID, cash.getC_Cash_ID());
-			dispose();
 		}
 		else if (action.equals("Tickets"))
 		{
