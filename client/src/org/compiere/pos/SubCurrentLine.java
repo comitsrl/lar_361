@@ -32,6 +32,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.apps.ADialog;
 import org.compiere.grid.ed.VPAttributeDialog;
 import org.compiere.minigrid.ColumnInfo;
@@ -325,9 +326,13 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		//	ProductName
 		else if (e.getSource() == f_productName)
 		{
-			if (findProduct()) {
-		        p_posPanel.updateInfo();
-			}
+            try {
+                if (findProduct()) {
+                    p_posPanel.updateInfo();
+                }
+            } catch (AdempiereException ex) {
+                ADialog.error(p_posPanel.getWindowNo(), this, ex.getMessage());
+            }
 			return;
 		}
 		else if ("Previous".equalsIgnoreCase(e.getActionCommand()))
