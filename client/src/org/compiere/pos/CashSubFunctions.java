@@ -24,7 +24,6 @@ import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Properties;
 
 import javax.swing.border.TitledBorder;
 
@@ -100,7 +99,6 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 	private CButton f_calculateDifference = null;
 
 	private CPanel 			panel;
-	private Properties p_ctx;
 
 	/**	Logger			*/
 	private static CLogger log = CLogger.getCLogger(SubCheckout.class);
