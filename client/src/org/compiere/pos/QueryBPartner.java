@@ -17,16 +17,16 @@ package org.compiere.pos;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
 
 import org.compiere.minigrid.ColumnInfo;
 import org.compiere.minigrid.IDColumn;
-import org.compiere.minigrid.MiniTable;
 import org.compiere.model.MBPartnerInfo;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CLabel;
@@ -167,9 +167,7 @@ public class QueryBPartner extends PosQuery
 
 		//	Center
 		m_table = new PosTable();
-		String sql = m_table.prepareTable (s_layout, s_sqlFrom,
-			s_sqlWhere, false, "RV_BPartner")
-			+ " ORDER BY Value";
+		m_table.prepareTable (s_layout, s_sqlFrom, s_sqlWhere, false, "RV_BPartner");
 		m_table.addMouseListener(this);
 		m_table.getSelectionModel().addListSelectionListener(this);
 		enableButtons();
@@ -178,6 +176,7 @@ public class QueryBPartner extends PosQuery
 		m_table.growScrollbars();
 		panel.setPreferredSize(new Dimension(800,600));
 		f_value.requestFocus();
+		addWindowListener(new WindowsCloseAdapter());
 	}	//	init
 
 	/**
@@ -297,4 +296,29 @@ public class QueryBPartner extends PosQuery
 		setResults(new MBPartnerInfo[0]);
 	}
 
+    /*
+     * WindowsListener adapter for manage close window event
+     * (this avoid reopen bp dialog when is closed from windows manager)
+     */
+    private class WindowsCloseAdapter implements WindowListener
+    {
+        @Override
+        public void windowClosed(WindowEvent e){}
+        @Override
+        public void windowIconified(WindowEvent e){}
+        @Override
+        public void windowDeiconified(WindowEvent e){}
+        @Override
+        public void windowActivated(WindowEvent e){}
+        @Override
+        public void windowDeactivated(WindowEvent e){}
+        @Override
+        public void windowOpened(WindowEvent e){}
+
+        @Override
+        public void windowClosing(WindowEvent e)
+        {
+            close();
+        }
+    }
 }	//	PosQueryBPartner
