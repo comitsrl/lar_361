@@ -182,9 +182,9 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 
 		buttonPanel = new CPanel(new GridBagLayout());
 		buttonPanel.setBorder(new TitledBorder(""));
-		buttonPanel.setMaximumSize(new Dimension(400,400));
-		buttonPanel.setMinimumSize(new Dimension(400,400));
-		buttonPanel.setPreferredSize(new Dimension(400,400));
+		buttonPanel.setMaximumSize(new Dimension(300,400));
+		buttonPanel.setMinimumSize(new Dimension(300,400));
+		buttonPanel.setPreferredSize(new Dimension(300,400));
 		panel.add (buttonPanel, gbc);
 
 
@@ -227,17 +227,16 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		gbc0.gridx = 0;
 		gbc0.gridwidth = 2;
 		//gbc0.fill = GridBagConstraints.HORIZONTAL;
-		f_change = createButtonAction("InitialChange", null);
+		f_change = createButtonAction("SaveChange", null);
 		f_change.setText("Save Change");
-		f_change.setActionCommand("saveChange");
-		cInitial.add (f_change, gbc0);
 		f_change.setPreferredSize(new Dimension(160,35));
 		f_change.setMaximumSize(new Dimension(160,35));
 		f_change.setMinimumSize(new Dimension(160,35));
+		cInitial.add (f_change, gbc0);
 
-		cInitial.setMaximumSize(new Dimension(400,400));
-		cInitial.setMinimumSize(new Dimension(400,400));
-		cInitial.setPreferredSize(new Dimension(400,400));
+		cInitial.setMaximumSize(new Dimension(300,400));
+		cInitial.setMinimumSize(new Dimension(300,400));
+		cInitial.setPreferredSize(new Dimension(300,400));
 
 
 		//******************************  Panel for cash scrutiniy ************************
@@ -298,13 +297,15 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		gbc1.gridy = 4;
 		gbc1.gridwidth = 2;
 		gbc1.fill = GridBagConstraints.HORIZONTAL;
-		f_calculateDifference = createButtonAction("InitialChange", null);
+		f_calculateDifference = createButtonAction("AnnotateDifference", null);
 		f_calculateDifference.setText("Annotate Difference");
-		f_calculateDifference.setActionCommand("AnnotateDiference");
+		f_calculateDifference.setPreferredSize(new Dimension(160,35));
+		f_calculateDifference.setMaximumSize(new Dimension(160,35));
+		f_calculateDifference.setMinimumSize(new Dimension(160,35));
 		cScrutiny.add (f_calculateDifference, gbc1);
 
-		cScrutiny.setMaximumSize(new Dimension(400,400));
-		cScrutiny.setMinimumSize(new Dimension(400,400));
+		cScrutiny.setMaximumSize(new Dimension(300,400));
+		cScrutiny.setMinimumSize(new Dimension(300,400));
 		cScrutiny.setPreferredSize(new Dimension(400,400));
 	}	//	init
 
@@ -373,7 +374,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		{
 			dispose();
 		}
-		else if (action.equals("saveChange"))
+		else if (action.equals("SaveChange"))
 		{
 			cmd_saveChange();
 		}
