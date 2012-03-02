@@ -98,7 +98,7 @@ public class FiscalCloseAction extends FiscalPrinterAction
 	} catch (Exception e) {
 	    setErrorMsg(e.getMessage());
 	}
-		return false;
+		return true; //emmie
 	}
 
 
