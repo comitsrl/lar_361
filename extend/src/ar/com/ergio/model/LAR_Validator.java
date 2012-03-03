@@ -134,7 +134,7 @@ import ar.com.ergio.util.LAR_Utils;
          {
              MOrderLine ol = (MOrderLine) po;
 
-             int c_BPartner_ID = ol.getParent().getC_BPartner_ID();
+             int c_BPartner_ID = ol.getC_BPartner_ID();
              MBPartner bp = new MBPartner(ol.getCtx(), c_BPartner_ID, ol.get_TrxName());
              msg = calculatePerceptionLine(bp, ol, type);
              if (msg != null) {
@@ -338,6 +338,7 @@ import ar.com.ergio.util.LAR_Utils;
                         || line.is_ValueChanged("M_Product_ID")
                         || line.is_ValueChanged("IsActive")
                         || line.is_ValueChanged("C_Tax_ID")
+                        || line.is_ValueChanged("C_BPartner_ID")
                         )
                     )
            )

@@ -103,7 +103,6 @@ public class PosOrderModel extends MOrder {
 			{
 				log.info("BPartner - " + partner);
 				super.setBPartner(partner);
-				/* TODO - (emmie) Review I think that this code is OLD, and no longer needed it
 				MOrderLine[] lineas = getLines();
 				for (int i = 0; i < lineas.length; i++)
 				{
@@ -112,7 +111,6 @@ public class PosOrderModel extends MOrder {
 					lineas[i].save();
 				}
 				saveEx();
-				*/
 			}
 		}
 	}
