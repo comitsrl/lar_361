@@ -250,7 +250,6 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 				{
 					line.setQty(newQty);
 					line.saveEx();
-					//p_posPanel.updateInfo();
 				}
 			}
 		}
@@ -264,7 +263,6 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 				{
 					line.setQty(line.getQtyOrdered().subtract(Env.ONE));
 					line.saveEx();
-					p_posPanel.updateInfo();
 				}
 			}
 
@@ -285,6 +283,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		else if (action.equals("Payment"))
 		{
 			payOrder();
+			return;
 		}
 		//	VNumber - TODO - Review this behavior, seem there is a bug (set qty with price?)
 		else if (e.getSource() == f_price && orderLineId > 0)
@@ -294,7 +293,6 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			{
 				line.setPrice(new BigDecimal(f_price.getValue().toString()));
 				line.saveEx();
-				//p_posPanel.updateInfo();
 			}
 		}
 		else if (e.getSource() == f_quantity && orderLineId > 0 )
@@ -305,7 +303,6 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			{
 				line.setQty(newQty);
 				line.saveEx();
-				//p_posPanel.updateInfo();
 			}
 		}
 		//	Product
@@ -416,6 +413,8 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
             try {
                 Trx.run(trxRunnable);
             } catch (Exception e) {
+                // set trx name to null again
+                p_posPanel.m_order.set_TrxName(null);
                 ADialog.warn(0, p_posPanel, e.getLocalizedMessage());
                 return;
             }

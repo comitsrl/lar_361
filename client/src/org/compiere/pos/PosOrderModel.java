@@ -94,7 +94,7 @@ public class PosOrderModel extends MOrder {
 	 */
 	public void setBPartner(MBPartner partner)
 	{
-		if (getDocStatus().equals("DR"))
+		if (getDocStatus().equals("DR") || getDocStatus().equals("IP"))
 		{
 			if (partner == null || partner.get_ID() == 0) {
 				throw new AdempierePOSException("no BPartner");
