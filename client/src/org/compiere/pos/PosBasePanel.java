@@ -280,7 +280,7 @@ public class PosBasePanel extends CPanel
 		else if (poss.length == 1)
 		{
 			p_pos = poss[0];
-			Env.setContext(m_ctx, "PosNumber", p_pos.get_ValueAsInt("PosNumber"));
+			Env.setContext(m_ctx, Env.POS_ID, p_pos.get_ID());
 			return true;
 		}
 
@@ -292,7 +292,7 @@ public class PosBasePanel extends CPanel
 		if (selection != null)
 		{
 			p_pos = (MPOS)selection;
-            Env.setContext(m_ctx, "PosNumber", p_pos.get_ValueAsInt("PosNumber"));
+            Env.setContext(m_ctx, Env.POS_ID, p_pos.get_ID());
 			return true;
 		}
 		return false;

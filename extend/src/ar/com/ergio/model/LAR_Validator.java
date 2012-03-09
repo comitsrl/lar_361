@@ -193,7 +193,7 @@ import ar.com.ergio.util.LAR_Utils;
             final MOrgInfo orgInfo = MOrgInfo.get(invoice.getCtx(), ad_Org_ID, invoice.get_TrxName());
             int lco_TaxPayerType_Vendor_ID = orgInfo.get_ValueAsInt("LCO_TaxPayerType_ID");
             int lco_TaxPayerType_Customer_ID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
-            int posNumber = Env.getContextAsInt(invoice.getCtx(), "PosNumber");
+            int c_POS_ID = Env.getContextAsInt(invoice.getCtx(),Env.POS_ID);
 
             // Check vendor taxpayertype
             if (lco_TaxPayerType_Vendor_ID == 0) {
@@ -204,8 +204,8 @@ import ar.com.ergio.util.LAR_Utils;
                 return "CustomerTaxPayerTypeNotFound";
             }
             // Check posnumber
-            if (posNumber == 0) {
-                return "PosNumberNotFound";
+            if (c_POS_ID == 0) {
+                return "PosConfigNotFound";
             }
 
             // Determines document letter to bill
@@ -231,9 +231,9 @@ import ar.com.ergio.util.LAR_Utils;
                                                   .append(" AND DocBaseType=?")
                                                   .append(" AND FiscalDocument=?") // 'F' > Factura
                                                   .append(" AND LAR_DocumentLetter_ID=?")
-                                                  .append(" AND PosNumber=?");
+                                                  .append(" AND C_POS_ID=?");
             Object[] params = new Object[]{ad_Client_ID, ad_Org_ID, "Y", MDocType.DOCBASETYPE_ARInvoice,
-                                           LAR_MDocType.FISCALDOCUMENT_Factura, lar_DocumentLetter_ID, posNumber};
+                                           LAR_MDocType.FISCALDOCUMENT_Factura, lar_DocumentLetter_ID, c_POS_ID};
             MDocType docType = new Query(invoice.getCtx(), MDocType.Table_Name, whereClause.toString(), invoice.get_TrxName())
                     .setParameters(params)
                     .firstOnly();
@@ -245,7 +245,7 @@ import ar.com.ergio.util.LAR_Utils;
             // Change invoice docytype target (TODO - review this asignation)
             invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
             invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
-            invoice.set_ValueOfColumn("PosNumber", posNumber);
+            invoice.set_ValueOfColumn("C_POS_ID", c_POS_ID);
             if (!invoice.save()) {
                 return "CannotChangeInvoiceDocType";
             }
