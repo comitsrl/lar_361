@@ -461,6 +461,7 @@ import ar.com.ergio.util.LAR_Utils;
                     MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
                     pwh.setC_Payment_ID(payment.get_ID());
                     pwh.setC_Invoice_ID(payment.getC_Invoice_ID());
+                    pwh.setC_Tax_ID(wc.getC_Tax_ID());
                     pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
                     pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
                     pwh.setDateAcct(payment.getDateAcct());
