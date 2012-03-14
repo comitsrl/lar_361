@@ -26,14 +26,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for LAR_OrderPerception
  *  @author Adempiere (generated)
- *  @version 3.6.0LTS+P20110709 - $Id$ */
+ *  @version 360LTS.015 - $Id$ */
 public class X_LAR_OrderPerception extends PO implements I_LAR_OrderPerception, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20111211L;
+	private static final long serialVersionUID = 20120315L;
 
     /** Standard Constructor */
     public X_LAR_OrderPerception (Properties ctx, int LAR_OrderPerception_ID, String trxName)
@@ -58,7 +58,7 @@ public class X_LAR_OrderPerception extends PO implements I_LAR_OrderPerception, 
     }
 
     /** AccessLevel
-      * @return 7 - System - Client - Org
+      * @return 3 - Client - Org
       */
     protected int get_AccessLevel()
     {

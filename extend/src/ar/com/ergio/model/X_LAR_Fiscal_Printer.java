@@ -24,15 +24,15 @@ import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Model for LAR_Fiscal_Printer
- *  @author Adempiere (generated) 
- *  @version 3.6.0LTS+P20110709 - $Id$ */
-public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_Persistent 
+ *  @author Adempiere (generated)
+ *  @version 360LTS.015 - $Id$ */
+public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20110831L;
+	private static final long serialVersionUID = 20120313L;
 
     /** Standard Constructor */
     public X_LAR_Fiscal_Printer (Properties ctx, int LAR_Fiscal_Printer_ID, String trxName)
@@ -41,11 +41,11 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
       /** if (LAR_Fiscal_Printer_ID == 0)
         {
 			setHost (null);
-			setisremote (false);
+			setIsRemote (false);
 			setLAR_Fiscal_Printer_ID (0);
 			setLAR_Fiscal_Printer_Type_ID (0);
-			setonprintproductformat (null);
-			setonprintuseproductreference (false);
+			setOnPrintProductFormat (null);
+			setOnPrintUseProductReference (false);
 			setPort (0);
         } */
     }
@@ -57,7 +57,7 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
     }
 
     /** AccessLevel
-      * @return 7 - System - Client - Org 
+      * @return 3 - Client - Org
       */
     protected int get_AccessLevel()
     {
@@ -79,7 +79,7 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
     }
 
 	/** Set Description.
-		@param Description 
+		@param Description
 		Optional short description of the record
 	  */
 	public void setDescription (String Description)
@@ -90,7 +90,7 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
 	/** Get Description.
 		@return Optional short description of the record
 	  */
-	public String getDescription () 
+	public String getDescription ()
 	{
 		return (String)get_Value(COLUMNNAME_Description);
 	}
@@ -104,45 +104,45 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
 
 	/** Get Host.
 		@return Host	  */
-	public String getHost () 
+	public String getHost ()
 	{
 		return (String)get_Value(COLUMNNAME_Host);
 	}
 
-	/** Set isremote.
-		@param isremote isremote	  */
-	public void setisremote (boolean isremote)
+	/** Set IsRemote.
+		@param IsRemote IsRemote	  */
+	public void setIsRemote (boolean IsRemote)
 	{
-		set_Value (COLUMNNAME_isremote, Boolean.valueOf(isremote));
+		set_Value (COLUMNNAME_IsRemote, Boolean.valueOf(IsRemote));
 	}
 
-	/** Get isremote.
-		@return isremote	  */
-	public boolean isremote () 
+	/** Get IsRemote.
+		@return IsRemote	  */
+	public boolean isRemote ()
 	{
-		Object oo = get_Value(COLUMNNAME_isremote);
-		if (oo != null) 
+		Object oo = get_Value(COLUMNNAME_IsRemote);
+		if (oo != null)
 		{
-			 if (oo instanceof Boolean) 
-				 return ((Boolean)oo).booleanValue(); 
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
 			return "Y".equals(oo);
 		}
 		return false;
 	}
 
-	/** Set Fiscal Printer.
-		@param LAR_Fiscal_Printer_ID Fiscal Printer	  */
+	/** Set LAR_Fiscal_Printer.
+		@param LAR_Fiscal_Printer_ID LAR_Fiscal_Printer	  */
 	public void setLAR_Fiscal_Printer_ID (int LAR_Fiscal_Printer_ID)
 	{
-		if (LAR_Fiscal_Printer_ID < 1) 
+		if (LAR_Fiscal_Printer_ID < 1)
 			set_ValueNoCheck (COLUMNNAME_LAR_Fiscal_Printer_ID, null);
-		else 
+		else
 			set_ValueNoCheck (COLUMNNAME_LAR_Fiscal_Printer_ID, Integer.valueOf(LAR_Fiscal_Printer_ID));
 	}
 
-	/** Get Fiscal Printer.
-		@return Fiscal Printer	  */
-	public int getLAR_Fiscal_Printer_ID () 
+	/** Get LAR_Fiscal_Printer.
+		@return LAR_Fiscal_Printer	  */
+	public int getLAR_Fiscal_Printer_ID ()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_LAR_Fiscal_Printer_ID);
 		if (ii == null)
@@ -155,19 +155,19 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
 		return (ar.com.ergio.model.I_LAR_Fiscal_Printer_Type)MTable.get(getCtx(), ar.com.ergio.model.I_LAR_Fiscal_Printer_Type.Table_Name)
 			.getPO(getLAR_Fiscal_Printer_Type_ID(), get_TrxName());	}
 
-	/** Set Fiscal Printer Type.
-		@param LAR_Fiscal_Printer_Type_ID Fiscal Printer Type	  */
+	/** Set LAR_Fiscal_Printer_Type.
+		@param LAR_Fiscal_Printer_Type_ID LAR_Fiscal_Printer_Type	  */
 	public void setLAR_Fiscal_Printer_Type_ID (int LAR_Fiscal_Printer_Type_ID)
 	{
-		if (LAR_Fiscal_Printer_Type_ID < 1) 
+		if (LAR_Fiscal_Printer_Type_ID < 1)
 			set_Value (COLUMNNAME_LAR_Fiscal_Printer_Type_ID, null);
-		else 
+		else
 			set_Value (COLUMNNAME_LAR_Fiscal_Printer_Type_ID, Integer.valueOf(LAR_Fiscal_Printer_Type_ID));
 	}
 
-	/** Get Fiscal Printer Type.
-		@return Fiscal Printer Type	  */
-	public int getLAR_Fiscal_Printer_Type_ID () 
+	/** Get LAR_Fiscal_Printer_Type.
+		@return LAR_Fiscal_Printer_Type	  */
+	public int getLAR_Fiscal_Printer_Type_ID ()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_LAR_Fiscal_Printer_Type_ID);
 		if (ii == null)
@@ -176,7 +176,7 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
 	}
 
 	/** Set Name.
-		@param Name 
+		@param Name
 		Alphanumeric identifier of the entity
 	  */
 	public void setName (String Name)
@@ -187,7 +187,7 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
 	/** Get Name.
 		@return Alphanumeric identifier of the entity
 	  */
-	public String getName () 
+	public String getName ()
 	{
 		return (String)get_Value(COLUMNNAME_Name);
 	}
@@ -195,69 +195,69 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
     /** Get Record ID/ColumnName
         @return ID/ColumnName pair
       */
-    public KeyNamePair getKeyNamePair() 
+    public KeyNamePair getKeyNamePair()
     {
         return new KeyNamePair(get_ID(), getName());
     }
 
-	/** onprintproductformat AD_Reference_ID=1000005 */
-	public static final int ONPRINTPRODUCTFORMAT_AD_Reference_ID=1000005;
-	/** Nombre = N */
-	public static final String ONPRINTPRODUCTFORMAT_Nombre = "N";
-	/** Codigo = V */
-	public static final String ONPRINTPRODUCTFORMAT_Codigo = "V";
-	/** Nombre Codigo = NV */
-	public static final String ONPRINTPRODUCTFORMAT_NombreCodigo = "NV";
-	/** Codigo Nombre = VN */
-	public static final String ONPRINTPRODUCTFORMAT_CodigoNombre = "VN";
-	/** Set onprintproductformat.
-		@param onprintproductformat onprintproductformat	  */
-	public void setonprintproductformat (String onprintproductformat)
+	/** OnPrintProductFormat AD_Reference_ID=3000006 */
+	public static final int ONPRINTPRODUCTFORMAT_AD_Reference_ID=3000006;
+	/** Name = N */
+	public static final String ONPRINTPRODUCTFORMAT_Name = "N";
+	/** Name Value = NV */
+	public static final String ONPRINTPRODUCTFORMAT_NameValue = "NV";
+	/** Value = V */
+	public static final String ONPRINTPRODUCTFORMAT_Value = "V";
+	/** Value Name = VN */
+	public static final String ONPRINTPRODUCTFORMAT_ValueName = "VN";
+	/** Set OnPrintProductFormat.
+		@param OnPrintProductFormat OnPrintProductFormat	  */
+	public void setOnPrintProductFormat (String OnPrintProductFormat)
 	{
 
-		set_Value (COLUMNNAME_onprintproductformat, onprintproductformat);
+		set_Value (COLUMNNAME_OnPrintProductFormat, OnPrintProductFormat);
 	}
 
-	/** Get onprintproductformat.
-		@return onprintproductformat	  */
-	public String getonprintproductformat () 
+	/** Get OnPrintProductFormat.
+		@return OnPrintProductFormat	  */
+	public String getOnPrintProductFormat ()
 	{
-		return (String)get_Value(COLUMNNAME_onprintproductformat);
+		return (String)get_Value(COLUMNNAME_OnPrintProductFormat);
 	}
 
-	/** Set onprintuseproductreference.
-		@param onprintuseproductreference onprintuseproductreference	  */
-	public void setonprintuseproductreference (boolean onprintuseproductreference)
+	/** Set OnPrintUseProductReference.
+		@param OnPrintUseProductReference OnPrintUseProductReference	  */
+	public void setOnPrintUseProductReference (boolean OnPrintUseProductReference)
 	{
-		set_Value (COLUMNNAME_onprintuseproductreference, Boolean.valueOf(onprintuseproductreference));
+		set_Value (COLUMNNAME_OnPrintUseProductReference, Boolean.valueOf(OnPrintUseProductReference));
 	}
 
-	/** Get onprintuseproductreference.
-		@return onprintuseproductreference	  */
-	public boolean isonprintuseproductreference () 
+	/** Get OnPrintUseProductReference.
+		@return OnPrintUseProductReference	  */
+	public boolean isOnPrintUseProductReference ()
 	{
-		Object oo = get_Value(COLUMNNAME_onprintuseproductreference);
-		if (oo != null) 
+		Object oo = get_Value(COLUMNNAME_OnPrintUseProductReference);
+		if (oo != null)
 		{
-			 if (oo instanceof Boolean) 
-				 return ((Boolean)oo).booleanValue(); 
+			 if (oo instanceof Boolean)
+				 return ((Boolean)oo).booleanValue();
 			return "Y".equals(oo);
 		}
 		return false;
 	}
 
-	/** Set operation_date.
-		@param operation_date operation_date	  */
-	public void setoperation_date (Timestamp operation_date)
+	/** Set Operation_Date.
+		@param Operation_Date Operation_Date	  */
+	public void setOperation_Date (Timestamp Operation_Date)
 	{
-		set_Value (COLUMNNAME_operation_date, operation_date);
+		set_Value (COLUMNNAME_Operation_Date, Operation_Date);
 	}
 
-	/** Get operation_date.
-		@return operation_date	  */
-	public Timestamp getoperation_date () 
+	/** Get Operation_Date.
+		@return Operation_Date	  */
+	public Timestamp getOperation_Date ()
 	{
-		return (Timestamp)get_Value(COLUMNNAME_operation_date);
+		return (Timestamp)get_Value(COLUMNNAME_Operation_Date);
 	}
 
 	/** Set Port.
@@ -269,7 +269,7 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
 
 	/** Get Port.
 		@return Port	  */
-	public int getPort () 
+	public int getPort ()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_Port);
 		if (ii == null)
@@ -277,16 +277,16 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
 		return ii.intValue();
 	}
 
-	/** Status AD_Reference_ID=1000006 */
-	public static final int STATUS_AD_Reference_ID=1000006;
-	/** OCUPADO = BSY */
-	public static final String STATUS_OCUPADO = "BSY";
-	/** ERROR = ERR */
-	public static final String STATUS_ERROR = "ERR";
-	/** OCIOSO = IDL */
-	public static final String STATUS_OCIOSO = "IDL";
+	/** Status AD_Reference_ID=3000007 */
+	public static final int STATUS_AD_Reference_ID=3000007;
+	/** Busy = BSY */
+	public static final String STATUS_Busy = "BSY";
+	/** Error = ERR */
+	public static final String STATUS_Error = "ERR";
+	/** IDLE = IDL */
+	public static final String STATUS_IDLE = "IDL";
 	/** Set Status.
-		@param Status 
+		@param Status
 		Status of the currently running check
 	  */
 	public void setStatus (String Status)
@@ -298,7 +298,7 @@ public class X_LAR_Fiscal_Printer extends PO implements I_LAR_Fiscal_Printer, I_
 	/** Get Status.
 		@return Status of the currently running check
 	  */
-	public String getStatus () 
+	public String getStatus ()
 	{
 		return (String)get_Value(COLUMNNAME_Status);
 	}

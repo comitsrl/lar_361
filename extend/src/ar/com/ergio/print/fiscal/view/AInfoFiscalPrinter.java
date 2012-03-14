@@ -538,11 +538,11 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
 
     public void statusReported(FiscalDocumentPrint fdp, MFiscalPrinter source, String status)
     {
-        if (status.equals(MFiscalPrinter.STATUS_ERROR)) {
+        if (status.equals(MFiscalPrinter.STATUS_Error)) {
             invoke(doErrorStatusReported, true);
-        } else if (status.equals(MFiscalPrinter.STATUS_OCUPADO)) {
+        } else if (status.equals(MFiscalPrinter.STATUS_IDLE)) {
             invoke(doBusyStatusReported, false);
-        } else if (status.equals(MFiscalPrinter.STATUS_OCIOSO)) {
+        } else if (status.equals(MFiscalPrinter.STATUS_IDLE)) {
             invoke(doIdleStatusReported, false);
         }
     }

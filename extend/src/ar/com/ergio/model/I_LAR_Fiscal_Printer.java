@@ -22,23 +22,23 @@ import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_Fiscal_Printer
- *  @author Adempiere (generated) 
- *  @version 3.6.0LTS+P20110709
+ *  @author Adempiere (generated)
+ *  @version 360LTS.015
  */
-public interface I_LAR_Fiscal_Printer 
+public interface I_LAR_Fiscal_Printer
 {
 
     /** TableName=LAR_Fiscal_Printer */
     public static final String Table_Name = "LAR_Fiscal_Printer";
 
-    /** AD_Table_ID=1000010 */
+    /** AD_Table_ID=3000001 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 7 - System - Client - Org 
+    /** AccessLevel = 3 - Client - Org
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(7);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 
@@ -114,31 +114,31 @@ public interface I_LAR_Fiscal_Printer
 	  */
 	public boolean isActive();
 
-    /** Column name isremote */
-    public static final String COLUMNNAME_isremote = "isremote";
+    /** Column name IsRemote */
+    public static final String COLUMNNAME_IsRemote = "IsRemote";
 
-	/** Set isremote	  */
-	public void setisremote (boolean isremote);
+	/** Set IsRemote	  */
+	public void setIsRemote (boolean IsRemote);
 
-	/** Get isremote	  */
-	public boolean isremote();
+	/** Get IsRemote	  */
+	public boolean isRemote();
 
     /** Column name LAR_Fiscal_Printer_ID */
     public static final String COLUMNNAME_LAR_Fiscal_Printer_ID = "LAR_Fiscal_Printer_ID";
 
-	/** Set Fiscal Printer	  */
+	/** Set LAR_Fiscal_Printer	  */
 	public void setLAR_Fiscal_Printer_ID (int LAR_Fiscal_Printer_ID);
 
-	/** Get Fiscal Printer	  */
+	/** Get LAR_Fiscal_Printer	  */
 	public int getLAR_Fiscal_Printer_ID();
 
     /** Column name LAR_Fiscal_Printer_Type_ID */
     public static final String COLUMNNAME_LAR_Fiscal_Printer_Type_ID = "LAR_Fiscal_Printer_Type_ID";
 
-	/** Set Fiscal Printer Type	  */
+	/** Set LAR_Fiscal_Printer_Type	  */
 	public void setLAR_Fiscal_Printer_Type_ID (int LAR_Fiscal_Printer_Type_ID);
 
-	/** Get Fiscal Printer Type	  */
+	/** Get LAR_Fiscal_Printer_Type	  */
 	public int getLAR_Fiscal_Printer_Type_ID();
 
 	public ar.com.ergio.model.I_LAR_Fiscal_Printer_Type getLAR_Fiscal_Printer_Type() throws RuntimeException;
@@ -156,32 +156,32 @@ public interface I_LAR_Fiscal_Printer
 	  */
 	public String getName();
 
-    /** Column name onprintproductformat */
-    public static final String COLUMNNAME_onprintproductformat = "onprintproductformat";
+    /** Column name OnPrintProductFormat */
+    public static final String COLUMNNAME_OnPrintProductFormat = "OnPrintProductFormat";
 
-	/** Set onprintproductformat	  */
-	public void setonprintproductformat (String onprintproductformat);
+	/** Set OnPrintProductFormat	  */
+	public void setOnPrintProductFormat (String OnPrintProductFormat);
 
-	/** Get onprintproductformat	  */
-	public String getonprintproductformat();
+	/** Get OnPrintProductFormat	  */
+	public String getOnPrintProductFormat();
 
-    /** Column name onprintuseproductreference */
-    public static final String COLUMNNAME_onprintuseproductreference = "onprintuseproductreference";
+    /** Column name OnPrintUseProductReference */
+    public static final String COLUMNNAME_OnPrintUseProductReference = "OnPrintUseProductReference";
 
-	/** Set onprintuseproductreference	  */
-	public void setonprintuseproductreference (boolean onprintuseproductreference);
+	/** Set OnPrintUseProductReference	  */
+	public void setOnPrintUseProductReference (boolean OnPrintUseProductReference);
 
-	/** Get onprintuseproductreference	  */
-	public boolean isonprintuseproductreference();
+	/** Get OnPrintUseProductReference	  */
+	public boolean isOnPrintUseProductReference();
 
-    /** Column name operation_date */
-    public static final String COLUMNNAME_operation_date = "operation_date";
+    /** Column name Operation_Date */
+    public static final String COLUMNNAME_Operation_Date = "Operation_Date";
 
-	/** Set operation_date	  */
-	public void setoperation_date (Timestamp operation_date);
+	/** Set Operation_Date	  */
+	public void setOperation_Date (Timestamp Operation_Date);
 
-	/** Get operation_date	  */
-	public Timestamp getoperation_date();
+	/** Get Operation_Date	  */
+	public Timestamp getOperation_Date();
 
     /** Column name Port */
     public static final String COLUMNNAME_Port = "Port";

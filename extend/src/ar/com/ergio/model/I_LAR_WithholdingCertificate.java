@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_WithholdingCertificate
  *  @author Adempiere (generated)
- *  @version 3.6.0LTS+P20110709
+ *  @version 360LTS.015
  */
 public interface I_LAR_WithholdingCertificate
 {
@@ -31,14 +31,14 @@ public interface I_LAR_WithholdingCertificate
     /** TableName=LAR_WithholdingCertificate */
     public static final String Table_Name = "LAR_WithholdingCertificate";
 
-    /** AD_Table_ID=1000043 */
+    /** AD_Table_ID=3000005 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 7 - System - Client - Org
+    /** AccessLevel = 3 - Client - Org
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(7);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 
@@ -49,19 +49,6 @@ public interface I_LAR_WithholdingCertificate
 	  * Client/Tenant for this installation.
 	  */
 	public int getAD_Client_ID();
-
-    /** Column name Address1 */
-    public static final String COLUMNNAME_Address1 = "Address1";
-
-	/** Set Address 1.
-	  * Address line 1 for this location
-	  */
-	public void setAddress1 (String Address1);
-
-	/** Get Address 1.
-	  * Address line 1 for this location
-	  */
-	public String getAddress1();
 
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
@@ -76,14 +63,18 @@ public interface I_LAR_WithholdingCertificate
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name BPName */
-    public static final String COLUMNNAME_BPName = "BPName";
+    /** Column name Base */
+    public static final String COLUMNNAME_Base = "Base";
 
-	/** Set BP Name	  */
-	public void setBPName (String BPName);
+	/** Set Base.
+	  * Calculation Base
+	  */
+	public void setBase (BigDecimal Base);
 
-	/** Get BP Name	  */
-	public String getBPName();
+	/** Get Base.
+	  * Calculation Base
+	  */
+	public BigDecimal getBase();
 
     /** Column name C_DocType_ID */
     public static final String COLUMNNAME_C_DocType_ID = "C_DocType_ID";
@@ -113,6 +104,8 @@ public interface I_LAR_WithholdingCertificate
 	  */
 	public int getC_DocTypeTarget_ID();
 
+	public I_C_DocType getC_DocTypeTarget() throws RuntimeException;
+
     /** Column name C_Invoice_ID */
     public static final String COLUMNNAME_C_Invoice_ID = "C_Invoice_ID";
 
@@ -140,6 +133,19 @@ public interface I_LAR_WithholdingCertificate
 	  * Identifies a City
 	  */
 	public String getCity();
+
+    /** Column name C_Location_ID */
+    public static final String COLUMNNAME_C_Location_ID = "C_Location_ID";
+
+	/** Set Address.
+	  * Location or Address
+	  */
+	public void setC_Location_ID (String C_Location_ID);
+
+	/** Get Address.
+	  * Location or Address
+	  */
+	public String getC_Location_ID();
 
     /** Column name C_Payment_ID */
     public static final String COLUMNNAME_C_Payment_ID = "C_Payment_ID";
@@ -172,6 +178,19 @@ public interface I_LAR_WithholdingCertificate
 	  */
 	public int getCreatedBy();
 
+    /** Column name DateDoc */
+    public static final String COLUMNNAME_DateDoc = "DateDoc";
+
+	/** Set Document Date.
+	  * Date of the Document
+	  */
+	public void setDateDoc (Timestamp DateDoc);
+
+	/** Get Document Date.
+	  * Date of the Document
+	  */
+	public Timestamp getDateDoc();
+
     /** Column name DocumentNo */
     public static final String COLUMNNAME_DocumentNo = "DocumentNo";
 
@@ -184,6 +203,19 @@ public interface I_LAR_WithholdingCertificate
 	  * Document sequence number of the document
 	  */
 	public String getDocumentNo();
+
+    /** Column name DUNS */
+    public static final String COLUMNNAME_DUNS = "DUNS";
+
+	/** Set D-U-N-S.
+	  * Dun & Bradstreet Number
+	  */
+	public void setDUNS (String DUNS);
+
+	/** Get D-U-N-S.
+	  * Dun & Bradstreet Number
+	  */
+	public String getDUNS();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
@@ -207,18 +239,18 @@ public interface I_LAR_WithholdingCertificate
 	/** Get LAR_WithholdingCertificate	  */
 	public int getLAR_WithholdingCertificate_ID();
 
-    /** Column name NAICS */
-    public static final String COLUMNNAME_NAICS = "NAICS";
+    /** Column name Name */
+    public static final String COLUMNNAME_Name = "Name";
 
-	/** Set NAICS/SIC.
-	  * Standard Industry Code or its successor NAIC - http://www.osha.gov/oshstats/sicser.html
+	/** Set Name.
+	  * Alphanumeric identifier of the entity
 	  */
-	public void setNAICS (String NAICS);
+	public void setName (String Name);
 
-	/** Get NAICS/SIC.
-	  * Standard Industry Code or its successor NAIC - http://www.osha.gov/oshstats/sicser.html
+	/** Get Name.
+	  * Alphanumeric identifier of the entity
 	  */
-	public String getNAICS();
+	public String getName();
 
     /** Column name Percent */
     public static final String COLUMNNAME_Percent = "Percent";
