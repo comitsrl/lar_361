@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120206-1215 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 360LTS.015_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ADempiere - Supported by ADempiere community-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Message">
  <row id="101" trl="Y">
@@ -195,7 +195,7 @@
   <value column="MsgTip" original=""/>
  </row>
  <row id="149" trl="Y">
-  <value column="MsgText" original="Attachment">Anexo</value>
+  <value column="MsgText" original="Attachment">Adjunto</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="150" trl="Y">
@@ -207,12 +207,12 @@
   <value column="MsgTip" original=""/>
  </row>
  <row id="152" trl="Y">
-  <value column="MsgText" original="Attachment not found">Anexo no fue encontrado</value>
+  <value column="MsgText" original="Attachment not found">Adjunto no encontrado</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="153" trl="Y">
-  <value column="MsgText" original="Cannot add Attachment to this entity">No se puede anexar archivos a esta entidad</value>
-  <value column="MsgTip" original="Attachments require a single key and this entity is probably an Association (with two keys) or an entity without an unique numeric key.">Los anexos requiere una llave única y esta entidad probablemente está asociada con dos llaves ó es una entidad sin una llave númerica única</value>
+  <value column="MsgText" original="Cannot add Attachment to this entity">No se puede adjuntar archivos a esta entidad</value>
+  <value column="MsgTip" original="Attachments require a single key and this entity is probably an Association (with two keys) or an entity without an unique numeric key.">Los adjuntos requieren una llave única y esta entidad probablemente está asociada con dos llaves ó es una entidad sin una llave númerica única</value>
  </row>
  <row id="154" trl="Y">
   <value column="MsgText" original="Automatic Write-Off">Calculo automático</value>
@@ -2538,7 +2538,7 @@
   <value column="MsgTip" original=""/>
  </row>
  <row id="744" trl="Y">
-  <value column="MsgText" original="Save Attachment to Disk">Guarda Anexo en el Disco</value>
+  <value column="MsgText" original="Save Attachment to Disk">Guarda Adjunto en el Disco</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="745" trl="Y">
@@ -5517,6 +5517,14 @@ Patrón de agendamiento crontab no válido - chequee la sintaxis
   <value column="MsgText" original="Error in payment schedule">Error en Programa de Pagos</value>
   <value column="MsgTip" original="Check the payment schedule.  If the payment term has a schema then the document must have a schedule (is auto-generated if empty) and the schedule must sum the total of the document.  If the payment term doesn't have a schema, then the document must not have schedule.">Chequee el Programa de Pagos. Si el término de pago tiene un esquema entonces el documento debe tener un programa (es auto-generado si esta vacío) y el programa debe sumar el Total del documento. Si el término de Pago no tiene esquema  entonces el documento no debe tener un programa de pagos.</value>
  </row>
+ <row id="53120" trl="Y">
+  <value column="MsgText" original="c">b</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="53121" trl="Y">
+  <value column="MsgText" original="c">Borrar</value>
+  <value column="MsgTip" original=""/>
+ </row>
  <row id="53122" trl="Y">
   <value column="MsgText" original="The table doesn't have associated button for the process">La tabla no tiene un boón asociado al proceso</value>
   <value column="MsgTip" original="Choose a table with a column associated to the process">Elija una talba con una columna asociada al porceso</value>
@@ -5559,6 +5567,18 @@ Patrón de agendamiento crontab no válido - chequee la sintaxis
  </row>
  <row id="53132" trl="Y">
   <value column="MsgText" original="Negative inventory disallowed in this warehouse">No Permitir Inventario Negativo en este Deósito</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="53136" trl="Y">
+  <value column="MsgText" original="Total">Total</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="53148" trl="Y">
+  <value column="MsgText" original="Add">Añadir</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="53149" trl="Y">
+  <value column="MsgText" original="Reply">Responder</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="520010" trl="Y">
