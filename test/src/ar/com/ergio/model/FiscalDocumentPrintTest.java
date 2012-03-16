@@ -157,7 +157,7 @@ public class FiscalDocumentPrintTest extends AdempiereTestCase
 
         // Fiscal Printer Type
         fiscalPrinterType = new X_LAR_Fiscal_Printer_Type(getCtx(), 0, getTrxName());
-        fiscalPrinterType.setclazz("ar.com.ergio.print.fiscal.hasar.HasarPrinterP320F");
+        fiscalPrinterType.setClazz("ar.com.ergio.print.fiscal.hasar.HasarPrinterP320F");
         fiscalPrinterType.setIsActive(true);
         fiscalPrinterType.setName("Test Printer Type");
         fiscalPrinterType.save();

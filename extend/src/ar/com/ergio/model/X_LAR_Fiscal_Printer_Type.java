@@ -23,15 +23,15 @@ import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Model for LAR_Fiscal_Printer_Type
- *  @author Adempiere (generated) 
- *  @version 3.6.0LTS+P20110709 - $Id$ */
-public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printer_Type, I_Persistent 
+ *  @author Adempiere (generated)
+ *  @version 360LTS.015 - $Id$ */
+public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printer_Type, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20110831L;
+	private static final long serialVersionUID = 20120313L;
 
     /** Standard Constructor */
     public X_LAR_Fiscal_Printer_Type (Properties ctx, int LAR_Fiscal_Printer_Type_ID, String trxName)
@@ -39,7 +39,7 @@ public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printe
       super (ctx, LAR_Fiscal_Printer_Type_ID, trxName);
       /** if (LAR_Fiscal_Printer_Type_ID == 0)
         {
-			setclazz (null);
+			setClazz (null);
 			setLAR_Fiscal_Printer_Type_ID (0);
 			setName (null);
         } */
@@ -52,7 +52,7 @@ public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printe
     }
 
     /** AccessLevel
-      * @return 7 - System - Client - Org 
+      * @return 3 - Client - Org
       */
     protected int get_AccessLevel()
     {
@@ -73,22 +73,22 @@ public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printe
       return sb.toString();
     }
 
-	/** Set clazz.
-		@param clazz clazz	  */
-	public void setclazz (String clazz)
+	/** Set Clazz.
+		@param Clazz Clazz	  */
+	public void setClazz (String Clazz)
 	{
-		set_Value (COLUMNNAME_clazz, clazz);
+		set_Value (COLUMNNAME_Clazz, Clazz);
 	}
 
-	/** Get clazz.
-		@return clazz	  */
-	public String getclazz () 
+	/** Get Clazz.
+		@return Clazz	  */
+	public String getClazz ()
 	{
-		return (String)get_Value(COLUMNNAME_clazz);
+		return (String)get_Value(COLUMNNAME_Clazz);
 	}
 
 	/** Set Description.
-		@param Description 
+		@param Description
 		Optional short description of the record
 	  */
 	public void setDescription (String Description)
@@ -99,24 +99,24 @@ public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printe
 	/** Get Description.
 		@return Optional short description of the record
 	  */
-	public String getDescription () 
+	public String getDescription ()
 	{
 		return (String)get_Value(COLUMNNAME_Description);
 	}
 
-	/** Set Fiscal Printer Type.
-		@param LAR_Fiscal_Printer_Type_ID Fiscal Printer Type	  */
+	/** Set LAR_Fiscal_Printer_Type.
+		@param LAR_Fiscal_Printer_Type_ID LAR_Fiscal_Printer_Type	  */
 	public void setLAR_Fiscal_Printer_Type_ID (int LAR_Fiscal_Printer_Type_ID)
 	{
-		if (LAR_Fiscal_Printer_Type_ID < 1) 
+		if (LAR_Fiscal_Printer_Type_ID < 1)
 			set_ValueNoCheck (COLUMNNAME_LAR_Fiscal_Printer_Type_ID, null);
-		else 
+		else
 			set_ValueNoCheck (COLUMNNAME_LAR_Fiscal_Printer_Type_ID, Integer.valueOf(LAR_Fiscal_Printer_Type_ID));
 	}
 
-	/** Get Fiscal Printer Type.
-		@return Fiscal Printer Type	  */
-	public int getLAR_Fiscal_Printer_Type_ID () 
+	/** Get LAR_Fiscal_Printer_Type.
+		@return LAR_Fiscal_Printer_Type	  */
+	public int getLAR_Fiscal_Printer_Type_ID ()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_LAR_Fiscal_Printer_Type_ID);
 		if (ii == null)
@@ -125,7 +125,7 @@ public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printe
 	}
 
 	/** Set Name.
-		@param Name 
+		@param Name
 		Alphanumeric identifier of the entity
 	  */
 	public void setName (String Name)
@@ -136,7 +136,7 @@ public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printe
 	/** Get Name.
 		@return Alphanumeric identifier of the entity
 	  */
-	public String getName () 
+	public String getName ()
 	{
 		return (String)get_Value(COLUMNNAME_Name);
 	}
@@ -144,22 +144,22 @@ public class X_LAR_Fiscal_Printer_Type extends PO implements I_LAR_Fiscal_Printe
     /** Get Record ID/ColumnName
         @return ID/ColumnName pair
       */
-    public KeyNamePair getKeyNamePair() 
+    public KeyNamePair getKeyNamePair()
     {
         return new KeyNamePair(get_ID(), getName());
     }
 
-	/** Set parameters.
-		@param parameters parameters	  */
-	public void setparameters (String parameters)
+	/** Set Parameters.
+		@param Parameters Parameters	  */
+	public void setParameters (String Parameters)
 	{
-		set_Value (COLUMNNAME_parameters, parameters);
+		set_Value (COLUMNNAME_Parameters, Parameters);
 	}
 
-	/** Get parameters.
-		@return parameters	  */
-	public String getparameters () 
+	/** Get Parameters.
+		@return Parameters	  */
+	public String getParameters ()
 	{
-		return (String)get_Value(COLUMNNAME_parameters);
+		return (String)get_Value(COLUMNNAME_Parameters);
 	}
 }

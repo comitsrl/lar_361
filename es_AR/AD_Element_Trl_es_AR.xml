@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.0LTS+P20110709_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ${ADEMPIERE_VERSION} 20120206-1215 - ${ADEMPIERE_VENDOR}-->
+<!--ADempiere(r) 360LTS.015_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ADempiere - Supported by ADempiere community-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Element">
  <row id="101" trl="Y">
@@ -1272,9 +1272,9 @@
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="279" trl="Y">
-  <value column="Name" original="Discontinued by">Discontinuadeo por</value>
-  <value column="PrintName" original="Discontinued by">Discontinuadeo por</value>
+ <row id="279" trl="N">
+  <value column="Name" original="Discontinued by">Discontinued by</value>
+  <value column="PrintName" original="Discontinued by">Discontinued by</value>
   <value column="Description" original="Discontinued By">Discontinued By</value>
   <value column="Help" original="The Discontinued By indicates the individual who discontinued this product">The Discontinued By indicates the individual who discontinued this product</value>
   <value column="PO_Description" original=""/>
@@ -29716,10 +29716,20 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="55253" trl="Y">
-  <value column="Name" original="QtyAllocated">Cantidad Asignada</value>
-  <value column="PrintName" original="QtyAllocated">Cantidad Asignada</value>
+ <row id="55256" trl="Y">
+  <value column="Name" original="Bank Account Description">Descripción de la cuenta Bancaria</value>
+  <value column="PrintName" original="Bank Account Description">Descripción de la cuenta Bancaria</value>
   <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="55297" trl="Y">
+  <value column="Name" original="Allow Copy">Permitir copia</value>
+  <value column="PrintName" original="Allow Copy">Permitir copia</value>
+  <value column="Description" original="Determine if a column must be copied when pushing the button to copy record">Determina si una columna debe ser copiada cuando se selecciona copiar registro</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -30116,9 +30126,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000039" trl="Y">
-  <value column="Name" original="lar_fiscal_printer_type">Tipo Impresora Fiscal</value>
-  <value column="PrintName" original="lar_fiscal_printer_type">Tipo Impresora Fiscal</value>
+ <row id="3000000" trl="Y">
+  <value column="Name" original="LAR_Fiscal_Printer_Type">LAR_Fiscal_Printer_Type</value>
+  <value column="PrintName" original="LAR_Fiscal_Printer_Type">LAR_Fiscal_Printer_Type</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30126,9 +30136,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000040" trl="Y">
-  <value column="Name" original="parameters">Parámetros</value>
-  <value column="PrintName" original="parameters">Parámetros</value>
+ <row id="3000001" trl="Y">
+  <value column="Name" original="Parameters">Parámetros</value>
+  <value column="PrintName" original="Parameters">parameters</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30136,9 +30146,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000041" trl="Y">
-  <value column="Name" original="clazz">Clase</value>
-  <value column="PrintName" original="clazz">Clase</value>
+ <row id="3000002" trl="Y">
+  <value column="Name" original="Clazz">Clase</value>
+  <value column="PrintName" original="Clazz">Clase</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30146,9 +30156,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000042" trl="Y">
-  <value column="Name" original="lar_fiscal_printer">Impresora Fiscal</value>
-  <value column="PrintName" original="lar_fiscal_printer">Lar Impresora Fiscal</value>
+ <row id="3000003" trl="Y">
+  <value column="Name" original="LAR_Fiscal_Printer">Impresora Fiscal</value>
+  <value column="PrintName" original="LAR_Fiscal_Printer">LAR_Fiscal_Printer</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30156,9 +30166,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000043" trl="Y">
-  <value column="Name" original="usedby_id">Usado por</value>
-  <value column="PrintName" original="usedby_id">Usado por</value>
+ <row id="3000005" trl="Y">
+  <value column="Name" original="Operation_Date">Fecha Operación</value>
+  <value column="PrintName" original="Operation_Date">operation_date</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30166,9 +30176,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000044" trl="Y">
-  <value column="Name" original="operation_date">Fecha operación</value>
-  <value column="PrintName" original="operation_date">Fecha operación</value>
+ <row id="3000006" trl="Y">
+  <value column="Name" original="IsRemote">Es Remoto</value>
+  <value column="PrintName" original="IsRemote">isremote</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30176,9 +30186,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000045" trl="Y">
-  <value column="Name" original="isremote">Es Remoto</value>
-  <value column="PrintName" original="isremote">Es Remoto</value>
+ <row id="3000007" trl="Y">
+  <value column="Name" original="OnPrintProductFormat">Formato impresión</value>
+  <value column="PrintName" original="OnPrintProductFormat">onprintproductformat</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30186,9 +30196,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000046" trl="Y">
-  <value column="Name" original="onprintproductformat">Formato Impresión Producto</value>
-  <value column="PrintName" original="onprintproductformat">Formato Impresión Producto</value>
+ <row id="3000008" trl="Y">
+  <value column="Name" original="OnPrintUseProductReference">Usa Referencia en Impresión</value>
+  <value column="PrintName" original="OnPrintUseProductReference">onprintuseproductreference</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30196,9 +30206,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000047" trl="Y">
-  <value column="Name" original="onprintuseproductreference">Usar Código Producto en impresión</value>
-  <value column="PrintName" original="onprintuseproductreference">Usar Código Producto en impresión</value>
+ <row id="3000009" trl="Y">
+  <value column="Name" original="IsFiscal">Fiscal</value>
+  <value column="PrintName" original="IsFiscal">isfiscal</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30206,9 +30216,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000048" trl="Y">
-  <value column="Name" original="lastmaintenencedate">Última Fecha Mantenimiento</value>
-  <value column="PrintName" original="lastmaintenencedate">Última Fecha Mantenimiento</value>
+ <row id="3000010" trl="Y">
+  <value column="Name" original="IsFiscaldocument">Documento Fiscal</value>
+  <value column="PrintName" original="IsFiscaldocument">isfiscaldocument</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30216,9 +30226,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000049" trl="Y">
-  <value column="Name" original="lastmaintenanceuseunit">Último Mantenimineto unidad</value>
-  <value column="PrintName" original="lastmaintenanceuseunit">Último Mantenimineto unidad</value>
+ <row id="3000011" trl="Y">
+  <value column="Name" original="FiscalDocument">Documento Fiscal</value>
+  <value column="PrintName" original="FiscalDocument">fiscaldocument</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30226,9 +30236,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000050" trl="Y">
-  <value column="Name" original="nextmaintenanceuseunit">Próximo Mantenimiento Unidad</value>
-  <value column="PrintName" original="nextmaintenanceuseunit">Próximo Mantenimiento Unidad</value>
+ <row id="3000012" trl="Y">
+  <value column="Name" original="DocSubtypeCAE">Sub-Tipo Documento CAE</value>
+  <value column="PrintName" original="DocSubtypeCAE">docsubtypecae</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30236,9 +30246,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000051" trl="Y">
-  <value column="Name" original="ldapquery">Consulta Ldap</value>
-  <value column="PrintName" original="ldapquery">Consulta Ldap</value>
+ <row id="3000013" trl="Y">
+  <value column="Name" original="DocSubtypeINV">Categoría Fiscal</value>
+  <value column="PrintName" original="DocSubtypeINV">docsubtypeinv</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30246,9 +30256,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000052" trl="Y">
-  <value column="Name" original="allocationno">No. Asignación</value>
-  <value column="PrintName" original="allocationno">No. Asignación</value>
+ <row id="3000014" trl="Y">
+  <value column="Name" original="IsElectronic">Electrónico</value>
+  <value column="PrintName" original="IsElectronic">iselectronic</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30256,9 +30266,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000053" trl="Y">
-  <value column="Name" original="isfiscal">Es Fiscal</value>
-  <value column="PrintName" original="isfiscal">Es Fiscal</value>
+ <row id="3000015" trl="Y">
+  <value column="Name" original="IsFiscalPrinted">Impresión Fiscal</value>
+  <value column="PrintName" original="IsFiscalPrinted">isfiscalprinted</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30266,9 +30276,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000054" trl="Y">
-  <value column="Name" original="isfiscaldocument">Es Documento Fiscal</value>
-  <value column="PrintName" original="isfiscaldocument">Es Documento Fiscal</value>
+ <row id="3000016" trl="Y">
+  <value column="Name" original="FiscalReceiptNumber">Número Recibo Fiscal</value>
+  <value column="PrintName" original="FiscalReceiptNumber">fiscalreceiptnumber</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30276,9 +30286,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000055" trl="Y">
-  <value column="Name" original="fiscaldocument">Documento Fiscal</value>
-  <value column="PrintName" original="fiscaldocument">Documento Fiscal</value>
+ <row id="3000017" trl="Y">
+  <value column="Name" original="CAI">CAI</value>
+  <value column="PrintName" original="CAI">Código de Autorización de Impresión</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30286,9 +30296,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000056" trl="Y">
-  <value column="Name" original="docsubtypecae">CAE Subtipo Documento</value>
-  <value column="PrintName" original="docsubtypecae">CAE Subtipo Documento</value>
+ <row id="3000018" trl="Y">
+  <value column="Name" original="CAIDate">Fecha del CAI</value>
+  <value column="PrintName" original="CAIDate">Fecha del Código de Autorización de Impresión</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30296,9 +30306,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000057" trl="Y">
-  <value column="Name" original="docsubtypeinv">Subtipo Documento</value>
-  <value column="PrintName" original="docsubtypeinv">Subtipo Documento</value>
+ <row id="3000019" trl="Y">
+  <value column="Name" original="LAR_DocumentLetter">Letra del Documento</value>
+  <value column="PrintName" original="LAR_DocumentLetter">LAR_DocumentLetter</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30306,9 +30316,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000058" trl="Y">
-  <value column="Name" original="iselectronic">Es Electrónica</value>
-  <value column="PrintName" original="iselectronic">Es Electrónica</value>
+ <row id="3000020" trl="Y">
+  <value column="Name" original="Letter">Letra</value>
+  <value column="PrintName" original="Letter">Letter</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30316,9 +30326,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000059" trl="Y">
-  <value column="Name" original="isfiscalprinted">Es Impreso Fiscal</value>
-  <value column="PrintName" original="isfiscalprinted">Es Impreso Fiscal</value>
+ <row id="3000021" trl="Y">
+  <value column="Name" original="LAR_LetterRule">Regla de la Letra</value>
+  <value column="PrintName" original="LAR_LetterRule">LAR_LetterRule</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30326,9 +30336,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000060" trl="Y">
-  <value column="Name" original="fiscalreceiptnumber">Número recibo Fiscal</value>
-  <value column="PrintName" original="fiscalreceiptnumber">Número recibo Fiscal</value>
+ <row id="3000022" trl="Y">
+  <value column="Name" original="LCO_TaxPayerType_Vendor_ID">Categoría IVA Proveedor</value>
+  <value column="PrintName" original="LCO_TaxPayerType_Vendor_ID">lco_taxpayertype_vendor_id</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30336,9 +30346,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000061" trl="Y">
-  <value column="Name" original="cai">CAI</value>
-  <value column="PrintName" original="cai">CAI</value>
+ <row id="3000023" trl="Y">
+  <value column="Name" original="LCO_TaxPayerType_Customer_ID">Categoría IVA Cliente</value>
+  <value column="PrintName" original="LCO_TaxPayerType_Customer_ID">lco_taxpayertype_customer_id</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30346,9 +30356,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000062" trl="Y">
-  <value column="Name" original="caidate">Fecha CAI</value>
-  <value column="PrintName" original="caidate">Fecha CAI</value>
+ <row id="3000024" trl="Y">
+  <value column="Name" original="IsSaleWithoutStock">Vender sin Stock</value>
+  <value column="PrintName" original="IsSaleWithoutStock">issalewithoutstock</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30356,9 +30366,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000063" trl="Y">
-  <value column="Name" original="issalewithoutstock">Vender sin Stock</value>
-  <value column="PrintName" original="issalewithoutstock">Vender sin Stock</value>
+ <row id="3000025" trl="Y">
+  <value column="Name" original="PosNumber">Nro. Punto de Venta</value>
+  <value column="PrintName" original="PosNumber">posnumber</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30366,9 +30376,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000064" trl="Y">
-  <value column="Name" original="lar_orderperception">Lar Percepción en la Orden </value>
-  <value column="PrintName" original="lar_orderperception">Lar Percepción en la Orden </value>
+ <row id="3000026" trl="Y">
+  <value column="Name" original="LAR_PaymentWithholding">Retención en el Pago</value>
+  <value column="PrintName" original="LAR_PaymentWithholding">LAR_PaymentWithholding</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30376,9 +30386,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000065" trl="Y">
-  <value column="Name" original="istoformule">A Formular</value>
-  <value column="PrintName" original="istoformule">A Formular</value>
+ <row id="3000027" trl="Y">
+  <value column="Name" original="LAR_WithholdingCertificate">Certificado de Retención</value>
+  <value column="PrintName" original="LAR_WithholdingCertificate">LAR_WithholdingCertificate</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30386,9 +30396,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000066" trl="Y">
-  <value column="Name" original="isissue">Es issue</value>
-  <value column="PrintName" original="isissue">Es issue</value>
+ <row id="3000028" trl="Y">
+  <value column="Name" original="WithholdingPercent">% Retención</value>
+  <value column="PrintName" original="WithholdingPercent">withholdingpercent</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30396,9 +30406,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000067" trl="Y">
-  <value column="Name" original="r_issuesource">Fuente Issue</value>
-  <value column="PrintName" original="r_issuesource">Fuente Issue</value>
+ <row id="3000029" trl="Y">
+  <value column="Name" original="PaymentThresholdMin">Límite Mínimo del Pago</value>
+  <value column="PrintName" original="PaymentThresholdMin">paymentthresholdmin</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30406,109 +30416,9 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
- <row id="1000068" trl="Y">
-  <value column="Name" original="nullclause">Clase Null</value>
-  <value column="PrintName" original="nullclause">Clase Null</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000069" trl="Y">
-  <value column="Name" original="defaultclause">Por defecto (clause)</value>
-  <value column="PrintName" original="defaultclause">Por defecto (clause)</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000070" trl="Y">
-  <value column="Name" original="warehouse">Depósito</value>
-  <value column="PrintName" original="warehouse">Depósito</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000071" trl="Y">
-  <value column="Name" original="rowtype">Tipo Columna</value>
-  <value column="PrintName" original="rowtype">Tipo Columna</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000072" trl="Y">
-  <value column="Name" original="instancename">Nombre Instancia</value>
-  <value column="PrintName" original="instancename">Nombre Instancia</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000073" trl="Y">
-  <value column="Name" original="uomname">Nombre UM</value>
-  <value column="PrintName" original="uomname">Nombre UM</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000074" trl="Y">
-  <value column="Name" original="qtyreserved_order">Cantidad Reservada (Orden)</value>
-  <value column="PrintName" original="qtyreserved_order">Cantidad Reservada (Orden)</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000075" trl="Y">
-  <value column="Name" original="qtyreserved_storage">Cantidad Reservada (Depósito)</value>
-  <value column="PrintName" original="qtyreserved_storage">Cantidad Reservada (Depósito)</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000076" trl="Y">
-  <value column="Name" original="qtyopen">Cantidad Abierta</value>
-  <value column="PrintName" original="qtyopen">Cantidad Abierta</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000077" trl="Y">
-  <value column="Name" original="createdbyissue">Creado por</value>
-  <value column="PrintName" original="createdbyissue">Creado por</value>
-  <value column="Description" original=""/>
-  <value column="Help" original=""/>
-  <value column="PO_Description" original=""/>
-  <value column="PO_Help" original=""/>
-  <value column="PO_Name" original=""/>
-  <value column="PO_PrintName" original=""/>
- </row>
- <row id="1000078" trl="Y">
-  <value column="Name" original="updatedbyissue">Actualizado Issue</value>
-  <value column="PrintName" original="updatedbyissue">Actualizado Issue</value>
+ <row id="3000030" trl="Y">
+  <value column="Name" original="IsCalcFromPayment">Calculado desde el Pago</value>
+  <value column="PrintName" original="IsCalcFromPayment">iscalcfrompayment</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>

@@ -193,7 +193,7 @@ import ar.com.ergio.util.LAR_Utils;
             final MOrgInfo orgInfo = MOrgInfo.get(invoice.getCtx(), ad_Org_ID, invoice.get_TrxName());
             int lco_TaxPayerType_Vendor_ID = orgInfo.get_ValueAsInt("LCO_TaxPayerType_ID");
             int lco_TaxPayerType_Customer_ID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
-            int c_POS_ID = Env.getContextAsInt(invoice.getCtx(),Env.POS_ID) != 0 ? Env.getContextAsInt(invoice.getCtx(),Env.POS_ID) 
+            int c_POS_ID = Env.getContextAsInt(invoice.getCtx(),Env.POS_ID) != 0 ? Env.getContextAsInt(invoice.getCtx(),Env.POS_ID)
                     : invoice.get_ValueAsInt("C_POS_ID");
 
             // Check vendor taxpayertype
@@ -230,11 +230,11 @@ import ar.com.ergio.util.LAR_Utils;
                                                   .append(" AND AD_Org_ID=?")
                                                   .append(" AND IsActive=?")
                                                   .append(" AND DocBaseType=?")
-                                                  .append(" AND FiscalDocument=?") // 'F' > Factura
+                                                  .append(" AND FiscalDocument=?") // 'F' > Invoice
                                                   .append(" AND LAR_DocumentLetter_ID=?")
                                                   .append(" AND C_POS_ID=?");
             Object[] params = new Object[]{ad_Client_ID, ad_Org_ID, "Y", MDocType.DOCBASETYPE_ARInvoice,
-                                           LAR_MDocType.FISCALDOCUMENT_Factura, lar_DocumentLetter_ID, c_POS_ID};
+                                           LAR_MDocType.FISCALDOCUMENT_Invoice, lar_DocumentLetter_ID, c_POS_ID};
             MDocType docType = new Query(invoice.getCtx(), MDocType.Table_Name, whereClause.toString(), invoice.get_TrxName())
                     .setParameters(params)
                     .firstOnly();
@@ -461,6 +461,7 @@ import ar.com.ergio.util.LAR_Utils;
                     MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
                     pwh.setC_Payment_ID(payment.get_ID());
                     pwh.setC_Invoice_ID(payment.getC_Invoice_ID());
+                    pwh.setC_Tax_ID(wc.getC_Tax_ID());
                     pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
                     pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
                     pwh.setDateAcct(payment.getDateAcct());
