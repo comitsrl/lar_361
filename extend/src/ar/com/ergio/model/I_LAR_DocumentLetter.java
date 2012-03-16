@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_DocumentLetter
  *  @author Adempiere (generated)
- *  @version 3.6.0LTS+P20110709
+ *  @version 360LTS.015
  */
 public interface I_LAR_DocumentLetter
 {
@@ -31,7 +31,7 @@ public interface I_LAR_DocumentLetter
     /** TableName=LAR_DocumentLetter */
     public static final String Table_Name = "LAR_DocumentLetter";
 
-    /** AD_Table_ID=1000048 */
+    /** AD_Table_ID=3000002 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);

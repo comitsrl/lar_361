@@ -22,23 +22,23 @@ import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_Fiscal_Printer_Type
- *  @author Adempiere (generated) 
- *  @version 3.6.0LTS+P20110709
+ *  @author Adempiere (generated)
+ *  @version 360LTS.015
  */
-public interface I_LAR_Fiscal_Printer_Type 
+public interface I_LAR_Fiscal_Printer_Type
 {
 
     /** TableName=LAR_Fiscal_Printer_Type */
     public static final String Table_Name = "LAR_Fiscal_Printer_Type";
 
-    /** AD_Table_ID=1000009 */
+    /** AD_Table_ID=3000000 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 7 - System - Client - Org 
+    /** AccessLevel = 3 - Client - Org
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(7);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 
@@ -63,14 +63,14 @@ public interface I_LAR_Fiscal_Printer_Type
 	  */
 	public int getAD_Org_ID();
 
-    /** Column name clazz */
-    public static final String COLUMNNAME_clazz = "clazz";
+    /** Column name Clazz */
+    public static final String COLUMNNAME_Clazz = "Clazz";
 
-	/** Set clazz	  */
-	public void setclazz (String clazz);
+	/** Set Clazz	  */
+	public void setClazz (String Clazz);
 
-	/** Get clazz	  */
-	public String getclazz();
+	/** Get Clazz	  */
+	public String getClazz();
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -117,10 +117,10 @@ public interface I_LAR_Fiscal_Printer_Type
     /** Column name LAR_Fiscal_Printer_Type_ID */
     public static final String COLUMNNAME_LAR_Fiscal_Printer_Type_ID = "LAR_Fiscal_Printer_Type_ID";
 
-	/** Set Fiscal Printer Type	  */
+	/** Set LAR_Fiscal_Printer_Type	  */
 	public void setLAR_Fiscal_Printer_Type_ID (int LAR_Fiscal_Printer_Type_ID);
 
-	/** Get Fiscal Printer Type	  */
+	/** Get LAR_Fiscal_Printer_Type	  */
 	public int getLAR_Fiscal_Printer_Type_ID();
 
     /** Column name Name */
@@ -136,14 +136,14 @@ public interface I_LAR_Fiscal_Printer_Type
 	  */
 	public String getName();
 
-    /** Column name parameters */
-    public static final String COLUMNNAME_parameters = "parameters";
+    /** Column name Parameters */
+    public static final String COLUMNNAME_Parameters = "Parameters";
 
-	/** Set parameters	  */
-	public void setparameters (String parameters);
+	/** Set Parameters	  */
+	public void setParameters (String Parameters);
 
-	/** Get parameters	  */
-	public String getparameters();
+	/** Get Parameters	  */
+	public String getParameters();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

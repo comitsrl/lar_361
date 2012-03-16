@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -38,6 +39,7 @@ import org.compiere.apps.form.FormFrame;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPOS;
+import org.compiere.model.Query;
 import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
@@ -280,7 +282,7 @@ public class PosBasePanel extends CPanel
 		else if (poss.length == 1)
 		{
 			p_pos = poss[0];
-			Env.setContext(m_ctx, "PosNumber", p_pos.get_ValueAsInt("PosNumber"));
+			Env.setContext(m_ctx, Env.POS_ID, p_pos.get_ID());
 			return true;
 		}
 
@@ -292,28 +294,31 @@ public class PosBasePanel extends CPanel
 		if (selection != null)
 		{
 			p_pos = (MPOS)selection;
-            Env.setContext(m_ctx, "PosNumber", p_pos.get_ValueAsInt("PosNumber"));
+            Env.setContext(m_ctx, Env.POS_ID, p_pos.get_ID());
 			return true;
 		}
 		return false;
 	}	//	setMPOS
 
 	/**
-	 * 	Get POSs for specific Sales Rep or all
+	 * 	Get POSs for specific Sales Rep and Org
 	 *	@param SalesRep_ID
 	 *	@return array of POS
 	 */
-	private MPOS[] getPOSs (int SalesRep_ID)
-	{
-		String pass_field = "SalesRep_ID";
-		int pass_ID = SalesRep_ID;
-		if (SalesRep_ID==0)
-			{
-			pass_field = "AD_Client_ID";
-			pass_ID = Env.getAD_Client_ID(m_ctx);
-			}
-		return MPOS.getAll(m_ctx, pass_field, pass_ID);
-	}	//	getPOSs
+    private MPOS[] getPOSs(int SalesRep_ID)
+    {
+        String whereClause = "AD_Org_ID=?";
+        Object[] params = new Object[] { Env.getAD_Org_ID(m_ctx) };
+        if (SalesRep_ID != 0) {
+            whereClause = whereClause + " AND SalesRep_ID=?";
+            params = new Object[] { Env.getAD_Org_ID(m_ctx), SalesRep_ID };
+        }
+        List<MPOS> list = new Query(m_ctx, MPOS.Table_Name, whereClause, null)
+                .setParameters(params)
+                .setOnlyActiveRecords(true)
+                .list();
+        return list.toArray(new MPOS[list.size()]);
+    } // getPOSs
 
 	/**************************************************************************
 	 * 	Get Today's date

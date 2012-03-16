@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_PaymentWithholding
  *  @author Adempiere (generated)
- *  @version 3.6.0LTS+P20110709
+ *  @version 360LTS.015
  */
 public interface I_LAR_PaymentWithholding
 {
@@ -31,14 +31,14 @@ public interface I_LAR_PaymentWithholding
     /** TableName=LAR_PaymentWithholding */
     public static final String Table_Name = "LAR_PaymentWithholding";
 
-    /** AD_Table_ID=1000047 */
+    /** AD_Table_ID=3000004 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
 
-    /** AccessLevel = 7 - System - Client - Org
+    /** AccessLevel = 3 - Client - Org
      */
-    BigDecimal accessLevel = BigDecimal.valueOf(7);
+    BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
 

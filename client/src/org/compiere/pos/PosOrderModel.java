@@ -94,7 +94,7 @@ public class PosOrderModel extends MOrder {
 	 */
 	public void setBPartner(MBPartner partner)
 	{
-		if (getDocStatus().equals("DR"))
+		if (getDocStatus().equals("DR") || getDocStatus().equals("IP"))
 		{
 			if (partner == null || partner.get_ID() == 0) {
 				throw new AdempierePOSException("no BPartner");
@@ -103,7 +103,6 @@ public class PosOrderModel extends MOrder {
 			{
 				log.info("BPartner - " + partner);
 				super.setBPartner(partner);
-				/* TODO - (emmie) Review I think that this code is OLD, and no longer needed it
 				MOrderLine[] lineas = getLines();
 				for (int i = 0; i < lineas.length; i++)
 				{
@@ -112,7 +111,6 @@ public class PosOrderModel extends MOrder {
 					lineas[i].save();
 				}
 				saveEx();
-				*/
 			}
 		}
 	}
@@ -335,7 +333,7 @@ public class PosOrderModel extends MOrder {
 	}
 
 	public boolean payCash(BigDecimal amt) {
-
+	    /*
 		MPayment payment = createPayment(MPayment.TENDERTYPE_Cash);
 		payment.setC_CashBook_ID(m_pos.getC_CashBook_ID());
 		payment.setAmount(getC_Currency_ID(), amt);
@@ -350,6 +348,9 @@ public class PosOrderModel extends MOrder {
 			return true;
 		}
 		else return false;
+		*/
+	    setPaymentRule(PAYMENTRULE_Cash);
+	    return true;
 	} // payCash
 
 	public boolean payCheck(BigDecimal amt, String accountNo, String routingNo, String checkNo)

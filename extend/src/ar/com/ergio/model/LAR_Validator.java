@@ -134,7 +134,7 @@ import ar.com.ergio.util.LAR_Utils;
          {
              MOrderLine ol = (MOrderLine) po;
 
-             int c_BPartner_ID = ol.getParent().getC_BPartner_ID();
+             int c_BPartner_ID = ol.getC_BPartner_ID();
              MBPartner bp = new MBPartner(ol.getCtx(), c_BPartner_ID, ol.get_TrxName());
              msg = calculatePerceptionLine(bp, ol, type);
              if (msg != null) {
@@ -193,7 +193,8 @@ import ar.com.ergio.util.LAR_Utils;
             final MOrgInfo orgInfo = MOrgInfo.get(invoice.getCtx(), ad_Org_ID, invoice.get_TrxName());
             int lco_TaxPayerType_Vendor_ID = orgInfo.get_ValueAsInt("LCO_TaxPayerType_ID");
             int lco_TaxPayerType_Customer_ID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
-            int posNumber = Env.getContextAsInt(invoice.getCtx(), "PosNumber");
+            int c_POS_ID = Env.getContextAsInt(invoice.getCtx(),Env.POS_ID) != 0 ? Env.getContextAsInt(invoice.getCtx(),Env.POS_ID)
+                    : invoice.get_ValueAsInt("C_POS_ID");
 
             // Check vendor taxpayertype
             if (lco_TaxPayerType_Vendor_ID == 0) {
@@ -204,8 +205,8 @@ import ar.com.ergio.util.LAR_Utils;
                 return "CustomerTaxPayerTypeNotFound";
             }
             // Check posnumber
-            if (posNumber == 0) {
-                return "PosNumberNotFound";
+            if (c_POS_ID == 0) {
+                return "PosConfigNotFound";
             }
 
             // Determines document letter to bill
@@ -229,11 +230,11 @@ import ar.com.ergio.util.LAR_Utils;
                                                   .append(" AND AD_Org_ID=?")
                                                   .append(" AND IsActive=?")
                                                   .append(" AND DocBaseType=?")
-                                                  .append(" AND FiscalDocument=?") // 'F' > Factura
+                                                  .append(" AND FiscalDocument=?") // 'F' > Invoice
                                                   .append(" AND LAR_DocumentLetter_ID=?")
-                                                  .append(" AND PosNumber=?");
+                                                  .append(" AND C_POS_ID=?");
             Object[] params = new Object[]{ad_Client_ID, ad_Org_ID, "Y", MDocType.DOCBASETYPE_ARInvoice,
-                                           LAR_MDocType.FISCALDOCUMENT_Factura, lar_DocumentLetter_ID, posNumber};
+                                           LAR_MDocType.FISCALDOCUMENT_Invoice, lar_DocumentLetter_ID, c_POS_ID};
             MDocType docType = new Query(invoice.getCtx(), MDocType.Table_Name, whereClause.toString(), invoice.get_TrxName())
                     .setParameters(params)
                     .firstOnly();
@@ -245,7 +246,7 @@ import ar.com.ergio.util.LAR_Utils;
             // Change invoice docytype target (TODO - review this asignation)
             invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
             invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
-            invoice.set_ValueOfColumn("PosNumber", posNumber);
+            invoice.set_ValueOfColumn("C_POS_ID", c_POS_ID);
             if (!invoice.save()) {
                 return "CannotChangeInvoiceDocType";
             }
@@ -338,6 +339,7 @@ import ar.com.ergio.util.LAR_Utils;
                         || line.is_ValueChanged("M_Product_ID")
                         || line.is_ValueChanged("IsActive")
                         || line.is_ValueChanged("C_Tax_ID")
+                        || line.is_ValueChanged("C_BPartner_ID")
                         )
                     )
            )
@@ -459,6 +461,7 @@ import ar.com.ergio.util.LAR_Utils;
                     MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
                     pwh.setC_Payment_ID(payment.get_ID());
                     pwh.setC_Invoice_ID(payment.getC_Invoice_ID());
+                    pwh.setC_Tax_ID(wc.getC_Tax_ID());
                     pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
                     pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
                     pwh.setDateAcct(payment.getDateAcct());

@@ -76,6 +76,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 	//private NumberFormat formatter = new DecimalFormat("#0.00"); //red1 - parser to remove commas or dots separator for above '000s.
 	private Locale locale = Language.getLoginLanguage().getLocale();
     private NumberFormat nf = NumberFormat.getInstance(locale);
+    private BigDecimal payCashAmt = BigDecimal.ZERO;
 
     /** Logger          */
     private static CLogger log = CLogger.getCLogger(PosPayment.class);
@@ -130,6 +131,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 			if ( tenderType.equals(MPayment.TENDERTYPE_Cash) )
 			{
 				p_posPanel.m_order.payCash(amt);
+				payCashAmt = amt;
 			}
 			else if ( tenderType.equals(MPayment.TENDERTYPE_Check) )
 			{
@@ -496,7 +498,8 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 
 		fTotal.setValue(nf.format(p_order.getGrandTotal()));
 
-		BigDecimal received = p_order.getPaidAmt();
+		// TODO - Review this workaround (emmie)
+		BigDecimal received = cash ? payCashAmt : p_order.getPaidAmt();
 		balance  = p_order.getGrandTotal().subtract(received);
 		balance = balance.setScale(MCurrency.getStdPrecision(p_ctx, p_order.getC_Currency_ID()));
 		log.info(String.format("TenderType: %s paymentTerm: %s isPaidOnCredit: %b", tenderType,
@@ -509,6 +512,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 			    ADialog.warn(0, this, Msg.getMsg(p_ctx, "Change") + ": " + balance);
 			}
 			dispose();
+			return;
 		}
 
 		fBalance.setValue(nf.format(balance));

@@ -23,14 +23,14 @@ import org.compiere.model.*;
 
 /** Generated Model for LAR_DocumentLetter
  *  @author Adempiere (generated)
- *  @version 3.6.0LTS+P20110709 - $Id$ */
+ *  @version 360LTS.015 - $Id$ */
 public class X_LAR_DocumentLetter extends PO implements I_LAR_DocumentLetter, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120213L;
+	private static final long serialVersionUID = 20120313L;
 
     /** Standard Constructor */
     public X_LAR_DocumentLetter (Properties ctx, int LAR_DocumentLetter_ID, String trxName)
@@ -133,14 +133,16 @@ public class X_LAR_DocumentLetter extends PO implements I_LAR_DocumentLetter, I_
 		return ii.intValue();
 	}
 
-	/** Letter AD_Reference_ID=1000012 */
-	public static final int LETTER_AD_Reference_ID=1000012;
+	/** Letter AD_Reference_ID=3000003 */
+	public static final int LETTER_AD_Reference_ID=3000003;
 	/** A = A */
 	public static final String LETTER_A = "A";
 	/** B = B */
 	public static final String LETTER_B = "B";
 	/** C = C */
 	public static final String LETTER_C = "C";
+	/** E = E */
+	public static final String LETTER_E = "E";
 	/** Set Letter.
 		@param Letter Letter	  */
 	public void setLetter (String Letter)

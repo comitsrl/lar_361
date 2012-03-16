@@ -408,10 +408,8 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
         String email = (query.indexOf('@') != -1 ? query : null);
         String phone = (noNumber ? null : query);
         String city = null;
-        //
-        // TODO: contact have been remove from rv_bpartner
-        MBPartnerInfo[] results = MBPartnerInfo.find(p_ctx, value, name,
-        /* Contact, */null, email, phone, city);
+
+        MBPartnerInfo[] results = MBPartnerInfo.find(p_ctx, value, name, null, email, phone, city);
 
         // Set Result
         if (results.length == 0) {
@@ -456,8 +454,9 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
         getM_PriceList_Version_ID();
         // fillCombos();
         if (p_posPanel.m_order != null && m_bpartner != null) {
-            p_posPanel.m_order.setBPartner(m_bpartner); // added by ConSerTi to update the client in
-        }                                               // the request
+            p_posPanel.m_order.setBPartner(m_bpartner); // added by ConSerTi to update the client in the request
+            p_posPanel.f_curLine.updateTable(p_posPanel.m_order);
+        }
     } // setC_BPartner_ID
 
 	/**

@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_LetterRule
  *  @author Adempiere (generated)
- *  @version 3.6.0LTS+P20110709
+ *  @version 360LTS.015
  */
 public interface I_LAR_LetterRule
 {
@@ -31,7 +31,7 @@ public interface I_LAR_LetterRule
     /** TableName=LAR_LetterRule */
     public static final String Table_Name = "LAR_LetterRule";
 
-    /** AD_Table_ID=1000049 */
+    /** AD_Table_ID=3000003 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);

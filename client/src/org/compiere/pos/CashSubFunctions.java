@@ -24,7 +24,9 @@ import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Properties;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.border.TitledBorder;
 
@@ -42,6 +44,7 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
+import org.compiere.util.Language;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
 
@@ -100,7 +103,9 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 	private CButton f_calculateDifference = null;
 
 	private CPanel 			panel;
-	private Properties p_ctx;
+	// LAR improvements
+    private Locale locale = Language.getLoginLanguage().getLocale();
+    private NumberFormat nf = NumberFormat.getInstance(locale);
 
 	/**	Logger			*/
 	private static CLogger log = CLogger.getCLogger(SubCheckout.class);
@@ -130,14 +135,12 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		//********************  Main buttons **********************************
 
 		f_initialChange = createButtonAction("InitialChange", null);
-		f_initialChange.setText("Initial Change");
 		f_initialChange.setMaximumSize(new Dimension(160,35));
 		f_initialChange.setMinimumSize(new Dimension(160,35));
 		f_initialChange.setPreferredSize(new Dimension(160,35));
 		panel.add (f_initialChange, gbc);
 		//
 		f_closingCash = createButtonAction("CashClosing", null);
-		f_closingCash.setText("Cash Closing");
 		f_closingCash.setPreferredSize(new Dimension(160,35));
 		f_closingCash.setMaximumSize(new Dimension(160,35));
 		f_closingCash.setMinimumSize(new Dimension(160,35));
@@ -145,7 +148,6 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		panel.add (f_closingCash, gbc);
 		//
 		f_cashScrutiny = createButtonAction("CashScrutiny", null);
-		f_cashScrutiny.setText("Cash Scrutiny");
 		f_cashScrutiny.setPreferredSize(new Dimension(160,35));
 		f_cashScrutiny.setMaximumSize(new Dimension(160,35));
 		f_cashScrutiny.setMinimumSize(new Dimension(160,35));
@@ -153,7 +155,6 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		panel.add (f_cashScrutiny, gbc);
 		//
 		f_inputsOutputs = createButtonAction("InputsOutputs", null);
-		f_inputsOutputs.setText("Inputs and Outputs");
 		f_inputsOutputs.setPreferredSize(new Dimension(160,35));
 		f_inputsOutputs.setMaximumSize(new Dimension(160,35));
 		f_inputsOutputs.setMinimumSize(new Dimension(160,35));
@@ -161,7 +162,6 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		panel.add (f_inputsOutputs, gbc);
 		//
 		f_tickets = createButtonAction("Tickets", null);
-		f_tickets.setText("Tickets");
 		f_tickets.setPreferredSize(new Dimension(160,35));
 		f_tickets.setMaximumSize(new Dimension(160,35));
 		f_tickets.setMinimumSize(new Dimension(160,35));
@@ -169,7 +169,6 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		panel.add (f_tickets, gbc);
 		//
 		f_pos = createButtonAction("End", null);
-		f_pos.setText("POS");
 		f_pos.setPreferredSize(new Dimension(160,35));
 		f_pos.setMaximumSize(new Dimension(160,35));
 		f_pos.setMinimumSize(new Dimension(160,35));
@@ -184,12 +183,10 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 
 		buttonPanel = new CPanel(new GridBagLayout());
 		buttonPanel.setBorder(new TitledBorder(""));
-		buttonPanel.setMaximumSize(new Dimension(400,400));
-		buttonPanel.setMinimumSize(new Dimension(400,400));
-		buttonPanel.setPreferredSize(new Dimension(400,400));
+		buttonPanel.setMaximumSize(new Dimension(300,400));
+		buttonPanel.setMinimumSize(new Dimension(300,400));
+		buttonPanel.setPreferredSize(new Dimension(300,400));
 		panel.add (buttonPanel, gbc);
-
-
 
 		//*************************** Panel for initial change *************************
 		gbc.gridx = 1;
@@ -197,7 +194,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		gbc.gridy = 0;
 		gbc.gridheight = 5;
 		cInitial = new CPanel(new GridBagLayout());
-		cInitial.setBorder(new TitledBorder("Initial Change"));
+		cInitial.setBorder(new TitledBorder(Msg.getMsg(p_ctx, "InitialChange")));
 		cInitial.setVisible(false);
 		panel.add (cInitial, gbc);
 		GridBagConstraints gbc0 = new GridBagConstraints();
@@ -205,7 +202,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		//
 		gbc0.gridx = 0;
 		gbc0.gridy = 0;
-		l_PreviousChange = new CLabel("Previous Change");
+		l_PreviousChange = new CLabel(Msg.getMsg(p_ctx, "PreviousChange"));
 		cInitial.add (l_PreviousChange, gbc0);
 
 		gbc0.gridx = 1;
@@ -216,7 +213,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		//
 		gbc0.gridx = 0;
 		gbc0.gridy = 1;
-		l_change = new CLabel("Initial Change");
+		l_change = new CLabel(Msg.getMsg(p_ctx, "InitialChange"));
 		cInitial.add (l_change, gbc0);
 
 		gbc0.gridx = 1;
@@ -229,17 +226,16 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		gbc0.gridx = 0;
 		gbc0.gridwidth = 2;
 		//gbc0.fill = GridBagConstraints.HORIZONTAL;
-		f_change = createButtonAction("InitialChange", null);
+		f_change = createButtonAction("SaveChange", null);
 		f_change.setText("Save Change");
-		f_change.setActionCommand("saveChange");
-		cInitial.add (f_change, gbc0);
 		f_change.setPreferredSize(new Dimension(160,35));
 		f_change.setMaximumSize(new Dimension(160,35));
 		f_change.setMinimumSize(new Dimension(160,35));
+		cInitial.add (f_change, gbc0);
 
-		cInitial.setMaximumSize(new Dimension(400,400));
-		cInitial.setMinimumSize(new Dimension(400,400));
-		cInitial.setPreferredSize(new Dimension(400,400));
+		cInitial.setMaximumSize(new Dimension(300,400));
+		cInitial.setMinimumSize(new Dimension(300,400));
+		cInitial.setPreferredSize(new Dimension(300,400));
 
 
 		//******************************  Panel for cash scrutiniy ************************
@@ -251,7 +247,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 	//	gbc.weightx = .7;
 
 		cScrutiny = new CPanel(new GridBagLayout());
-		cScrutiny.setBorder(new TitledBorder("Cash Scrutiny"));
+		cScrutiny.setBorder(new TitledBorder(Msg.getMsg(p_ctx, "CashScrutiny")));
 		cScrutiny.setVisible(false);
 		panel.add (cScrutiny, gbc);
 		GridBagConstraints gbc1 = new GridBagConstraints();
@@ -260,7 +256,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		//
 		gbc1.gridx = 0;
 		gbc1.gridy = 0;
-		l_previousBalance = new CLabel("Previous Balance");
+		l_previousBalance = new CLabel(Msg.getMsg(p_ctx, "PreviousBalance"));
 		cScrutiny.add (l_previousBalance, gbc1);
 
 		gbc1.gridx = 1;
@@ -286,7 +282,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		//
 		gbc1.gridx = 0;
 		gbc1.gridy = 2;
-		l_difference = new CLabel("Difference");
+		l_difference = new CLabel(Msg.getMsg(p_ctx, "Difference"));
 		cScrutiny.add (l_difference, gbc1);
 
 		gbc1.gridx = 1;
@@ -300,13 +296,15 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		gbc1.gridy = 4;
 		gbc1.gridwidth = 2;
 		gbc1.fill = GridBagConstraints.HORIZONTAL;
-		f_calculateDifference = createButtonAction("InitialChange", null);
+		f_calculateDifference = createButtonAction("AnnotateDifference", null);
 		f_calculateDifference.setText("Annotate Difference");
-		f_calculateDifference.setActionCommand("AnnotateDiference");
+		f_calculateDifference.setPreferredSize(new Dimension(160,35));
+		f_calculateDifference.setMaximumSize(new Dimension(160,35));
+		f_calculateDifference.setMinimumSize(new Dimension(160,35));
 		cScrutiny.add (f_calculateDifference, gbc1);
 
-		cScrutiny.setMaximumSize(new Dimension(400,400));
-		cScrutiny.setMinimumSize(new Dimension(400,400));
+		cScrutiny.setMaximumSize(new Dimension(300,400));
+		cScrutiny.setMinimumSize(new Dimension(300,400));
 		cScrutiny.setPreferredSize(new Dimension(400,400));
 	}	//	init
 
@@ -338,31 +336,29 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		//	to display panel with initial change
 		if (action.equals("InitialChange"))
 		{
-		    // TODO - Define if this behavior is useful or not
 			cmd_displayInitialChange();
-			cInitial.setVisible(false);
 		}
 		//  to display panel with cash closing
 		else if (action.equals("CashClosing"))
 		{
+		    dispose();
 			Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
 
-			MCash cash = MCash.get(p_pos.getCtx(), /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
+			MCash cash = MCash.get(p_ctx, p_pos.getC_CashBook_ID(), today, null);
 
 			MQuery query = new MQuery(MCash.Table_Name);
 			query.addRestriction("C_Cash_ID", MQuery.EQUAL, cash.getC_Cash_ID());
 			AEnv.zoom(query);
-			dispose();
 		}
 		//	to open window with inputs and outputs of cash
 		else if (action.equals("InputsOutputs"))
 		{
+		    dispose();
 			Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
 
-			MCash cash = MCash.get(p_pos.getCtx(), /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
+			MCash cash = MCash.get(p_ctx, p_pos.getC_CashBook_ID(), today, null);
 
 			AEnv.zoom(MCash.Table_ID, cash.getC_Cash_ID());
-			dispose();
 		}
 		else if (action.equals("Tickets"))
 		{
@@ -377,7 +373,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		{
 			dispose();
 		}
-		else if (action.equals("saveChange"))
+		else if (action.equals("SaveChange"))
 		{
 			cmd_saveChange();
 		}
@@ -408,7 +404,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 
 		Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
 
-		MCash cash = MCash.get(p_pos.getCtx(), /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
+		MCash cash = MCash.get(p_ctx, p_pos.getC_CashBook_ID(), today, null);
 
 		if (cash != null)
 		{
@@ -437,7 +433,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		// calculate total until the moment and shows it in scrutiny panel
 		Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
 
-		MCash cash = MCash.get(p_pos.getCtx(), /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
+		MCash cash = MCash.get(p_ctx, p_pos.getC_CashBook_ID(), today, null);
 
 		v_previousBalance.setValue(cash.getEndingBalance());
 
@@ -461,19 +457,23 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 	 */
 	private void cmd_saveChange()
 	{
-		//MCashBook cashBook = new MCashBook(p_ctx, p_pos.getC_CashBook_ID(), null); emmie - unused object
 		Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
 
-		MCash cash = MCash.get(p_ctx, /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
+		MCash cash = MCash.get(p_ctx, p_pos.getC_CashBook_ID(), today, null);
 
 		BigDecimal initialChange = (BigDecimal)v_change.getValue();
 
 		if (cash != null && cash.get_ID() != 0 && initialChange.compareTo(cash.getEndingBalance()) != 0)
 		{
+		    // Prepare localized message with arguments > "Initial Change Before: {0} Now {1}"
+            MessageFormat mf = new MessageFormat(Msg.getMsg(p_ctx, "InitialChangeBefore"), locale);
+            Object[] args = {nf.format(cash.getEndingBalance()), nf.format(initialChange) }; // {0}, {1}
+            String description = mf.format(args);
+
 			MCashLine cl = new MCashLine (cash);
 			cl.setCashType(MCashLine.CASHTYPE_Difference);
 			cl.setAmount(initialChange.subtract(cash.getEndingBalance()));
-			cl.setDescription("Initial Change Before: " + cash.getEndingBalance() + " Now: " + initialChange);
+			cl.setDescription(description);
 			cl.save();
 		}
 		v_PreviousChange.setValue(initialChange);
@@ -493,7 +493,7 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		BigDecimal previousValue, actualValue;
 
 		Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
-		MCash cash = MCash.get(p_pos.getCtx(), /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
+		MCash cash = MCash.get(p_ctx, p_pos.getC_CashBook_ID(), today, null);
 		v_previousBalance.setValue(cash.getEndingBalance());
 		previousValue = cash.getEndingBalance();
 
@@ -522,17 +522,22 @@ public class CashSubFunctions extends PosQuery implements ActionListener, InputM
 		MCashBook cashBook = new MCashBook(p_ctx, p_pos.getC_CashBook_ID(), null);
 		Timestamp today = TimeUtil.getDay(System.currentTimeMillis());
 
-		MCash cash = MCash.get(p_ctx, /*cashBook.getAD_Org_ID(),*/ cashBook.getC_CashBook_ID(), today, null);
+		MCash cash = MCash.get(p_ctx, cashBook.getC_CashBook_ID(), today, null);
 
 		if (cash != null && cash.get_ID() != 0 && difference.compareTo(cash.getStatementDifference()) != 0)
 		{
-			MCashLine cl = new MCashLine (cash);
+            // Prepare localized message with arguments > "Cash Scrutiny -> Before: {0} Now {1}"
+            MessageFormat mf = new MessageFormat(Msg.getMsg(p_ctx, "CashScrutinyBefore"), locale);
+            Object[] args = {nf.format(previousValue), nf.format(actualValue) }; // {0}, {1}
+            String description = mf.format(args);
+
+            MCashLine cl = new MCashLine (cash);
 			cl.setCashType(MCashLine.CASHTYPE_Difference);
 			cl.setAmount(difference);
-			cl.setDescription(Msg.translate(p_pos.getCtx(), "Cash Scrutiny -> Before: ") + previousValue + " Now: " + actualValue);
+			cl.setDescription(description);
 			cl.save();
 		}
-		cash = MCash.get(p_pos.getCtx(), /*p_pos.getAD_Org_ID(),*/ p_pos.getC_CashBook_ID(), today, null);
+		cash = MCash.get(p_ctx, p_pos.getC_CashBook_ID(), today, null);
 		v_previousBalance.setValue(cash.getEndingBalance());
 		v_ActualBalance.setValue(Env.ZERO);
 		v_difference.setValue(Env.ZERO);

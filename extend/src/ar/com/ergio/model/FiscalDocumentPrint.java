@@ -31,6 +31,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLocation;
@@ -188,7 +189,7 @@ public class FiscalDocumentPrint {
     {
         log.info("Executing action: " + action);
         boolean error = false;
-        String newPrinterStatus = MFiscalPrinter.STATUS_OCIOSO;
+        String newPrinterStatus = MFiscalPrinter.STATUS_IDLE;
         String errorTitle = "";
         String errorDesc = "";
 
@@ -218,11 +219,11 @@ public class FiscalDocumentPrint {
             doAction(action, args);
 
             // Se libera la impresora fiscal.
-            setFiscalPrinterStatus(fiscalPrinter, MFiscalPrinter.STATUS_OCIOSO);
+            setFiscalPrinterStatus(fiscalPrinter, MFiscalPrinter.STATUS_IDLE);
         } catch (FiscalPrinterStatusError e) {
             // Si la impresora retornó un estado de error se marca el controlador
             // fiscal con estado de ERROR.
-            newPrinterStatus = MFiscalPrinter.STATUS_ERROR;
+            newPrinterStatus = MFiscalPrinter.STATUS_Error;
             // Se asigna el mensaje de error.
             errorTitle = "FiscalPrinterStatusError";
             errorDesc = e.getDeviceErrorMsg();
@@ -337,8 +338,8 @@ public class FiscalDocumentPrint {
         }
 
         // Se obtiene el tipo de documento a emitir por la impresora.
-        LAR_MDocType docType = new LAR_MDocType(ctx, C_DocType_ID, null);
-        setPrinterDocType(docType.getFiscalDocument());
+        MDocType docType = new MDocType(ctx, C_DocType_ID, null);
+        setPrinterDocType(docType.get_ValueAsString("FiscalDocument"));
 
         // Se asigna el documento OXP.
         setOxpDocument(document);
@@ -412,15 +413,15 @@ public class FiscalDocumentPrint {
         fireActionStarted(FiscalDocumentListener.AC_PRINT_DOCUMENT);
 
         // Emisión de una factura.
-        if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_Factura)) {
+        if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_Invoice)) {
             printInvoice(documentPrintable);
 
         // Emisión de una nota de crédito.
-        } else if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_NotaDeCredito)) {
+        } else if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_CreditNote)) {
             printCreditNote(documentPrintable, originalInvoice);
 
         // Emisión de una nota de débito.
-        } else if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_NotaDeDebito)) {
+        } else if (getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_DebitNote)) {
             printDebitNote(documentPrintable);
         }
 
@@ -538,15 +539,15 @@ public class FiscalDocumentPrint {
 	public Document createDocument(final MInvoice mInvoice, final MInvoice originalInvoice){
 		Document document = null;
 		// Creación de una factura.
-		if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_Factura)) {
+		if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_Invoice)) {
 			document = createInvoice(mInvoice);
 
 		// Creación de una nota de crédito.
-		} else if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_NotaDeCredito)) {
+		} else if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_CreditNote)) {
 			document = createCreditNote(mInvoice, originalInvoice);
 
 		// Creación de una nota de débito.
-		} else if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_NotaDeDebito)) {
+		} else if(getPrinterDocType().equals(LAR_MDocType.FISCALDOCUMENT_DebitNote)) {
 			document = createDebitNote(mInvoice);
 		}
 		return document;
@@ -1240,7 +1241,7 @@ public class FiscalDocumentPrint {
 		int bsyCount = 0;
 		// Si la impresora se encuentra en estado de error se dispara el evento
 		// que informa dicha situación.
-		if(cFiscal.getStatus().equals(MFiscalPrinter.STATUS_ERROR)) {
+		if(cFiscal.getStatus().equals(MFiscalPrinter.STATUS_Error)) {
 			fireStatusReported(cFiscal);
 			// Dependiendo de si hay que ignorar o no el estado de error
 			// se continua con la impresión. (Esto se utiliza para evitar
@@ -1249,7 +1250,7 @@ public class FiscalDocumentPrint {
 			if(isIgnoreErrorStatus())
 				// Por ello se setea la impresora como Lista y se intenta
 				// continuar con la impresión.
-				setFiscalPrinterStatus(cFiscal, MFiscalPrinter.STATUS_OCIOSO);
+				setFiscalPrinterStatus(cFiscal, MFiscalPrinter.STATUS_IDLE);
 			else
 				// Si no se pueden ignorar estados de error, entonces
 				// no es posible continuar con la impresión.
@@ -1257,7 +1258,7 @@ public class FiscalDocumentPrint {
 		}
 
 		// Mientras el status sea BUSY, espera 5 segundos y vuelve a chequear.
-		while(cFiscal.getStatus().equals(MFiscalPrinter.STATUS_OCUPADO) && !isCancelWaiting()) {
+		while(cFiscal.getStatus().equals(MFiscalPrinter.STATUS_Busy) && !isCancelWaiting()) {
 			fireStatusReported(cFiscal);
 			Thread.sleep(BSY_SLEEP_TIME);
 			bsyCount++;
@@ -1272,12 +1273,12 @@ public class FiscalDocumentPrint {
 			return false;
 		}
 
-		fireStatusReported(cFiscal, MFiscalPrinter.STATUS_OCIOSO);
+		fireStatusReported(cFiscal, MFiscalPrinter.STATUS_IDLE);
 		// Se asigna el status de la impresora, el usuario que realiza la operación
 		// y la fecha de operación.
-		cFiscal.setStatus(MFiscalPrinter.STATUS_OCUPADO);
+		cFiscal.setStatus(MFiscalPrinter.STATUS_Busy);
 		//cFiscal.setUsedBy_ID(Env.getAD_User_ID(ctx)); TODO - Revisar
-		cFiscal.setoperation_date(new Timestamp(System.currentTimeMillis()));
+		cFiscal.setOperation_Date(new Timestamp(System.currentTimeMillis()));
 		// No se usa trx dado que los cambios deben ser visibles
 		// inmediatamente por otros usuarios.
 		cFiscal.save();
@@ -1527,7 +1528,7 @@ public class FiscalDocumentPrint {
 			description = " ";
 
 			/* Usar los campos Identificador para definir el contenido de la linea */
-			if (fiscalPrinter.isonprintuseproductreference())
+			if (fiscalPrinter.isOnPrintUseProductReference())
 			{
 				return genDescriptionFromIdentifiers(aProduct);
 			}
@@ -1541,13 +1542,13 @@ public class FiscalDocumentPrint {
 					name = aProduct.getName().trim();
 
 				// armar la descripción según la selección
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Nombre.equals(fiscalPrinter.getonprintproductformat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Name.equals(fiscalPrinter.getOnPrintProductFormat()))
 					description = name;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Codigo.equals(fiscalPrinter.getonprintproductformat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Value.equals(fiscalPrinter.getOnPrintProductFormat()))
 					description = value;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_NombreCodigo.equals(fiscalPrinter.getonprintproductformat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_NameValue.equals(fiscalPrinter.getOnPrintProductFormat()))
 					description = name + " " + value;
-				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_CodigoNombre.equals(fiscalPrinter.getonprintproductformat()))
+				if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_ValueName.equals(fiscalPrinter.getOnPrintProductFormat()))
 					description = value + " " + name;
 			}
 		}

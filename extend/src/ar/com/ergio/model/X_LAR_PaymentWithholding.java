@@ -26,14 +26,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for LAR_PaymentWithholding
  *  @author Adempiere (generated)
- *  @version 3.6.0LTS+P20110709 - $Id$ */
+ *  @version 360LTS.015 - $Id$ */
 public class X_LAR_PaymentWithholding extends PO implements I_LAR_PaymentWithholding, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120127L;
+	private static final long serialVersionUID = 20120313L;
 
     /** Standard Constructor */
     public X_LAR_PaymentWithholding (Properties ctx, int LAR_PaymentWithholding_ID, String trxName)
@@ -58,7 +58,7 @@ public class X_LAR_PaymentWithholding extends PO implements I_LAR_PaymentWithhol
     }
 
     /** AccessLevel
-      * @return 7 - System - Client - Org
+      * @return 3 - Client - Org
       */
     protected int get_AccessLevel()
     {

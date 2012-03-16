@@ -97,7 +97,7 @@ public class MFiscalPrinter extends X_LAR_Fiscal_Printer {
 	FiscalPrinterDevice fiscalPrinter = null;
 	X_LAR_Fiscal_Printer_Type cType = new X_LAR_Fiscal_Printer_Type(Env.getCtx(),
 			getLAR_Fiscal_Printer_Type_ID(), null);
-	String className = cType.getclazz();
+	String className = cType.getClazz();
 
 	try {
 	    fiscalPrinter = (FiscalPrinterDevice) Class.forName(className).newInstance();

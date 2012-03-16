@@ -19,20 +19,21 @@ package ar.com.ergio.model;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
 
 /** Generated Model for LAR_WithholdingCertificate
  *  @author Adempiere (generated)
- *  @version 3.6.0LTS+P20110709 - $Id$ */
+ *  @version 360LTS.015 - $Id$ */
 public class X_LAR_WithholdingCertificate extends PO implements I_LAR_WithholdingCertificate, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120130L;
+	private static final long serialVersionUID = 20120313L;
 
     /** Standard Constructor */
     public X_LAR_WithholdingCertificate (Properties ctx, int LAR_WithholdingCertificate_ID, String trxName)
@@ -40,11 +41,7 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
       super (ctx, LAR_WithholdingCertificate_ID, trxName);
       /** if (LAR_WithholdingCertificate_ID == 0)
         {
-			setC_DocType_ID (0);
-// 0
-			setC_DocTypeTarget_ID (0);
 			setC_Invoice_ID (0);
-// 0
 			setC_Payment_ID (0);
 			setDocumentNo (null);
 			setLAR_WithholdingCertificate_ID (0);
@@ -58,7 +55,7 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
     }
 
     /** AccessLevel
-      * @return 7 - System - Client - Org
+      * @return 3 - Client - Org
       */
     protected int get_AccessLevel()
     {
@@ -79,33 +76,23 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
       return sb.toString();
     }
 
-	/** Set Address 1.
-		@param Address1
-		Address line 1 for this location
+	/** Set Base.
+		@param Base
+		Calculation Base
 	  */
-	public void setAddress1 (String Address1)
+	public void setBase (BigDecimal Base)
 	{
-		throw new IllegalArgumentException ("Address1 is virtual column");	}
+		throw new IllegalArgumentException ("Base is virtual column");	}
 
-	/** Get Address 1.
-		@return Address line 1 for this location
+	/** Get Base.
+		@return Calculation Base
 	  */
-	public String getAddress1 ()
+	public BigDecimal getBase ()
 	{
-		return (String)get_Value(COLUMNNAME_Address1);
-	}
-
-	/** Set BP Name.
-		@param BPName BP Name	  */
-	public void setBPName (String BPName)
-	{
-		throw new IllegalArgumentException ("BPName is virtual column");	}
-
-	/** Get BP Name.
-		@return BP Name	  */
-	public String getBPName ()
-	{
-		return (String)get_Value(COLUMNNAME_BPName);
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_Base);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	public I_C_DocType getC_DocType() throws RuntimeException
@@ -135,6 +122,11 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
 			 return 0;
 		return ii.intValue();
 	}
+
+	public I_C_DocType getC_DocTypeTarget() throws RuntimeException
+    {
+		return (I_C_DocType)MTable.get(getCtx(), I_C_DocType.Table_Name)
+			.getPO(getC_DocTypeTarget_ID(), get_TrxName());	}
 
 	/** Set Target Document Type.
 		@param C_DocTypeTarget_ID
@@ -203,6 +195,22 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
 		return (String)get_Value(COLUMNNAME_City);
 	}
 
+	/** Set Address.
+		@param C_Location_ID
+		Location or Address
+	  */
+	public void setC_Location_ID (String C_Location_ID)
+	{
+		throw new IllegalArgumentException ("C_Location_ID is virtual column");	}
+
+	/** Get Address.
+		@return Location or Address
+	  */
+	public String getC_Location_ID ()
+	{
+		return (String)get_Value(COLUMNNAME_C_Location_ID);
+	}
+
 	public I_C_Payment getC_Payment() throws RuntimeException
     {
 		return (I_C_Payment)MTable.get(getCtx(), I_C_Payment.Table_Name)
@@ -231,6 +239,22 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
 		return ii.intValue();
 	}
 
+	/** Set Document Date.
+		@param DateDoc
+		Date of the Document
+	  */
+	public void setDateDoc (Timestamp DateDoc)
+	{
+		throw new IllegalArgumentException ("DateDoc is virtual column");	}
+
+	/** Get Document Date.
+		@return Date of the Document
+	  */
+	public Timestamp getDateDoc ()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_DateDoc);
+	}
+
 	/** Set Document No.
 		@param DocumentNo
 		Document sequence number of the document
@@ -246,6 +270,22 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
 	public String getDocumentNo ()
 	{
 		return (String)get_Value(COLUMNNAME_DocumentNo);
+	}
+
+	/** Set D-U-N-S.
+		@param DUNS
+		Dun & Bradstreet Number
+	  */
+	public void setDUNS (String DUNS)
+	{
+		throw new IllegalArgumentException ("DUNS is virtual column");	}
+
+	/** Get D-U-N-S.
+		@return Dun & Bradstreet Number
+	  */
+	public String getDUNS ()
+	{
+		return (String)get_Value(COLUMNNAME_DUNS);
 	}
 
 	/** Set LAR_WithholdingCertificate.
@@ -268,20 +308,20 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
 		return ii.intValue();
 	}
 
-	/** Set NAICS/SIC.
-		@param NAICS
-		Standard Industry Code or its successor NAIC - http://www.osha.gov/oshstats/sicser.html
+	/** Set Name.
+		@param Name
+		Alphanumeric identifier of the entity
 	  */
-	public void setNAICS (String NAICS)
+	public void setName (String Name)
 	{
-		throw new IllegalArgumentException ("NAICS is virtual column");	}
+		throw new IllegalArgumentException ("Name is virtual column");	}
 
-	/** Get NAICS/SIC.
-		@return Standard Industry Code or its successor NAIC - http://www.osha.gov/oshstats/sicser.html
+	/** Get Name.
+		@return Alphanumeric identifier of the entity
 	  */
-	public String getNAICS ()
+	public String getName ()
 	{
-		return (String)get_Value(COLUMNNAME_NAICS);
+		return (String)get_Value(COLUMNNAME_Name);
 	}
 
 	/** Set Percent.
