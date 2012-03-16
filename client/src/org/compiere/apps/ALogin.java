@@ -265,7 +265,7 @@ public final class ALogin extends CDialog
 		connectionPanel.add(copy0Label,       new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0
 			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 
-		copy1Label.setText(Adempiere.COPYRIGHT);
+		copy1Label.setText(Adempiere.COPYRIGHT + " - " + Adempiere.getImplementationVendor());
 		connectionPanel.add(copy1Label,         new GridBagConstraints(1, 6, 2, 1, 0.0, 0.0
 			,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 12, 12), 0, 0));
 		connectionPanel.add(compileDate,        new GridBagConstraints(2, 1, 2, 1, 0.0, 0.0
