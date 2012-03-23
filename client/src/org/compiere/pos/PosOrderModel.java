@@ -333,7 +333,7 @@ public class PosOrderModel extends MOrder {
 	}
 
 	public boolean payCash(BigDecimal amt) {
-	    /*
+
 		MPayment payment = createPayment(MPayment.TENDERTYPE_Cash);
 		payment.setC_CashBook_ID(m_pos.getC_CashBook_ID());
 		payment.setAmount(getC_Currency_ID(), amt);
@@ -348,9 +348,6 @@ public class PosOrderModel extends MOrder {
 			return true;
 		}
 		else return false;
-		*/
-	    setPaymentRule(PAYMENTRULE_Cash);
-	    return true;
 	} // payCash
 
 	public boolean payCheck(BigDecimal amt, String accountNo, String routingNo, String checkNo)
