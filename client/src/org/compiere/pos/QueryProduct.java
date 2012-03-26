@@ -291,6 +291,7 @@ public class QueryProduct extends PosQuery
 		{
 			p_posPanel.f_curLine.setM_Product_ID(m_M_Product_ID);
 			p_posPanel.f_curLine.setPrice(m_Price);
+			p_posPanel.f_curLine.saveLine();
 		}
 		else
 		{

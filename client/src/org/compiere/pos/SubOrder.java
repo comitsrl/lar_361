@@ -27,6 +27,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.logging.Level;
 
 import javax.swing.JFormattedTextField;
@@ -416,7 +417,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
             setC_BPartner_ID(0);
         } else if (results.length == 1) {
             setC_BPartner_ID(results[0].getC_BPartner_ID());
-            f_bpName.setText(results[0].getName());
+            //f_bpName.setText(results[0].getName());
         } else {  // more than one
             QueryBPartner qt = new QueryBPartner(p_posPanel);
             qt.setResults(results);
@@ -445,6 +446,11 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 
         // Set Info
         if (m_bpartner != null) {
+            if (!hasCreditAvailable(m_bpartner)) {
+                m_bpartner = null;
+                f_bpName.setText(null);
+                return;
+            }
             f_bpName.setText(m_bpartner.getName());
         } else {
             f_bpName.setText(null);
@@ -459,7 +465,23 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
         }
     } // setC_BPartner_ID
 
-	/**
+    /**
+     * Performs credit check from BPartner
+     */
+    private boolean hasCreditAvailable(final MBPartner bp)
+    {
+        BigDecimal creditAvailable = m_bpartner.getSO_CreditLimit().subtract(m_bpartner.getSO_CreditUsed());
+        boolean allowCreditExceeded = p_pos.get_ValueAsBoolean("IsAllowCreditExceeded");
+        if (creditAvailable.compareTo(BigDecimal.ZERO) < 0) {
+            ADialog.warn(0, this, "CreditLimitOver",
+                    DisplayType.getNumberFormat(DisplayType.Amount).format(creditAvailable));
+            return allowCreditExceeded;
+        }
+        return true;
+
+    }
+
+    /**
 	 * 	Fill Combos (Location, User)
 	 *
 	private void fillCombos()
@@ -616,7 +638,8 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			if (order != null)
 			{
 			    f_Order_ID.setValue(order.get_ID());
-  				setC_BPartner_ID(order.getC_BPartner_ID());
+			    if (m_bpartner == null)
+			        setC_BPartner_ID(order.getC_BPartner_ID());
   				f_bNew.setEnabled(order.getLines().length != 0);
   				//f_bEdit.setEnabled(true);
   				f_process.setEnabled(true);
