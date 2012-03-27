@@ -30,6 +30,7 @@ import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
@@ -344,6 +345,11 @@ import ar.com.ergio.util.LAR_Utils;
                     )
            )
         {
+            // Check if withholding on sales is needed
+            final MPOS pos = MPOS.get(Env.getCtx(), Env.getContextAsInt(Env.getCtx(),Env.POS_ID));
+            if (!pos.get_ValueAsBoolean("IsGenerateWithholdingOnSale")) {
+                return null;
+            }
             final MOrder order = line.getParent();
             final WithholdingConfig wc = new WithholdingConfig(bp, order.isSOTrx());
             log.info("Withholding conf >> " + wc);
@@ -384,6 +390,11 @@ import ar.com.ergio.util.LAR_Utils;
 
     private String deletePerceptionLine(final MOrder order)
     {
+        // Check if withholding on sales is needed
+        final MPOS pos = MPOS.get(Env.getCtx(), Env.getContextAsInt(Env.getCtx(),Env.POS_ID));
+        if (!pos.get_ValueAsBoolean("IsGenerateWithholdingOnSale")) {
+            return null;
+        }
         int c_Order_ID = order.get_ID();
         log.info("Delete perceptions for order " + c_Order_ID);
         String sql = "DELETE FROM LAR_OrderPerception WHERE C_ORDER_ID=?";
