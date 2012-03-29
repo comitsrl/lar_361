@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 360LTS.015_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ADempiere - Supported by ADempiere community-->
+<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Element">
  <row id="101" trl="Y">
@@ -925,7 +925,7 @@
  <row id="222" trl="Y">
   <value column="Name" original="Combination">Combinación</value>
   <value column="PrintName" original="Combination">Combinación</value>
-  <value column="Description" original="Valid Account Combination">Combinación de Cuenta Válido</value>
+  <value column="Description" original="Valid Account Combination">Combinación Contable Válida</value>
   <value column="Help" original="The Combination identifies a valid combination of element which represent a GL account.">La combinación identifica una combinación válida de elementos que representan una cuenta de Contabilidad General.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -4553,8 +4553,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1025" trl="Y">
-  <value column="Name" original="Shipment/Receipt">Entrega / Recibo</value>
-  <value column="PrintName" original="Shipment/Receipt">Entrega / Recibo</value>
+  <value column="Name" original="Shipment/Receipt">Remitos</value>
+  <value column="PrintName" original="Shipment/Receipt">Remitos</value>
   <value column="Description" original="Material Shipment Document">Entrega ó documento de recibo</value>
   <value column="Help" original="The Material Shipment / Receipt ">La ID de Entrega / Recibo indica el documento único para esta entrega ó recibo</value>
   <value column="PO_Description" original="Material Receipt Document"/>
@@ -4563,8 +4563,8 @@
   <value column="PO_PrintName" original="Receipt"/>
  </row>
  <row id="1026" trl="Y">
-  <value column="Name" original="Shipment/Receipt Line">Línea Entrega / Recibo</value>
-  <value column="PrintName" original="Shipment/Receipt Line">Línea Entrega / Recibo</value>
+  <value column="Name" original="Shipment/Receipt Line">Línea Remito</value>
+  <value column="PrintName" original="Shipment/Receipt Line">Línea Remito</value>
   <value column="Description" original="Line on Shipment or Receipt document">Línea de entrega ó documento de recibo.</value>
   <value column="Help" original="The Shipment/Receipt Line indicates a unique line in a Shipment/Receipt document">La línea de Entrega / Recibo indica una línea única en un documento de entrega / recibo</value>
   <value column="PO_Description" original="Line on Receipt document"/>
@@ -5223,9 +5223,9 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1111" trl="Y">
-  <value column="Name" original="Name 2">Nombre Comercial</value>
-  <value column="PrintName" original="Name 2">Nombre Comercial</value>
-  <value column="Description" original="Additional Name">Nombre Comercial</value>
+  <value column="Name" original="Name 2">Nombre 2</value>
+  <value column="PrintName" original="Name 2">Nombre 2</value>
+  <value column="Description" original="Additional Name">Nombre Adicional</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -7523,9 +7523,9 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1462" trl="Y">
-  <value column="Name" original="Cash Journal">Efectivo</value>
-  <value column="PrintName" original="Cash Journal">Efectivo</value>
-  <value column="Description" original="Cash Journal">Efectivo</value>
+  <value column="Name" original="Cash Journal">Contado Efectivo</value>
+  <value column="PrintName" original="Cash Journal">Contado Efectivo</value>
+  <value column="Description" original="Cash Journal">Contado Efectivo</value>
   <value column="Help" original="The Cash Journal uniquely identifies a Cash Journal.  The Cash Journal will record transactions for the cash bank account"/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -11093,8 +11093,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1876" trl="Y">
-  <value column="Name" original="BP Search Key">Numero de Cliente</value>
-  <value column="PrintName" original="Customer No">Numero de Cliente</value>
+  <value column="Name" original="BP Search Key">Número de Cliente</value>
+  <value column="PrintName" original="Customer No">Número de Cliente</value>
   <value column="Description" original="Business Partner Key Value">Valor de la Llave de búsqueda del socio</value>
   <value column="Help" original="Search Key of Business Partner">Valor de la Llave de búsqueda del socio</value>
   <value column="PO_Description" original=""/>
@@ -11793,7 +11793,7 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1950" trl="Y">
-  <value column="Name" original="Delivery Confirmation">Confirmación de Entrega</value>
+  <value column="Name" original="Delivery Confirmation">Confirmación de Remito Entrega</value>
   <value column="PrintName" original="Delivery Confirmation">Confirmación de Entrega</value>
   <value column="Description" original="EMail Delivery confirmation">Confirmación de Entrega de Email</value>
   <value column="Help" original=""/>
@@ -16258,8 +16258,8 @@ de proyecto - capacidad de publicar el material</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2428" trl="Y">
-  <value column="Name" original="Referenced Shipment">Referencia de Entrega</value>
-  <value column="PrintName" original="Ref Ship">Referencia de Entrega</value>
+  <value column="Name" original="Referenced Shipment">Referencia de Remito (Entrega)</value>
+  <value column="PrintName" original="Ref Ship">Referencia de Remito (Entrega)</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -16418,8 +16418,8 @@ de proyecto - capacidad de publicar el material</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2445" trl="Y">
-  <value column="Name" original="Referenced Shipment Line">Línea de Referencia de Entrega</value>
-  <value column="PrintName" original="Ref Ship Line">Línea de Referencia de Entrega</value>
+  <value column="Name" original="Referenced Shipment Line">Línea de Referencia de Remito (Entrega)</value>
+  <value column="PrintName" original="Ref Ship Line">Línea de Referencia de Remito (Entrega)</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -17169,8 +17169,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2522" trl="Y">
-  <value column="Name" original="Ship/Receipt Confirmation">Confirmación entrega/Recibo</value>
-  <value column="PrintName" original="Ship/Receipt Confirm">Confirmación entrega/Recibo</value>
+  <value column="Name" original="Ship/Receipt Confirmation">Confirmación Remitoo</value>
+  <value column="PrintName" original="Ship/Receipt Confirm">Confirmación Remito</value>
   <value column="Description" original="Require Ship or Receipt Confirmation before processing">Requiere la confirmación de la entrega ó del recibo antes de procesar</value>
   <value column="Help" original="The processing of the Shipment (Receipt) requires Ship (Receipt) Confirmation. Note that shipments for automatic documents like POS/Warehouse Orders cannot have confirmations!">El proceso del envío (recibo) requiere la confirmación de la entrega (recibo)</value>
   <value column="PO_Description" original=""/>
@@ -17179,8 +17179,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2523" trl="Y">
-  <value column="Name" original="Ship/Receipt Confirmation">Confirmación entrega/Recibo</value>
-  <value column="PrintName" original="Ship/Receipt Confirm">Confirmación entrega/Recibo</value>
+  <value column="Name" original="Ship/Receipt Confirmation">Confirmación Remito</value>
+  <value column="PrintName" original="Ship/Receipt Confirm">Confirmación Remito</value>
   <value column="Description" original="Material Shipment or Receipt Confirmation">Confirmación material del envío ó del recibo</value>
   <value column="Help" original="Confirmation of Shipment or Receipt - Created from the Shipment/Receipt">Confirmación del envío ó del recibo - creado del Envio/Recibo</value>
   <value column="PO_Description" original=""/>
@@ -17189,8 +17189,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2524" trl="Y">
-  <value column="Name" original="Ship/Receipt Confirmation Line">Línea Confirmación entrega/Recibo</value>
-  <value column="PrintName" original="Ship/Receipt Confirm Line">Línea Confirmación entrega/Recibo</value>
+  <value column="Name" original="Ship/Receipt Confirmation Line">Línea Confirmación Remito</value>
+  <value column="PrintName" original="Ship/Receipt Confirm Line">Línea Confirmación Remito</value>
   <value column="Description" original="Material Shipment or Receipt Confirmation Line">Envio de material ó linea de confirmación del recibo.</value>
   <value column="Help" original="Confirmation details">Detalles de la confirmación.</value>
   <value column="PO_Description" original=""/>
@@ -17259,8 +17259,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2532" trl="Y">
-  <value column="Name" original="Ship Description">Descripción de la entrega</value>
-  <value column="PrintName" original="Ship Description">Descripción de la entrega</value>
+  <value column="Name" original="Ship Description">Descripción del Remito (Entrega)</value>
+  <value column="PrintName" original="Ship Description">Descripción del Remito (Entrega)</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -17499,8 +17499,8 @@ Si usted define una relación aquí, usted sobreescribe el tipo de documento del
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2561" trl="Y">
-  <value column="Name" original="Ship/Receipt Confirmation Import Line">Entrega/Recibo Línea de Confirmación de la importación </value>
-  <value column="PrintName" original="Ship/Receipt Confirm Import Line">Entrega/Recibo Línea de Confirmación de la importación </value>
+  <value column="Name" original="Ship/Receipt Confirmation Import Line">Remit Línea de Confirmación de la importación </value>
+  <value column="PrintName" original="Ship/Receipt Confirm Import Line">Remito Línea de Confirmación de la importación </value>
   <value column="Description" original="Material Shipment or Receipt Confirmation Import Line">Línea de confirmación de importación, entrega ó recibo de material.</value>
   <value column="Help" original="Import Confirmation Line Details">Detalles de importación de confirmación.</value>
   <value column="PO_Description" original=""/>
@@ -18771,7 +18771,7 @@ Si el patrón del lenguaje no es correcto, porfavor cree una petición en la ayu
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2689" trl="Y">
-  <value column="Name" original="Search Shipment/Receipt">Busca Entrega/Recibo</value>
+  <value column="Name" original="Search Shipment/Receipt">Busca Remitos</value>
   <value column="PrintName" original="Search Shipment/Receipt">Busca Entrega/Recibo</value>
   <value column="Description" original="Material Shipment Document">Documento de Entrega/Recibo Material</value>
   <value column="Help" original="The Material Shipment / Receipt ">El envio de materiales/Recibo</value>
@@ -20298,7 +20298,7 @@ Note que usted puede  Sobre o Sub Asignar el Pago.Durante el procesamiento  del 
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2849" trl="Y">
-  <value column="Name" original="Post Services Separately">Conmtabilizar Servicios Separadamente</value>
+  <value column="Name" original="Post Services Separately">Contabilizar Servicios Separadamente</value>
   <value column="PrintName" original="Post Services">Contabilizar Servicios Separadamente</value>
   <value column="Description" original="Differentiate between Services and Product Receivable/Payables">Diferenciación entre Servicios y Productos Cobranzas/Pagos</value>
   <value column="Help" original="If selected, you will post service related revenue to a different receivables account and service related cost to a different payables account.">Si seleccionó, usted aplicará ingresos a servicios relacionados a diferentes cuentas por cobrar y costos relacionados a servicios a diferentes cuentas por pagar.</value>
@@ -23491,8 +23491,8 @@ The ID is related 1 to 1 to the container ID</value>
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="52000" trl="Y">
-  <value column="Name" original="Shipment/Receipt">Envío / Recepción</value>
-  <value column="PrintName" original="Shipment/Receipt">Envío / Recepción</value>
+  <value column="Name" original="Shipment/Receipt">Remitos</value>
+  <value column="PrintName" original="Shipment/Receipt">Remito</value>
   <value column="Description" original="MaterialShipment Document">MaterialShipment Document</value>
   <value column="Help" original="The Material Shipment / Receipt ">The Material Shipment / Receipt </value>
   <value column="PO_Description" original="Material Receipt Document">Material Receipt Document</value>
@@ -29747,10 +29747,10 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1000001" trl="Y">
-  <value column="Name" original="Base Type">Nro Documento Obligatorio</value>
-  <value column="PrintName" original="Base Type">Nro Documento Obligatorio</value>
-  <value column="Description" original="">Nro Documento Obligatorio</value>
-  <value column="Help" original="">Indica que el numero de documento es obligatorio para este contribuyente</value>
+  <value column="Name" original="Base Type">Base del Cálculo</value>
+  <value column="PrintName" original="Base Type">Base del Cálculo</value>
+  <value column="Description" original="">Base sobre la cual se calculará el impuesto.</value>
+  <value column="Help" original="">Base sobre la cual se calculará el impuesto.</value>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
   <value column="PO_Name" original=""/>
@@ -30408,8 +30408,8 @@ Prepare genera documentos de entrega/recibo divididos
  </row>
  <row id="3000029" trl="Y">
   <value column="Name" original="PaymentThresholdMin">Límite Mínimo del Pago</value>
-  <value column="PrintName" original="PaymentThresholdMin">paymentthresholdmin</value>
-  <value column="Description" original=""/>
+  <value column="PrintName" original="PaymentThresholdMin">Límite Mínimo del Pago</value>
+  <value column="Description" original="">Si se supera este importe se aplicará retención.</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -30419,6 +30419,16 @@ Prepare genera documentos de entrega/recibo divididos
  <row id="3000030" trl="Y">
   <value column="Name" original="IsCalcFromPayment">Calculado desde el Pago</value>
   <value column="PrintName" original="IsCalcFromPayment">iscalcfrompayment</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000031" trl="N">
+  <value column="Name" original="LAR_OrderPerception">LAR_OrderPerception</value>
+  <value column="PrintName" original="LAR_OrderPerception">LAR_OrderPerception</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>

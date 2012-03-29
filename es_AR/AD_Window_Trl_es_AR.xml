@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 360LTS.015_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ADempiere - Supported by ADempiere community-->
+<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Window">
  <row id="100" trl="Y">
@@ -33,8 +33,8 @@
   <value column="Help" original="The Maintain Menu Window defines the Menu which will display.  It is for System Admin use only.  The menu items that each user will see depends upon the security defined.">La ventana de mantener menú define el menú que será desplegado. Es solamente para ser usado por el administrador del sistema. Los elementos que cada usuario verá dependerán de la seguridad definida.</value>
  </row>
  <row id="106" trl="Y">
-  <value column="Name" original="Language">Lenguaje</value>
-  <value column="Description" original="Maintain Languages">Mantener Lenguajes</value>
+  <value column="Name" original="Language">Idioma</value>
+  <value column="Description" original="Maintain Languages">Mantener Idiomas</value>
   <value column="Help" original="The Language Window allows you to define multiple parallel language for users. This allows users to access the same data but have the windows, tabs and fields appear in different languages.&#10;If a language is a System Language, you can change the User Interface to this language (after translation).  Otherwise the language is only used for printing documents.&#10;&#10;For the language code, we suggest using the Java convention of country and language (e.g. fr_CN - Canadian French).&#10;&#10;Verify the translation creates missing translation records. Start this process after creating a new language.">La ventana de lenguaje permite definir múltiples idiomas paralelos para los usuarios. Esto permite a los usuarios acceder a los mismos datos pero tener ventanas; pestañas y campos desplegados en lenguajes. Si un idioma es un idioma del sistema; se puede cambiar la interfase de usuario a este idioma (después de traducirlo); de otra manera; el idioma será usado solo para imprimir documentos. Para códigos de idioma; se sugiere usar la convención Java de país e idioma (ej. fr_CN para francés de Canada). El verificar el idioma crea los registros de traducción faltantes. Comience este proceso después de crear un nuevo Idioma.</value>
  </row>
  <row id="107" trl="Y">
@@ -233,7 +233,7 @@
   <value column="Help" original="The Sales Region Window defines the different regions where you do business.  You can generate reports based on Sales Regions">Define las diferentes regiones donde se hacen negocios. Es posible generar Informes basado en las regiones de ventas.</value>
  </row>
  <row id="153" trl="Y">
-  <value column="Name" original="Account Combination">Combinación de Cuentas</value>
+  <value column="Name" original="Account Combination">Combinación Contable</value>
   <value column="Description" original="Maintain Valid Account Combinations ">Mantener combinaciones de cuenta válida</value>
   <value column="Help" original="The Account Combination Window defines and displays valid account combinations. ">Define y despliega combinaciones contables válidas.</value>
  </row>
@@ -288,7 +288,7 @@
   <value column="Help" original="The Physical Inventory Window allows you to generate inventory count lists.  These counts can then be processed which will update the actual inventory with the new counts. Normally you would create inventory count lines automaticelly. If you create them manually, make sure that the book value is correct.">Permite generar listas de conteo del inventario físico. Estos conteos pueden ser procesados para actualizar el inventario real con las cantidades contadas.</value>
  </row>
  <row id="169" trl="Y">
-  <value column="Name" original="Shipment (Customer)">Entregas (Cliente)</value>
+  <value column="Name" original="Shipment (Customer)">Remitos (Cliente)</value>
   <value column="Description" original="Customer Inventory Shipments Customer Returns">Entrega de Inventario a Clientes</value>
   <value column="Help" original="The Shipment Window defines shipments made or to be made to a customer.  They are generated from an Customer Order.  The Shipment Document will generate the Customer Invoice.">Define las entregas hechos ó por hacer a un cliente. Las entregas son generadas desde una orden de un cliente. Los documentos de entrega generarán la factura del cliente.</value>
  </row>
@@ -623,9 +623,9 @@
   <value column="Help" original="The Import Report Line Set Window is an interim table which is used when importing external data into the system.  Selecting the 'Process' button will either add or modify the appropriate records.">La línea ventana determinada del informe de la importación es una tabla del interino se utiliza que al importar datos externos en el sistema. Seleccionar el 'Proceso' el botón agregará ó modificará los registros apropiados.</value>
  </row>
  <row id="250" trl="Y">
-  <value column="Name" original="System Translation Check">Traducción del Lenguaje</value>
-  <value column="Description" original="Check System Language Translations">Comprueba traducciones del lenguaje</value>
-  <value column="Help" original="Verify your language translations for selected entities. You should use Translation Export / Import for effective translation. This window allows you to check the translation of the main translation entities.">Verifica sus traducciones del lenguaje para las entidades seleccionadas</value>
+  <value column="Name" original="System Translation Check">Traducción del Idioma</value>
+  <value column="Description" original="Check System Language Translations">Comprueba traducciones del ldioma</value>
+  <value column="Help" original="Verify your language translations for selected entities. You should use Translation Export / Import for effective translation. This window allows you to check the translation of the main translation entities.">Verifica sus traducciones del ldioma para las entidades seleccionadas</value>
  </row>
  <row id="251" trl="Y">
   <value column="Name" original="Asset">Activo</value>
@@ -1024,7 +1024,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
   <value column="Help" original="Material Demand can be based on Forecast, Requisitions, Open Orders">La demanda material se puede basar en el pronóstico, demandas, órdenes abiertas.</value>
  </row>
  <row id="330" trl="Y">
-  <value column="Name" original="Ship/Receipt Confirm">Confirmación Entrega/Recibo</value>
+  <value column="Name" original="Ship/Receipt Confirm">Confirmación Remito</value>
   <value column="Description" original="Material Shipment or Receipt Confirmation">Confirmación de entrega ó recibo de material</value>
   <value column="Help" original="Confirmation of Shipment or Receipt - Created from the Shipment/Receipt">Confirmación de entrega ó recibo - Creado por una entrega/Recibo </value>
  </row>

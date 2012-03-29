@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 360LTS.015_2010-06-14 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: ADempiere - Supported by ADempiere community-->
+<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="M_Product">
  <row id="122" trl="Y">
@@ -267,6 +267,196 @@ Información acerca de cómo plantar mejor su futuro.
  <row id="50027" trl="Y">
   <value column="Name" original="Fertilizer Inspection Area">Area de Inspección de Fertilizante</value>
   <value column="Description" original=""/>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000000" trl="Y">
+  <value column="Name" original="12x55 ECO D">12x55 ECO D</value>
+  <value column="Description" original="12volt 55Ah. Derecha. Garantia: 6 meses">12volt 55Ah. Derecha. Garantia: 6 meses</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000001" trl="N">
+  <value column="Name" original="12x55 D LEIMAT">12x55 D LEIMAT</value>
+  <value column="Description" original=""/>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000002" trl="Y">
+  <value column="Name" original="12x40 D">12x40 D</value>
+  <value column="Description" original="12Volt 40Ah. Derecha. Garantia: 1 año">12Volt 40Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000003" trl="Y">
+  <value column="Name" original="12x50 B D">12x50 B D</value>
+  <value column="Description" original="12volt 50Ah. Baja, Derecha. Garantia: 1 año">12volt 50Ah. Baja, Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000006" trl="Y">
+  <value column="Name" original="12x50 A D">12x50 A D</value>
+  <value column="Description" original="12Volt 50Ah. Alta, Derecha. Garantia: 1año">12Volt 50Ah. Alta, Derecha. Garantia: 1año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000007" trl="Y">
+  <value column="Name" original="12x50 Civic D">12x50 Civic D</value>
+  <value column="Description" original="12Volt 50Ah. Derecha. Garantia: 1año">12Volt 50Ah. Derecha. Garantia: 1año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000008" trl="Y">
+  <value column="Name" original="12x65 D">12x65 D</value>
+  <value column="Description" original="12Volt 65Ah. Derecha. Garantia: 1año">12Volt 65Ah. Derecha. Garantia: 1año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000009" trl="N">
+  <value column="Name" original="12x65 I">12x65 I</value>
+  <value column="Description" original="12volt 65Ah. Izquierda. Garantia: 1año">12volt 65Ah. Izquierda. Garantia: 1año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000010" trl="Y">
+  <value column="Name" original="12x70 D">12x70 D</value>
+  <value column="Description" original="12Volt 70Ah. Derecha. Garantia: 1año">12Volt 70Ah. Derecha. Garantia: 1año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000011" trl="Y">
+  <value column="Name" original="12x75 B D">12x75 B D</value>
+  <value column="Description" original="12Volt 75Ah. Baja, Derecha. Garantia: 1año">12Volt 75Ah. Baja, Derecha. Garantia: 1año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000013" trl="Y">
+  <value column="Name" original="12x75 A D">12x75 A D</value>
+  <value column="Description" original="12Volt 75Ah. Baja, Derecha. Garantia: 1 año">12Volt 75Ah. Baja, Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000014" trl="N">
+  <value column="Name" original="12x75 B I">12x75 B I</value>
+  <value column="Description" original="12Volt 65Ah. Baja, Izquierda. Garantia: 1 año">12Volt 65Ah. Baja, Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000015" trl="N">
+  <value column="Name" original="12x80 D">12x80 D</value>
+  <value column="Description" original="12volt 80Ah. Derecha. Garantia: 1 año">12volt 80Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000016" trl="Y">
+  <value column="Name" original="12x80 S10 D">12x80 S10 D</value>
+  <value column="Description" original="12Volt 80Ah. Derecha. Garantia: 1 año">12Volt 80Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000017" trl="N">
+  <value column="Name" original="12x85 D">12x85 D</value>
+  <value column="Description" original="12volt 85Ah. Derecha. Garantia: 1 año">12volt 85Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000018" trl="N">
+  <value column="Name" original="12x85 I">12x85 I</value>
+  <value column="Description" original="12volt 85Ah. Izquierda. Garantia: 1 año">12volt 85Ah. Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000019" trl="N">
+  <value column="Name" original="12x90 B D">12x90 B D</value>
+  <value column="Description" original="12volt 90Ah. Baja, Derecha. Garantia: 1 año">12volt 90Ah. Baja, Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000020" trl="N">
+  <value column="Name" original="12x90 A D">12x90 A D</value>
+  <value column="Description" original="12volt 90Ah. Alta, Derecha. Garantia: 1 año">12volt 90Ah. Alta, Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000021" trl="N">
+  <value column="Name" original="12x90 B I">12x90 B I</value>
+  <value column="Description" original="12volt 90Ah. Baja, Izquierda. Garantia: 1 año">12volt 90Ah. Baja, Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000022" trl="N">
+  <value column="Name" original="12x90 A I">12x90 A I</value>
+  <value column="Description" original="12volt 90Ah. Alta, Izquierda. Garantia: 1 año">12volt 90Ah. Alta, Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000023" trl="N">
+  <value column="Name" original="12x100 B D">12x100 B D</value>
+  <value column="Description" original="12volt 100Ah. Baja, Derecha. Garantia: 1 año">12volt 100Ah. Baja, Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000024" trl="N">
+  <value column="Name" original="12x100 A I">12x100 A I</value>
+  <value column="Description" original="12volt 100Ah. Alta, Izquierda. Garantia: 1 año">12volt 100Ah. Alta, Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000025" trl="N">
+  <value column="Name" original="12x110 B D">12x110 B D</value>
+  <value column="Description" original="12volt 110Ah. Baja, Derecha. Garantia: 1 año">12volt 110Ah. Baja, Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000026" trl="N">
+  <value column="Name" original="12x110 A I">12x110 A I</value>
+  <value column="Description" original="12volt 110Ah. Alta, Izquierda. Garantia: 1 año">12volt 110Ah. Alta, Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000027" trl="N">
+  <value column="Name" original="12x120 D">12x120 D</value>
+  <value column="Description" original="12volt 1200Ah. Derecha. Garantia: 1 año">12volt 1200Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000028" trl="N">
+  <value column="Name" original="12x130 B D">12x130 B D</value>
+  <value column="Description" original="12volt 130Ah. Baja, Derecha. Garantia: 1 año">12volt 130Ah. Baja, Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000029" trl="N">
+  <value column="Name" original="12x130 A I">12x130 A I</value>
+  <value column="Description" original="12volt 130Ah. Alta, Izquierda. Garantia: 1 año">12volt 130Ah. Alta, Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000030" trl="N">
+  <value column="Name" original="12x180 D">12x180 D</value>
+  <value column="Description" original="12volt 180Ah. Derecha. Garantia: 1 año">12volt 180Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000031" trl="N">
+  <value column="Name" original="12x180 I">12x180 I</value>
+  <value column="Description" original="12volt 180Ah. Izquierda. Garantia: 1 año">12volt 180Ah. Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000032" trl="N">
+  <value column="Name" original="12x185 D">12x185 D</value>
+  <value column="Description" original="12volt 185Ah. Derecha. Garantia: 1 año">12volt 185Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000033" trl="N">
+  <value column="Name" original="12x185 I">12x185 I</value>
+  <value column="Description" original="12volt 185Ah. Izquierda. Garantia: 1 año">12volt 185Ah. Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000034" trl="N">
+  <value column="Name" original="12x220 D">12x220 D</value>
+  <value column="Description" original="12volt 220Ah. Derecha. Garantia: 1 año">12volt 220Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000035" trl="N">
+  <value column="Name" original="12x220 I">12x220 I</value>
+  <value column="Description" original="12volt 220Ah. Izquierda. Garantia: 1 año">12volt 220Ah. Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000036" trl="N">
+  <value column="Name" original="12x250 D">12x250 D</value>
+  <value column="Description" original="12volt 250Ah. Derecha. Garantia: 1 año">12volt 250Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000037" trl="N">
+  <value column="Name" original="12x250 I">12x250 I</value>
+  <value column="Description" original="12volt 250Ah. Izquierda. Garantia: 1 año">12volt 250Ah. Izquierda. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000038" trl="N">
+  <value column="Name" original="6x130 D">6x130 D</value>
+  <value column="Description" original="6volt 130Ah. Derecha. Garantia: 1 año">6volt 130Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000039" trl="N">
+  <value column="Name" original="6x160 D">6x160 D</value>
+  <value column="Description" original="6volt 160Ah. Derecha. Garantia: 1 año">6volt 160Ah. Derecha. Garantia: 1 año</value>
+  <value column="DocumentNote" original=""/>
+ </row>
+ <row id="1000040" trl="N">
+  <value column="Name" original="6x200 D">6x200 D</value>
+  <value column="Description" original="6volt 200Ah. Derecha. Garantia: 1 año">6volt 200Ah. Derecha. Garantia: 1 año</value>
   <value column="DocumentNote" original=""/>
  </row>
 </adempiereTrl>
