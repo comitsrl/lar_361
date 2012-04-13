@@ -198,6 +198,7 @@ public class DrawerTransfer extends SvrProcess
         paymentBankFrom.setC_Currency_ID(p_C_Currency_ID);
         paymentBankFrom.setPayAmt(totalAmt);
         paymentBankFrom.setOverUnderAmt(Env.ZERO);
+        paymentBankFrom.setIsReconciled(true);
         paymentBankFrom.setC_DocType_ID(false);
         paymentBankFrom.saveEx();
         paymentBankFrom.processIt(MPayment.DOCACTION_Complete);
