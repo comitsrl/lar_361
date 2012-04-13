@@ -11,7 +11,8 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=argentine_localization/extend\/src"/>
         <javaElement handleIdentifier="=argentine_localization/client\/src"/>
+        <javaElement handleIdentifier="=argentine_localization/extend\/src"/>
+        <javaElement handleIdentifier="=argentine_localization/base\/src"/>
     </selectedElements>
 </jardesc>

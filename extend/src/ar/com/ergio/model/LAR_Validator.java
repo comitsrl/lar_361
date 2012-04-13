@@ -21,7 +21,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 
-import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
@@ -456,65 +455,68 @@ import ar.com.ergio.util.LAR_Utils;
         }
         else if (type == TYPE_AFTER_NEW || (type == TYPE_AFTER_CHANGE && payment.is_ValueChanged("PayAmt")))
         {
-            final MInvoice invoice = new MInvoice(payment.getCtx(), payment.getC_Invoice_ID(), payment.get_TrxName());
-            final WithholdingConfig wc = new WithholdingConfig(bp, invoice.isSOTrx());
-            log.info("Withholding conf >> " + wc);
-
-            // if payment amt is greater than the limit, create a withholding
-            if (wc.isCalcFromPayment())
+            log.info("C_Payment_ID: " + payment.get_ID());
+            if (!Env.isSOTrx(Env.getCtx())) // Only process AP payments
             {
-                if (payment.getPayAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+                final WithholdingConfig wc = new WithholdingConfig(bp, Env.isSOTrx(Env.getCtx()));
+                log.info("Withholding conf >> " + wc);
+
+                // if payment amt is greater than the limit, create a withholding
+                if (wc.isCalcFromPayment())
                 {
-                    // create withholding
-                    BigDecimal taxAmt = payment.getPayAmt().multiply(wc.getAliquot())
-                            .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                    if (payment.getPayAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+                    {
+                        // create withholding
+                        BigDecimal taxAmt = payment.getPayAmt().multiply(wc.getAliquot())
+                                .setScale(2, BigDecimal.ROUND_HALF_EVEN);
 
-                    MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
-                    pwh.setC_Payment_ID(payment.get_ID());
-                    pwh.setC_Invoice_ID(payment.getC_Invoice_ID());
-                    pwh.setC_Tax_ID(wc.getC_Tax_ID());
-                    pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
-                    pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
-                    pwh.setDateAcct(payment.getDateAcct());
-                    pwh.setDateTrx(payment.getDateTrx());
-                    pwh.setPercent(wc.getAliquot());
-                    pwh.setProcessed(false);
-                    pwh.setTaxAmt(taxAmt);
-                    pwh.setTaxBaseAmt(payment.getPayAmt());
-                    if (!pwh.save()) {
-                        return "Can not create withholding on payment";
+                        MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
+                        pwh.setC_Payment_ID(payment.get_ID());
+                        pwh.setC_Invoice_ID(payment.getC_Invoice_ID());
+                        pwh.setC_Tax_ID(wc.getC_Tax_ID());
+                        pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
+                        pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
+                        pwh.setDateAcct(payment.getDateAcct());
+                        pwh.setDateTrx(payment.getDateTrx());
+                        pwh.setPercent(wc.getAliquot());
+                        pwh.setProcessed(false);
+                        pwh.setTaxAmt(taxAmt);
+                        pwh.setTaxBaseAmt(payment.getPayAmt());
+                        if (!pwh.save()) {
+                            return "Can not create withholding on payment";
+                        }
+
+                        // update payment amounts (with sql in order to avoid circular events)
+                        // TODO - Review WriteOffAmt for withholding on invoices (IVA)
+                        // NewPayAmt = PayAmt - taxAmt
+                        String sql = "UPDATE C_Payment"
+                                   + "   SET WriteOffAmt=?"
+                                   + "     , PayAmt=?"
+                                   + "     , WithholdingAmt=?"
+                                   + "     , WithholdingPercent=?"
+                                   + " WHERE C_Payment_ID=?";
+
+                        PreparedStatement pstmt = null;
+                        try {
+                            pstmt = DB.prepareStatement(sql, payment.get_TrxName());
+                            pstmt.setBigDecimal(1, taxAmt);
+                            pstmt.setBigDecimal(2, payment.getPayAmt().subtract(taxAmt));
+                            pstmt.setBigDecimal(3, taxAmt);
+                            // save aliquot as percentage
+                            pstmt.setBigDecimal(4, wc.getAliquot().multiply(BigDecimal.valueOf(100L)));
+                            pstmt.setInt(5, payment.get_ID());
+                            pstmt.executeUpdate();
+                        } catch (Exception e) {
+                            log.log(Level.SEVERE, sql, e);
+                            return e.getMessage();
+                        } finally {
+                            DB.close(pstmt);
+                            pstmt = null;
+                        }
+                    } else {
+                        // if exists a withholding, deleted
+                        deleteWithholdingOnPayment(payment);
                     }
-
-                    // update payment amounts (with sql in order to avoid circular events)
-                    // TODO - Review WriteOffAmt for withholding on invoices (IVA)
-                    // NewPayAmt = PayAmt - taxAmt
-                    String sql = "UPDATE C_Payment"
-                               + "   SET WriteOffAmt=?"
-                               + "     , PayAmt=?"
-                               + "     , WithholdingAmt=?"
-                               + "     , WithholdingPercent=?"
-                               + " WHERE C_Payment_ID=?";
-
-                    PreparedStatement pstmt = null;
-                    try {
-                        pstmt = DB.prepareStatement(sql, payment.get_TrxName());
-                        pstmt.setBigDecimal(1, taxAmt);
-                        pstmt.setBigDecimal(2, payment.getPayAmt().subtract(taxAmt));
-                        pstmt.setBigDecimal(3, taxAmt);
-                        // save aliquot as percentage
-                        pstmt.setBigDecimal(4, wc.getAliquot().multiply(BigDecimal.valueOf(100L)));
-                        pstmt.setInt(5, payment.get_ID());
-                        pstmt.executeUpdate();
-                    } catch (Exception e) {
-                        log.log(Level.SEVERE, sql, e);
-                        return e.getMessage();
-                    } finally {
-                        DB.close(pstmt);
-                        pstmt = null;
-                    }
-                } else {
-                    // if exists a withholding, deleted
-                    deleteWithholdingOnPayment(payment);
                 }
             }
         }
@@ -531,24 +533,25 @@ import ar.com.ergio.util.LAR_Utils;
         }
         else if (timing == TIMING_AFTER_COMPLETE)
         {
-            log.info("Payment: " + payment.get_ID());
-            final MBPartner bp = new MBPartner(payment.getCtx(), payment.getC_BPartner_ID(), payment.get_TrxName());
-            final MInvoice invoice = new MInvoice(payment.getCtx(), payment.getC_Invoice_ID(), payment.get_TrxName());
-            final WithholdingConfig wc = new WithholdingConfig(bp, invoice.isSOTrx());
-
-            if (wc.isCalcFromPayment())
+            log.info("C_Payment_ID: " + payment.get_ID());
+            if (!Env.isSOTrx(Env.getCtx())) // Only process AP payments
             {
-                if (payment.getPayAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+                final MBPartner bp = new MBPartner(payment.getCtx(), payment.getC_BPartner_ID(), payment.get_TrxName());
+                final WithholdingConfig wc = new WithholdingConfig(bp, Env.isSOTrx(Env.getCtx()));
+
+                if (wc.isCalcFromPayment())
                 {
-                    X_LAR_WithholdingCertificate whc = new X_LAR_WithholdingCertificate(
-                            payment.getCtx(), 0, payment.get_TrxName());
-                    whc.setC_DocType_ID(wc.getC_DocType_ID());
-                    whc.setC_Payment_ID(payment.get_ID());
-                    whc.setC_Invoice_ID(payment.getC_Invoice_ID());
-                    whc.setC_DocTypeTarget_ID(wc.getC_DocType_ID());
-                    whc.setDocumentNo(payment.getDocumentNo());
-                    if (!whc.save()) {
-                        return "Can not create a withholding certificate";
+                    if (payment.getPayAmt().compareTo(wc.getPaymentThresholdMin()) >= 0) {
+                        X_LAR_WithholdingCertificate whc = new X_LAR_WithholdingCertificate(payment.getCtx(), 0,
+                                payment.get_TrxName());
+                        whc.setC_DocType_ID(wc.getC_DocType_ID());
+                        whc.setC_Payment_ID(payment.get_ID());
+                        whc.setC_Invoice_ID(payment.getC_Invoice_ID());
+                        whc.setC_DocTypeTarget_ID(wc.getC_DocType_ID());
+                        whc.setDocumentNo(payment.getDocumentNo());
+                        if (!whc.save()) {
+                            return "Can not create a withholding certificate";
+                        }
                     }
                 }
             }
@@ -566,7 +569,7 @@ import ar.com.ergio.util.LAR_Utils;
         }
         else if (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT)
         {
-            log.info("Payment: " + payment.get_ID());
+            log.info("C_Payment_ID: " + payment.get_ID());
 
             MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
             pwh.setIsActive(false);
@@ -680,8 +683,6 @@ import ar.com.ergio.util.LAR_Utils;
                      isCalcFromPayment = rs.getString(5).equals("Y");
                      paymentThresholdMin = rs.getBigDecimal(6);
                      c_DocType_ID = rs.getInt(7);
-                 } else {
-                     throw new AdempiereException("Withholding configuration not found");
                  }
              } catch (Exception e) {
                  log.log(Level.SEVERE, sql, e);
