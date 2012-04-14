@@ -141,8 +141,11 @@ public class DrawerTransfer extends SvrProcess
             final MPayment paymentFrom = new MPayment(getCtx(), line.getC_Payment_ID(), get_TrxName());
             totalAmt = totalAmt.add(paymentFrom.getPayAmt());
             // Accumulates cash amounts
-            if (paymentFrom.getTenderType().equals(MPayment.TENDERTYPE_Cash)) {
+            if (paymentFrom.getTenderType().equals(MPayment.TENDERTYPE_Cash)) 
+            {
                 cashAmt = cashAmt.add(paymentFrom.getPayAmt());
+                line.set_ValueOfColumn("IsTransferred", true);
+                line.saveEx();
                 continue;
             }
             // Transfer other payments
@@ -162,7 +165,7 @@ public class DrawerTransfer extends SvrProcess
             paymentBankTo.processIt(MPayment.DOCACTION_Complete);
             paymentBankTo.saveEx();
 
-            // Mark bank statement as transferred
+            // Mark bank statement line as transferred
             line.set_ValueOfColumn("IsTransferred", true);
             line.saveEx();
             m_transferred++;
@@ -184,7 +187,7 @@ public class DrawerTransfer extends SvrProcess
         cashBankTo.saveEx();
         cashBankTo.processIt(MPayment.DOCACTION_Complete);
         cashBankTo.saveEx();
-        m_transferred++;
+        if (!cashAmt.equals(Env.ZERO)) m_transferred++;
 
         // Creates a debit for tranference total amount
         final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
@@ -203,7 +206,6 @@ public class DrawerTransfer extends SvrProcess
         paymentBankFrom.saveEx();
         paymentBankFrom.processIt(MPayment.DOCACTION_Complete);
         paymentBankFrom.saveEx();
-        m_transferred++;
 
         // Creates a bank statement and a bank statement line for balance transfer
         final MBankStatement newStmt = new MBankStatement(mBankFrom);
