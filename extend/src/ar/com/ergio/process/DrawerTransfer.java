@@ -215,6 +215,8 @@ public class DrawerTransfer extends SvrProcess
         newLine.setC_Payment_ID(paymentBankFrom.getC_Payment_ID());
         newLine.setLine(10);
         newLine.set_ValueOfColumn("IsTransferred", true);
+        newLine.set_ValueOfColumn("TrxAmt", totalAmt.negate());
+        newLine.set_ValueOfColumn("StmtAmt", totalAmt.negate());
         newLine.saveEx();
         // process statement
         newStmt.processIt(MBankStatement.DOCACTION_Complete);
