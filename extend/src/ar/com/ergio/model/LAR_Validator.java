@@ -345,6 +345,9 @@ import ar.com.ergio.util.LAR_Utils;
            )
         {
             final MOrder order = line.getParent();
+            // Check if is a sales transaction
+            if (!order.isSOTrx())
+                return null;
             final WithholdingConfig wc = new WithholdingConfig(bp, order.isSOTrx());
             log.info("Withholding conf >> " + wc);
 
@@ -384,6 +387,9 @@ import ar.com.ergio.util.LAR_Utils;
 
     private String deletePerceptionLine(final MOrder order)
     {
+        // Check if is a sales transaction
+        if (!order.isSOTrx())
+            return null;
         int c_Order_ID = order.get_ID();
         log.info("Delete perceptions for order " + c_Order_ID);
         String sql = "DELETE FROM LAR_OrderPerception WHERE C_ORDER_ID=?";
