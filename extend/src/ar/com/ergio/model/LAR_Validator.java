@@ -350,6 +350,9 @@ import ar.com.ergio.util.LAR_Utils;
                 return null;
             }
             final MOrder order = line.getParent();
+            // Check if is a sales transaction
+            if (!order.isSOTrx())
+                return null;
             final WithholdingConfig wc = new WithholdingConfig(bp, order.isSOTrx());
             log.info("Withholding conf >> " + wc);
 
@@ -389,6 +392,9 @@ import ar.com.ergio.util.LAR_Utils;
 
     private String deletePerceptionLine(final MOrder order)
     {
+        // Check if is a sales transaction
+        if (!order.isSOTrx())
+            return null;
         // Check if withholding on sales is needed
         final MPOS pos = MPOS.get(Env.getCtx(), Env.getContextAsInt(Env.getCtx(),Env.POS_ID));
         if (!pos.get_ValueAsBoolean("IsGenerateWithholdingOnSale")) {
