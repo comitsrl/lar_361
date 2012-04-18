@@ -172,22 +172,25 @@ public class DrawerTransfer extends SvrProcess
         }
 
         // Transfer an accumulated cash amount
-        final MPayment cashBankTo = new MPayment(getCtx(), 0, get_TrxName());
-        cashBankTo.setC_BankAccount_ID(mBankTo.getC_BankAccount_ID());
-        cashBankTo.setDocumentNo(p_DocumentNo);
-        cashBankTo.setDateAcct(p_DateAcct);
-        cashBankTo.setDateTrx(p_StatementDate);
-        cashBankTo.setTenderType(MPayment.TENDERTYPE_Cash);
-        cashBankTo.setDescription(p_Description);
-        cashBankTo.setC_BPartner_ID(p_C_BPartner_ID);
-        cashBankTo.setC_Currency_ID(p_C_Currency_ID);
-        cashBankTo.setPayAmt(cashAmt);
-        cashBankTo.setOverUnderAmt(Env.ZERO);
-        cashBankTo.setC_DocType_ID(true);
-        cashBankTo.saveEx();
-        cashBankTo.processIt(MPayment.DOCACTION_Complete);
-        cashBankTo.saveEx();
-        if (!cashAmt.equals(Env.ZERO)) m_transferred++;
+        if (cashAmt.compareTo(BigDecimal.ZERO) > 0)
+        {
+            final MPayment cashBankTo = new MPayment(getCtx(), 0, get_TrxName());
+            cashBankTo.setC_BankAccount_ID(mBankTo.getC_BankAccount_ID());
+            cashBankTo.setDocumentNo(p_DocumentNo);
+            cashBankTo.setDateAcct(p_DateAcct);
+            cashBankTo.setDateTrx(p_StatementDate);
+            cashBankTo.setTenderType(MPayment.TENDERTYPE_Cash);
+            cashBankTo.setDescription(p_Description);
+            cashBankTo.setC_BPartner_ID(p_C_BPartner_ID);
+            cashBankTo.setC_Currency_ID(p_C_Currency_ID);
+            cashBankTo.setPayAmt(cashAmt);
+            cashBankTo.setOverUnderAmt(Env.ZERO);
+            cashBankTo.setC_DocType_ID(true);
+            cashBankTo.saveEx();
+            cashBankTo.processIt(MPayment.DOCACTION_Complete);
+            cashBankTo.saveEx();
+            m_transferred++;
+        }
 
         // Creates a debit for tranference total amount
         final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
