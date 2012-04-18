@@ -276,7 +276,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 				}
 
 				// TODO - Account Tender type should be parametrized in POS config window
-				if (!"CKXT".contains(key.getID())) {
+				if (!"CDKXT".contains(key.getID())) {
 					tenderTypePick.removeItem(key);
 				}
 			}

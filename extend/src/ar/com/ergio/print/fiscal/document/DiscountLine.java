@@ -24,21 +24,24 @@ import ar.com.ergio.print.fiscal.exception.DocumentException;
 /**
  * Línea de descuento o recargo. El signo del <code>amount</code> de la línea
  * indica si la línea es un descuento (signo negativo) o si la línea es un recargo
- * (signo positivo). 
+ * (signo positivo).
+ *
  * @author Franco Bonafine
  * @date 12/02/2008
+ *
+ * @contributor Emiliano Pereyra - http://www.ergio.com.ar
  */
 public class DiscountLine implements Serializable{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	/** Descripción de la línea de descuento / recargo */
 	private String description;
 	/** Monto del descuento */
 	private BigDecimal amount;
-	/** El monto tiene el IVA incluído o no */ 
+	/** El monto tiene el IVA incluído o no */
 	private boolean amountIncludeIva = true;
 	/** Tasa de impuesto */
 	private BigDecimal taxRate = null;
@@ -55,7 +58,7 @@ public class DiscountLine implements Serializable{
 		this.amount = amount;
 		this.amountIncludeIva = amountIncludeIva;
 	}
-	
+
 	/**
 	 * @param description
 	 * @param amount
@@ -78,7 +81,7 @@ public class DiscountLine implements Serializable{
 	public BigDecimal getAmount() {
 		return amount;
 	}
-	
+
 	/**
 	 * @return Retorna el monto en valor absoluto.
 	 */
