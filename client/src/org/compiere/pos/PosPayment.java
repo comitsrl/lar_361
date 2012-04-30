@@ -72,6 +72,9 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 {
 
 	private static final long serialVersionUID = 1961106531807910948L;
+	/** LAR - MixImmendiate tender type = B */
+    private static final String TENDERTYPE_MixImmediate = "K";
+
 	// TODO - review this formatter (added by red1)
 	//private NumberFormat formatter = new DecimalFormat("#0.00"); //red1 - parser to remove commas or dots separator for above '000s.
 	private Locale locale = Language.getLoginLanguage().getLocale();
@@ -165,6 +168,10 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 				isPaidOnCredit = p_posPanel.m_order.payAccount(amt, item.getKey());
 				//TODO - This method must be removed from others ifs
 				//p_posPanel.f_order.openCashDrawer();
+			}
+			else if (tenderType.equals(MPayment.TENDERTYPE_Account))
+			{
+			    p_posPanel.m_order.payMixImmendiate(amt);
 			}
 			else
 			{
@@ -278,7 +285,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 				}
 
 				// TODO - Account Tender type should be parametrized in POS config window
-				if (!"CDKXT".contains(key.getID())) {
+				if (!"BCDKXT".contains(key.getID())) {
 					tenderTypePick.removeItem(key);
 				}
 			}

@@ -332,8 +332,8 @@ public class PosOrderModel extends MOrder {
 	    return perception.getTaxAmt();
 	}
 
-	public boolean payCash(BigDecimal amt) {
-
+	public boolean payCash(BigDecimal amt)
+	{
 		MPayment payment = createPayment(MPayment.TENDERTYPE_Cash);
 		payment.setC_CashBook_ID(m_pos.getC_CashBook_ID());
 		payment.setAmount(getC_Currency_ID(), amt);
@@ -402,6 +402,17 @@ public class PosOrderModel extends MOrder {
         setPaymentRule(MOrder.PAYMENTRULE_OnCredit);
         return payment.save();
 	}
+
+    public boolean payMixImmendiate(BigDecimal amt)
+    {
+        // TODO - Review payment with this TT and with account TT
+        MPayment payment = createPayment(MPayment.TENDERTYPE_Cash);
+        payment.setC_CashBook_ID(m_pos.getC_CashBook_ID());
+        payment.setAmount(getC_Currency_ID(), amt);
+        payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
+        setPaymentRule(MOrder.PAYMENTRULE_Cash);
+        return payment.save();
+    }
 
 	private MPayment createPayment(String tenderType)
 	{
