@@ -133,8 +133,8 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 			}
 			else if ( tenderType.equals(MPayment.TENDERTYPE_Check) )
 			{
-				p_posPanel.m_order.payCheck(amt,fCheckAccountNo.getText(), fCheckRouteNo.getText(), fCheckNo.getText());
-				p_posPanel.f_order.openCashDrawer();
+				p_posPanel.m_order.payCheck(amt,fCheckAccountNo.getText(), fCheckRouteNo.getText(), fCheckNo.getText(),
+				        fCheckAccountName.getText());
 			}
 			else if ( tenderType.equals(MPayment.TENDERTYPE_CreditCard) )
 			{
@@ -193,6 +193,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 	private boolean paid = false;
 	private BigDecimal balance = Env.ZERO;
 	private PosTextField fCheckAccountNo;
+	private PosTextField fCheckAccountName;
 	private PosTextField fCheckNo;
 	private PosTextField fCheckRouteNo;
 	private PosTextField fCCardNo;
@@ -203,6 +204,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 
 	private CLabel lCheckNo;
 	private CLabel lCheckAccountNo;
+    private CLabel lCheckAccountName;
 	private CLabel lCheckRouteNo;
 	private CLabel lCCardNo;
 	private CLabel lCCardName;
@@ -361,7 +363,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		mainPanel.add(fReturnAmt, "wrap, growx");
 		fReturnAmt.setEditable(false);
 
-		fCheckRouteNo = new PosTextField(Msg.translate(p_ctx, "RoutingNo"), p_posPanel, p_pos.getOSNP_KeyLayout_ID(),  new DecimalFormat("#"));
+		fCheckRouteNo = new PosTextField(Msg.translate(p_ctx, "RoutingNo"), p_posPanel, p_pos.getOSNP_KeyLayout_ID());
 		lCheckRouteNo = new CLabel(Msg.translate(p_ctx, "RoutingNo"));
 		mainPanel.add(lCheckRouteNo, "growx");
 		mainPanel.add(fCheckRouteNo, "wrap, growx");
@@ -381,6 +383,13 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		mainPanel.add(fCheckNo, "wrap, growx");
 		fCheckNo.setFont(font);
 		fCheckNo.setHorizontalAlignment(JTextField.TRAILING);
+
+        fCheckAccountName = new PosTextField(Msg.translate(p_ctx, "A_Name"), p_posPanel, p_pos.getOSNP_KeyLayout_ID());
+        lCheckAccountName = new CLabel(Msg.translate(p_ctx, "A_Name"));
+        mainPanel.add(lCheckAccountName, "growx");
+        mainPanel.add(fCheckAccountName, "wrap, growx");
+        fCheckAccountName.setFont(font);
+        fCheckAccountName.setHorizontalAlignment(JTextField.TRAILING);
 
 		/**
 		 *	Load Credit Cards
