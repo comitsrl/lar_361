@@ -45,6 +45,7 @@ public class PosOrderModel extends MOrder {
 	private static final long serialVersionUID = 5253837037827124425L;
 
 	private MPOS m_pos;
+	private MPayment payment;
 
 	public PosOrderModel(Properties ctx, int C_Order_ID, String trxName, MPOS pos) {
 		super(ctx, C_Order_ID, trxName);
@@ -416,13 +417,18 @@ public class PosOrderModel extends MOrder {
 
 	private MPayment createPayment(String tenderType)
 	{
-		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
+		payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setAD_Org_ID(m_pos.getAD_Org_ID());
 		payment.setTenderType(tenderType);
 		payment.setC_Order_ID(getC_Order_ID());
 		payment.setIsReceipt(true);
 		payment.setC_BPartner_ID(getC_BPartner_ID());
 		return payment;
+	}
+
+	MPayment getPayment()
+	{
+	    return payment;
 	}
 
 	public void reload() {

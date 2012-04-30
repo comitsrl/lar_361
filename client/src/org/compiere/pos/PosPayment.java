@@ -73,7 +73,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 
 	private static final long serialVersionUID = 1961106531807910948L;
 	/** LAR - MixImmendiate tender type = B */
-    private static final String TENDERTYPE_MixImmediate = "K";
+    static final String TENDERTYPE_MixImmediate = "K";
 
 	// TODO - review this formatter (added by red1)
 	//private NumberFormat formatter = new DecimalFormat("#0.00"); //red1 - parser to remove commas or dots separator for above '000s.
