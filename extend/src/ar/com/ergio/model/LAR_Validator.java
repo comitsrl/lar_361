@@ -420,33 +420,36 @@ import ar.com.ergio.util.LAR_Utils;
 
     private String deleteWithholdingOnPayment(final MPayment payment)
     {
-        int c_Payment_ID = payment.get_ID();
-        log.info("Delete withholding for payment " + c_Payment_ID);
-        String sql = "";
-        PreparedStatement pstmt = null;
-        try {
-            sql = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
-            pstmt = DB.prepareStatement(sql, payment.get_TrxName());
-            pstmt.setInt(1, c_Payment_ID);
-            pstmt.executeUpdate();
+        if (!payment.isReceipt()) // Only process AP payments
+        {
+            int c_Payment_ID = payment.get_ID();
+            log.info("Delete withholding for payment " + c_Payment_ID);
+            String sql = "";
+            PreparedStatement pstmt = null;
+            try {
+                sql = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
+                pstmt = DB.prepareStatement(sql, payment.get_TrxName());
+                pstmt.setInt(1, c_Payment_ID);
+                pstmt.executeUpdate();
 
-            sql = "UPDATE C_Payment"
-                + "   SET WriteOffAmt=?"
-                + "     , WithholdingAmt=?"
-                + "     , WithholdingPercent=?"
-                + " WHERE C_Payment_ID=?";
-            pstmt = DB.prepareStatement(sql, payment.get_TrxName());
-            pstmt.setBigDecimal(1, BigDecimal.ZERO);
-            pstmt.setBigDecimal(2, BigDecimal.ZERO);
-            pstmt.setBigDecimal(3, BigDecimal.ZERO);
-            pstmt.setInt(4, payment.get_ID());
-            pstmt.executeUpdate();
-        } catch (Exception e) {
-            log.log(Level.SEVERE, sql, e);
-            return e.getMessage();
-        } finally {
-            DB.close(pstmt);
-            pstmt = null;
+                sql = "UPDATE C_Payment"
+                    + "   SET WriteOffAmt=?"
+                    + "     , WithholdingAmt=?"
+                    + "     , WithholdingPercent=?"
+                    + " WHERE C_Payment_ID=?";
+                pstmt = DB.prepareStatement(sql, payment.get_TrxName());
+                pstmt.setBigDecimal(1, BigDecimal.ZERO);
+                pstmt.setBigDecimal(2, BigDecimal.ZERO);
+                pstmt.setBigDecimal(3, BigDecimal.ZERO);
+                pstmt.setInt(4, payment.get_ID());
+                pstmt.executeUpdate();
+            } catch (Exception e) {
+                log.log(Level.SEVERE, sql, e);
+                return e.getMessage();
+            } finally {
+                DB.close(pstmt);
+                pstmt = null;
+            }
         }
         return null;
     }
@@ -462,7 +465,7 @@ import ar.com.ergio.util.LAR_Utils;
         else if (type == TYPE_AFTER_NEW || (type == TYPE_AFTER_CHANGE && payment.is_ValueChanged("PayAmt")))
         {
             log.info("C_Payment_ID: " + payment.get_ID());
-            if (!Env.isSOTrx(Env.getCtx())) // Only process AP payments
+            if (!payment.isReceipt()) // Only process AP payments
             {
                 final WithholdingConfig wc = new WithholdingConfig(bp, Env.isSOTrx(Env.getCtx()));
                 log.info("Withholding conf >> " + wc);
@@ -540,7 +543,7 @@ import ar.com.ergio.util.LAR_Utils;
         else if (timing == TIMING_AFTER_COMPLETE)
         {
             log.info("C_Payment_ID: " + payment.get_ID());
-            if (!Env.isSOTrx(Env.getCtx())) // Only process AP payments
+            if (!payment.isReceipt()) // Only process AP payments
             {
                 final MBPartner bp = new MBPartner(payment.getCtx(), payment.getC_BPartner_ID(), payment.get_TrxName());
                 final WithholdingConfig wc = new WithholdingConfig(bp, Env.isSOTrx(Env.getCtx()));
@@ -576,7 +579,8 @@ import ar.com.ergio.util.LAR_Utils;
         else if (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT)
         {
             log.info("C_Payment_ID: " + payment.get_ID());
-
+            if(payment.isReceipt())
+                return null;
             MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
             pwh.setIsActive(false);
             if (!pwh.save()) {
