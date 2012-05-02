@@ -72,8 +72,6 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 {
 
 	private static final long serialVersionUID = 1961106531807910948L;
-	/** LAR - MixImmendiate tender type = B */
-    static final String TENDERTYPE_MixImmediate = "B";
 
 	// TODO - review this formatter (added by red1)
 	//private NumberFormat formatter = new DecimalFormat("#0.00"); //red1 - parser to remove commas or dots separator for above '000s.
@@ -119,8 +117,6 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		}
 
 		setTotals();
-
-		super.actionPerformed(e);
 	}
 
 	private void processPayment() {
@@ -128,16 +124,20 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		try {
 
 			String tenderType = ((ValueNamePair) tenderTypePick.getValue()).getID();
-			BigDecimal amt = BigDecimal.valueOf(nf.parse(fPayAmt.getText()).doubleValue());
-
+            String tenderAmt = fTenderAmt.getText().equals("") ? "0" : fTenderAmt.getText();
+			BigDecimal amt = BigDecimal.valueOf(nf.parse(tenderAmt).doubleValue());
+			if (amt.compareTo(BigDecimal.ZERO) <= 0)
+			    return;
 			if ( tenderType.equals(MPayment.TENDERTYPE_Cash) )
 			{
 				p_posPanel.m_order.payCash(amt);
+                tenderTypePick.removeItem(accountKey);
 			}
 			else if ( tenderType.equals(MPayment.TENDERTYPE_Check) )
 			{
 				p_posPanel.m_order.payCheck(amt,fCheckAccountNo.getText(), fCheckRouteNo.getText(), fCheckNo.getText(),
 				        fCheckAccountName.getText());
+                tenderTypePick.removeItem(accountKey);
 			}
 			else if ( tenderType.equals(MPayment.TENDERTYPE_CreditCard) )
 			{
@@ -160,26 +160,17 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 				}
 				p_posPanel.m_order.payCreditCard(amt, fCCardName.getText(),
 						month, year, fCCardNo.getText(), fCCardVC.getText(), type);
-				p_posPanel.f_order.openCashDrawer();
+                tenderTypePick.removeItem(accountKey);
 			}
 			else if ( tenderType.equals(MPayment.TENDERTYPE_Account) )
 			{
-			    KeyNamePair item = (KeyNamePair) fCPaymentTerm.getSelectedItem();
-				isPaidOnCredit = p_posPanel.m_order.payAccount(amt, item.getKey());
-				//TODO - This method must be removed from others ifs
-				//p_posPanel.f_order.openCashDrawer();
-			}
-			else if (tenderType.equals(MPayment.TENDERTYPE_Account))
-			{
-			    p_posPanel.m_order.payMixImmendiate(amt);
+		        p_posPanel.m_order.setPaidFromAccount();
 			}
 			else
 			{
 				ADialog.warn(0, this, "Unsupported payment type");
 			}
-
-			p_posPanel.f_order.openCashDrawer();
-			setTotals();
+			//setTotals();
 		}
 		catch (Exception e )
 		{
@@ -225,7 +216,8 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 	private CButton f_bCancel;
 	private CComboBox fCPaymentTerm = new CComboBox();
 	private CLabel lCPaymentTerm;
-	private boolean isPaidOnCredit = false;
+
+    private ValueNamePair accountKey;
 
 	public PosPayment(PosBasePanel posPanel) {
 		super(Env.getFrame(posPanel),true);
@@ -233,7 +225,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		p_pos = posPanel.p_pos;
 		p_ctx = p_pos.getCtx();
 		p_order = p_posPanel.m_order;
-
+		p_order.clearPayments();
 		if ( p_order == null )
 			dispose();
 
@@ -284,10 +276,14 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 					tenderTypePick.setSelectedItem(key);
 				}
 
-				// TODO - Account Tender type should be parametrized in POS config window
-				if (!"BCDKXT".contains(key.getID())) {
+				if (!"CDKXT".contains(key.getID())) {
 					tenderTypePick.removeItem(key);
 				}
+
+				if ( key.getID().equals("T")) { // Account
+                    accountKey = key;
+                }
+
 			}
 		}
 
@@ -442,7 +438,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		fCCardName.setFont(font);
 		fCCardName.setHorizontalAlignment(JTextField.TRAILING);
 
-		fCCardMonth = new PosTextField(Msg.translate(p_ctx, "Expires"), p_posPanel, p_pos.getOSNP_KeyLayout_ID(), new DecimalFormat("#"));
+		fCCardMonth = new PosTextField(Msg.translate(p_ctx, "Expires"), p_posPanel, p_pos.getOSNP_KeyLayout_ID());
 		lCCardMonth = new CLabel(Msg.translate(p_ctx, "Expires"));
 		fCCardMonth.setName("expiry");
 		mainPanel.add(lCCardMonth, "growx");
@@ -472,27 +468,29 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		pack();
 
 		setTotals();
-	}
+	} // init
 
-	private void setTotals() {
-
+	private void setTotals()
+	{
 		String tenderType = ((ValueNamePair) tenderTypePick.getValue()).getID();
 		boolean cash = MPayment.TENDERTYPE_Cash.equals(tenderType);
 		boolean check = MPayment.TENDERTYPE_Check.equals(tenderType);
 		boolean creditcard = MPayment.TENDERTYPE_CreditCard.equals(tenderType);
 		boolean account = MPayment.TENDERTYPE_Account.equals(tenderType);
 
-		fTenderAmt.setVisible(cash);
+		fTenderAmt.setVisible(cash || check || creditcard);
 		fReturnAmt.setVisible(cash);
-		lTenderAmt.setVisible(cash);
+		lTenderAmt.setVisible(cash || check || creditcard);
 		lReturnAmt.setVisible(cash);
 
 		fCheckAccountNo.setVisible(check);
 		fCheckNo.setVisible(check);
 		fCheckRouteNo.setVisible(check);
+		fCheckAccountName.setVisible(check);
 		lCheckAccountNo.setVisible(check);
 		lCheckNo.setVisible(check);
 		lCheckRouteNo.setVisible(check);
+        lCheckAccountName.setVisible(check);
 
 		fCCardMonth.setVisible(creditcard);
 		fCCardName.setVisible(creditcard);
@@ -515,9 +513,8 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		BigDecimal received = p_order.getPaidAmt();
 		balance  = p_order.getGrandTotal().subtract(received);
 		balance = balance.setScale(MCurrency.getStdPrecision(p_ctx, p_order.getC_Currency_ID()));
-		log.info(String.format("TenderType: %s paymentTerm: %s isPaidOnCredit: %b", tenderType,
-		        fCPaymentTerm.getSelectedItem(), isPaidOnCredit));
-		if (balance.compareTo(Env.ZERO) <= 0 || isPaidOnCredit)
+		log.info(String.format("TenderType=%s Received=%f Balace=%f", tenderType, received.doubleValue(), balance.doubleValue()));
+		if (balance.compareTo(Env.ZERO) <= 0)
 		{
 			paid = true;
 
@@ -529,20 +526,14 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 
 		fBalance.setValue(nf.format(balance));
 		fPayAmt.setValue(balance);
-		if ( !MPayment.TENDERTYPE_Cash.equals(tenderType) )
-		{
-			fPayAmt.requestFocusInWindow();
-			SwingUtilities.invokeLater(new Runnable() {
+        fTenderAmt.setValue(balance);
+		fTenderAmt.requestFocusInWindow();
+		SwingUtilities.invokeLater(new Runnable() {
 
-				public void run() {
-					fPayAmt.selectAll();
-				}
-			});
-		}
-		else
-		{
-			fTenderAmt.requestFocusInWindow();
-		}
+			public void run() {
+				fTenderAmt.selectAll();
+			}
+		});
 
 		pack();
 	}
