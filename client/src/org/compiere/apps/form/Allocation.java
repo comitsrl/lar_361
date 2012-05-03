@@ -121,33 +121,12 @@ public class Allocation
 			+ "c.ISO_Code,p.PayAmt,"                            //  4..5
 			+ "currencyConvert(p.PayAmt,p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"//  6   #1, #2
 			+ "currencyConvert(paymentAvailable(C_Payment_ID),p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"  //  7   #3, #4
-			+ "p.MultiplierAP, "
-		//TODO nuevo by German Wagner
-		//{
-			+ "RLTT.name AS TenderType, "// Medio de Pago
-			+ "p.CheckNo, "// Nº Cheque
-			+ "RLCCT.name AS CreditCardType, "// Tipo Tarjeta
-			+ "p.CreditCardNumber "// Nº Tarjeta
-		//}
+			+ "p.MultiplierAP "
 			+ "FROM C_Payment_v p"		//	Corrected for AP/AR
 			+ " INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID) "
-		//TODO nuevo by German Wagner
-		//{
-			+ "INNER JOIN ad_ref_list RLTT "
-		    + "ON (RLTT.value =  P.tenderType) "
-		    + "INNER JOIN ad_reference REFTT "
-		    + "ON (REFTT.ad_reference_id = RLTT.ad_reference_id "
-		    + "AND REFTT.name='C_Payment Tender Type') "
-		    + "INNER JOIN ad_reference REFCCT "
-		    + "ON (REFCCT.name='C_Payment CreditCard Type') "
-		    + "LEFT JOIN ad_ref_list RLCCT "
-		    + "ON (RLCCT.value = P.CreditCardType "
-		    + "AND RLCCT.ad_reference_id = REFCCT.ad_reference_id) "
-	    //}
 			+ "WHERE p.IsAllocated='N' AND p.Processed='Y'"
 			+ " AND p.C_Charge_ID IS NULL"		//	Prepayments OK
-			+ " AND p.C_BPartner_ID=?"                   		//      #5
-			);
+			+ " AND p.C_BPartner_ID=?");                   		//      #5
 		if (!isMultiCurrency)
 			sql.append(" AND p.C_Currency_ID=?");				//      #6
 		if (m_AD_Org_ID != 0 )
@@ -188,13 +167,6 @@ public class Allocation
 				line.add(available);				//  4/6-ConvOpen/Available
 				line.add(Env.ZERO);					//  5/7-Payment
 //				line.add(rs.getBigDecimal(8));		//  6/8-Multiplier
-			//TODO nuevo by German Wagner
-			//{
-				line.add(rs.getString("TenderType"));					//  6/08-Medio de Pago
-				line.add(rs.getString("CheckNo"));					//  7/09-Nº Cheque
-				line.add(rs.getString("CreditCardType"));					//  8/10-Tipo Tarjeta
-				line.add(rs.getString("CreditCardNumber"));					//  9/11-Nº Tarjeta
-			//}
 				//
 				data.add(line);
 			}
@@ -226,14 +198,6 @@ public class Allocation
 		columnNames.add(Msg.getMsg(Env.getCtx(), "AppliedAmt"));
 //		columnNames.add(" ");	//	Multiplier
 
-	//TODO nuevo by German Wagner
-	//{
-		columnNames.add("Forma de Pago");
-		columnNames.add("Nº Cheque");
-		columnNames.add("Tarjeta");
-		columnNames.add("Nº Tarjeta");
-	//}
-
 		return columnNames;
 	}
 
@@ -253,13 +217,6 @@ public class Allocation
 		paymentTable.setColumnClass(i++, BigDecimal.class, false);      //  7-Allocated
 //		paymentTable.setColumnClass(i++, BigDecimal.class, true);      	//  8-Multiplier
 
-	//TODO nuevo by German Wagner
-	//{
-		paymentTable.setColumnClass(i++, String.class, true);      	//  08-Medio de Pago
-		paymentTable.setColumnClass(i++, String.class, true);      	//  09-Nº Cheque
-		paymentTable.setColumnClass(i++, String.class, true);      	//  10-Tipo Tarjeta
-		paymentTable.setColumnClass(i++, String.class, true);      	//  11-Nº Tarjeta
-	//}
 		//
 		i_payment = isMultiCurrency ? 7 : 5;
 
@@ -647,7 +604,7 @@ public class Allocation
 		if (AD_Org_ID == 0)
 		{
 			//ADialog.error(m_WindowNo, this, "Org0NotAllowed", null);
-			new AdempiereException("@Org0NotAllowed@");
+			throw new AdempiereException("@Org0NotAllowed@");
 		}
 		//
 		log.config("Client=" + AD_Client_ID + ", Org=" + AD_Org_ID
