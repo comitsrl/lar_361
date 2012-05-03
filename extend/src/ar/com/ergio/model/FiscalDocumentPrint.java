@@ -920,6 +920,9 @@ public class FiscalDocumentPrint {
 			       "SUM(Amount + DiscountAmt + WriteoffAmt) AS PaidAmount " +
 			"FROM C_AllocationLine " +
 			"WHERE C_Invoice_ID = ? " +
+		    ///////////////////////////////////////////////////////////////////////////
+			"  AND 1=2" +  // <<<<<<<<<<<<<<<<<< (emmie) AVOID PROCESS THIS QUERY
+		    ///////////////////////////////////////////////////////////////////////////
 			"GROUP BY C_Payment_ID, C_CashLine_ID " + //, C_Invoice_Credit_ID " +
 			"ORDER BY PaidAmount ";
 

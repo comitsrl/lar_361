@@ -14,7 +14,9 @@
 package org.compiere.pos;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import org.compiere.model.MBPartner;
@@ -27,7 +29,6 @@ import org.compiere.model.MPaymentProcessor;
 import org.compiere.model.MProduct;
 import org.compiere.model.MStorage;
 import org.compiere.process.DocAction;
-import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
@@ -45,7 +46,8 @@ public class PosOrderModel extends MOrder {
 	private static final long serialVersionUID = 5253837037827124425L;
 
 	private MPOS m_pos;
-	private MPayment payment;
+	private List<MPayment> payments = new ArrayList<MPayment>();
+	private boolean isPaidFromAccount = false;
 
 	public PosOrderModel(Properties ctx, int C_Order_ID, String trxName, MPOS pos) {
 		super(ctx, C_Order_ID, trxName);
@@ -314,17 +316,13 @@ public class PosOrderModel extends MOrder {
 
 	public BigDecimal getPaidAmt()
 	{
-		String sql = "SELECT sum(PayAmt) FROM C_Payment WHERE C_Order_ID = ? AND DocStatus IN ('CO','CL')";
-		BigDecimal received = DB.getSQLValueBD(get_TrxName(), sql, getC_Order_ID());
-		if ( received == null )
-			received = Env.ZERO;
-
-		sql = "SELECT sum(Amount) FROM C_CashLine WHERE C_Invoice_ID = ? ";
-		BigDecimal cashline = DB.getSQLValueBD(get_TrxName(), sql, getC_Invoice_ID());
-		if ( cashline != null )
-			received = received.add(cashline);
-
-		return received;
+	    if (isPaidFromAccount)
+	        return getGrandTotal();
+	    BigDecimal amt = BigDecimal.ZERO;
+	    for (final MPayment p : payments) {
+	        amt = amt.add(p.getPayAmt());
+	    }
+	    return amt;
 	}
 
 	private BigDecimal getPerceptionAmt()
@@ -346,6 +344,7 @@ public class PosOrderModel extends MOrder {
 		if ( payment.processIt(MPayment.DOCACTION_Complete) )
 		{
 			payment.save();
+			payments.add(payment);
 			return true;
 		}
 		else return false;
@@ -367,6 +366,7 @@ public class PosOrderModel extends MOrder {
 		if ( payment.processIt(MPayment.DOCACTION_Complete) )
 		{
 			payment.saveEx();
+            payments.add(payment);
 			return true;
 		}
 		else return false;
@@ -388,36 +388,15 @@ public class PosOrderModel extends MOrder {
 		if ( payment.processIt(MPayment.DOCACTION_Complete) )
 		{
 			payment.saveEx();
+            payments.add(payment);
 			return true;
 		}
 		else return false;
 	} // payCheck
 
-	public boolean payAccount(final BigDecimal amt, int C_PaymentTerm_ID)
-	{
-        MPayment payment = createPayment(MPayment.TENDERTYPE_Account);
-        payment.setAmount(getC_Currency_ID(), amt);
-        payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
-        payment.setPayAmt(amt);
-        setC_PaymentTerm_ID(C_PaymentTerm_ID);
-        setPaymentRule(MOrder.PAYMENTRULE_OnCredit);
-        return payment.save();
-	}
-
-    public boolean payMixImmendiate(BigDecimal amt)
-    {
-        // TODO - Review payment with this TT and with account TT
-        MPayment payment = createPayment(MPayment.TENDERTYPE_Cash);
-        payment.setC_CashBook_ID(m_pos.getC_CashBook_ID());
-        payment.setAmount(getC_Currency_ID(), amt);
-        payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
-        setPaymentRule(MOrder.PAYMENTRULE_Cash);
-        return payment.save();
-    }
-
 	private MPayment createPayment(String tenderType)
 	{
-		payment = new MPayment(getCtx(), 0, get_TrxName());
+		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setAD_Org_ID(m_pos.getAD_Org_ID());
 		payment.setTenderType(tenderType);
 		payment.setC_Order_ID(getC_Order_ID());
@@ -426,12 +405,23 @@ public class PosOrderModel extends MOrder {
 		return payment;
 	}
 
-	MPayment getPayment()
+	MPayment[] getPayments()
 	{
-	    return payment;
+	    return payments.toArray(new MPayment[payments.size()]);
 	}
 
-	public void reload() {
+    void clearPayments()
+    {
+        payments.clear();
+        isPaidFromAccount = false;
+    }
+
+	void setPaidFromAccount()
+	{
+	    isPaidFromAccount = true;
+	}
+
+    public void reload() {
 		load( get_TrxName());
 		getLines(true, "");
 	}
