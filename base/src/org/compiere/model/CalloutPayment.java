@@ -55,6 +55,15 @@ public class CalloutPayment extends CalloutEngine
 	public String invoice(Properties ctx, int WindowNo, GridTab mTab,
 		GridField mField, Object value)
 	{
+//      german custom
+//      {
+        Object o = mTab.getValue("LAR_PaymentSource_ID");
+        boolean ofpi = false;
+        if ((o != null) && (new Integer(o.toString()) > 0))
+            ofpi = true;
+        BigDecimal payAmt =(BigDecimal)mTab.getValue("PayAmt");
+        GridField oup = mTab.getField("IsOverUnderPayment");
+//      } end german custom
 		Integer C_Invoice_ID = (Integer)value;
 		if (isCalloutActive () // assuming it is resetting value
 			|| C_Invoice_ID == null || C_Invoice_ID.intValue () == 0)
@@ -94,9 +103,11 @@ public class CalloutPayment extends CalloutEngine
 			rs = pstmt.executeQuery ();
 			if (rs.next ())
 			{
-				mTab.setValue ("C_BPartner_ID", new Integer (rs.getInt (1)));
+			    if(!ofpi)//German custom
+			        mTab.setValue ("C_BPartner_ID", new Integer (rs.getInt (1)));
 				int C_Currency_ID = rs.getInt (2); // Set Invoice Currency
-				mTab.setValue ("C_Currency_ID", new Integer (C_Currency_ID));
+				if(!ofpi)//German custom
+				    mTab.setValue ("C_Currency_ID", new Integer (C_Currency_ID));
 				//
 				BigDecimal InvoiceOpen = rs.getBigDecimal (3); // Set Invoice
 				// OPen Amount
@@ -106,7 +117,15 @@ public class CalloutPayment extends CalloutEngine
 				// Amt
 				if (DiscountAmt == null)
 					DiscountAmt = Env.ZERO;
-				mTab.setValue ("PayAmt", InvoiceOpen.subtract (DiscountAmt));
+				if(!ofpi)//German custom
+				    mTab.setValue ("PayAmt", InvoiceOpen.subtract (DiscountAmt));
+
+                if(InvoiceOpen.subtract(DiscountAmt).compareTo(payAmt)!=0)          //German custom
+                {                                                                   //German custom
+                    mTab.setValue ("IsOverUnderPayment" , Boolean.TRUE);            //German custom
+                    amounts(ctx, WindowNo, mTab, oup, Boolean.TRUE, oup.getValue());//German custom
+                }                                                                   //German custom
+
 				mTab.setValue ("DiscountAmt", DiscountAmt);
 				// reset as dependent fields get reset
 				Env.setContext (ctx, WindowNo, "C_Invoice_ID", C_Invoice_ID
@@ -140,6 +159,16 @@ public class CalloutPayment extends CalloutEngine
 	public String order(Properties ctx, int WindowNo, GridTab mTab,
 		GridField mField, Object value)
 	{
+//      German custom
+//      {
+        Object o = mTab.getValue("LAR_PaymentSource_ID");
+        boolean ofpi = false;
+        if ((o != null) && (new Integer(o.toString()) > 0))
+            ofpi = true;
+        BigDecimal payAmt =(BigDecimal)mTab.getValue("PayAmt");
+
+        GridField oup = mTab.getField("IsOverUnderPayment");
+//      }
 		Integer C_Order_ID = (Integer)value;
 		if (isCalloutActive () // assuming it is resetting value
 			|| C_Order_ID == null || C_Order_ID.intValue () == 0)
@@ -170,15 +199,24 @@ public class CalloutPayment extends CalloutEngine
 			rs = pstmt.executeQuery ();
 			if (rs.next ())
 			{
-				mTab.setValue ("C_BPartner_ID", new Integer (rs.getInt (1)));
+			    if(!ofpi)//German custom
+			        mTab.setValue ("C_BPartner_ID", new Integer (rs.getInt (1)));
 				int C_Currency_ID = rs.getInt (2); // Set Order Currency
-				mTab.setValue ("C_Currency_ID", new Integer (C_Currency_ID));
+				if(!ofpi)//German custom
+				    mTab.setValue ("C_Currency_ID", new Integer (C_Currency_ID));
 				//
 				BigDecimal GrandTotal = rs.getBigDecimal (3); // Set Pay
 				// Amount
 				if (GrandTotal == null)
 					GrandTotal = Env.ZERO;
-				mTab.setValue ("PayAmt", GrandTotal);
+				if(!ofpi)//German custom
+				    mTab.setValue ("PayAmt", GrandTotal);
+
+				if(GrandTotal.compareTo(payAmt)!=0)     //German custom
+                {                                                                   //German custom
+                    mTab.setValue ("IsOverUnderPayment" , Boolean.TRUE);            //German custom
+                    amounts(ctx, WindowNo, mTab, oup, Boolean.TRUE, oup.getValue());//German custom
+                }                                                                   //German custom
 			}
 		}
 		catch (SQLException e)
@@ -297,7 +335,16 @@ public class CalloutPayment extends CalloutEngine
 	{
 		if (isCalloutActive ()) // assuming it is resetting value
 			return "";
-		int C_Invoice_ID = Env.getContextAsInt (ctx, WindowNo, "C_Invoice_ID");
+
+//      german custom
+//      {
+        Object o = mTab.getValue("LAR_PaymentSource_ID");
+        boolean ofpi = false;
+        if ((o != null) && (new Integer(o.toString()) > 0))
+            ofpi = true;
+//      } end german custom
+
+        int C_Invoice_ID = Env.getContextAsInt (ctx, WindowNo, "C_Invoice_ID");
 		// New Payment
 		if (Env.getContextAsInt (ctx, WindowNo, "C_Payment_ID") == 0
 			&& Env.getContextAsInt (ctx, WindowNo, "C_BPartner_ID") == 0
@@ -475,9 +522,30 @@ public class CalloutPayment extends CalloutEngine
 			// PayAmt
 			// End By Goodwill
 			{
-				PayAmt = InvoiceOpenAmt.subtract (DiscountAmt).subtract (
-					WriteOffAmt).subtract (OverUnderAmt);
-				mTab.setValue ("PayAmt", PayAmt);
+	            if(!ofpi)   //german custom
+	            {           //german custom
+	                PayAmt = InvoiceOpenAmt.subtract (DiscountAmt).subtract (
+	                    WriteOffAmt).subtract (OverUnderAmt);
+	                mTab.setValue ("PayAmt", PayAmt);
+	            }           //german custom
+	            //german custom
+	            //{
+	            else
+	            {
+	                boolean overUnderPaymentActive = "Y".equals (Env.getContext (ctx,WindowNo, "IsOverUnderPayment"));
+	                if (overUnderPaymentActive)
+	                {
+	                    OverUnderAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (DiscountAmt).subtract(WriteOffAmt);
+	                    mTab.setValue ("OverUnderAmt", OverUnderAmt);
+	                }
+	                else
+	                {
+	                    WriteOffAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (DiscountAmt);
+	                    mTab.setValue ("WriteOffAmt", WriteOffAmt);
+	                    mTab.setValue ("OverUnderAmt", Env.ZERO);
+	                }
+	            }
+	            //} end german custom
 			}
 		}
 		return "";
