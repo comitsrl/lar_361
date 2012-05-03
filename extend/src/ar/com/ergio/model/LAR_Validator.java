@@ -180,6 +180,50 @@ import ar.com.ergio.util.LAR_Utils;
                 return msg;
             }
         }
+        //german wagner custom
+    	//{
+    		if
+    			(po.get_TableName().equals(MPayment.Table_Name) &&
+    					(	type == ModelValidator.TYPE_BEFORE_NEW || type == ModelValidator.TYPE_BEFORE_CHANGE))
+    		{
+    			MPayment pay = (MPayment) po;
+    			Integer source = (Integer) pay.get_Value("LAR_PaymentSource_ID");
+
+    			if((source==null)||(source <=0))
+    				return null;
+
+    			msg=setReconcilied(source, "Y", pay.get_TrxName());
+    			if(msg!=null)
+    				return msg;
+    			// Marcos Zúñiga -Excludes payment source from drawer
+    			msg=setIsOnDrawer(source, "N", pay.get_TrxName());
+    			if(msg!=null)
+    				return msg;
+
+    			msg=setReconcilied(pay.getC_Payment_ID(),"Y", pay.get_TrxName());
+    			if(msg!=null)
+    				return msg;
+
+    		}
+
+    		if
+    		(po.get_TableName().equals(MPayment.Table_Name) && (type == ModelValidator.TYPE_BEFORE_DELETE ))
+    		{
+    			MPayment pay = (MPayment) po;
+    			Integer source = (Integer) pay.get_Value("LAR_PaymentSource_ID");
+
+    			if((source==null)||(source <=0))
+    				return null;
+
+    			msg=setReconcilied(source, "N", pay.get_TrxName());
+    			if(msg!=null)
+    				return msg;
+    			// Marcos Zúñiga
+    			msg=setIsOnDrawer(source, "Y", pay.get_TrxName());
+    			if(msg!=null)
+    				return msg;
+    		}
+    	//}
         return null;
      }
 
@@ -713,4 +757,41 @@ import ar.com.ergio.util.LAR_Utils;
          }
      } // WithholndigConfig
 
+	 	/**
+	 	 * german wagner
+	 	 * @param payID
+	 	 * @param value valor en que se seteara el campo isreconcilied
+	 	 * @param trxName
+	 	 * @return
+	 	 */
+	 	private String setReconcilied(Integer payID, String value, String trxName)
+	 	{
+	 		String sql="UPDATE C_Payment SET isReconciled='"+value+"' WHERE C_Payment_ID="+payID;
+
+	 		int result = DB.executeUpdate(sql, trxName);
+	 		if(result<0)
+	 			return "ERROR al setear los pagos como reconciliados";
+
+	 		return null;
+	 	}
+	 	//Marcos Zúñiga -begin
+
+	 	/**
+	 	 * Marcos Zúñiga
+	 	 * @param payID
+	 	 * @param Value to be set on IsOnDrawer
+	 	 * @param trxName
+	 	 * @return
+	 	 */
+	 	private String setIsOnDrawer(Integer payID, String value, String trxName)
+	 	{
+	 		String sql="UPDATE C_Payment SET IsOnDrawer='"+value+"' WHERE C_Payment_ID="+payID;
+
+	 		int result = DB.executeUpdate(sql, trxName);
+	 		if(result<0)
+	 			return "ERROR al excluir los pagos Cartera";
+
+	 		return null;
+	 	}
+	 	//Marcos Zúñiga -end
  }   //  LAR_Validator
