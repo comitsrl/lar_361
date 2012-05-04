@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.model.I_C_OrderLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
@@ -55,6 +56,7 @@ import ar.com.ergio.print.fiscal.FiscalPrinterListener;
 import ar.com.ergio.print.fiscal.document.CreditNote;
 import ar.com.ergio.print.fiscal.document.Customer;
 import ar.com.ergio.print.fiscal.document.DebitNote;
+import ar.com.ergio.print.fiscal.document.DiscountLine;
 import ar.com.ergio.print.fiscal.document.Document;
 import ar.com.ergio.print.fiscal.document.DocumentLine;
 import ar.com.ergio.print.fiscal.document.Invoice;
@@ -816,8 +818,21 @@ public class FiscalDocumentPrint {
 			// que hacer si el producto tiene otro impuesto que no sea IVA.
 			MTax mTax = MTax.get(Env.getCtx(),mLine.getC_Tax_ID());
 			docLine.setIvaRate(mTax.getRate());
-			// Se agrega la línea al documento.
-			document.addLine(docLine);
+			// LAR - Process discount for invoice
+            final I_C_OrderLine ol = mLine.getC_OrderLine();
+            final BigDecimal discountRate = ol.getDiscount();
+            if (discountRate.compareTo(BigDecimal.ZERO) > 0)
+            {
+                final BigDecimal originalAmt = BigDecimal.valueOf(100).multiply(unitPrice).divide(
+                        BigDecimal.valueOf(100).subtract(discountRate), 2, BigDecimal.ROUND_FLOOR);
+                // TODO - Add I18N for discount descrtiption
+                final DiscountLine discountLine = new DiscountLine("Dto aplicado", originalAmt.subtract(unitPrice),
+                        false, discountRate);
+                // Add discount to document line
+                docLine.setDiscount(discountLine);
+            }
+            // Se agrega la línea al documento.
+            document.addLine(docLine);
 		}
 		// TODO - Improve this behavior
 		BigDecimal amt = ((BigDecimal) mInvoice.get_Value("WithHoldingAmt")).negate(); // LAR perception are negative
@@ -905,6 +920,9 @@ public class FiscalDocumentPrint {
 			       "SUM(Amount + DiscountAmt + WriteoffAmt) AS PaidAmount " +
 			"FROM C_AllocationLine " +
 			"WHERE C_Invoice_ID = ? " +
+		    ///////////////////////////////////////////////////////////////////////////
+			"  AND 1=2" +  // <<<<<<<<<<<<<<<<<< (emmie) AVOID PROCESS THIS QUERY
+		    ///////////////////////////////////////////////////////////////////////////
 			"GROUP BY C_Payment_ID, C_CashLine_ID " + //, C_Invoice_Credit_ID " +
 			"ORDER BY PaidAmount ";
 

@@ -14,7 +14,9 @@
 package org.compiere.pos;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import org.compiere.model.MBPartner;
@@ -25,14 +27,15 @@ import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentProcessor;
 import org.compiere.model.MProduct;
+import org.compiere.model.MProductPricing;
 import org.compiere.model.MStorage;
 import org.compiere.process.DocAction;
-import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
 
 import ar.com.ergio.model.MLAROrderPerception;
+import ar.com.ergio.model.MLARPaymentHeader;
 
 /**
  * Wrapper for standard order
@@ -45,6 +48,9 @@ public class PosOrderModel extends MOrder {
 	private static final long serialVersionUID = 5253837037827124425L;
 
 	private MPOS m_pos;
+	private List<MPayment> payments = new ArrayList<MPayment>();
+	private MLARPaymentHeader paymentHeader;
+	private boolean isPaidFromAccount = false;
 
 	public PosOrderModel(Properties ctx, int C_Order_ID, String trxName, MPOS pos) {
 		super(ctx, C_Order_ID, trxName);
@@ -123,14 +129,20 @@ public class PosOrderModel extends MOrder {
 	public MOrderLine createLine(MProduct product, BigDecimal qtyOrdered,
 			BigDecimal priceActual, int WindowNo) {
 
-	    String stockMsg = checkStockAvailable(product, qtyOrdered.intValue(), WindowNo);
-	    if (stockMsg != null) {
-	        throw new AdempierePOSException(stockMsg);
-	    }
-
 		if (!(getDocStatus().equals("DR") || getDocStatus().equals("IP"))) {
 		    return null;
 		}
+
+		String stockMsg = checkStockAvailable(product, qtyOrdered, WindowNo);
+		if (stockMsg != null) {
+		    throw new AdempierePOSException(stockMsg);
+		}
+
+        String creditMsg = checkCreditAvailable(product, Env.ONE);
+        if (creditMsg != null) {
+            throw new AdempierePOSException(creditMsg);
+        }
+
 		//add new line or increase qty
 
 		// catch Exceptions at order.getLines()
@@ -313,17 +325,13 @@ public class PosOrderModel extends MOrder {
 
 	public BigDecimal getPaidAmt()
 	{
-		String sql = "SELECT sum(PayAmt) FROM C_Payment WHERE C_Order_ID = ? AND DocStatus IN ('CO','CL')";
-		BigDecimal received = DB.getSQLValueBD(get_TrxName(), sql, getC_Order_ID());
-		if ( received == null )
-			received = Env.ZERO;
-
-		sql = "SELECT sum(Amount) FROM C_CashLine WHERE C_Invoice_ID = ? ";
-		BigDecimal cashline = DB.getSQLValueBD(get_TrxName(), sql, getC_Invoice_ID());
-		if ( cashline != null )
-			received = received.add(cashline);
-
-		return received;
+	    if (isPaidFromAccount)
+	        return getGrandTotal();
+	    BigDecimal amt = BigDecimal.ZERO;
+	    for (final MPayment p : payments) {
+	        amt = amt.add(p.getPayAmt());
+	    }
+	    return amt;
 	}
 
 	private BigDecimal getPerceptionAmt()
@@ -332,28 +340,19 @@ public class PosOrderModel extends MOrder {
 	    return perception.getTaxAmt();
 	}
 
-	public boolean payCash(BigDecimal amt) {
-	    /*
+	public boolean payCash(BigDecimal amt)
+	{
 		MPayment payment = createPayment(MPayment.TENDERTYPE_Cash);
 		payment.setC_CashBook_ID(m_pos.getC_CashBook_ID());
 		payment.setAmount(getC_Currency_ID(), amt);
 		payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
 		setPaymentRule(MOrder.PAYMENTRULE_Cash);
-		payment.save();
-		payment.setDocAction(MPayment.DOCACTION_Complete);
-		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
-		if ( payment.processIt(MPayment.DOCACTION_Complete) )
-		{
-			payment.save();
-			return true;
-		}
-		else return false;
-		*/
-	    setPaymentRule(PAYMENTRULE_Cash);
-	    return true;
+        payment.saveEx();
+        payments.add(payment);
+        return true;
 	} // payCash
 
-	public boolean payCheck(BigDecimal amt, String accountNo, String routingNo, String checkNo)
+	public boolean payCheck(BigDecimal amt, String accountNo, String routingNo, String checkNo, String accountName)
 	{
 		MPayment payment = createPayment(MPayment.TENDERTYPE_Check);
 		payment.setAmount(getC_Currency_ID(), amt);
@@ -361,16 +360,12 @@ public class PosOrderModel extends MOrder {
 		payment.setAccountNo(accountNo);
 		payment.setRoutingNo(routingNo);
 		payment.setCheckNo(checkNo);
+		payment.setA_Name(accountName);
 		setPaymentRule(MOrder.PAYMENTRULE_Check);
-		payment.saveEx();
-		payment.setDocAction(MPayment.DOCACTION_Complete);
-		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
-		if ( payment.processIt(MPayment.DOCACTION_Complete) )
-		{
-			payment.saveEx();
-			return true;
-		}
-		else return false;
+        set_ValueOfColumn("IsOnDrawer", true);
+        payment.saveEx();
+        payments.add(payment);
+        return true;
 	} // payCheck
 
 	public boolean payCreditCard(BigDecimal amt, String accountName, int month, int year,
@@ -384,39 +379,58 @@ public class PosOrderModel extends MOrder {
 				cardNo, cvc, month, year);
 		setPaymentRule(MOrder.PAYMENTRULE_CreditCard);
 		payment.saveEx();
-		payment.setDocAction(MPayment.DOCACTION_Complete);
-		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
-		if ( payment.processIt(MPayment.DOCACTION_Complete) )
-		{
-			payment.saveEx();
-			return true;
-		}
-		else return false;
+        payments.add(payment);
+		return true;
 	} // payCheck
-
-	public boolean payAccount(final BigDecimal amt, int C_PaymentTerm_ID)
-	{
-        MPayment payment = createPayment(MPayment.TENDERTYPE_Account);
-        payment.setAmount(getC_Currency_ID(), amt);
-        payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
-        payment.setPayAmt(amt);
-        setC_PaymentTerm_ID(C_PaymentTerm_ID);
-        setPaymentRule(MOrder.PAYMENTRULE_OnCredit);
-        return payment.save();
-	}
 
 	private MPayment createPayment(String tenderType)
 	{
+        if (paymentHeader == null)
+        {
+            paymentHeader = new MLARPaymentHeader(getCtx(), 0, get_TrxName());
+            paymentHeader.setAD_Org_ID(m_pos.getAD_Org_ID());
+            paymentHeader.setC_DocType_ID(m_pos.getC_DocType_ID());
+            paymentHeader.setC_BPartner_ID(getC_BPartner_ID());
+            paymentHeader.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
+            paymentHeader.setDocStatus(DocAction.STATUS_Drafted);
+            paymentHeader.setIsReceipt(true);
+            paymentHeader.saveEx();
+        }
 		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setAD_Org_ID(m_pos.getAD_Org_ID());
 		payment.setTenderType(tenderType);
 		payment.setC_Order_ID(getC_Order_ID());
-		payment.setIsReceipt(true);
-		payment.setC_BPartner_ID(getC_BPartner_ID());
+		//payment.setIsReceipt(true);
+		//payment.setC_BPartner_ID(getC_BPartner_ID());
+		payment.set_ValueOfColumn("LAR_PaymentHeader_ID", paymentHeader.getLAR_PaymentHeader_ID());
 		return payment;
 	}
 
-	public void reload() {
+	MPayment[] getPayments()
+	{
+	    return payments.toArray(new MPayment[payments.size()]);
+	}
+
+    boolean processPayments()
+    {
+        // FIXME - Improve MLARPaymentHeader processes and convetions!!
+        if (isPaidFromAccount)
+            return true;
+        return paymentHeader.processIt(DocAction.ACTION_Complete);
+    }
+
+    void clearPayments()
+    {
+        payments.clear();
+        isPaidFromAccount = false;
+    }
+
+	void setPaidFromAccount()
+	{
+	    isPaidFromAccount = true;
+	}
+
+    public void reload() {
 		load( get_TrxName());
 		getLines(true, "");
 	}
@@ -512,7 +526,7 @@ public class PosOrderModel extends MOrder {
 	 * @param count
 	 * @return null or error stock message
 	 */
-    String checkStockAvailable(final MProduct product, int count, int windowNo)
+    String checkStockAvailable(final MProduct product, final BigDecimal count, int windowNo)
     {
         boolean isSaleWithoutStock = m_pos.get_ValueAsBoolean("IsSaleWithoutStock");
         if (product.isStocked() && !isSaleWithoutStock) {
@@ -520,7 +534,7 @@ public class PosOrderModel extends MOrder {
             int m_Locator_ID = Env.getContextAsInt(m_pos.getCtx(), windowNo, "M_Locator_ID");
             int m_AttributeSetInstance_ID = Env.getContextAsInt(m_pos.getCtx(), windowNo, "M_AttributeSetInstance_ID");
             String msg = String.format("Product=%s AttrSetInstance=%d Count=%d WindowNo=%d",
-                    product, m_AttributeSetInstance_ID, count, windowNo);
+                    product, m_AttributeSetInstance_ID, count.intValue(), windowNo);
             log.info(msg);
 
             BigDecimal available = MStorage.getQtyAvailable(m_pos.getM_Warehouse_ID(), m_Locator_ID, product.get_ID(),
@@ -531,11 +545,48 @@ public class PosOrderModel extends MOrder {
             if (available.signum() == 0) {
                return Msg.translate(p_ctx, "NoQtyAvailable") + " 0";
             }
-            else if (available.compareTo(BigDecimal.valueOf(count)) < 0) {
+            else if (available.compareTo(count) < 0) {
                 return Msg.translate(p_ctx, "InsufficientQtyAvailable") + " " +available.toString();
             }
         }
         return null;
     } // checkStockAvailable
+
+    /**
+     * Performs credit check from BPartner
+     */
+    String checkCreditAvailable(final MProduct product, final BigDecimal qty)
+    {
+        final MBPartner bp = new MBPartner(m_pos.getCtx(), getC_BPartner_ID(), get_TrxName());
+        BigDecimal productPrice = getProductPricing(product.getM_Product_ID()).getPriceStd().multiply(qty);
+        BigDecimal creditUsed = bp.getSO_CreditUsed().add(productPrice);
+        BigDecimal creditAvailable = bp.getSO_CreditLimit().subtract(creditUsed);
+        boolean allowCreditExceeded = m_pos.get_ValueAsBoolean("IsAllowCreditExceeded");
+
+        String msg = String.format("C_BPartner_ID=%d CreditUsed=%.2f ProductPrice=%.2f CreditAvailable=%.2f AllowCreditExceeded=%b",
+                bp.getC_BPartner_ID(), bp.getSO_CreditUsed(), productPrice, creditAvailable, allowCreditExceeded);
+        log.info(msg);
+
+        if (allowCreditExceeded)
+            return null;
+
+        if (creditAvailable.compareTo(BigDecimal.ZERO) < 0)
+            return Msg.translate(p_ctx, "CreditLimitOver") + String.format("\n Diferencia: %.2f", creditAvailable);
+
+        return null;
+    }
+
+    /**
+     *  Get and calculate Product Pricing
+     */
+    private MProductPricing getProductPricing (int M_Product_ID)
+    {
+        final MProductPricing m_productPrice = new MProductPricing (M_Product_ID, getC_BPartner_ID(), Env.ONE, true);
+        m_productPrice.setM_PriceList_ID(m_pos.getM_PriceList_ID());
+        m_productPrice.setPriceDate(getDateOrdered());
+        //
+        m_productPrice.calculatePrice();
+        return m_productPrice;
+    }   //  getProductPrice
 
 } // PosOrderModel.class

@@ -290,7 +290,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		FiscalPacket cmd = createFiscalPacket(CMD_LAST_ITEM_DISCOUNT);
 		int i = 1;
 		cmd.setText(i++, description, 50, false);
-		cmd.setAmount(i++, amount, false);
+		cmd.setPerceptionAmount(i++, amount, false);
 		cmd.setBoolean(i++, substract, "m", "M", false);
 		cmd.setNumber(i++, display, true);
 		cmd.setBoolean(i++, baseAmount, "x", "T", false);

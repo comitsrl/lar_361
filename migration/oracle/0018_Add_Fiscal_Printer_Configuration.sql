@@ -2379,3 +2379,13 @@ UPDATE AD_Table SET AD_Window_ID=3000000,Updated=TO_DATE('2012-03-14 18:51:46','
 -- Add Fiscal printer configuration
 UPDATE AD_Table SET AD_Window_ID=3000001,Updated=TO_DATE('2012-03-14 18:51:54','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Table_ID=3000000
 ;
+
+-- 28/04/2012 15:57:33 GMT-03:00
+-- Add Fiscal printer configuration
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2012-04-28 15:57:33','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000026
+;
+
+-- 28/04/2012 15:58:21 GMT-03:00
+-- Add Fiscal printer configuration
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2012-04-28 15:58:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000025
+;

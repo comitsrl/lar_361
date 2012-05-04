@@ -37,10 +37,14 @@ import org.compiere.apps.ADialog;
 import org.compiere.grid.ed.VPAttributeDialog;
 import org.compiere.minigrid.ColumnInfo;
 import org.compiere.minigrid.IDColumn;
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MAllocationLine;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MPayment;
 import org.compiere.model.MProduct;
 import org.compiere.model.MWarehousePrice;
 import org.compiere.model.PO;
+import org.compiere.process.DocAction;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CScrollPane;
@@ -246,7 +250,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			{
 				MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
 				BigDecimal newQty = line.getQtyOrdered().add(Env.ONE);
-				if (line != null && hasStock(line.getProduct(), newQty))
+				if (line != null && hasStock(line.getProduct(), newQty) && hasCredit(line.getProduct(), newQty))
 				{
 					line.setQty(newQty);
 					line.saveEx();
@@ -387,7 +391,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		//Check if order is completed, if so, print and open drawer, create an empty order and set cashGiven to zero
 		if( p_posPanel.m_order != null ) //red1 wrong action flow below
         {
-		    // Create a transaction thread
+            // Create a transaction thread
             final TrxRunnable trxRunnable = new TrxRunnable()
             {
                 @Override
@@ -400,10 +404,37 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                         String msg = Msg.translate(p_ctx, "PosPaymentCancel");
                         throw new AdempierePOSException(msg);
                     }
+
+                    if (!p_posPanel.m_order.processPayments()) {
+                        String msg = Msg.translate(p_ctx, "FailProcessPaymentHeader");
+                        throw new AdempierePOSException(msg);
+                    }
+
                     if (!p_posPanel.m_order.isProcessed() && !p_posPanel.m_order.processOrder()) {
                         String msg = Msg.translate(p_ctx, p_posPanel.m_order.getProcessMsg());
                         throw new AdempierePOSException(msg);
                     }
+
+                    // Creates payment allocation for earch payment of order
+                    final String desc = Msg.translate(Env.getCtx(), "C_Order_ID") + ": " + p_posPanel.m_order.getDocumentNo();
+                    final MAllocationHdr alloc = new MAllocationHdr(p_ctx, false, p_posPanel.getToday(),
+                            p_posPanel.m_order.getC_Currency_ID(), desc, trxName);
+                    alloc.setAD_Org_ID(Env.getAD_Org_ID(Env.getCtx()));
+                    alloc.setDateAcct(p_posPanel.getToday());
+                    alloc.saveEx();
+
+                    for (final MPayment payment : p_posPanel.m_order.getPayments())
+                    {
+                        final MAllocationLine line = new MAllocationLine(alloc,payment.getPayAmt(),
+                                payment.getDiscountAmt(), payment.getWriteOffAmt(), payment.getOverUnderAmt());
+                        line.setDocInfo(payment.getC_BPartner_ID(), p_posPanel.m_order.getC_Order_ID(),
+                                p_posPanel.m_order.getC_Invoice_ID());
+                        line.setC_Payment_ID(payment.getC_Payment_ID());
+                        line.saveEx(trxName);
+                    }
+                    // Should start WF
+                    alloc.processIt(DocAction.ACTION_Complete);
+                    alloc.saveEx(trxName);
 
                     // set trx name to null again
                     p_posPanel.m_order.set_TrxName(null);
@@ -765,7 +796,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	 */
 	private boolean hasStock(final MProduct product, final BigDecimal newQty)
 	{
-	    String stockMsg = p_posPanel.m_order.checkStockAvailable(product, newQty.intValue(), p_posPanel.getWindowNo());
+	    String stockMsg = p_posPanel.m_order.checkStockAvailable(product, newQty, p_posPanel.getWindowNo());
         if (stockMsg != null) {
             ADialog.error(0, this, stockMsg);
             return false;
@@ -773,7 +804,22 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
         return true;
 	} // hasStock
 
-	/**
+    /**
+     * Check credit available
+     *
+     * @author Emiliano Pereyra
+     */
+    private boolean hasCredit(final MProduct product, final BigDecimal qty)
+    {
+        String creditMsg = p_posPanel.m_order.checkCreditAvailable(product, qty);
+        if (creditMsg != null) {
+            ADialog.error(0, this, creditMsg);
+            return false;
+        }
+        return true;
+    } // hasCredit
+
+    /**
 	 * Shows the product attribute instance dialog in order to set the attributes
 	 * defined for each product (if product has any)
 	 *

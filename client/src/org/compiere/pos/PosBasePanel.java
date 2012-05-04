@@ -117,7 +117,6 @@ public class PosBasePanel extends CPanel
 	private HashMap<Integer, POSKeyboard> keyboards = new HashMap<Integer, POSKeyboard>();
     /** LAR - fiscal printer control window */
 	protected AInfoFiscalPrinter infoFiscalPrinter;
-    private boolean printed = false;
 
 
 	public String getTrxName(){
@@ -435,7 +434,8 @@ public class PosBasePanel extends CPanel
      *                            LAR Fiscal Printing Implementation
      **********************************************************************************************/
 
-	protected boolean printFiscalTicket() {
+	protected boolean printFiscalTicket()
+	{
         final MInvoice invoice = m_order.getInvoices()[0];
         log.info("Printing ticket for " + invoice);
 
@@ -443,9 +443,10 @@ public class PosBasePanel extends CPanel
             @Override
             public Object construct()
             {
+                boolean success = true;
                 int c_DocType_ID = invoice.getC_DocType_ID();
-                boolean success = LAR_Utils.isFiscalDocType(c_DocType_ID);
-                if (success) {
+                if (LAR_Utils.isFiscalDocType(c_DocType_ID))
+                {
                     try {
                         final MDocType docType = new MDocType(m_ctx, c_DocType_ID, null);
                         int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
@@ -462,27 +463,18 @@ public class PosBasePanel extends CPanel
                         success = false;
                     }
                 }
+                else
+                {
+                    log.info(String.format("Invoice %s is not fiscal document", invoice));
+                }
                 return Boolean.valueOf(success);
             }
             @Override
             public void finished() {
-                log.info("Finish fiscal printing thread");
-                printed = (Boolean) getValue();
-//                boolean fiscalPrintError = errorMsg != null && errorMsg.equals(FISCAL_PRINT_ERROR);
-                if (printed) {
+                boolean result = (Boolean) getValue();
+                log.info("Finish fiscal printing thread. Printed Ok?: " + result);
+                if (result) {
                     newOrder();
-//                } else if (!fiscalPrintError) {
-//                    if(errorDesc == null)
-//                        errorMsg(errorMsg);
-//                    else
-//                        errorMsg(errorMsg, errorDesc);
-//                    //waitingDialog.doNotWait();
-//                    //waitingDialog.setVisible(false);
-//                    //getFrame().setEnabled(true);
-//                }
-//                if (!fiscalPrintError) {
-//                    getFrame().setBusy(false);
-//                    mNormal();
                     m_frame.setBusy(false);
                     m_frame.setCursor(Cursor.getDefaultCursor());
                 }
@@ -499,13 +491,8 @@ public class PosBasePanel extends CPanel
 
         infoFiscalPrinter.setVisible(true); // Thread stops here until fiscal printing finished
 
-        return isPrinted();
-
+        return (Boolean) worker.get();
 	} // printFiscalTicket
-
-	private boolean isPrinted() {
-	    return printed;
-	}
 
     private void createInfoFiscalPrinter()
     {
@@ -544,7 +531,7 @@ public class PosBasePanel extends CPanel
      * Invoca la anulación de los documentos generados debido a un error en la
      * impresión fiscal
      */
-    void voidDocuments() // TODO - Review visibility for this method
+    private void voidDocuments()
     {
         SwingWorker worker = new SwingWorker()
         {
@@ -553,13 +540,16 @@ public class PosBasePanel extends CPanel
             @Override
             public Object construct()
             {
-                // TODO - Assume that a pos order has only one invoice
                 final MInvoice invoice = m_order.getInvoices()[0];
-                boolean success = invoice.voidIt();
-                if (!success) {
+                if (!invoice.processIt(MInvoice.DOCACTION_Void)) {
                     errorMsg = Msg.parseTranslation(Env.getCtx(), "@ErrorVoidingInvoice@");
+                    return Boolean.FALSE;
                 }
-                return Boolean.valueOf(success);
+                if (!invoice.save()) {
+                    errorMsg = Msg.parseTranslation(Env.getCtx(), "@ErrorSavingVoidingInvoice@");
+                    return Boolean.FALSE;
+                }
+                return Boolean.TRUE;
             }
 
             @Override
@@ -582,7 +572,6 @@ public class PosBasePanel extends CPanel
                     newOrder();
                     m_frame.setBusy(false);
                     m_frame.setCursor(Cursor.getDefaultCursor());
-//                    getStatusBar().setStatusLine(MSG_VOID_INVOICE_OK);
                 }
             }
         }; // new SwingWorker
