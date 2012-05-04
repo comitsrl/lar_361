@@ -20,7 +20,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.compiere.apps.ADialog;
 import org.compiere.model.MPayment;
@@ -29,9 +31,11 @@ import org.compiere.util.DB;
 
 /**
  * Payment Header
+ *
  * @author Wagner Germán
+ *
+ * @contributor Marcos Zuñiga - http://www.ergio.com.ar
  */
-
 public class MLARPaymentHeader extends X_LAR_PaymentHeader
 {
 	/**
@@ -67,6 +71,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 
 	protected boolean beforeSave(boolean newRecord)
 	{
+	    // TODO - Think about implement a determination of DocType similar to in MPayment.beforeSave()
 		if(!newRecord)
 		{
 			MPayment[] pays;
@@ -76,19 +81,17 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 			}
 			catch (SQLException e)
 			{
-				e.printStackTrace();
+				s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				return false;
 			}
-			for(int i=0;i<pays.length;i++)
+            for (int i = 0; i < pays.length; i++)
 			{
 				pays[i].setC_DocType_ID(getC_DocType_ID());
 				pays[i].setDocumentNo(getDocumentNo());
 				pays[i].setDateTrx(getDateTrx());
 				pays[i].setDateAcct(getDateTrx());
 				pays[i].setC_BPartner_ID(getC_BPartner_ID());
-//				pays[i].setDocStatus(getDocStatus());
 				pays[i].setIsReceipt(isReceipt());
-//				pays[i].setProcessed(isProcessed());
 				pays[i].setIsActive(isActive());
 				if(!pays[i].save(get_TrxName()))
 				{
@@ -98,7 +101,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 					}
 					catch (SQLException e)
 					{
-						e.printStackTrace();
+					    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 					}
 					return false;
 				}
@@ -116,19 +119,22 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 		{
 			try
 			{
-				MPayment[] pays=getPayments(get_TrxName());
-				for(int i=0;i<pays.length;i++)
+                MPayment[] pays = getPayments(get_TrxName());
+                for (int i = 0; i < pays.length; i++)
+                {
 					if(!pays[i].delete(false, get_TrxName()))
 					{
-						String msg="No se pudo eliminar alguno de los pagos vinculados al documento que se está eliminando. Se cancelará la operación";
+						String msg = "No se pudo eliminar alguno de los pagos vinculados al documento que" +
+								"se está eliminando. Se cancelará la operación";
 						s_log.severe(msg);
 						ADialog.error(0, null, msg);
 						return false;
 					}
+                }
 			}
 			catch (SQLException e)
 			{
-				e.printStackTrace();
+			    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				return false;
 			}
 		}
@@ -143,20 +149,19 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 	 */
 	public MPayment[] getPayments(String trxName) throws SQLException
 	{
-		MPayment[] result= new MPayment[0];
-		ArrayList<MPayment> pays = new ArrayList<MPayment>();
+	    //TODO - Analize genereate a cache for this payments
+		List<MPayment> pays = new ArrayList<MPayment>();
 
-		String sql=""
-			+ " SELECT * FROM C_Payment "
-			+ " WHERE LAR_PaymentHeader_ID = "+getLAR_PaymentHeader_ID();
+        String sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ?";
 
 		PreparedStatement pstmt;
-		pstmt = DB.prepareStatement(sql, null);
+		pstmt = DB.prepareStatement(sql, trxName);
 		ResultSet rs=null;
 
 		try
 		{
-			rs=pstmt.executeQuery();
+		    pstmt.setInt(1, getLAR_PaymentHeader_ID());
+			rs = pstmt.executeQuery();
 			while(rs.next())
 				pays.add(new MPayment(getCtx(),rs,trxName));
 		}
@@ -168,12 +173,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 		finally
 		{
 			DB.close(rs, pstmt);
-			rs=null;pstmt=null;
+			rs = null; pstmt = null;
 		}
 
-		result=pays.toArray(result);
-
-		return result;
+		return pays.toArray(new MPayment[pays.size()]);
 	}
 
 	/**
@@ -183,6 +186,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 	 */
 	public boolean processIt (String processAction)
 	{
+	    s_log.info(toString());
 		MPayment[] pays;
 		try
 		{
@@ -190,11 +194,11 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+		    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			return false;
 		}
 
-		for(int i=0;i<pays.length;i++)
+		for(int i = 0; i < pays.length; i++)
 		{
 			if(!pays[i].processIt(processAction))
 			{
@@ -204,7 +208,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 				}
 				catch (SQLException e)
 				{
-					e.printStackTrace();
+				    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				}
 				return false;
 			}
@@ -216,7 +220,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 				}
 				catch (SQLException e)
 				{
-					e.printStackTrace();
+				    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				}
 				return false;
 			}
@@ -235,7 +239,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 			}
 			catch (SQLException e)
 			{
-				e.printStackTrace();
+			    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			}
 			return false;
 		}
@@ -243,4 +247,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 
 	}	//	process
 
+	@Override
+	public String toString()
+	{
+        StringBuffer sb = new StringBuffer ("MLARPaymentHeader[");
+        sb.append(get_ID()).append("-").append(getDocumentNo())
+            .append(",Receipt=").append(isReceipt())
+            .append(",DocStatus=").append(getDocStatus())
+            .append ("]");
+        return sb.toString ();
+	}
 }	//	MLARPaymentHeader

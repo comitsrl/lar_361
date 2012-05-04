@@ -404,10 +404,17 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                         String msg = Msg.translate(p_ctx, "PosPaymentCancel");
                         throw new AdempierePOSException(msg);
                     }
+
+                    if (!p_posPanel.m_order.processPayments()) {
+                        String msg = Msg.translate(p_ctx, "FailProcessPaymentHeader");
+                        throw new AdempierePOSException(msg);
+                    }
+
                     if (!p_posPanel.m_order.isProcessed() && !p_posPanel.m_order.processOrder()) {
                         String msg = Msg.translate(p_ctx, p_posPanel.m_order.getProcessMsg());
                         throw new AdempierePOSException(msg);
                     }
+
                     // Creates payment allocation for earch payment of order
                     final String desc = Msg.translate(Env.getCtx(), "C_Order_ID") + ": " + p_posPanel.m_order.getDocumentNo();
                     final MAllocationHdr alloc = new MAllocationHdr(p_ctx, false, p_posPanel.getToday(),

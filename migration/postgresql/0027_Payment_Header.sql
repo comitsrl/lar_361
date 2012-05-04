@@ -7,8 +7,10 @@ CREATE TABLE LAR_PaymentHeader
     datetrx                 timestamp NULL,
     c_bpartner_id           numeric(10,0) NULL,
     docstatus               varchar(2) NULL,
+    -- TODO - Remove this fields -------
     processit               char(1) NULL,
     searchpayments          char(1) NULL,
+    --------------------------------------
     ad_org_id               numeric(10,0) NULL,
     ad_client_id            numeric(10,0) NULL,
     updatedby               numeric(10,0) NULL,

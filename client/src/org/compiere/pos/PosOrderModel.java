@@ -34,6 +34,7 @@ import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
 
 import ar.com.ergio.model.MLAROrderPerception;
+import ar.com.ergio.model.MLARPaymentHeader;
 
 /**
  * Wrapper for standard order
@@ -47,6 +48,7 @@ public class PosOrderModel extends MOrder {
 
 	private MPOS m_pos;
 	private List<MPayment> payments = new ArrayList<MPayment>();
+	private MLARPaymentHeader paymentHeader;
 	private boolean isPaidFromAccount = false;
 
 	public PosOrderModel(Properties ctx, int C_Order_ID, String trxName, MPOS pos) {
@@ -338,16 +340,9 @@ public class PosOrderModel extends MOrder {
 		payment.setAmount(getC_Currency_ID(), amt);
 		payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
 		setPaymentRule(MOrder.PAYMENTRULE_Cash);
-		payment.save();
-		payment.setDocAction(MPayment.DOCACTION_Complete);
-		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
-		if ( payment.processIt(MPayment.DOCACTION_Complete) )
-		{
-			payment.save();
-			payments.add(payment);
-			return true;
-		}
-		else return false;
+        payment.saveEx();
+        payments.add(payment);
+        return true;
 	} // payCash
 
 	public boolean payCheck(BigDecimal amt, String accountNo, String routingNo, String checkNo, String accountName)
@@ -360,16 +355,10 @@ public class PosOrderModel extends MOrder {
 		payment.setCheckNo(checkNo);
 		payment.setA_Name(accountName);
 		setPaymentRule(MOrder.PAYMENTRULE_Check);
-		payment.saveEx();
-		payment.setDocAction(MPayment.DOCACTION_Complete);
-		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
-		if ( payment.processIt(MPayment.DOCACTION_Complete) )
-		{
-			payment.saveEx();
-            payments.add(payment);
-			return true;
-		}
-		else return false;
+        set_ValueOfColumn("IsOnDrawer", true);
+        payment.saveEx();
+        payments.add(payment);
+        return true;
 	} // payCheck
 
 	public boolean payCreditCard(BigDecimal amt, String accountName, int month, int year,
@@ -383,25 +372,30 @@ public class PosOrderModel extends MOrder {
 				cardNo, cvc, month, year);
 		setPaymentRule(MOrder.PAYMENTRULE_CreditCard);
 		payment.saveEx();
-		payment.setDocAction(MPayment.DOCACTION_Complete);
-		payment.setDocStatus(MPayment.DOCSTATUS_Drafted);
-		if ( payment.processIt(MPayment.DOCACTION_Complete) )
-		{
-			payment.saveEx();
-            payments.add(payment);
-			return true;
-		}
-		else return false;
+        payments.add(payment);
+		return true;
 	} // payCheck
 
 	private MPayment createPayment(String tenderType)
 	{
+        if (paymentHeader == null)
+        {
+            paymentHeader = new MLARPaymentHeader(getCtx(), 0, get_TrxName());
+            paymentHeader.setAD_Org_ID(m_pos.getAD_Org_ID());
+            paymentHeader.setC_DocType_ID(m_pos.getC_DocType_ID());
+            paymentHeader.setC_BPartner_ID(getC_BPartner_ID());
+            paymentHeader.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
+            paymentHeader.setDocStatus(DocAction.STATUS_Drafted);
+            paymentHeader.setIsReceipt(true);
+            paymentHeader.saveEx();
+        }
 		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setAD_Org_ID(m_pos.getAD_Org_ID());
 		payment.setTenderType(tenderType);
 		payment.setC_Order_ID(getC_Order_ID());
-		payment.setIsReceipt(true);
-		payment.setC_BPartner_ID(getC_BPartner_ID());
+		//payment.setIsReceipt(true);
+		//payment.setC_BPartner_ID(getC_BPartner_ID());
+		payment.set_ValueOfColumn("LAR_PaymentHeader_ID", paymentHeader.getLAR_PaymentHeader_ID());
 		return payment;
 	}
 
@@ -409,6 +403,14 @@ public class PosOrderModel extends MOrder {
 	{
 	    return payments.toArray(new MPayment[payments.size()]);
 	}
+
+    boolean processPayments()
+    {
+        // FIXME - Improve MLARPaymentHeader processes and convetions!!
+        if (isPaidFromAccount)
+            return true;
+        return paymentHeader.processIt(DocAction.ACTION_Complete);
+    }
 
     void clearPayments()
     {
