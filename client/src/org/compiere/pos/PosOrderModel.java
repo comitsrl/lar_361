@@ -27,6 +27,7 @@ import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentProcessor;
 import org.compiere.model.MProduct;
+import org.compiere.model.MProductPricing;
 import org.compiere.model.MStorage;
 import org.compiere.process.DocAction;
 import org.compiere.util.Env;
@@ -128,14 +129,20 @@ public class PosOrderModel extends MOrder {
 	public MOrderLine createLine(MProduct product, BigDecimal qtyOrdered,
 			BigDecimal priceActual, int WindowNo) {
 
-	    String stockMsg = checkStockAvailable(product, qtyOrdered.intValue(), WindowNo);
-	    if (stockMsg != null) {
-	        throw new AdempierePOSException(stockMsg);
-	    }
-
 		if (!(getDocStatus().equals("DR") || getDocStatus().equals("IP"))) {
 		    return null;
 		}
+
+		String stockMsg = checkStockAvailable(product, qtyOrdered, WindowNo);
+		if (stockMsg != null) {
+		    throw new AdempierePOSException(stockMsg);
+		}
+
+        String creditMsg = checkCreditAvailable(product, Env.ONE);
+        if (creditMsg != null) {
+            throw new AdempierePOSException(creditMsg);
+        }
+
 		//add new line or increase qty
 
 		// catch Exceptions at order.getLines()
@@ -519,7 +526,7 @@ public class PosOrderModel extends MOrder {
 	 * @param count
 	 * @return null or error stock message
 	 */
-    String checkStockAvailable(final MProduct product, int count, int windowNo)
+    String checkStockAvailable(final MProduct product, final BigDecimal count, int windowNo)
     {
         boolean isSaleWithoutStock = m_pos.get_ValueAsBoolean("IsSaleWithoutStock");
         if (product.isStocked() && !isSaleWithoutStock) {
@@ -527,7 +534,7 @@ public class PosOrderModel extends MOrder {
             int m_Locator_ID = Env.getContextAsInt(m_pos.getCtx(), windowNo, "M_Locator_ID");
             int m_AttributeSetInstance_ID = Env.getContextAsInt(m_pos.getCtx(), windowNo, "M_AttributeSetInstance_ID");
             String msg = String.format("Product=%s AttrSetInstance=%d Count=%d WindowNo=%d",
-                    product, m_AttributeSetInstance_ID, count, windowNo);
+                    product, m_AttributeSetInstance_ID, count.intValue(), windowNo);
             log.info(msg);
 
             BigDecimal available = MStorage.getQtyAvailable(m_pos.getM_Warehouse_ID(), m_Locator_ID, product.get_ID(),
@@ -538,11 +545,48 @@ public class PosOrderModel extends MOrder {
             if (available.signum() == 0) {
                return Msg.translate(p_ctx, "NoQtyAvailable") + " 0";
             }
-            else if (available.compareTo(BigDecimal.valueOf(count)) < 0) {
+            else if (available.compareTo(count) < 0) {
                 return Msg.translate(p_ctx, "InsufficientQtyAvailable") + " " +available.toString();
             }
         }
         return null;
     } // checkStockAvailable
+
+    /**
+     * Performs credit check from BPartner
+     */
+    String checkCreditAvailable(final MProduct product, final BigDecimal qty)
+    {
+        final MBPartner bp = new MBPartner(m_pos.getCtx(), getC_BPartner_ID(), get_TrxName());
+        BigDecimal productPrice = getProductPricing(product.getM_Product_ID()).getPriceStd().multiply(qty);
+        BigDecimal creditUsed = bp.getSO_CreditUsed().add(productPrice);
+        BigDecimal creditAvailable = bp.getSO_CreditLimit().subtract(creditUsed);
+        boolean allowCreditExceeded = m_pos.get_ValueAsBoolean("IsAllowCreditExceeded");
+
+        String msg = String.format("C_BPartner_ID=%d CreditUsed=%.2f ProductPrice=%.2f CreditAvailable=%.2f AllowCreditExceeded=%b",
+                bp.getC_BPartner_ID(), bp.getSO_CreditUsed(), productPrice, creditAvailable, allowCreditExceeded);
+        log.info(msg);
+
+        if (allowCreditExceeded)
+            return null;
+
+        if (creditAvailable.compareTo(BigDecimal.ZERO) < 0)
+            return Msg.translate(p_ctx, "CreditLimitOver") + String.format("\n Diferencia: %.2f", creditAvailable);
+
+        return null;
+    }
+
+    /**
+     *  Get and calculate Product Pricing
+     */
+    private MProductPricing getProductPricing (int M_Product_ID)
+    {
+        final MProductPricing m_productPrice = new MProductPricing (M_Product_ID, getC_BPartner_ID(), Env.ONE, true);
+        m_productPrice.setM_PriceList_ID(m_pos.getM_PriceList_ID());
+        m_productPrice.setPriceDate(getDateOrdered());
+        //
+        m_productPrice.calculatePrice();
+        return m_productPrice;
+    }   //  getProductPrice
 
 } // PosOrderModel.class

@@ -250,7 +250,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			{
 				MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
 				BigDecimal newQty = line.getQtyOrdered().add(Env.ONE);
-				if (line != null && hasStock(line.getProduct(), newQty))
+				if (line != null && hasStock(line.getProduct(), newQty) && hasCredit(line.getProduct(), newQty))
 				{
 					line.setQty(newQty);
 					line.saveEx();
@@ -796,7 +796,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	 */
 	private boolean hasStock(final MProduct product, final BigDecimal newQty)
 	{
-	    String stockMsg = p_posPanel.m_order.checkStockAvailable(product, newQty.intValue(), p_posPanel.getWindowNo());
+	    String stockMsg = p_posPanel.m_order.checkStockAvailable(product, newQty, p_posPanel.getWindowNo());
         if (stockMsg != null) {
             ADialog.error(0, this, stockMsg);
             return false;
@@ -804,7 +804,22 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
         return true;
 	} // hasStock
 
-	/**
+    /**
+     * Check credit available
+     *
+     * @author Emiliano Pereyra
+     */
+    private boolean hasCredit(final MProduct product, final BigDecimal qty)
+    {
+        String creditMsg = p_posPanel.m_order.checkCreditAvailable(product, qty);
+        if (creditMsg != null) {
+            ADialog.error(0, this, creditMsg);
+            return false;
+        }
+        return true;
+    } // hasCredit
+
+    /**
 	 * Shows the product attribute instance dialog in order to set the attributes
 	 * defined for each product (if product has any)
 	 *
