@@ -54,7 +54,7 @@ public class InvoiceFiscalPrinting extends SvrProcess
     @Override
     protected void prepare()
     {
-        p_C_Invoice_ID = Env.getContextAsInt(getCtx(), m_WindowNo, 0, "C_Invoice_ID");
+        p_C_Invoice_ID = getRecord_ID();
         invoice = new MInvoice(getCtx(), p_C_Invoice_ID, get_TrxName());
     }
 
