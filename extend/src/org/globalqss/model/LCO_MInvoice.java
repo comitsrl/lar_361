@@ -87,7 +87,7 @@ public class LCO_MInvoice extends MInvoice
 			MLocation bpl = MLocation.get(getCtx(), mbpl.getC_Location_ID(), get_TrxName());
 			int bp_city_id = bpl.getC_City_ID();
 			// OrgInfo variables
-			MOrgInfo oi = MOrgInfo.get(getCtx(), getAD_Org_ID(),"");
+			MOrgInfo oi = MOrgInfo.get(getCtx(), getAD_Org_ID(), get_TrxName());
 			Integer org_isic_int = (Integer) oi.get_Value("LCO_ISIC_ID");
 			int org_isic_id = 0;
 			if (org_isic_int != null)
