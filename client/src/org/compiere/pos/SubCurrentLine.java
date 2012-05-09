@@ -441,12 +441,14 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                 }
             };
             // Execute the transaction
+            p_posPanel.startGlassPane("PrintingTicket");
             try {
                 Trx.run(trxRunnable);
             } catch (Exception e) {
                 // set trx name to null again
                 p_posPanel.m_order.set_TrxName(null);
                 ADialog.warn(0, p_posPanel, e.getLocalizedMessage());
+                p_posPanel.stopGlassPane();
                 return;
             }
             // Actions out of transaction
@@ -830,7 +832,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	    MProduct product = line.getProduct();
 	    int m_AttributeSet_ID = product.getM_AttributeSet_ID();
 	    int m_AttributeSetInstance_ID = line.getM_AttributeSetInstance_ID();
-	    String logMsg = String.format("Product/Attr[Inst] - %s/%d[%d]",product, m_AttributeSet_ID
+	    String logMsg = String.format("Product=%s - M_AttributeSet_ID=%d - M_AttributeSetInstance_ID=%d",product, m_AttributeSet_ID
 	            , m_AttributeSetInstance_ID);
 	    log.info(logMsg);
 
