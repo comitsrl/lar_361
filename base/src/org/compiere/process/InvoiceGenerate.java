@@ -64,6 +64,10 @@ public class InvoiceGenerate extends SvrProcess
 	private boolean		p_ConsolidateDocument = true;
 	/** Invoice Document Action	*/
 	private String		p_docAction = DocAction.ACTION_Complete;
+    // @emmie custom
+    /** POS Terminal            */
+    private int         p_C_POS_ID = 0;
+    // @emmie custom
 
 	/**	The current Invoice	*/
 	private MInvoice 	m_invoice = null;
@@ -101,6 +105,10 @@ public class InvoiceGenerate extends SvrProcess
 				p_ConsolidateDocument = "Y".equals(para[i].getParameter());
 			else if (name.equals("DocAction"))
 				p_docAction = (String)para[i].getParameter();
+		    // @emmie custom
+            else if (name.equals("C_POS_ID"))
+                p_C_POS_ID = para[i].getParameterAsInt();
+            // @emmie custom
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -126,6 +134,9 @@ public class InvoiceGenerate extends SvrProcess
 		log.info("Selection=" + p_Selection + ", DateInvoiced=" + p_DateInvoiced
 			+ ", AD_Org_ID=" + p_AD_Org_ID + ", C_BPartner_ID=" + p_C_BPartner_ID
 			+ ", C_Order_ID=" + p_C_Order_ID + ", DocAction=" + p_docAction
+			// @emmie custom
+			+ ", C_POS_ID=" + p_C_POS_ID
+			// @emmie custom
 			+ ", Consolidate=" + p_ConsolidateDocument);
 		//
 		String sql = null;
@@ -257,7 +268,7 @@ public class InvoiceGenerate extends SvrProcess
 						BigDecimal toInvoice = oLine.getQtyOrdered().subtract(oLine.getQtyInvoiced());
 						if (toInvoice.compareTo(Env.ZERO) == 0 && oLine.getM_Product_ID() != 0)
 							continue;
-						BigDecimal notInvoicedShipment = oLine.getQtyDelivered().subtract(oLine.getQtyInvoiced());
+						//BigDecimal notInvoicedShipment = oLine.getQtyDelivered().subtract(oLine.getQtyInvoiced()); @emmie
 						//
 						boolean fullyDelivered = oLine.getQtyOrdered().compareTo(oLine.getQtyDelivered()) == 0;
 
@@ -353,6 +364,9 @@ public class InvoiceGenerate extends SvrProcess
 		if (m_invoice == null)
 		{
 			m_invoice = new MInvoice (order, 0, p_DateInvoiced);
+			// @emmie custom
+			m_invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
+			// @emmie custom
 			if (!m_invoice.save())
 				throw new IllegalStateException("Could not create Invoice (o)");
 		}
@@ -378,6 +392,9 @@ public class InvoiceGenerate extends SvrProcess
 		if (m_invoice == null)
 		{
 			m_invoice = new MInvoice (order, 0, p_DateInvoiced);
+            // @emmie custom
+            m_invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
+            // @emmie custom
 			if (!m_invoice.save())
 				throw new IllegalStateException("Could not create Invoice (s)");
 		}
@@ -448,6 +465,9 @@ public class InvoiceGenerate extends SvrProcess
 	{
 		if (m_invoice != null)
 		{
+		    // @emmie custom
+		    m_invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
+		    // @emmie custom
 			MOrder order = new MOrder(getCtx(), m_invoice.getC_Order_ID(), get_TrxName());
 			if (order != null) {
 				m_invoice.setPaymentRule(order.getPaymentRule());

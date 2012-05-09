@@ -248,7 +248,9 @@ public class InvoiceGen extends GenForm
 	/**************************************************************************
 	 *	Generate Invoices
 	 */
-	public String generate(IStatusBar statusBar, KeyNamePair docTypeKNPair, String docActionSelected)
+	// @emmie custom
+	public String generate(IStatusBar statusBar, KeyNamePair docTypeKNPair, int C_POS_ID, String docActionSelected)
+	// @emmie custom
 	{
 		String info = "";
 		String trxName = Trx.createTrxName("IVG");
@@ -342,6 +344,18 @@ public class InvoiceGen extends GenForm
 			log.log(Level.SEVERE, msg);
 			return info;
 		}
+		// @emmie custom
+        para = new MPInstancePara(instance, 30);
+        para.setParameter("C_POS_ID", C_POS_ID);
+
+        if (!para.save())
+        {
+            String msg = "No C_POS_ID Parameter added";  //  not translated
+            info = msg;
+            log.log(Level.SEVERE, msg);
+            return info;
+        }
+        // @emmie custom
 
 		setTrx(trx);
 		setProcessInfo(pi);

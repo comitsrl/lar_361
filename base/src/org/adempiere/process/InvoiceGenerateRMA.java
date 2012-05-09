@@ -46,6 +46,11 @@ public class InvoiceGenerateRMA extends SvrProcess
     /** Invoice Document Action */
     private String      p_docAction = DocAction.ACTION_Complete;
 
+    // @emmie custom
+    /** POS                     */
+    private int         p_C_POS_ID = 0;
+    // @emmie custom
+
     /** Number of Invoices      */
     private int         m_created = 0;
     /** Invoice Date            */
@@ -67,6 +72,10 @@ public class InvoiceGenerateRMA extends SvrProcess
                 p_Selection = "Y".equals(para[i].getParameter());
             else if (name.equals("DocAction"))
                 p_docAction = (String)para[i].getParameter();
+            // @emmie custom
+            else if (name.equals("C_POS_ID"))
+                p_C_POS_ID = para[i].getParameterAsInt();
+            // @emmie custom
             else
                 log.log(Level.SEVERE, "Unknown Parameter: " + name);
         }
@@ -144,6 +153,10 @@ public class InvoiceGenerateRMA extends SvrProcess
 
         MInvoice invoice = new MInvoice(getCtx(), 0, get_TrxName());
         invoice.setRMA(rma);
+
+        // @emmie custom
+        invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
+        // @emmie custom
 
         invoice.setC_DocTypeTarget_ID(docTypeId);
         if (!invoice.save())

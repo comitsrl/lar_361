@@ -58,6 +58,10 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 	private VComboBox  cmbDocType = new VComboBox();
 	private CLabel     lDocAction = new CLabel();
 	private VLookup    docAction;
+	// @emmie custom
+    private CLabel     lPOS = new CLabel();
+    private VLookup    fPOS;
+    // @emmie custom
 
 	/**
 	 *	Initialize Panel
@@ -118,6 +122,11 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 
 		panel.getParameterPanel().add(lOrg, null);
 		panel.getParameterPanel().add(fOrg, null);
+        // @emmie custom
+        lPOS.setLabelFor(fPOS);
+        panel.getParameterPanel().add(lPOS, null);
+        panel.getParameterPanel().add(fPOS, null);
+        // @emmie custom
 		panel.getParameterPanel().add(lBPartner, null);
 		panel.getParameterPanel().add(fBPartner, null);
 		panel.getParameterPanel().add(lDocType, null);
@@ -156,6 +165,12 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
         cmbDocType.addItem(new KeyNamePair(MOrder.Table_ID, Msg.translate(Env.getCtx(), "Order")));
         cmbDocType.addItem(new KeyNamePair(MRMA.Table_ID, Msg.translate(Env.getCtx(), "CustomerRMA")));
         cmbDocType.addActionListener(this);
+
+        // @emmie custom
+        MLookup posL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 0, 3000068, DisplayType.Table);
+        fPOS = new VLookup ("C_POS_ID", true, false, true, posL);
+        lPOS.setText(Msg.translate(Env.getCtx(), "C_POS_ID"));
+        // @emmie custom
 
         panel.getStatusBar().setStatusLine(Msg.getMsg(Env.getCtx(), "InvGenerateSel"));//@@
 	}	//	fillPicks
@@ -216,6 +231,9 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 	{
 		KeyNamePair docTypeKNPair = (KeyNamePair)cmbDocType.getSelectedItem();
 		String docActionSelected = (String)docAction.getValue();
-		return generate(panel.getStatusBar(), docTypeKNPair, docActionSelected);
+		// @emmie custom
+		int C_POS_ID = (Integer) fPOS.getValue();
+		return generate(panel.getStatusBar(), docTypeKNPair, C_POS_ID, docActionSelected);
+	    // @emmie custom
 	}	//	generateShipments
 }
