@@ -6404,11 +6404,17 @@ UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_TIMESTAMP('2012-05-03 16:
 ;
 
 -- 03/05/2012 18:11:59 ART
--- I forgot to set the DICTIONARY_ID_COMMENTS System Configurator
+--Add On Drawer Checks Window
 UPDATE AD_Tab SET IsInsertRecord='N',Updated=TO_TIMESTAMP('2012-05-03 18:11:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=0 WHERE AD_Tab_ID=3000018
 ;
 
 -- 03/05/2012 18:11:59 ART
--- I forgot to set the DICTIONARY_ID_COMMENTS System Configurator
+--Add On Drawer Checks Window
 UPDATE AD_Tab SET IsInsertRecord='N',Updated=TO_DATE('2012-05-03 18:11:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=0 WHERE AD_Tab_ID=3000018
 ;
+
+-- 11/05/2012 0:08:04 ART
+-- Allow Tender Type Cash on C_Payment
+UPDATE AD_Column SET AD_Val_Rule_ID=NULL,Updated=TO_TIMESTAMP('2012-05-11 00:08:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=0 WHERE AD_Column_ID=5046
+;
+
