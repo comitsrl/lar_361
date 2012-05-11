@@ -6404,3 +6404,7 @@ UPDATE AD_Column SET ReadOnlyLogic=NULL,Updated=TO_DATE('2012-05-03 16:03:18','Y
 UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_DATE('2012-05-03 16:09:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=0 WHERE AD_Column_ID=3000261
 ;
 
+-- 11/05/2012 0:08:04 ART
+-- Allow Tender Type Cash on C_Payment
+UPDATE AD_Column SET AD_Val_Rule_ID=NULL,Updated=TO_DATE('2012-05-11 00:08:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=0 WHERE AD_Column_ID=5046
+;
