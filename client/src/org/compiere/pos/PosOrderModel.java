@@ -556,6 +556,10 @@ public class PosOrderModel extends MOrder {
     String checkCreditAvailable(final MProduct product, final BigDecimal qty)
     {
         final MBPartner bp = new MBPartner(m_pos.getCtx(), getC_BPartner_ID(), get_TrxName());
+        // Limit $0.00 means Unlimited
+        if (bp.getSO_CreditLimit().compareTo(BigDecimal.ZERO) == 0)
+            return null;
+
         BigDecimal productPrice = getProductPricing(product.getM_Product_ID()).getPriceStd().multiply(qty);
         BigDecimal creditUsed = bp.getSO_CreditUsed().add(productPrice);
         BigDecimal creditAvailable = bp.getSO_CreditLimit().subtract(creditUsed);
