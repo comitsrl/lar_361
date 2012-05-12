@@ -413,6 +413,12 @@ public class CalloutPayment extends CalloutEngine
 		BigDecimal DiscountAmt = (BigDecimal)mTab.getValue ("DiscountAmt");
 		BigDecimal WriteOffAmt = (BigDecimal)mTab.getValue ("WriteOffAmt");
 		BigDecimal OverUnderAmt = (BigDecimal)mTab.getValue ("OverUnderAmt");
+        // @marcos custom
+		PayAmt = PayAmt == null ? BigDecimal.ZERO : PayAmt;
+		DiscountAmt = DiscountAmt == null ? BigDecimal.ZERO : DiscountAmt;
+		WriteOffAmt = WriteOffAmt == null ? BigDecimal.ZERO : WriteOffAmt;
+		OverUnderAmt = OverUnderAmt == null ? BigDecimal.ZERO : OverUnderAmt;
+        // @marcos custom
 		log.fine ("Pay=" + PayAmt + ", Discount=" + DiscountAmt + ", WriteOff="
 			+ WriteOffAmt + ", OverUnderAmt=" + OverUnderAmt);
 		// Get Currency Info
