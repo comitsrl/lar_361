@@ -161,6 +161,7 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 p_posPanel.newOrder();
                 log.info("Printing tradicional document for " + invoice);
                 ReportCtl.startDocumentPrint(ReportEngine.INVOICE, invoice.getC_Invoice_ID(), null, Env.getWindowNo(this), false);
+                p_posPanel.stopGlassPane();
             }
 		}
 	}
