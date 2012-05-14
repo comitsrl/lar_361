@@ -633,8 +633,8 @@ public class FiscalDocumentPrint {
 		MInvoice mOriginalInvoice = originalInvoice;
 		// Si la factura parámetro es null y la factura oxp parámetro contiene
 		// una factura original seteada entonces la busco
-		if (mOriginalInvoice == null && mInvoice.getRef_Invoice_ID() != 0) {
-			mOriginalInvoice = new MInvoice(ctx, mInvoice.getRef_Invoice_ID(), getTrxName());
+		if (mOriginalInvoice == null && mInvoice.get_ValueAsInt("Source_Invoice_ID") != 0) {
+			mOriginalInvoice = new MInvoice(ctx, mInvoice.get_ValueAsInt("Source_Invoice_ID"), getTrxName());
 		}
 		// Si existe una factura original entonces obtengo el nro de factura
 		// original
