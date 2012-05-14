@@ -16,31 +16,117 @@
 *****************************************************************************/
 package ar.com.ergio.model;
 
+import java.awt.Cursor;
 import java.util.Properties;
 
+import javax.swing.JFrame;
+
+import org.compiere.apps.ADialog;
+import org.compiere.apps.ProcessCtl;
 import org.compiere.model.CalloutEngine;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.MPInstance;
+import org.compiere.model.MPInstancePara;
+import org.compiere.process.ProcessInfo;
+import org.compiere.util.ASyncProcess;
 import org.compiere.util.AdempiereSystemError;
-/**
-* Callouts for Localization Argentina
-*
-* @author Emiliano Gonzalez - Ergio=energia+evolucion - http://www.ergio.com.ar
-* @version $Id: LAR_Callouts.java,v 1.0 2011/11/04 egonzalez Exp $
-**/
+import org.compiere.util.Env;
+import org.compiere.util.Msg;
 
-public class LAR_Callouts extends CalloutEngine {
+/**
+ * Callouts for Localization Argentina
+ *
+ * @author Emiliano Gonzalez - Ergio=energia+evolucion - http://www.ergio.com.ar
+ * @version $Id: LAR_Callouts.java,v 1.0 2011/11/04 egonzalez Exp $
+ **/
+public class LAR_Callouts extends CalloutEngine
+{
 
     public String normalizeCuit(Properties ctx, int windowNo, GridTab mTab, GridField mField,
-            Object value) throws AdempiereSystemError {
+            Object value) throws AdempiereSystemError
+    {
         String localValue = ((String) mTab.getValue("TaxID")).replaceAll("[^0123456789]", "");
-        mTab.setValue("TaxID",localValue);
-                   return "";
-            }
+        mTab.setValue("TaxID", localValue);
+        return "";
+    }
 
     public String normalizeIibb(Properties ctx, int windowNo, GridTab mTab, GridField mField,
-            Object value) throws AdempiereSystemError {
-                   mTab.setValue("DUNS",((String)mTab.getValue("DUNS")).replaceAll("[^0123456789]", ""));
-                   return "";
-            }
+            Object value) throws AdempiereSystemError
+    {
+        mTab.setValue("DUNS", ((String) mTab.getValue("DUNS")).replaceAll("[^0123456789]", ""));
+        return "";
+    }
+
+    /**
+     * Callout used in Source_Invoice_ID field (C_Invoice table), in order to copy
+     * lines of source invoice
+     */
+    public String copyLines(final Properties ctx, final int windowNo, final GridTab mTab, final GridField mField,
+            Object value) throws AdempiereSystemError
+    {
+        int Source_Invoice_ID = (Integer) mTab.getValue("Source_Invoice_ID");
+        if (Source_Invoice_ID == 0)
+            return "";
+
+        if (!ADialog.ask(windowNo, Env.getWindow(windowNo), "CopyLinesFromInvoice?"))
+            return "";
+
+        // Config CopyFromInvoice process (AD_Process_ID=210)
+        int AD_Process_ID = 210;
+        int C_Invoice_ID = (Integer) mTab.getValue("C_Invoice_ID");
+        MPInstance instance = new MPInstance(Env.getCtx(), AD_Process_ID, 0);
+        if (!instance.save())
+            return Msg.getMsg(Env.getCtx(), "ProcessNoInstance");
+        ProcessInfo pi = new ProcessInfo ("", AD_Process_ID);
+        pi.setRecord_ID(C_Invoice_ID);
+        pi.setAD_PInstance_ID (instance.getAD_PInstance_ID());
+
+        //  Add Parameters
+        MPInstancePara param = new MPInstancePara(instance, 10);
+        param.setParameter("C_Invoice_ID", Source_Invoice_ID);
+        if (!param.save())
+            return Msg.getMsg(Env.getCtx(), "ParameterMissing");
+
+        // TODO - Creates a dummy asyc control process thread (review)
+        final ASyncProcess asyncProcess = new ASyncProcess()
+        {
+            private JFrame component = Env.getWindow(windowNo);
+            /**
+             * {@inheritDoc}
+             */
+            public void lockUI (ProcessInfo pi)
+            {
+                component.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                component.setEnabled(false);
+            }   //  lockUI
+
+            /**
+             * {@inheritDoc}
+             */
+            public void unlockUI (ProcessInfo pi)
+            {
+                component.setEnabled(true);
+                component.setCursor(Cursor.getDefaultCursor());
+            }   //  unlockUI
+
+            /**
+             * {@inheritDoc}
+             */
+            public boolean isUILocked()
+            {
+                return component.isEnabled();
+            }   //  isUILocked
+
+            /**
+             * {@inheritDoc}
+             */
+            public void executeASync (ProcessInfo pi) {}
+        };
+
+        // Execute process
+        ProcessCtl worker = new ProcessCtl(asyncProcess, windowNo, pi, null);
+        worker.run();
+        return "";
+    } // copyLines
 }
