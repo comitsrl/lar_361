@@ -387,7 +387,7 @@ public class PosOrderModel extends MOrder {
 	{
         paymentHeader = new MLARPaymentHeader(getCtx(), 0, get_TrxName());
         paymentHeader.setAD_Org_ID(m_pos.getAD_Org_ID());
-        paymentHeader.setC_DocType_ID(m_pos.getC_DocType_ID());
+        paymentHeader.setC_DocType_ID(m_pos.get_ValueAsInt("C_Payment_DocType_ID"));
         paymentHeader.setC_BPartner_ID(getC_BPartner_ID());
         paymentHeader.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
         paymentHeader.setDocStatus(DocAction.STATUS_Drafted);
