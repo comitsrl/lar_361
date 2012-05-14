@@ -3,6 +3,16 @@ ALTER TABLE C_POS ADD COLUMN C_Payment_DocType_ID Numeric(10,0);
 
 -- 14/05/2012 10:53:06 ART
 -- Add payment doctype to POS
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000087,'C_Payment_DocType_ID','LAR','C_Payment_DocType_ID','C_Payment_DocType_ID',0,TO_TIMESTAMP('2012-04-30 18:23:39','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2012-04-30 18:23:39','YYYY-MM-DD HH24:MI:SS'),'Y',0,0,0)
+;
+
+-- 14/05/2012 10:53:06 ART
+-- Add payment doctype to POS
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,PO_Name,Name,Description,PrintName,PO_PrintName, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.PO_Name,t.Name,t.Description,t.PrintName,t.PO_PrintName, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000087 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 14/05/2012 10:53:06 ART
+-- Add payment doctype to POS
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3000277,748,'LAR',0,'N','N','N','N',10,'N',19,'N',3000087,'N','Y','N','c_payment_doctype_id','c_payment_doctype_id',100,TO_TIMESTAMP('2012-05-14 10:53:05','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2012-05-14 10:53:05','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
