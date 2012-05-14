@@ -1,5 +1,5 @@
 -- Add credit note behavior
-ALTER TABLE C_Invoice ADD COLUMN Source_Invoice_ID Numeric(10,0) NULL;
+ALTER TABLE C_Invoice ADD COLUMN Source_Invoice_ID Number(10,0) NULL;
 ALTER TABLE C_Invoice ADD CONSTRAINT sourceinvoice_cinvoice
     FOREIGN KEY (Source_Invoice_ID) REFERENCES C_Invoice (C_Invoice_ID);
 
