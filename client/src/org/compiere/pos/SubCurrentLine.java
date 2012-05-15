@@ -265,8 +265,11 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 				MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
 				if ( line != null )
 				{
-					line.setQty(line.getQtyOrdered().subtract(Env.ONE));
-					line.saveEx();
+				    if (line.getQtyOrdered().compareTo(BigDecimal.ONE) > 0)
+				    {
+				        line.setQty(line.getQtyOrdered().subtract(Env.ONE));
+				        line.saveEx();
+				    }
 				}
 			}
 
