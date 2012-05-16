@@ -30,7 +30,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.model.I_C_Order;
 import org.compiere.model.I_C_OrderLine;
+import org.compiere.model.I_M_InOutLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
@@ -571,7 +573,8 @@ public class FiscalDocumentPrint {
 		// Se asigna la letra de la factura.
 		invoice.setLetter(LAR_Utils.getLetter(mInvoice));
 
-		// TODO: Se asigna el número de remito en caso de existir.
+		// Se asigna el número de remito en caso de existir.
+		loadShipmentOrderNumbers(mInvoice, invoice); // @emmie
 
 		// Se agregan las líneas de la factura al documento.
 		loadDocumentLines(mInvoice, invoice);
@@ -630,8 +633,8 @@ public class FiscalDocumentPrint {
 		MInvoice mOriginalInvoice = originalInvoice;
 		// Si la factura parámetro es null y la factura oxp parámetro contiene
 		// una factura original seteada entonces la busco
-		if (mOriginalInvoice == null && mInvoice.getRef_Invoice_ID() != 0) {
-			mOriginalInvoice = new MInvoice(ctx, mInvoice.getRef_Invoice_ID(), getTrxName());
+		if (mOriginalInvoice == null && mInvoice.get_ValueAsInt("Source_Invoice_ID") != 0) {
+			mOriginalInvoice = new MInvoice(ctx, mInvoice.get_ValueAsInt("Source_Invoice_ID"), getTrxName());
 		}
 		// Si existe una factura original entonces obtengo el nro de factura
 		// original
@@ -767,6 +770,30 @@ public class FiscalDocumentPrint {
 	}
 
 	/**
+	 * Retrieve shipment and sales order numbers, if they exists.
+	 *
+	 * @param mInvoice ADempiere invoice document
+	 * @param document fiscal printer document
+	 */
+	private void loadShipmentOrderNumbers(final MInvoice mInvoice, final Invoice document)
+	{
+	    final I_C_Order order = mInvoice.getC_Order();
+	    if (order.getC_Order_ID() > 0)
+	        document.addObservation(Msg.translate(ctx, "C_Order_ID") + ": " + order.getDocumentNo());
+	    final MInvoiceLine[] iLines = mInvoice.getLines();
+	    for (final MInvoiceLine line : iLines)
+	    {
+	        final I_M_InOutLine ioline = line.getM_InOutLine();
+	        if (ioline.getM_InOutLine_ID() > 0)
+	        {
+	            String obs = Msg.translate(ctx, "M_InOut_ID") + ": " + ioline.getM_InOut().getDocumentNo();
+	            if (!document.getObservations().contains(obs))
+	                document.addObservation(obs);
+	        }
+	    }
+	}
+
+	/**
 	 * Carga las líneas que se encuentran en el documento de ADempiere hacia
 	 * el documento de impresoras fiscales.
 	 * @param mInvoice Documento de ADempiere.
@@ -779,65 +806,80 @@ public class FiscalDocumentPrint {
 		//int scale = MCurrency.get(oxpDocument.getCtx(), oxpDocument.getC_Currency_ID()).getCostingPrecision();
 
 		MInvoiceLine[] lines = mInvoice.getLines();
-		BigDecimal unitPrice = null;
+		BigDecimal totalLineAmt = BigDecimal.ZERO;
 		//String description = "";
-		for (int i = 0; i < lines.length; i++) {
+		for (int i = 0; i < lines.length; i++)
+		{
 			MInvoiceLine mLine = lines[i];
-			DocumentLine docLine = new DocumentLine();
-			docLine.setLineNumber(mLine.getLine());
-			docLine.setDescription(manageLineDescription(docLine, mLine));
-			// TODO - Review discounts at invoice behavior
-			// Calcula el precio unitario de la línea.
-			// Aquí tenemos dos casos de línea: Con Bonificaciones o Sin Bonificaciones
-			// 1. Sin Bonificaciones
-			// El precio unitario es entonces simplemente el precio actual de la
-			// línea, es decir el PriceActual.
-			//if (!mLine.hasBonus()) {
-			unitPrice = mLine.getPriceActual();
-			//} else {
-			// 2. Con Bonificaciones
-			// Aquí NO se puede utilizar el mLine.getPriceActual() ya que el
-			// mismo tiene contemplado las bonificaciones mientras que en la
-			// impresión del ticket, las bonificaciones se restan al final
-			// del mismo. De esta forma, el precio unitario para el ticket
-			// va a ser mayor que el PriceActual de la línea en caso de que
-			// la misma contenga bonificaciones.
-			// El cálculo a realizar es:
-			//    (PriceList * Qty - LineDiscountAmt) / Qty
-			//
-			//	unitPrice = (mLine.getPriceList().multiply(mLine.getQtyEntered())
-			//		.subtract(mLine.getLineDiscountAmt())).divide(
-			//		mLine.getQtyEntered(), scale, RoundingMode.HALF_UP);
-			//}
-
-			docLine.setUnitPrice(unitPrice);
-			docLine.setQuantity(mLine.getQtyEntered());
-			docLine.setPriceIncludeIva(taxIncluded);
-			// Se obtiene la tasa del IVA de la línea
-			// Se asume que el impuesto es siempre IVA, a futuro se verá
-			// que hacer si el producto tiene otro impuesto que no sea IVA.
-			MTax mTax = MTax.get(Env.getCtx(),mLine.getC_Tax_ID());
-			docLine.setIvaRate(mTax.getRate());
-			// LAR - Process discount for invoice
-            final I_C_OrderLine ol = mLine.getC_OrderLine();
-            final BigDecimal discountRate = ol.getDiscount();
-            if (discountRate.compareTo(BigDecimal.ZERO) > 0)
+            BigDecimal qtyEntered = mLine.getQtyEntered();
+            // @emmie - avoid "special" invoice lines (as shipments comments lines)
+            if (qtyEntered.compareTo(BigDecimal.ZERO) > 0)
             {
-                final BigDecimal originalAmt = BigDecimal.valueOf(100).multiply(unitPrice).divide(
-                        BigDecimal.valueOf(100).subtract(discountRate), 2, BigDecimal.ROUND_FLOOR);
-                // TODO - Add I18N for discount descrtiption
-                final DiscountLine discountLine = new DiscountLine("Dto aplicado", originalAmt.subtract(unitPrice),
-                        false, discountRate);
-                // Add discount to document line
-                docLine.setDiscount(discountLine);
+                DocumentLine docLine = new DocumentLine();
+                docLine.setLineNumber(mLine.getLine());
+                docLine.setDescription(manageLineDescription(docLine, mLine));
+                // TODO - Review discounts at invoice behavior
+                // Calcula el precio unitario de la línea.
+                // Aquí tenemos dos casos de línea: Con Bonificaciones o Sin
+                // Bonificaciones
+                // 1. Sin Bonificaciones
+                // El precio unitario es entonces simplemente el precio actual
+                // de la
+                // línea, es decir el PriceActual.
+                // if (!mLine.hasBonus()) {
+                BigDecimal unitPrice = mLine.getPriceActual();
+                totalLineAmt = totalLineAmt.add(unitPrice);
+                // } else {
+                // 2. Con Bonificaciones
+                // Aquí NO se puede utilizar el mLine.getPriceActual() ya que el
+                // mismo tiene contemplado las bonificaciones mientras que en la
+                // impresión del ticket, las bonificaciones se restan al final
+                // del mismo. De esta forma, el precio unitario para el ticket
+                // va a ser mayor que el PriceActual de la línea en caso de que
+                // la misma contenga bonificaciones.
+                // El cálculo a realizar es:
+                // (PriceList * Qty - LineDiscountAmt) / Qty
+                //
+                // unitPrice =
+                // (mLine.getPriceList().multiply(mLine.getQtyEntered())
+                // .subtract(mLine.getLineDiscountAmt())).divide(
+                // mLine.getQtyEntered(), scale, RoundingMode.HALF_UP);
+                // }
+
+                docLine.setUnitPrice(unitPrice);
+                docLine.setQuantity(mLine.getQtyEntered());
+                docLine.setPriceIncludeIva(taxIncluded);
+                // Se obtiene la tasa del IVA de la línea
+                // Se asume que el impuesto es siempre IVA, a futuro se verá
+                // que hacer si el producto tiene otro impuesto que no sea IVA.
+                MTax mTax = MTax.get(Env.getCtx(), mLine.getC_Tax_ID());
+                docLine.setIvaRate(mTax.getRate());
+                // LAR - Process discount for invoice
+                final I_C_OrderLine ol = mLine.getC_OrderLine();
+                final BigDecimal discountRate = ol.getDiscount();
+                if (discountRate.compareTo(BigDecimal.ZERO) > 0)
+                {
+                    final BigDecimal originalAmt = BigDecimal.valueOf(100).multiply(unitPrice).divide(
+                            BigDecimal.valueOf(100).subtract(discountRate), 2, BigDecimal.ROUND_FLOOR);
+                    // TODO - Add I18N for discount descrtiption
+                    final DiscountLine discountLine = new DiscountLine("Dto aplicado", originalAmt.subtract(unitPrice),
+                            false, discountRate);
+                    // Add discount to document line
+                    docLine.setDiscount(discountLine);
+                }
+                // Se agrega la línea al documento.
+                document.addLine(docLine);
             }
-            // Se agrega la línea al documento.
-            document.addLine(docLine);
 		}
 		// TODO - Improve this behavior
 		BigDecimal amt = ((BigDecimal) mInvoice.get_Value("WithHoldingAmt")).negate(); // LAR perception are negative
-		PerceptionLine perceptionLine = new PerceptionLine("Percepci\u00f3n", amt, null);
-		document.setPerceptionLine(perceptionLine);
+		if (amt.compareTo(BigDecimal.ZERO) > 0)
+		{
+		    BigDecimal rate = amt.divide(totalLineAmt, 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
+		    String desc = String.format("Percepci\u00f3n (%2.2f%%)", rate);
+		    PerceptionLine perceptionLine = new PerceptionLine(desc, amt, null);
+		    document.setPerceptionLine(perceptionLine);
+		}
 	}
 
 	/**
@@ -1340,7 +1382,7 @@ public class FiscalDocumentPrint {
 
 	private void validateOxpDocument(final MInvoice mInvoice) throws Exception {
 		// Validar si la factura ya fue impresa.
-		if(mInvoice.get_ValueAsBoolean("isfiscalprinted")) {
+		if(mInvoice.get_ValueAsBoolean("IsFiscalPrinted")) {
 			log.severe("The invoice was already printed with a fiscal printer.");
 			throw new Exception(Msg.translate(ctx,"FiscalAlreadyPrintedError"));
 		}

@@ -48,7 +48,6 @@ import org.compiere.util.Msg;
 import ar.com.ergio.model.FiscalDocumentPrint;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter.DialogActionListener;
-import ar.com.ergio.util.LAR_Utils;
 
 /**
  *	Point of Sales Main Window.
@@ -433,39 +432,46 @@ public class PosBasePanel extends CPanel
     /**********************************************************************************************
      *                            LAR Fiscal Printing Implementation
      **********************************************************************************************/
+    protected void startGlassPane(final String AD_Message)
+    {
+        m_frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        String waitMsg = Msg.getMsg(m_ctx, AD_Message) + ", " + Msg.getMsg(m_ctx, "PleaseWait");
+        m_frame.setBusyMessage(waitMsg);
+        m_frame.setBusyTimer(4);
+        m_frame.setBusy(true);
+    }
 
-	protected boolean printFiscalTicket()
+    protected void stopGlassPane()
+    {
+        m_frame.setBusy(false);
+        m_frame.setCursor(Cursor.getDefaultCursor());
+    }
+
+	protected boolean printFiscalTicket(final MInvoice invoice)
 	{
-        final MInvoice invoice = m_order.getInvoices()[0];
-        log.info("Printing ticket for " + invoice);
+        log.info("Printing fiscal ticket for " + invoice);
 
-        final SwingWorker worker = new SwingWorker() {
+        final SwingWorker worker = new SwingWorker()
+        {
             @Override
             public Object construct()
             {
                 boolean success = true;
                 int c_DocType_ID = invoice.getC_DocType_ID();
-                if (LAR_Utils.isFiscalDocType(c_DocType_ID))
-                {
-                    try {
-                        final MDocType docType = new MDocType(m_ctx, c_DocType_ID, null);
-                        int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
-                        log.info("doc type asociated " + docType);
+                try {
+                    final MDocType docType = new MDocType(m_ctx, c_DocType_ID, null);
+                    int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
+                    log.info("doc type asociated " + docType);
 
-                        final FiscalDocumentPrint fdp = new FiscalDocumentPrint(lar_Fiscal_Printer_ID,
-                                infoFiscalPrinter, infoFiscalPrinter);
-                        log.info("fiscal document print created: " + fdp);
+                    final FiscalDocumentPrint fdp = new FiscalDocumentPrint(lar_Fiscal_Printer_ID,
+                            infoFiscalPrinter, infoFiscalPrinter);
+                    log.info("fiscal document print created: " + fdp);
 
-                        infoFiscalPrinter.setFiscalDocumentPrint(fdp);
-                        success = fdp.printDocument(invoice);
-                    } catch (Exception e) {
-                        log.log(Level.SEVERE, "Fiscal printing error", e);
-                        success = false;
-                    }
-                }
-                else
-                {
-                    log.info(String.format("Invoice %s is not fiscal document", invoice));
+                    infoFiscalPrinter.setFiscalDocumentPrint(fdp);
+                    success = fdp.printDocument(invoice);
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, "Fiscal printing error", e);
+                    success = false;
                 }
                 return Boolean.valueOf(success);
             }
@@ -475,17 +481,10 @@ public class PosBasePanel extends CPanel
                 log.info("Finish fiscal printing thread. Printed Ok?: " + result);
                 if (result) {
                     newOrder();
-                    m_frame.setBusy(false);
-                    m_frame.setCursor(Cursor.getDefaultCursor());
+                    stopGlassPane();
                 }
             }
         };
-
-        m_frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        String waitMsg = Msg.getMsg(m_ctx, "PrintingTicket") + ", " + Msg.getMsg(m_ctx, "PleaseWait");
-        m_frame.setBusyMessage(waitMsg);
-        m_frame.setBusyTimer(4);
-        m_frame.setBusy(true);
 
         worker.start();
 
@@ -512,8 +511,7 @@ public class PosBasePanel extends CPanel
                 // Al finalizar una reimpresión de ticket, se
                 // reestablece la interfaz para un nuevo pedido
                 newOrder();
-                m_frame.setBusy(false);
-                m_frame.setCursor(Cursor.getDefaultCursor());
+                stopGlassPane();
             }
         };
 
@@ -565,21 +563,16 @@ public class PosBasePanel extends CPanel
                         voidDocuments();
                     } else {
                         newOrder();
-                        m_frame.setBusy(false);
-                        m_frame.setCursor(Cursor.getDefaultCursor());
+                        stopGlassPane();
                     }
                 } else {
                     newOrder();
-                    m_frame.setBusy(false);
-                    m_frame.setCursor(Cursor.getDefaultCursor());
+                    stopGlassPane();
                 }
             }
         }; // new SwingWorker
 
-        String waitMsg = Msg.getMsg(m_ctx, "VoidingInvoice") + ", " + Msg.getMsg(m_ctx, "PleaseWait");
-        m_frame.setBusyMessage(waitMsg);
-        m_frame.setBusyTimer(4);
-        m_frame.setBusy(true);
+        startGlassPane("VoidingInvoice");
         worker.start();
     } // voidDocuments
 

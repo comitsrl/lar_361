@@ -93,7 +93,7 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
     private static final String ACTION_VOID = ConfirmPanel.A_REFRESH;
     private static final String ACTION_EXPAND_INFO = ConfirmPanel.A_ZOOM;
 
-    private ConfirmPanel confirmPanel = new ConfirmPanel(true, true, true, false, false, true,
+    private ConfirmPanel confirmPanel = new ConfirmPanel(false, true, true, false, false, true,
             false);
     private CLabel iconLabel = new CLabel();
     private FlowLayout westLayout = new FlowLayout();

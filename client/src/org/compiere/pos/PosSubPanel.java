@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import javax.swing.KeyStroke;
 
 import org.compiere.apps.AppsAction;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPOS;
 import org.compiere.print.ReportCtl;
@@ -31,6 +32,8 @@ import org.compiere.swing.CButton;
 import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
+
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  *	POS Sub Panel Base Class.
@@ -142,24 +145,24 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 
 		if (order != null)
 		{
-			try
-			{
-                // TODO: to incorporate work from Posterita
-
+            final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
+            int C_DocType_ID = invoice.getC_DocType_ID();
+            if (LAR_Utils.isFiscalDocType(C_DocType_ID))
+            {
                 // LAR Fiscal Printing
-			    if (!p_posPanel.printFiscalTicket()) {
-			        log.info("Fiscal printing fail");
-			        return;
-			    }
-			    // print standard document
-			    //ReportCtl.startDocumentPrint(ReportEngine.ORDER, order.getC_Order_ID(), null, Env.getWindowNo(this), true);
-			    log.info("Fiscal printing OK. Continue printing others documents...");
-
-			}
-			catch (Exception e)
-			{
-				log.log(Level.SEVERE, "Error Printing Ticket", e);
-			}
+                if (!p_posPanel.printFiscalTicket(invoice)) {
+                    log.log(Level.SEVERE, "Error in Fiscal Printing Ticket");
+                    return;
+                }
+            }
+            else // Print document in tradicinal way
+            {
+                // TODO - Improve interaction with user applying glasspane for whole print process
+                p_posPanel.newOrder();
+                log.info("Printing tradicional document for " + invoice);
+                ReportCtl.startDocumentPrint(ReportEngine.INVOICE, invoice.getC_Invoice_ID(), null, Env.getWindowNo(this), false);
+                p_posPanel.stopGlassPane();
+            }
 		}
 	}
 

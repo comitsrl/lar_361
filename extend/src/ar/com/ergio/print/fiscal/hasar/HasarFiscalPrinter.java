@@ -1206,11 +1206,14 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
             FiscalPrinterIOException
     {
         PerceptionLine item = document.getPerceptionLine();
-        execute(cmdPerceptions(
-                item.getDescription(),
-                item.getAmt(),
-                item.getTaxRate())
-            );
+        if (item != null)
+        {
+            execute(cmdPerceptions(
+                    item.getDescription(),
+                    item.getAmt(),
+                    item.getTaxRate())
+                    );
+        }
     }
 
 	/**

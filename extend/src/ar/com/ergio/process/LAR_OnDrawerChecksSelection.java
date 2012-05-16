@@ -114,7 +114,9 @@ public class LAR_OnDrawerChecksSelection extends SvrProcess
 			pay.setProcessed(false);
 			pay.setIsActive(header.isActive());
 			pay.setPosted(false);
-			pay.setC_Invoice_ID(0);
+			//Marcos Zúñiga 
+			pay.setC_Invoice_ID(header.getC_Invoice_ID());
+			//Marcos Zúñiga
 			pay.setC_Order_ID(0);
 			pay.setIsApproved(false);
 			pay.setIsAllocated(false);

@@ -31,6 +31,7 @@ import org.compiere.model.MOrderTax;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
+import org.compiere.model.MSequence;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
@@ -38,6 +39,7 @@ import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 
 import static ar.com.ergio.model.LAR_TaxPayerType.RESPONSABLE_INSCRIPTO;
 import ar.com.ergio.util.LAR_Utils;
@@ -89,7 +91,7 @@ import ar.com.ergio.util.LAR_Utils;
 
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
-
+         engine.addDocValidate(MInvoice.Table_Name, this);
      }   //  initialize
 
     /**
@@ -180,6 +182,7 @@ import ar.com.ergio.util.LAR_Utils;
                 return msg;
             }
         }
+
         //german wagner custom
     	//{
     		if
@@ -327,6 +330,15 @@ import ar.com.ergio.util.LAR_Utils;
          {
              MPayment payment  = (MPayment) po;
              msg = deactivateWithholding(payment, timing);
+             if (msg != null) {
+                 return msg;
+             }
+         }
+         // Determine documentNo for voided invoices
+         if (po.get_TableName().equals(MInvoice.Table_Name) &&
+                 (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
+         {
+             msg = changeVoidDocumentNo(po);
              if (msg != null) {
                  return msg;
              }
@@ -634,6 +646,41 @@ import ar.com.ergio.util.LAR_Utils;
             whc.setIsActive(false);
             if (!whc.save()) {
                 return "Can not deactivate payment withholding";
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Change DocumentNo in order to avoid modified sequence for given document
+     */
+    // TODO - Improve and add this behavior to ADempiere and make it configurable (ideal)
+    private String changeVoidDocumentNo(final PO po)
+    {
+        // fix documentno for reverse invoices
+        if (po.get_TableName().equals(MInvoice.Table_Name))
+        {
+            final MInvoice invoice = (MInvoice) po;
+            if (invoice.isSOTrx() && invoice.getReversal_ID() != 0)
+            {
+                final MInvoice revInvoice = new MInvoice(invoice.getCtx(), invoice.getReversal_ID(), invoice.get_TrxName());
+                log.info("Change DocumentNo of " + revInvoice);
+
+                int AD_Sequence_ID = invoice.getC_DocType().getDefiniteSequence_ID();
+                final MSequence seq = new MSequence(invoice.getCtx(), AD_Sequence_ID, invoice.get_TrxName());
+                String newDocumentNo = Msg.translate(invoice.getCtx(), "Voided") + "-" + invoice.getDocumentNo();
+
+                revInvoice.setDocumentNo(newDocumentNo);
+                if (!revInvoice.save())
+                    return "AccessCannotUpdate"; // TODO - Improve this message, addding new one
+
+                invoice.setDescription("(" + newDocumentNo + "<-)");
+                if (!invoice.save())
+                    return "AccessCannotUpdate"; // TODO - Improve this message, addding new one
+
+                seq.setCurrentNext(seq.getCurrentNext() - 1);
+                if (!seq.save())
+                    return "SequenceDocNotFound"; // TODO - Improve this message, addding new one
             }
         }
         return null;

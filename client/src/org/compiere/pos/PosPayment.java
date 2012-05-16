@@ -346,6 +346,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		lPayAmt = new CLabel(Msg.translate(p_ctx, "PayAmt"));
         mainPanel.add(lPayAmt, "growx");
 		fPayAmt.setFont(font);
+		fPayAmt.setEditable(false);
 		fPayAmt.setHorizontalAlignment(JTextField.TRAILING);
 		fPayAmt.addActionListener(this);
 		mainPanel.add(fPayAmt, "wrap, growx");

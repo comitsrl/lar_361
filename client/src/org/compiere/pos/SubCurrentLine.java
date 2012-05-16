@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.ParseException;
 import java.util.logging.Level;
 
 import javax.swing.JTextField;
@@ -217,6 +218,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		f_price = new PosTextField(Msg.translate(Env.getCtx(), "PriceActual"),
 				p_posPanel,p_pos.getOSNP_KeyLayout_ID(), DisplayType.getNumberFormat(DisplayType.Amount));
 		f_price.addActionListener(this);
+		f_price.addFocusListener(this);
 		f_price.setHorizontalAlignment(JTextField.TRAILING);
 		add(f_price, "h 30, w 100, wrap");
 		setPrice(Env.ZERO);
@@ -265,8 +267,11 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 				MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
 				if ( line != null )
 				{
-					line.setQty(line.getQtyOrdered().subtract(Env.ONE));
-					line.saveEx();
+				    if (line.getQtyOrdered().compareTo(BigDecimal.ONE) > 0)
+				    {
+				        line.setQty(line.getQtyOrdered().subtract(Env.ONE));
+				        line.saveEx();
+				    }
 				}
 			}
 
@@ -289,7 +294,6 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			payOrder();
 			return;
 		}
-		//	VNumber - TODO - Review this behavior, seem there is a bug (set qty with price?)
 		else if (e.getSource() == f_price && orderLineId > 0)
 		{
 			MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
@@ -441,12 +445,14 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                 }
             };
             // Execute the transaction
+            p_posPanel.startGlassPane("PrintingTicket");
             try {
                 Trx.run(trxRunnable);
             } catch (Exception e) {
                 // set trx name to null again
                 p_posPanel.m_order.set_TrxName(null);
                 ADialog.warn(0, p_posPanel, e.getLocalizedMessage());
+                p_posPanel.stopGlassPane();
                 return;
             }
             // Actions out of transaction
@@ -749,9 +755,29 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		if (e.isTemporary())
 			return;
 		log.info( "PosSubProduct - focusLost");
-		if (findProduct()) {
-		    p_posPanel.updateInfo();
-		}
+        // Product Name
+        if (e.getSource() == f_productName)
+        {
+            if (!findProduct())
+                return;
+        }
+        // Price
+        else if (e.getSource() == f_price && orderLineId > 0)
+        {
+            MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
+            if (line != null) {
+                // force commit edited value of f_price
+                try {
+                    f_price.commitEdit();
+                } catch (ParseException ex) {
+                    log.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+                    return;
+                }
+                line.setPrice(new BigDecimal(f_price.getValue().toString()));
+                line.saveEx();
+            }
+        }
+        p_posPanel.updateInfo();
 	}	//	focusLost
 
 
@@ -830,7 +856,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	    MProduct product = line.getProduct();
 	    int m_AttributeSet_ID = product.getM_AttributeSet_ID();
 	    int m_AttributeSetInstance_ID = line.getM_AttributeSetInstance_ID();
-	    String logMsg = String.format("Product/Attr[Inst] - %s/%d[%d]",product, m_AttributeSet_ID
+	    String logMsg = String.format("Product=%s - M_AttributeSet_ID=%d - M_AttributeSetInstance_ID=%d",product, m_AttributeSet_ID
 	            , m_AttributeSetInstance_ID);
 	    log.info(logMsg);
 
