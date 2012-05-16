@@ -1,0 +1,12 @@
+2012-05-16
+==========
+
+Migration scripts added from last realse:
+
+ - 0029_Add_POS_To_Invoice_Processes.sql
+ - 0030_Delete_Validation_On_Drawer_Transfer.sql
+ - 0031_Modify_Payments_and_Receipts_Headers.sql
+ - 0032_Add_CreditNote_Behavior.sql
+ - 0033_Create_Payment_and_Receipt_Windows.sql
+ - 0034_Modify_On_Drawer_Checks.sql
+ - 0035_Add_Payment_DocType_To_POS.sql
