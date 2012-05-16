@@ -1638,6 +1638,8 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		log.info(toString());
 		StringBuffer info = new StringBuffer();
 		
+		/* @emmie custom - avoid register cashbook
+
 		// POS supports multiple payments
 		boolean fromPOS = false;
 		if ( getC_Order_ID() > 0 )
@@ -1686,6 +1688,8 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			info.append("@C_Cash_ID@: " + cash.getName() +  " #" + cl.getLine());
 			setC_CashLine_ID(cl.getC_CashLine_ID());
 		}	//	CashBook
+
+		   @emmie custom - avoid register cashbook */
 
 		//	Update Order & Match
 		int matchInv = 0;
