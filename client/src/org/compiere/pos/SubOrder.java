@@ -22,12 +22,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
@@ -37,12 +33,9 @@ import net.miginfocom.swing.MigLayout;
 
 import org.adempiere.plaf.AdempierePLAF;
 import org.compiere.apps.ADialog;
-import org.compiere.grid.ed.VLookup;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerInfo;
 import org.compiere.model.MCurrency;
-import org.compiere.model.MLookup;
-import org.compiere.model.MLookupFactory;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MPriceListVersion;
@@ -81,15 +74,14 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	}	//	PosSubCustomer
 
 	private CButton 		f_history;
-	private PosTextField	f_bpName;
+	protected PosTextField	f_bpName;
 	private CButton 		f_bNew;
 	//private CButton 		f_bSearch;
 	private CComboBox		f_location;
 	private CComboBox		f_user;
 	private CButton 		f_process;
 	private CButton 		f_print;
-	protected VLookup 		f_Order_ID;
-	private CLabel          l_Order_ID;
+    private CTextField      f_DocumentNo;
 	private CButton 		f_logout;
 	private JFormattedTextField f_net;
 	private JFormattedTextField f_tax;
@@ -173,34 +165,12 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 //		add (f_bSearch,buttonSize + ", spany 2");
 
 		// DOC NO
-        int ad_Column_ID = 2161; // table 259 | Order
-        // TODO - if necesary, parametrize this validation rule (simil > 134 | C_Order SO to be invoiced)
-        String validation = "DocStatus = 'IP' "
-                          + "AND EXISTS (SELECT * FROM C_OrderLine WHERE C_Order.C_Order_ID=C_OrderLine.C_Order_ID AND QtyOrdered <> QtyInvoiced) AND IsSOTrx='Y' "
-                          + "AND NOT EXISTS (SELECT * FROM C_Invoice i WHERE i.C_Order_ID=C_Order.C_Order_ID AND i.DocStatus IN ('IP', 'CO', 'CL'))";
-        MLookup lookup = null;
-        try {
-            lookup = MLookupFactory.get(p_ctx, p_posPanel.getWindowNo(), ad_Column_ID, DisplayType.TableDir,
-                    Env.getLanguage(p_ctx), "C_Order_ID", 0, false, validation);
-        } catch (Exception e) {
-            log.log(Level.SEVERE, "Lookup Order", e);
-        }
-        f_Order_ID = new VLookup("C_Order_ID", false, false, true, lookup);
-        f_Order_ID.addVetoableChangeListener(new VetoableChangeListener() {
+       add (new CLabel(Msg.getMsg(Env.getCtx(),"DocumentNo")), "");
 
-            public void vetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
-                log.info(String.format("property changed - %s/%s", event.getPropertyName(), event.getNewValue()));
-                Integer c_Order_ID = (Integer)event.getNewValue();
-                if(c_Order_ID != null && c_Order_ID > 0) {
-                    p_posPanel.loadOrder(c_Order_ID);
-                }
-            }
-        });
-        l_Order_ID = new CLabel(Msg.getMsg(Env.getCtx(), "DocumentNo"));
-        l_Order_ID.setLabelFor(f_Order_ID);
-        l_Order_ID.setBackground(AdempierePLAF.getInfoBackground());
-        add(l_Order_ID, "");
-        add(f_Order_ID, "growx, pushx");
+       f_DocumentNo = new CTextField("");
+       f_DocumentNo.setName("DocumentNo");
+       f_DocumentNo.setEditable(false);
+       add (f_DocumentNo, "growx, pushx");
 
 		CLabel lTax = new CLabel (Msg.translate(Env.getCtx(), "TaxAmt"));
 		add(lTax);
@@ -615,7 +585,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			MOrder order = p_posPanel.m_order;
 			if (order != null)
 			{
-			    f_Order_ID.setValue(order.get_ID());
+			    f_DocumentNo.setText(order.getDocumentNo());
 			    if (m_bpartner == null)
 			        setC_BPartner_ID(order.getC_BPartner_ID());
   				f_bNew.setEnabled(order.getLines().length != 0);
@@ -626,7 +596,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 			}
 			else
 			{
-				f_Order_ID.setValue(null);
+				f_DocumentNo.setValue(null);
 				setC_BPartner_ID(0);
 				f_bNew.setEnabled(true);
 				//f_bEdit.setEnabled(false);
