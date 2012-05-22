@@ -136,6 +136,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 
  		// Settings
 		f_bSettings = createButtonAction("Preference", null);
+		f_bSettings.setEnabled(false);
  		add (f_bSettings, buttonSize);
 
 		//
@@ -261,15 +262,16 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
                 //p_posPanel.f_curLine.f_productName.requestFocusInWindow();
             }
 		}
-		else if (action.equals("Preference"))
+		else if (action.equals("Preference")) // @emmie - disabled action
 		{
 			CashSubFunctions csf = new CashSubFunctions(p_posPanel);
 			csf.setVisible(true);
 		}
-		else if (action.equals("Print")) {
+		else if (action.equals("Print")) // @emmie - disabled action
+		{
 		    printOrder();
 		}
-		else if (action.equals("BPartner")) // TODO - (emmie) This action handler must be deleted (?)
+		else if (action.equals("BPartner")) // @emmie - disabled action
 		{
 			PosQuery qt = new QueryBPartner(p_posPanel);
 			qt.setVisible(true);
