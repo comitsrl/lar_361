@@ -65,8 +65,8 @@ public class LAR_Callouts extends CalloutEngine
     public String copyLines(final Properties ctx, final int windowNo, final GridTab mTab, final GridField mField,
             Object value) throws AdempiereSystemError
     {
-        int Source_Invoice_ID = (Integer) mTab.getValue("Source_Invoice_ID");
-        if (Source_Invoice_ID == 0)
+        Integer Source_Invoice_ID = (Integer)value;
+        if (Source_Invoice_ID == null || Source_Invoice_ID.intValue() == 0)
             return "";
 
         if (!ADialog.ask(windowNo, Env.getWindow(windowNo), "CopyLinesFromInvoice?"))
