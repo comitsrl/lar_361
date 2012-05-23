@@ -39,8 +39,10 @@ public class DiscountLine implements Serializable{
 	private static final long serialVersionUID = 1L;
 	/** Descripción de la línea de descuento / recargo */
 	private String description;
-	/** Monto del descuento */
+	/** Monto del descuento / recargo */
 	private BigDecimal amount;
+	/** The object is discount or not */
+	private boolean isDiscount;
 	/** El monto tiene el IVA incluído o no */
 	private boolean amountIncludeIva = true;
 	/** Tasa de impuesto */
@@ -49,28 +51,28 @@ public class DiscountLine implements Serializable{
 	/**
 	 * @param description
 	 * @param amount
-	 * @param substract
+	 * @param isDiscount
 	 * @param amountIncludeIva
 	 */
-	public DiscountLine(String description, BigDecimal amount, boolean amountIncludeIva) {
-		super();
-		this.description = description;
-		this.amount = amount;
-		this.amountIncludeIva = amountIncludeIva;
+	public DiscountLine(String description, BigDecimal amount, boolean isDiscount, boolean amountIncludeIva)
+	{
+	    this(description, amount, isDiscount, amountIncludeIva, null);
 	}
 
 	/**
 	 * @param description
 	 * @param amount
-	 * @param substract
+	 * @param isDiscount
 	 * @param amountIncludeIva
 	 * @param taxRate
 	 */
-	public DiscountLine(String description, BigDecimal amount,
-			boolean amountIncludeIva, BigDecimal taxRate) {
+	public DiscountLine(String description, BigDecimal amount, boolean isDiscount,
+			boolean amountIncludeIva, BigDecimal taxRate)
+	{
 		super();
 		this.description = description;
 		this.amount = amount;
+		this.isDiscount = isDiscount;
 		this.amountIncludeIva = amountIncludeIva;
 		this.taxRate = taxRate;
 	}
@@ -149,5 +151,13 @@ public class DiscountLine implements Serializable{
 	 */
 	public void setTaxRate(BigDecimal taxRate) {
 		this.taxRate = taxRate;
+	}
+
+	/**
+	 * Retrieves if this instance is a discount or not
+	 */
+	public boolean isDiscount()
+	{
+	    return isDiscount;
 	}
 }

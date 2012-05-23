@@ -1195,7 +1195,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 				execute(cmdLastItemDiscount(
 					discount.getDescription(),
 					discount.getAbsAmount(),
-					false,
+					discount.isDiscount(),
 					!discount.isAmountIncludeIva(),
 					null));
 			}
