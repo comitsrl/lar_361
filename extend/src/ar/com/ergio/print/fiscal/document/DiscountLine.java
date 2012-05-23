@@ -49,6 +49,16 @@ public class DiscountLine implements Serializable{
 	private BigDecimal taxRate = null;
 
 	/**
+     * @param description
+     * @param amount
+     * @param amountIncludeIva
+     */
+    public DiscountLine(String description, BigDecimal amount, boolean amountIncludeIva)
+    {
+        this(description, amount, true, amountIncludeIva, null);
+    }
+
+	/**
 	 * @param description
 	 * @param amount
 	 * @param isDiscount
