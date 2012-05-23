@@ -285,3 +285,12 @@ INSERT INTO ad_message_trl(ad_message_id, ad_language, ad_client_id, ad_org_id, 
     VALUES ((SELECT CurrentNext FROM AD_Sequence WHERE AD_Sequence_ID=9), 'es_AR', 1000000, 0, 'Y', getdate(), 100, getdate(), 100, '¿Desea eliminar la orden PDV?', null, 'Y');
 
 UPDATE AD_Sequence SET CurrentNext = CurrentNext + 1 WHERE AD_Sequence_ID=9;
+
+-- ProductWithoutAttributSet
+INSERT INTO ad_message(ad_message_id, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby, value, msgtext, msgtip, msgtype, entitytype)
+    VALUES ((SELECT CurrentNext FROM AD_Sequence WHERE AD_Sequence_ID=9), 1000000, 0, 'Y', getdate(), 100, getdate(), 100, 'ProductWithoutAttributSet', 'Product without attribut set', null, 'I', 'LAR');
+
+INSERT INTO ad_message_trl(ad_message_id, ad_language, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby, msgtext, msgtip, istranslated)
+    VALUES ((SELECT CurrentNext FROM AD_Sequence WHERE AD_Sequence_ID=9), 'es_AR', 1000000, 0, 'Y', getdate(), 100, getdate(), 100, 'Producto sin conjunto de atributos', null, 'Y');
+
+UPDATE AD_Sequence SET CurrentNext = CurrentNext + 1 WHERE AD_Sequence_ID=9;
