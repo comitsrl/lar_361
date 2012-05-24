@@ -846,14 +846,6 @@ public class FiscalDocumentPrint {
                 // mLine.getQtyEntered(), scale, RoundingMode.HALF_UP);
                 // }
 
-                docLine.setUnitPrice(unitPrice);
-                docLine.setQuantity(mLine.getQtyEntered());
-                docLine.setPriceIncludeIva(taxIncluded);
-                // Se obtiene la tasa del IVA de la línea
-                // Se asume que el impuesto es siempre IVA, a futuro se verá
-                // que hacer si el producto tiene otro impuesto que no sea IVA.
-                MTax mTax = MTax.get(Env.getCtx(), mLine.getC_Tax_ID());
-                docLine.setIvaRate(mTax.getRate());
                 // LAR - Process discount for invoice
                 final I_C_OrderLine ol = mLine.getC_OrderLine();
                 final BigDecimal discountRate = ol.getDiscount();
@@ -865,7 +857,18 @@ public class FiscalDocumentPrint {
                             true, false, discountRate);
                     // Add discount to document line
                     docLine.setDiscount(discountLine);
+                    unitPrice = originalAmt; // Set proper unitPrice
                 }
+                // LAR - Process discount for invoice
+
+                docLine.setUnitPrice(unitPrice);
+                docLine.setQuantity(mLine.getQtyEntered());
+                docLine.setPriceIncludeIva(taxIncluded);
+                // Se obtiene la tasa del IVA de la línea
+                // Se asume que el impuesto es siempre IVA, a futuro se verá
+                // que hacer si el producto tiene otro impuesto que no sea IVA.
+                MTax mTax = MTax.get(Env.getCtx(), mLine.getC_Tax_ID());
+                docLine.setIvaRate(mTax.getRate());
                 // Se agrega la línea al documento.
                 document.addLine(docLine);
             }
