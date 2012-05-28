@@ -867,15 +867,15 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	        if (vad.isChanged()) {
 	            line.setM_AttributeSetInstance_ID(vad.getM_AttributeSetInstance_ID());
 	            if (line.save()) {
-	                msg = Msg.translate(p_ctx,  "AttributSetInstanceSaved"); // TODO - Translate this msg
+	                msg = Msg.translate(p_ctx,  "AttributeSetInstanceSaved");
 	                ADialog.info(p_posPanel.getWindowNo(), this, msg);
 	            } else {
-                    msg = Msg.translate(p_ctx,  "AttributSetInstanceSavedError"); // TODO - Translate this msg
+                    msg = Msg.translate(p_ctx,  "AttributeSetInstanceSavedError");
 	                ADialog.error(p_posPanel.getWindowNo(), this, msg);
 	            }
 	        }
 	    } else {
-	        msg = Msg.translate(p_ctx,  "ProductWithouAttributSet"); // TODO - Translate this msg
+	        msg = Msg.translate(p_ctx,  "ProductWithoutAttributSet");
 	        ADialog.warn(p_posPanel.getWindowNo(), this, msg);
 	    }
 	} // requestProductAttributes

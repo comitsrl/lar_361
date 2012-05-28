@@ -689,6 +689,9 @@ public class AInfoFiscalPrinter extends CDialog implements ActionListener, Fisca
             confirmPanel.getCancelButton().setVisible(false);
             getFiscalDocumentPrint().setIgnoreErrorStatus(rsp);
             AInfoFiscalPrinter.this.setVisible(rsp);
+            // @emmie - if user doesn't continue with fiscal printing, void actual invoice
+            if (!rsp)
+               fireVoidAction();
         }
     };
 

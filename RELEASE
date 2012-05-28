@@ -1,3 +1,11 @@
+2012-05-24
+==========
+
+Migration scripts added from last realse:
+
+  - 0036_Add_POS_Missing_Translation.sql
+
+
 2012-05-16
 ==========
 

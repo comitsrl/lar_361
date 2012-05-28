@@ -846,6 +846,21 @@ public class FiscalDocumentPrint {
                 // mLine.getQtyEntered(), scale, RoundingMode.HALF_UP);
                 // }
 
+                // LAR - Process discount for invoice
+                final I_C_OrderLine ol = mLine.getC_OrderLine();
+                final BigDecimal discountRate = ol.getDiscount();
+                if (discountRate.compareTo(BigDecimal.ZERO) > 0)
+                {
+                    final BigDecimal originalAmt = BigDecimal.valueOf(100).multiply(unitPrice).divide(
+                            BigDecimal.valueOf(100).subtract(discountRate), 2, BigDecimal.ROUND_FLOOR);
+                    final DiscountLine discountLine = new DiscountLine("Dto aplicado", originalAmt.subtract(unitPrice),
+                            true, false, discountRate);
+                    // Add discount to document line
+                    docLine.setDiscount(discountLine);
+                    unitPrice = originalAmt; // Set proper unitPrice
+                }
+                // LAR - Process discount for invoice
+
                 docLine.setUnitPrice(unitPrice);
                 docLine.setQuantity(mLine.getQtyEntered());
                 docLine.setPriceIncludeIva(taxIncluded);
@@ -854,19 +869,6 @@ public class FiscalDocumentPrint {
                 // que hacer si el producto tiene otro impuesto que no sea IVA.
                 MTax mTax = MTax.get(Env.getCtx(), mLine.getC_Tax_ID());
                 docLine.setIvaRate(mTax.getRate());
-                // LAR - Process discount for invoice
-                final I_C_OrderLine ol = mLine.getC_OrderLine();
-                final BigDecimal discountRate = ol.getDiscount();
-                if (discountRate.compareTo(BigDecimal.ZERO) > 0)
-                {
-                    final BigDecimal originalAmt = BigDecimal.valueOf(100).multiply(unitPrice).divide(
-                            BigDecimal.valueOf(100).subtract(discountRate), 2, BigDecimal.ROUND_FLOOR);
-                    // TODO - Add I18N for discount descrtiption
-                    final DiscountLine discountLine = new DiscountLine("Dto aplicado", originalAmt.subtract(unitPrice),
-                            false, discountRate);
-                    // Add discount to document line
-                    docLine.setDiscount(discountLine);
-                }
                 // Se agrega la línea al documento.
                 document.addLine(docLine);
             }

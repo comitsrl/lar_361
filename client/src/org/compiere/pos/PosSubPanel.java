@@ -152,6 +152,7 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 // LAR Fiscal Printing
                 if (!p_posPanel.printFiscalTicket(invoice)) {
                     log.log(Level.SEVERE, "Error in Fiscal Printing Ticket");
+                    p_posPanel.stopGlassPane();
                     return;
                 }
             }

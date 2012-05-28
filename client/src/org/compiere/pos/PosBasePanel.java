@@ -307,10 +307,6 @@ public class PosBasePanel extends CPanel
     {
         String whereClause = "AD_Org_ID=?";
         Object[] params = new Object[] { Env.getAD_Org_ID(m_ctx) };
-        if (SalesRep_ID != 0) {
-            whereClause = whereClause + " AND SalesRep_ID=?";
-            params = new Object[] { Env.getAD_Org_ID(m_ctx), SalesRep_ID };
-        }
         List<MPOS> list = new Query(m_ctx, MPOS.Table_Name, whereClause, null)
                 .setParameters(params)
                 .setOnlyActiveRecords(true)
@@ -339,24 +335,12 @@ public class PosBasePanel extends CPanel
 		// TODO - Review: avoid create an order with default BPartner
 		//m_order = PosOrderModel.createOrder(p_pos, f_order.getBPartner(), trxName);
 		f_curLine.newLine();
-		f_order.f_Order_ID.requestFocusInWindow();
+		f_order.f_bpName.requestFocusInWindow();
 		updateInfo();
 		// LAR - Fiscal printer implementation
         infoFiscalPrinter.setVisible(false);
         infoFiscalPrinter.clearDetail();
 	}	//	newOrder
-
-    /**
-     * Loads an order into POS
-     *
-     * @param c_Order_ID order id
-     */
-    public void loadOrder(int c_Order_ID)
-    {
-        log.info(String.format("C_Order_ID: %d", c_Order_ID));
-        m_order = new PosOrderModel(m_ctx, c_Order_ID, trxName, p_pos);
-        updateInfo();
-    } // loadOrder
 
 	/**
 	 * Get the number of the window for the function calls that it needs
