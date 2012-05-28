@@ -307,10 +307,6 @@ public class PosBasePanel extends CPanel
     {
         String whereClause = "AD_Org_ID=?";
         Object[] params = new Object[] { Env.getAD_Org_ID(m_ctx) };
-        if (SalesRep_ID != 0) {
-            whereClause = whereClause + " AND SalesRep_ID=?";
-            params = new Object[] { Env.getAD_Org_ID(m_ctx), SalesRep_ID };
-        }
         List<MPOS> list = new Query(m_ctx, MPOS.Table_Name, whereClause, null)
                 .setParameters(params)
                 .setOnlyActiveRecords(true)
