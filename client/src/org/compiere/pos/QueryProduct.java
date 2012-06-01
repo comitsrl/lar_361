@@ -17,6 +17,8 @@ package org.compiere.pos;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.math.BigDecimal;
 
 import javax.swing.KeyStroke;
@@ -24,6 +26,8 @@ import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.adempiere.exceptions.AdempiereException;
+import org.compiere.apps.ADialog;
 import org.compiere.minigrid.ColumnInfo;
 import org.compiere.minigrid.IDColumn;
 import org.compiere.model.MWarehousePrice;
@@ -154,9 +158,7 @@ public class QueryProduct extends PosQuery
 
 		//	Center
 		m_table = new PosTable();
-		String sql = m_table.prepareTable (s_layout, s_sqlFrom,
-			s_sqlWhere, false, "RV_WarehousePrice")
-			+ " ORDER BY Margin, QtyAvailable";
+		m_table.prepareTable (s_layout, s_sqlFrom, s_sqlWhere, false, "RV_WarehousePrice"); // @emmie
 		m_table.addMouseListener(this);
 		m_table.getSelectionModel().addListSelectionListener(this);
 		m_table.setColumnVisibility(m_table.getColumn(0), false);
@@ -173,7 +175,8 @@ public class QueryProduct extends PosQuery
 		centerScroll = new CScrollPane(m_table);
 		panel.add (centerScroll, "growx, growy,south");
 		panel.setPreferredSize(new Dimension(800,600));
-		f_value.requestFocus();
+		f_name.requestFocusInWindow(); // @emmie
+		addWindowListener(new WindowsCloseAdapter()); // @emmie
 	}	//	init
 
 	/**
@@ -236,6 +239,10 @@ public class QueryProduct extends PosQuery
 			m_table.scrollRectToVisible(m_table.getCellRect(row, 1, true)); //@Trifon - BF[3121975]
 			return;
 		}
+        else if ("Cancel".equals(e.getActionCommand()))
+        {
+            m_M_Product_ID = -1; // @emmie - force non-selection
+        }
 		//	Exit
 		close();
 	}	//	actionPerformed
@@ -248,8 +255,10 @@ public class QueryProduct extends PosQuery
 	public void setResults (MWarehousePrice[] results)
 	{
 		m_table.loadTable(results);
+		/* @emmie - avoid select first element
 		if (m_table.getRowCount() >0 )
 			m_table.setRowSelectionInterval(0, 0);
+	    */
 		enableButtons();
 	}	//	setResults
 
@@ -291,7 +300,13 @@ public class QueryProduct extends PosQuery
 		{
 			p_posPanel.f_curLine.setM_Product_ID(m_M_Product_ID);
 			p_posPanel.f_curLine.setPrice(m_Price);
-			p_posPanel.f_curLine.saveLine();
+			// @emmie - add catch exception for credit exceeded
+			try {
+			    p_posPanel.f_curLine.saveLine();
+			} catch (AdempiereException ex) {
+			    ADialog.error(p_posPanel.getWindowNo(), this, ex.getMessage());
+			    return;
+			}
 		}
 		else
 		{
@@ -312,4 +327,33 @@ public class QueryProduct extends PosQuery
 		setResults(new MWarehousePrice[0]);
 	}
 
+    /*
+     * @emmie
+     *
+     * WindowsListener adapter for manage close window event
+     * (this avoid reopen bp dialog when is closed from windows manager)
+     *
+     */
+    private class WindowsCloseAdapter implements WindowListener
+    {
+        @Override
+        public void windowClosed(WindowEvent e){}
+        @Override
+        public void windowIconified(WindowEvent e){}
+        @Override
+        public void windowDeiconified(WindowEvent e){}
+        @Override
+        public void windowActivated(WindowEvent e){}
+        @Override
+        public void windowDeactivated(WindowEvent e){}
+        @Override
+        public void windowOpened(WindowEvent e){}
+
+        @Override
+        public void windowClosing(WindowEvent e)
+        {
+            m_M_Product_ID = -1; // force non-selection
+            close();
+        }
+    }
 }	//	PosQueryProduct

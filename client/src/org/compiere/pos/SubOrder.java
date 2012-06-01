@@ -76,7 +76,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	private CButton 		f_history;
 	protected PosTextField	f_bpName;
 	private CButton 		f_bNew;
-	//private CButton 		f_bSearch;
+	private CButton 		f_bSearch; // @emmie - bp search
 	private CComboBox		f_location;
 	private CComboBox		f_user;
 	private CButton 		f_process;
@@ -103,7 +103,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	public void init()
 	{
 		//	Content
-		MigLayout layout = new MigLayout("ins 0 0","[fill|fill|fill|fill]","[nogrid]unrel[||]");
+		MigLayout layout = new MigLayout("ins 0 0","[fill|fill|fill|fill|fill]","[nogrid]unrel[||]"); // @emmie - bp search
 		setLayout(layout);
 
 		Font bigFont = AdempierePLAF.getFont_Field().deriveFont(20f);
@@ -144,6 +144,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		add (f_logout, buttonSize + ", gapx 25, wrap");
 
 		// SALES REP
+		add(new CLabel(""), "");  // @emmie - bp search
 		add(new CLabel(Msg.translate(Env.getCtx(), "Cashier")), "");
 		CLabel cashiername = new CLabel((p_ctx.getProperty("#AD_User_Name")).toUpperCase());
 		cashiername.setFont(bigFont);
@@ -161,11 +162,8 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		add(f_net, "wrap, growx, pushx");
 		f_net.setValue (Env.ZERO);
 
-		// BPARTNER
-//		f_bSearch = createButtonAction ("BPartner", KeyStroke.getKeyStroke(KeyEvent.VK_I, Event.SHIFT_MASK+Event.CTRL_MASK));
-//		add (f_bSearch,buttonSize + ", spany 2");
-
 		// DOC NO
+        add(new CLabel(""), ""); // @emmie - bp search
        add (new CLabel(Msg.getMsg(Env.getCtx(),"DocumentNo")), "");
 
        f_DocumentNo = new CTextField("");
@@ -189,14 +187,18 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		add (f_location, " wrap");
 	*/
 
-		// BP
+        // BPARTNER  @emmie - bp search
+        f_bSearch = createButtonAction ("BPartner", KeyStroke.getKeyStroke(KeyEvent.VK_I, Event.SHIFT_MASK+Event.CTRL_MASK));
+        add (f_bSearch, buttonSize);
+
+        // BP
 		add(new CLabel(Msg.translate(Env.getCtx(), "Customer")), "");
 		f_bpName =new PosTextField(Msg.translate(Env.getCtx(), "C_BPartner_ID"), p_posPanel, p_pos.getOSK_KeyLayout_ID());
 		f_bpName.setEditable(true); //red1
 		f_bpName.setName("BPartner");
 		f_bpName.addActionListener(this);
 		f_bpName.addFocusListener(this);
-		add (f_bpName, " flowy, pushx, h 20!");
+		add (f_bpName, "h 25!");  // @emmie - bp search
 
 		//
 		CLabel lTotal = new CLabel (Msg.translate(Env.getCtx(), "TOTAL"));
@@ -271,10 +273,11 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 		{
 		    printOrder();
 		}
-		else if (action.equals("BPartner")) // @emmie - disabled action
+		else if (action.equals("BPartner"))
 		{
 			PosQuery qt = new QueryBPartner(p_posPanel);
 			qt.setVisible(true);
+			return; // @emmie - bp search
 		}
 		// Logout
 		else if (action.equals("Logout"))
