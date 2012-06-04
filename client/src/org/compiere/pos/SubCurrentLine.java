@@ -712,7 +712,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			qt.setResults(results);
 			qt.setQueryData(m_M_PriceList_Version_ID, m_M_Warehouse_ID);
 			qt.setVisible(true);
-			return m_product != null; // @emmie
+			return orderLineId > 0; // @emmie
 		}
 	}	//	findProduct
 
