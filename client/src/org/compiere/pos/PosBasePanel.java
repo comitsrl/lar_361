@@ -465,7 +465,6 @@ public class PosBasePanel extends CPanel
                 log.info("Finish fiscal printing thread. Printed Ok?: " + result);
                 if (result) {
                     newOrder();
-                    stopGlassPane();
                 }
             }
         };

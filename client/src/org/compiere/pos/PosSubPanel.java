@@ -157,7 +157,6 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
             }
             else // Print document in tradicinal way
             {
-                // TODO - Improve interaction with user applying glasspane for whole print process
                 p_posPanel.newOrder();
                 log.info("Printing tradicional document for " + invoice);
                 ReportCtl.startDocumentPrint(ReportEngine.INVOICE, invoice.getC_Invoice_ID(), null, Env.getWindowNo(this), false);
