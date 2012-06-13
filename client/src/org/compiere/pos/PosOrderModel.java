@@ -46,6 +46,9 @@ import ar.com.ergio.model.MLARPaymentHeader;
 public class PosOrderModel extends MOrder {
 
 	private static final long serialVersionUID = 5253837037827124425L;
+	//LAR payment terms.
+	private static final int PAYMENTTERMS_Account = 3000000;
+	private static final int PAYMENTTERMS_Cash = 3000001;
 
 	private MPOS m_pos;
 	private List<MPayment> payments = new ArrayList<MPayment>();
@@ -347,6 +350,7 @@ public class PosOrderModel extends MOrder {
 		payment.setAmount(getC_Currency_ID(), amt);
 		payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
 		setPaymentRule(MOrder.PAYMENTRULE_Cash);
+        setC_PaymentTerm_ID(PAYMENTTERMS_Cash);
         payment.saveEx();
         payments.add(payment);
         return true;
@@ -362,6 +366,7 @@ public class PosOrderModel extends MOrder {
 		payment.setCheckNo(checkNo);
 		payment.setA_Name(accountName);
 		setPaymentRule(MOrder.PAYMENTRULE_Check);
+        setC_PaymentTerm_ID(PAYMENTTERMS_Cash);
         set_ValueOfColumn("IsOnDrawer", true);
         payment.saveEx();
         payments.add(payment);
@@ -378,6 +383,7 @@ public class PosOrderModel extends MOrder {
 		payment.setCreditCard(MPayment.TRXTYPE_Sales, cardtype,
 				cardNo, cvc, month, year);
 		setPaymentRule(MOrder.PAYMENTRULE_CreditCard);
+        setC_PaymentTerm_ID(PAYMENTTERMS_Cash);
 		payment.saveEx();
         payments.add(payment);
 		return true;
@@ -426,6 +432,8 @@ public class PosOrderModel extends MOrder {
 	void setPaidFromAccount()
 	{
 	    isPaidFromAccount = true;
+	    setC_PaymentTerm_ID(PAYMENTTERMS_Account);
+	    saveEx();
 	}
 
     public void reload() {
