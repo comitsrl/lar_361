@@ -340,7 +340,7 @@ public class PosOrderModel extends MOrder {
 	private BigDecimal getPerceptionAmt()
 	{
 	    MLAROrderPerception perception = MLAROrderPerception.get(this, get_TrxName());
-	    return perception.getTaxAmt();
+	    return perception == null ? BigDecimal.ZERO : perception.getTaxAmt();
 	}
 
 	public boolean payCash(BigDecimal amt)
