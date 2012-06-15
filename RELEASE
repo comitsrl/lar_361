@@ -1,3 +1,10 @@
+2012-06-15
+==========
+
+Migration scripts added from last realse:
+
+  - 0037_Add_LAR_PaymentTerms.sql
+
 2012-05-24
 ==========
 
