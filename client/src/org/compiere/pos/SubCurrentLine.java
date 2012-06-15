@@ -320,6 +320,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			QueryProduct qt = new QueryProduct(p_posPanel);
 			qt.setQueryData(m_M_PriceList_Version_ID, m_M_Warehouse_ID);
 			qt.setVisible(true);
+			/* @emmie - perform unneeded second search
 			if (findProduct()) {
 			    int row = m_table.getSelectedRow();
 			    if (row < 0) row = 0;
@@ -327,6 +328,10 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			    //https://sourceforge.net/tracker/?func=detail&atid=879332&aid=3121975&group_id=176962
 			    m_table.scrollRectToVisible(m_table.getCellRect(row, 1, true)); //@Trifon - BF[3121975]
 			}
+			*/
+            // @emmie - avoid clean BP when no product is selected
+			if (orderLineId <= 0)
+			    return;
 		}
 		//	ProductName
 		else if (e.getSource() == f_productName)
@@ -707,7 +712,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			qt.setResults(results);
 			qt.setQueryData(m_M_PriceList_Version_ID, m_M_Warehouse_ID);
 			qt.setVisible(true);
-			return true;
+			return orderLineId > 0; // @emmie
 		}
 	}	//	findProduct
 

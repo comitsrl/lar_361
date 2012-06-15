@@ -152,13 +152,11 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 // LAR Fiscal Printing
                 if (!p_posPanel.printFiscalTicket(invoice)) {
                     log.log(Level.SEVERE, "Error in Fiscal Printing Ticket");
-                    p_posPanel.stopGlassPane();
                     return;
                 }
             }
             else // Print document in tradicinal way
             {
-                // TODO - Improve interaction with user applying glasspane for whole print process
                 p_posPanel.newOrder();
                 log.info("Printing tradicional document for " + invoice);
                 ReportCtl.startDocumentPrint(ReportEngine.INVOICE, invoice.getC_Invoice_ID(), null, Env.getWindowNo(this), false);

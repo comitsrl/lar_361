@@ -175,8 +175,8 @@ public class QueryBPartner extends PosQuery
 		panel.add (centerScroll, "growx, growy");
 		m_table.growScrollbars();
 		panel.setPreferredSize(new Dimension(800,600));
-		f_value.requestFocus();
-		addWindowListener(new WindowsCloseAdapter());
+		f_name.requestFocusInWindow(); // @emmie
+		addWindowListener(new WindowsCloseAdapter()); // @emmie
 	}	//	init
 
 	/**
@@ -226,6 +226,10 @@ public class QueryBPartner extends PosQuery
 			m_table.getSelectionModel().setSelectionInterval(row, row);
 			return;
 		}
+        else if ("Cancel".equals(e.getActionCommand()))
+        {
+            m_C_BPartner_ID = -1; // @emmie - force non-selection
+        }
 		//	Exit
 		close();
 	}	//	actionPerformed
@@ -255,8 +259,6 @@ public class QueryBPartner extends PosQuery
 			if (ID != null)
 			{
 				m_C_BPartner_ID = ID.intValue();
-			//	m_BPartnerName = (String)m_table.getValueAt(row, 2);
-			//	m_Price = (BigDecimal)m_table.getValueAt(row, 7);
 			}
 		}
 		f_ok.setEnabled(enabled);
@@ -274,12 +276,10 @@ public class QueryBPartner extends PosQuery
 		if (m_C_BPartner_ID > 0)
 		{
 			p_posPanel.f_order.setC_BPartner_ID(m_C_BPartner_ID);
-		//	p_posPanel.f_curLine.setCurrency(m_Price);
 		}
 		else
 		{
 			p_posPanel.f_order.setC_BPartner_ID(0);
-		//	p_posPanel.f_curLine.setPrice(Env.ZERO);
 		}
 		dispose();
 	}	//	close
@@ -297,6 +297,8 @@ public class QueryBPartner extends PosQuery
 	}
 
     /*
+     * @emmie
+     *
      * WindowsListener adapter for manage close window event
      * (this avoid reopen bp dialog when is closed from windows manager)
      */
@@ -318,6 +320,7 @@ public class QueryBPartner extends PosQuery
         @Override
         public void windowClosing(WindowEvent e)
         {
+            m_C_BPartner_ID = -1; // force non-selection
             close();
         }
     }
