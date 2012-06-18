@@ -853,8 +853,8 @@ public class FiscalDocumentPrint {
                 {
                     final BigDecimal originalAmt = BigDecimal.valueOf(100).multiply(unitPrice).divide(
                             BigDecimal.valueOf(100).subtract(discountRate), 2, BigDecimal.ROUND_FLOOR);
-                    final DiscountLine discountLine = new DiscountLine("Dto aplicado", originalAmt.subtract(unitPrice),
-                            true, false, discountRate);
+                    final DiscountLine discountLine = new DiscountLine("Dto aplicado",
+                            originalAmt.subtract(unitPrice).multiply(mLine.getQtyEntered()), true, false, discountRate);
                     // Add discount to document line
                     docLine.setDiscount(discountLine);
                     unitPrice = originalAmt; // Set proper unitPrice
