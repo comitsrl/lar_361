@@ -835,16 +835,16 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		try {
 			setCancelAllowed(false);
 			//////////////////////////////////////////////////////////////
-			// Se setean los datos del comprador.
-			// Comando: @SetCustomerData
-			loadCustomerData(customer);
-
-			//////////////////////////////////////////////////////////////
 			// Se setea el número de comprobante original.
 			// Comando: @SetEmbarkNumber
 			execute(cmdSetEmbarkNumber(
 				1, creditNote.getOriginalDocumentNo())
 			);
+
+			//////////////////////////////////////////////////////////////
+			// Se setean los datos del comprador.
+			// Comando: @SetCustomerData
+			loadCustomerData(customer);
 
 			//////////////////////////////////////////////////////////////
 			// Se abre un documento no fiscal homologado.
