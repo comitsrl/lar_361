@@ -126,6 +126,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
         lPOS.setLabelFor(fPOS);
         panel.getParameterPanel().add(lPOS, null);
         panel.getParameterPanel().add(fPOS, null);
+        lDocAction.setText(Msg.translate(Env.getCtx(), "Action"));
         // @emmie custom
 		panel.getParameterPanel().add(lBPartner, null);
 		panel.getParameterPanel().add(fBPartner, null);
@@ -149,7 +150,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 
 		MLookup docActionL = MLookupFactory.get(Env.getCtx(), m_WindowNo, 3494 /* C_Invoice.DocStatus */,
 				DisplayType.List, Env.getLanguage(Env.getCtx()), "DocAction", 135 /* _Document Action */,
-				false, "AD_Ref_List.Value IN ('CO','PR')");
+				false, "AD_Ref_List.Value IN ('PR')"); // @emmie - remove 'CO' for fiscal printing
 		docAction = new VLookup("DocAction", true, false, true,docActionL);
 		//  lDcoACtion.setText((Msg.translate(Env.getCtx(), "DocAction")););
 		docAction.addVetoableChangeListener(this);
@@ -169,7 +170,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
         // @emmie custom
         MLookup posL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 0, 3000068, DisplayType.Table);
         fPOS = new VLookup ("C_POS_ID", true, false, true, posL);
-        lPOS.setText(Msg.translate(Env.getCtx(), "C_POS_ID"));
+        lPOS.setText("PDV");
         // @emmie custom
 
         panel.getStatusBar().setStatusLine(Msg.getMsg(Env.getCtx(), "InvGenerateSel"));//@@
