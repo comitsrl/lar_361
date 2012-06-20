@@ -382,6 +382,7 @@ public class PosOrderModel extends MOrder {
 		payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
 		payment.setCreditCard(MPayment.TRXTYPE_Sales, cardtype,
 				cardNo, cvc, month, year);
+		payment.setA_Name(accountName);
 		setPaymentRule(MOrder.PAYMENTRULE_CreditCard);
         setC_PaymentTerm_ID(PAYMENTTERMS_Cash);
 		payment.saveEx();
