@@ -76,6 +76,9 @@ public class PosOrderModel extends MOrder {
 			order.setC_DocTypeTarget_ID(pos.getC_DocType_ID());
 		else
 			order.setC_DocTypeTarget_ID(MOrder.DocSubTypeSO_POS);
+        int m_PriceList_ID = pos.getM_PriceList_ID();
+        if (partner != null)
+            m_PriceList_ID = partner.getM_PriceList_ID();
 		if (partner == null || partner.get_ID() == 0)
 			partner = pos.getBPartner();
 		if (partner == null || partner.get_ID() == 0) {
@@ -83,7 +86,7 @@ public class PosOrderModel extends MOrder {
 		}
 		order.setBPartner(partner);
 		//
-		order.setM_PriceList_ID(pos.getM_PriceList_ID());
+		order.setM_PriceList_ID(m_PriceList_ID);
 		order.setM_Warehouse_ID(pos.getM_Warehouse_ID());
 		order.setSalesRep_ID(pos.getSalesRep_ID());
 		if (!order.save())
