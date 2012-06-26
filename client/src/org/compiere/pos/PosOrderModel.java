@@ -395,14 +395,17 @@ public class PosOrderModel extends MOrder {
 
 	private MPayment createPayment(String tenderType)
 	{
-        paymentHeader = new MLARPaymentHeader(getCtx(), 0, get_TrxName());
-        paymentHeader.setAD_Org_ID(m_pos.getAD_Org_ID());
-        paymentHeader.setC_DocType_ID(m_pos.get_ValueAsInt("C_Payment_DocType_ID"));
-        paymentHeader.setC_BPartner_ID(getC_BPartner_ID());
-        paymentHeader.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
-        paymentHeader.setDocStatus(DocAction.STATUS_Drafted);
-        paymentHeader.setIsReceipt(true);
-        paymentHeader.saveEx();
+	    if (paymentHeader == null)
+	    {
+	        paymentHeader = new MLARPaymentHeader(getCtx(), 0, get_TrxName());
+	        paymentHeader.setAD_Org_ID(m_pos.getAD_Org_ID());
+	        paymentHeader.setC_DocType_ID(m_pos.get_ValueAsInt("C_Payment_DocType_ID"));
+	        paymentHeader.setC_BPartner_ID(getC_BPartner_ID());
+	        paymentHeader.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
+	        paymentHeader.setDocStatus(DocAction.STATUS_Drafted);
+	        paymentHeader.setIsReceipt(true);
+	        paymentHeader.saveEx();
+	    }
 		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setAD_Org_ID(m_pos.getAD_Org_ID());
 		payment.setTenderType(tenderType);
