@@ -10,6 +10,6 @@ INSERT INTO AD_Reference_Trl (AD_Language,AD_Reference_ID, Help,Name,Description
 
 -- 01/07/2012 16:28:40 ART
 -- Add Ad_Org table reference, list all but summary orgs.
-INSERT INTO AD_Ref_Table (IsValueDisplayed,WhereClause,OrderByClause,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,CreatedBy,Created,Updated,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N','IsSummary = N''','AD_Ord.value',155,3000018,528,522,'LAR',100,TO_TIMESTAMP('2012-07-01 16:28:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2012-07-01 16:28:40','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
+INSERT INTO AD_Ref_Table (IsValueDisplayed,WhereClause,OrderByClause,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,CreatedBy,Created,Updated,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N','IsSummary = ''N''','AD_Org.value',155,3000018,528,522,'LAR',100,TO_TIMESTAMP('2012-07-01 16:28:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2012-07-01 16:28:40','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
 ;
 
