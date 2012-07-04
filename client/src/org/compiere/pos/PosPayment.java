@@ -126,8 +126,13 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 			String tenderType = ((ValueNamePair) tenderTypePick.getValue()).getID();
             String tenderAmt = fTenderAmt.getText().equals("") ? "0" : fTenderAmt.getText();
 			BigDecimal amt = BigDecimal.valueOf(nf.parse(tenderAmt).doubleValue());
+			BigDecimal pay =  BigDecimal.valueOf(nf.parse(fPayAmt.getText()).doubleValue());
 			if (amt.compareTo(BigDecimal.ZERO) <= 0)
 			    return;
+			if (amt.compareTo(pay) > 0)
+			{
+			    amt = pay;
+			}
 			if ( tenderType.equals(MPayment.TENDERTYPE_Cash) )
 			{
 				p_posPanel.m_order.payCash(amt);
