@@ -523,7 +523,7 @@ import ar.com.ergio.util.LAR_Utils;
             log.info("C_Payment_ID: " + payment.get_ID());
             if (!payment.isReceipt()) // Only process AP payments
             {
-                final WithholdingConfig wc = new WithholdingConfig(bp, Env.isSOTrx(Env.getCtx()));
+                final WithholdingConfig wc = new WithholdingConfig(bp, false);
                 log.info("Withholding conf >> " + wc);
 
                 // if payment amt is greater than the limit, create a withholding
@@ -602,7 +602,7 @@ import ar.com.ergio.util.LAR_Utils;
             if (!payment.isReceipt()) // Only process AP payments
             {
                 final MBPartner bp = new MBPartner(payment.getCtx(), payment.getC_BPartner_ID(), payment.get_TrxName());
-                final WithholdingConfig wc = new WithholdingConfig(bp, Env.isSOTrx(Env.getCtx()));
+                final WithholdingConfig wc = new WithholdingConfig(bp, false);
 
                 if (wc.isCalcFromPayment())
                 {
@@ -718,7 +718,8 @@ import ar.com.ergio.util.LAR_Utils;
                  + "  JOIN LCO_WithholdingType T ON T.LCO_WithholdingType_ID = R.LCO_WithholdingType_ID"
                  + "  JOIN C_Tax X on X.C_Tax_ID = C.C_Tax_ID"
                  + " WHERE B.C_BPartner_ID=?"
-                 + "   AND T.IsSOTrx=?";
+                 + "   AND T.IsSOTrx=?"
+                 + "   AND F.IsActive='Y'";
 
 
          private WithholdingConfig(final MBPartner bp, boolean isSOTrx)
