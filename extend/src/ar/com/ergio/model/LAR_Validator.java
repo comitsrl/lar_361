@@ -19,8 +19,16 @@ package ar.com.ergio.model;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.logging.Level;
 
+import org.compiere.acct.Doc;
+import org.compiere.acct.DocTax;
+import org.compiere.acct.Fact;
+import org.compiere.acct.FactLine;
+import org.compiere.model.MAcctSchema;
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
@@ -32,6 +40,7 @@ import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MSequence;
+import org.compiere.model.MTax;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
@@ -92,6 +101,7 @@ import ar.com.ergio.util.LAR_Utils;
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
          engine.addDocValidate(MInvoice.Table_Name, this);
+         engine.addDocValidate(MAllocationHdr.Table_Name, this);
      }   //  initialize
 
     /**
@@ -342,6 +352,12 @@ import ar.com.ergio.util.LAR_Utils;
              if (msg != null) {
                  return msg;
              }
+         }
+         // before posting the allocation - post the payment withholdings vs writeoff amount
+         if (po.get_TableName().equals(MAllocationHdr.Table_Name) && timing == TIMING_BEFORE_POST) {
+             msg = accountingForWithholdingOnPayment((MAllocationHdr) po);
+             if (msg != null)
+                 return msg;
          }
 
          return null;
@@ -681,6 +697,73 @@ import ar.com.ergio.util.LAR_Utils;
                 seq.setCurrentNext(seq.getCurrentNext() - 1);
                 if (!seq.save())
                     return "SequenceDocNotFound"; // TODO - Improve this message, addding new one
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Process acounting for withholding on sales payment
+     */
+    private String accountingForWithholdingOnPayment(final MAllocationHdr ah)
+    {
+        // Only process sales payments
+        if (!Env.isSOTrx(Env.getCtx()))
+            return null;
+
+        final Doc doc = ah.getDoc();
+        final List<Fact> facts = doc.getFacts();
+
+        // One fact per acctschema
+        for (int i = 0; i < facts.size(); i++)
+        {
+            Fact fact = facts.get(i);
+            MAcctSchema as = fact.getAcctSchema();
+
+            MAllocationLine[] allocLines = ah.getLines(false);
+            for (int j = 0; j < allocLines.length; j++)
+            {
+                MAllocationLine al = allocLines[j];
+                doc.setC_BPartner_ID(al.getC_BPartner_ID()); // TODO is this line necesary?
+                int c_Payment_ID = al.getC_Payment_ID();
+                if (c_Payment_ID <= 0)
+                    continue;
+                MPayment payment = new MPayment(ah.getCtx(), c_Payment_ID, ah.get_TrxName());
+                if (payment == null || payment.getC_Payment_ID() == 0)
+                    continue;
+
+                // Determine if is an withholding or not
+                int c_TaxWithholding_ID = payment.get_ValueAsInt("C_TaxWithholding_ID");
+                if (c_TaxWithholding_ID <= 0)
+                    continue;
+                if (payment.getWriteOffAmt().compareTo(Env.ZERO) <= 0)
+                    continue;
+
+                // Iterates over factlines, searching one with writeoff account
+                // in order to change it to the retrieved from processed payment
+                final FactLine[] factlines = fact.getLines();
+                for (int ifl = 0; ifl < factlines.length; ifl++)
+                {
+                    final FactLine fl = factlines[ifl];
+                    // if factline account is WriteOff, change it
+                    if (fl.getAccount().equals(doc.getAccount(Doc.ACCTTYPE_WriteOff, as)))
+                    {
+                        // Creates factline with proper account (using c_taxwithholding_id from processed payment)
+                        final BigDecimal withholdingAmt = payment.getWriteOffAmt();
+                        final MTax tw = new MTax(ah.getCtx(), c_TaxWithholding_ID, ah.get_TrxName());
+                        final DocTax taxLine = new DocTax(c_TaxWithholding_ID, tw.getName(), tw.getRate(), Env.ZERO,
+                                withholdingAmt, tw.isSalesTax());
+
+                        final FactLine newFactLine = fact.createLine(null, taxLine.getAccount(DocTax.ACCTTYPE_TaxCredit, as),
+                                as.getC_Currency_ID(), withholdingAmt, null);
+                        if (newFactLine != null)
+                            newFactLine.setC_Tax_ID(c_TaxWithholding_ID);
+
+                        // Removes factline with writeoff account from fact
+                        log.info(String.format("Replace factline: %s -> %s", fl, newFactLine));
+                        fact.remove(fl);
+                    }
+                }
             }
         }
         return null;

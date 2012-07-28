@@ -110,6 +110,21 @@ public class CalloutPayment extends CalloutEngine
 				    mTab.setValue ("C_Currency_ID", new Integer (C_Currency_ID));
 				//
 				BigDecimal InvoiceOpen = rs.getBigDecimal (3); // Set Invoice
+
+				// @emmie custom
+				if (InvoiceOpen != null)
+				{
+				    int LAR_PaymentHeader_ID = (Integer) mTab.getValue("LAR_PaymentHeader_ID");
+			        // Retrieve existing payments and writeoff for this invoice
+			        sql = "SELECT COALESCE(Sum(PayAmt),0) + COALESCE(Sum(WriteOffAmt),0)"
+			            + "  FROM C_Payment WHERE LAR_PaymentHeader_ID = ?";
+
+			        BigDecimal existsAmt = DB.getSQLValueBD(null, sql, LAR_PaymentHeader_ID);
+			        if (existsAmt != null && existsAmt.compareTo(Env.ZERO) > 0)
+			            InvoiceOpen = InvoiceOpen.subtract(existsAmt);
+				}
+				// @emmie custom
+
 				// OPen Amount
 				if (InvoiceOpen == null)
 					InvoiceOpen = Env.ZERO;
