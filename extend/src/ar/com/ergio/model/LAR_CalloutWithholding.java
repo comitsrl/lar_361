@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.compiere.model.CalloutEngine;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.MPayment;
 import org.compiere.util.Env;
 
 /**
@@ -46,6 +47,9 @@ public class LAR_CalloutWithholding extends CalloutEngine
             mTab.setValue("C_TaxWithholding_ID", null);
             mTab.setValue("WithholdingCertNo", null);
         }
+        // if writeoffamt is greater tha zero, TT is always cash
+        if (writeOffAmt == null || writeOffAmt.compareTo(Env.ZERO) > 0)
+            mTab.setValue("TenderType", MPayment.TENDERTYPE_Cash);
 
         return "";
     }

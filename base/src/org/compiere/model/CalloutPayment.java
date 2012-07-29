@@ -26,6 +26,7 @@ import java.util.logging.Level;
 
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Msg;
 
 /**
  * Payment Callouts. org.compiere.model.CalloutPayment.*
@@ -120,6 +121,8 @@ public class CalloutPayment extends CalloutEngine
 			            + "  FROM C_Payment WHERE LAR_PaymentHeader_ID = ?";
 
 			        BigDecimal existsAmt = DB.getSQLValueBD(null, sql, LAR_PaymentHeader_ID);
+                    if (existsAmt != null && existsAmt.compareTo(InvoiceOpen) == 0)
+                        return Msg.translate(Env.getCtx(), "PaymentNotAllowed");
 			        if (existsAmt != null && existsAmt.compareTo(Env.ZERO) > 0)
 			            InvoiceOpen = InvoiceOpen.subtract(existsAmt);
 				}
