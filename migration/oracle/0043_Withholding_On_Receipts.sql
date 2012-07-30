@@ -1139,3 +1139,34 @@ INSERT INTO ad_message_trl(ad_message_id, ad_language, ad_client_id, ad_org_id, 
 
 UPDATE AD_Sequence SET CurrentNext = CurrentNext + 1 WHERE AD_Sequence_ID=9
 ;
+
+-- 30/07/2012 13:08:36 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Column SET IsUpdateable='N',Updated=TO_DATE('2012-07-30 13:08:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000239
+;
+
+-- 30/07/2012 13:10:36 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0 & @Processed@=N',Updated=TO_DATE('2012-07-30 13:10:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000601
+;
+
+-- 30/07/2012 13:11:25 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0  & @Processed@=N',Updated=TO_DATE('2012-07-30 13:11:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000767
+;
+
+-- 30/07/2012 13:11:39 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0  & @Processed@=N',Updated=TO_DATE('2012-07-30 13:11:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000765
+;
+
+-- 30/07/2012 13:12:35 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0  & @Processed@=N',Updated=TO_DATE('2012-07-30 13:12:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000600
+;
+
+-- 30/07/2012 13:12:51 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0 & @Processed@=N',Updated=TO_DATE('2012-07-30 13:12:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000599
+;
+
