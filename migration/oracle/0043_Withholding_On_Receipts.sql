@@ -1078,37 +1078,23 @@ UPDATE AD_Column SET Callout='org.compiere.model.CalloutPayment.amounts;ar.com.e
 ;
 
 -- 29/07/2012 0:13:38 ART
--- Show Invoice Info on Header and avoid overpayment (Receipts)
+-- Show Invoice Info on Header 
 UPDATE AD_Column SET ColumnSQL='((SELECT InvoiceOpen( C_Invoice_ID, 0) FROM C_Invoice i WHERE i.C_Invoice_ID = LAR_PaymentHeader.C_Invoice_ID) - ((SELECT COALESCE(Sum(PayAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID) + (SELECT COALESCE(Sum(WriteOffAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID)))',Updated=TO_DATE('2012-07-29 00:13:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000264
 ;
 
 -- 29/07/2012 0:17:37 ART
--- Show Invoice Info on Header and avoid overpayment (Receipts)
+-- Show Invoice Info on Header 
 UPDATE AD_Column SET ColumnSQL='(COALESCE((SELECT InvoiceOpen( C_Invoice_ID, 0) FROM C_Invoice i WHERE i.C_Invoice_ID = LAR_PaymentHeader.C_Invoice_ID),0))',Updated=TO_DATE('2012-07-29 00:17:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000263
 ;
 
 -- 29/07/2012 0:18:49 ART
--- Show Invoice Info on Header and avoid overpayment (Receipts)
+-- Show Invoice Info on Header 
 UPDATE AD_Column SET ColumnSQL='((SELECT COALESCE(Sum(PayAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID) + (SELECT COALESCE(Sum(WriteOffAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID))',Updated=TO_DATE('2012-07-29 00:18:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000262
 ;
 
--- 29/07/2012 0:19:48 ART
--- Show Invoice Info on Header and avoid overpayment (Receipts)
-UPDATE AD_Field SET DisplayLogic='@RemainingAmt@>0 | @RemainingAmt@=0 | @InvoiceAmt@=0',Updated=TO_DATE('2012-07-29 00:19:48','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000277
-;
-
--- 29/07/2012 0:21:51 ART
--- Show Invoice Info on Header and avoid overpayment (Receipts)
-UPDATE AD_Field SET DisplayLogic='@RemainingAmt@>0 | @RemainingAmt@=0 | @InvoiceAmt@=0',Updated=TO_DATE('2012-07-29 00:21:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000762
-;
-
--- 29/07/2012 0:24:20 ART
--- Show Invoice Info on Header and avoid overpayment (Receipts)
-UPDATE AD_Field SET DisplayLogic='@RemainingAmt@>0 | @RemainingAmt@=0 | @InvoiceAmt@=0',Updated=TO_DATE('2012-07-29 00:24:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000399
-;
 
 -- 29/07/2012 0:24:45 ART
--- Show Invoice Info on Header and avoid overpayment (Receipts)
+-- Show Invoice Info on Header 
 UPDATE AD_Column SET DefaultValue=NULL,Updated=TO_DATE('2012-07-29 00:24:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000241
 ;
 
@@ -1139,3 +1125,34 @@ INSERT INTO ad_message_trl(ad_message_id, ad_language, ad_client_id, ad_org_id, 
 
 UPDATE AD_Sequence SET CurrentNext = CurrentNext + 1 WHERE AD_Sequence_ID=9
 ;
+
+-- 30/07/2012 13:08:36 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Column SET IsUpdateable='N',Updated=TO_DATE('2012-07-30 13:08:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000239
+;
+
+-- 30/07/2012 13:10:36 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0 & @Processed@=N',Updated=TO_DATE('2012-07-30 13:10:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000601
+;
+
+-- 30/07/2012 13:11:25 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0  & @Processed@=N',Updated=TO_DATE('2012-07-30 13:11:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000767
+;
+
+-- 30/07/2012 13:11:39 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0  & @Processed@=N',Updated=TO_DATE('2012-07-30 13:11:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000765
+;
+
+-- 30/07/2012 13:12:35 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0  & @Processed@=N',Updated=TO_DATE('2012-07-30 13:12:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000600
+;
+
+-- 30/07/2012 13:12:51 ART
+-- Do not display Invoice Amt/Remaining Amt if the invoice is processed
+UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0 & @Processed@=N',Updated=TO_DATE('2012-07-30 13:12:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000599
+;
+
