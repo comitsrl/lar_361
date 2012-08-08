@@ -244,14 +244,18 @@ import ar.com.ergio.util.LAR_Utils;
     {
         if (invoice.isSOTrx() && !invoice.isReversal())
         {
+            // determine if operation came from POS
+            if (Env.getContextAsInt(invoice.getCtx(),Env.POS_ID) == 0)
+                return "";
+
+            log.info("Changing doctype for " + invoice);
             final MBPartner bp = new MBPartner(invoice.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
             int ad_Client_ID = Env.getAD_Client_ID(invoice.getCtx());
             int ad_Org_ID = Env.getAD_Org_ID(invoice.getCtx());
             final MOrgInfo orgInfo = MOrgInfo.get(invoice.getCtx(), ad_Org_ID, invoice.get_TrxName());
             int lco_TaxPayerType_Vendor_ID = orgInfo.get_ValueAsInt("LCO_TaxPayerType_ID");
             int lco_TaxPayerType_Customer_ID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
-            int c_POS_ID = Env.getContextAsInt(invoice.getCtx(),Env.POS_ID) != 0 ? Env.getContextAsInt(invoice.getCtx(),Env.POS_ID)
-                    : invoice.get_ValueAsInt("C_POS_ID");
+            int c_POS_ID = Env.getContextAsInt(invoice.getCtx(),Env.POS_ID);
 
             // Check vendor taxpayertype
             if (lco_TaxPayerType_Vendor_ID == 0) {
