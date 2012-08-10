@@ -31,7 +31,6 @@ import org.compiere.model.MPInstancePara;
 import org.compiere.process.ProcessInfo;
 import org.compiere.util.ASyncProcess;
 import org.compiere.util.AdempiereSystemError;
-import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
@@ -130,38 +129,4 @@ public class LAR_Callouts extends CalloutEngine
         worker.run();
         return "";
     } // copyLines
-
-    /**
-     * Define the proper letter for targent document type (only in SOTrx)
-     */
-    // Called from C_Invoice.C_DoctypeTarget_ID
-    public String documentLetter(final Properties ctx, final int windowNo, final GridTab mTab, final GridField mField,
-            final Object value, final Object oldValue)
-    {
-        if (!Env.isSOTrx(ctx, windowNo) || isCalloutActive())
-            return "";
-
-        final Integer c_DocumentTarget_ID = (Integer) value;
-        if (c_DocumentTarget_ID == null || c_DocumentTarget_ID == 0)
-            return "";
-
-        // Determines document letter to bill
-        String sql = "SELECT LAR_DocumentLetter_ID"
-                   + "  FROM C_DocType"
-                   + " WHERE C_DocType_ID=?";
-
-        int lar_DocumentLetter_ID = DB.getSQLValue(null, sql, c_DocumentTarget_ID);
-
-        // Check document letter config
-        if (lar_DocumentLetter_ID == 0)
-            return "LetterRuleNotFount";
-
-        mTab.setValue("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
-
-        // Avoid that LAR_Validator process operation from Invoice Windows as POS operation
-        //Env.setContext(ctx, Env.POS_ID, 0);
-        Env.getCtx().remove(Env.POS_ID);
-
-        return "";
-    }
 }

@@ -434,8 +434,6 @@ public class PosBasePanel extends CPanel
 	protected boolean printFiscalTicket(final MInvoice invoice)
 	{
         log.info("Printing fiscal ticket for " + invoice);
-        // Force process POS operation in LAR_Validator.changeDocTypeForInvoice
-        Env.setContext(m_ctx, Env.POS_ID, p_pos.get_ID());
 
         final SwingWorker worker = new SwingWorker()
         {
