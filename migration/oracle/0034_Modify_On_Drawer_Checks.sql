@@ -5,6 +5,37 @@ ADD COLUMN isbounced 			Char(1) NULL DEFAULT 'N',
 ADD COLUMN isdeposited 			Char(1) NULL DEFAULT 'N'
 ;
 
+-- 25/08/2012 11:06:07 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000084,'TargetAccount','LAR','TargetAccount','TargetAccount',0,TO_DATE('2012-08-25 11:06:07','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2012-08-25 11:06:07','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 25/08/2012 11:06:07 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000084 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 25/08/2012 11:07:28 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000085,'IsBounced','LAR','IsBounced','IsBounced',0,TO_DATE('2012-08-25 11:07:28','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2012-08-25 11:07:28','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 25/08/2012 11:07:28 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000085 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 25/08/2012 11:07:51 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000086,'IsDeposited','LAR','IsDeposited','IsDeposited',0,TO_DATE('2012-08-25 11:07:51','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2012-08-25 11:07:51','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 25/08/2012 11:07:51 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000086 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+
 -- 14/05/2012 8:37:08 ART
 -- Modify On Drawer Checks Window
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3000273,335,'LAR',0,'N','N','N','N',60,'N',10,'N',3000084,'N','Y','N','targetaccount','targetaccount',0,TO_DATE('2012-05-14 08:37:08','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_DATE('2012-05-14 08:37:08','YYYY-MM-DD HH24:MI:SS'),0)
