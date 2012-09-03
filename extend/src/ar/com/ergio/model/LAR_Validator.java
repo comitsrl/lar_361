@@ -272,7 +272,7 @@ import ar.com.ergio.util.LAR_Utils;
 
          int c_Invoice_ID = header.getC_Invoice_ID();
 
-         // Se cuentan los cobros relacionados con la cabecera
+         // Recupera los cobros relacionados con la cabecera
          final String sql = "SELECT C_Invoice_ID FROM C_Payment"
                           + " WHERE AD_Client_ID=? AND AD_Org_ID=? AND LAR_PaymentHeader_ID=?";
 
@@ -290,12 +290,13 @@ import ar.com.ergio.util.LAR_Utils;
                  // Controla que la factura del cobro sea la misma que
                  // la de la cabezera; caso contrario, se notifica el error.
                  if (rs.getInt(1) != c_Invoice_ID)
-                     return "CannotChangePaymentHeaderInvoice";
+                     return Msg.translate(ctx, "CannotChangePaymentHeaderInvoice");
              }
          }
          catch (final SQLException ex)
          {
              log.log(Level.SEVERE, sql, ex);
+             return ex.toString();
          }
          finally
          {
