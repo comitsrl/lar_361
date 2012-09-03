@@ -19,7 +19,9 @@ package ar.com.ergio.model;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.acct.Doc;
@@ -97,6 +99,7 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addModelChange(MOrder.Table_Name, this);
          engine.addModelChange(MPayment.Table_Name, this);
          engine.addModelChange(MInvoice.Table_Name, this);
+         engine.addModelChange(MLARPaymentHeader.Table_Name, this);
 
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
@@ -237,7 +240,70 @@ import ar.com.ergio.util.LAR_Utils;
     				return msg;
     		}
     	//}
+
+        if (po.get_TableName().equals(MLARPaymentHeader.Table_Name) && type == TYPE_BEFORE_CHANGE)
+        {
+            msg = verifyExistingPayments((MLARPaymentHeader) po);
+            if (msg != null)
+                return msg;
+        }
+
         return null;
+     }
+
+
+     /**
+      * Verifica si la cabecera de pago tiene cobros asociados
+      *
+      * @param header cabecera de pagos
+      * @return null si no tiene cobros asociados o
+      *         mensaje de error en caso contrario
+      */
+     private String verifyExistingPayments(final MLARPaymentHeader header)
+     {
+         // Controla si la cabecera es un cobro y si la referencia a la factura cambio
+         final Properties ctx = header.getCtx();
+         if (!Env.isSOTrx(ctx) || !header.is_ValueChanged("C_Invoice_ID"))
+             return null;
+
+         // Controla que la referencia anterior no haya sido nula (cabecera sin factura)
+         if (header.get_ValueOld("C_Invoice_ID") == null)
+             return null;
+
+         int c_Invoice_ID = header.getC_Invoice_ID();
+
+         // Se cuentan los cobros relacionados con la cabecera
+         final String sql = "SELECT C_Invoice_ID FROM C_Payment"
+                          + " WHERE AD_Client_ID=? AND AD_Org_ID=? AND LAR_PaymentHeader_ID=?";
+
+         PreparedStatement pstmt = null;
+         ResultSet rs = null;
+         try
+         {
+             pstmt = DB.prepareStatement(sql, header.get_TrxName());
+             pstmt.setInt(1, Env.getAD_Client_ID(ctx));
+             pstmt.setInt(2, Env.getAD_Org_ID(ctx));
+             pstmt.setInt(3, header.getLAR_PaymentHeader_ID());
+             rs = pstmt.executeQuery();
+             if (rs.next())
+             {
+                 // Controla que la factura del cobro sea la misma que
+                 // la de la cabezera; caso contrario, se notifica el error.
+                 if (rs.getInt(1) != c_Invoice_ID)
+                     return "CannotChangePaymentHeaderInvoice";
+             }
+         }
+         catch (final SQLException ex)
+         {
+             log.log(Level.SEVERE, sql, ex);
+         }
+         finally
+         {
+             DB.close(rs, pstmt);
+             rs = null; pstmt = null;
+         }
+
+         return null;
      }
 
     private String changeDocTypeForInvoice(final MInvoice invoice)
