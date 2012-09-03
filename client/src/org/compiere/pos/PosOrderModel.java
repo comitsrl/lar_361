@@ -429,6 +429,14 @@ public class PosOrderModel extends MOrder {
         return paymentHeader.processIt(DocAction.ACTION_Complete);
     }
 
+    /**
+     * Recupera la cabezera de los pagos realizados por esta orden.
+     */
+    MLARPaymentHeader getMLARPaymentHeader()
+    {
+        return paymentHeader;
+    }
+
     void clearPayments()
     {
         payments.clear();

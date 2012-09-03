@@ -445,6 +445,12 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                     alloc.processIt(DocAction.ACTION_Complete);
                     alloc.saveEx(trxName);
 
+                    // Relaciona la factura generada a la cabecera de pagos creada por la orden
+                    // TODO - Esta operación podría portarse al completamiento de PosOrderModel
+                    //        (el cual debería extender -no reemplazar- al de MOrder)
+                    p_posPanel.m_order.getMLARPaymentHeader().setC_Invoice_ID(p_posPanel.m_order.getC_Invoice_ID());
+                    p_posPanel.m_order.getMLARPaymentHeader().saveEx(trxName);
+
                     // set trx name to null again
                     p_posPanel.m_order.set_TrxName(null);
                 }
