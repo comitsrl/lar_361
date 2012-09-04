@@ -261,18 +261,14 @@ import ar.com.ergio.util.LAR_Utils;
       */
      private String verifyExistingPayments(final MLARPaymentHeader header)
      {
-         // Controla si la cabecera es un cobro y si la referencia a la factura cambio
+         // Controla si la referencia a la factura cambio
          final Properties ctx = header.getCtx();
-         if (!Env.isSOTrx(ctx) || !header.is_ValueChanged("C_Invoice_ID"))
-             return null;
-
-         // Controla que la referencia anterior no haya sido nula (cabecera sin factura)
-         if (header.get_ValueOld("C_Invoice_ID") == null)
+         if (!header.is_ValueChanged("C_Invoice_ID"))
              return null;
 
          int c_Invoice_ID = header.getC_Invoice_ID();
 
-         // Recupera los cobros relacionados con la cabecera
+         // Recupera los cobros/pagos relacionados con la cabecera
          final String sql = "SELECT C_Invoice_ID FROM C_Payment"
                           + " WHERE AD_Client_ID=? AND AD_Org_ID=? AND LAR_PaymentHeader_ID=?";
 
@@ -287,9 +283,9 @@ import ar.com.ergio.util.LAR_Utils;
              rs = pstmt.executeQuery();
              if (rs.next())
              {
-                 // Controla que la factura del cobro sea la misma que
-                 // la de la cabezera; caso contrario, se notifica el error.
-                 if (rs.getInt(1) != c_Invoice_ID)
+                 // Controla que la factura asociada al cobro/pago no sea nula y que sea
+                 // la misma que la de la cabecera; caso contrario, se notifica el error.
+                 if (rs.getInt(1) == 0 || rs.getInt(1) != c_Invoice_ID)
                      return Msg.translate(ctx, "CannotChangePaymentHeaderInvoice");
              }
          }

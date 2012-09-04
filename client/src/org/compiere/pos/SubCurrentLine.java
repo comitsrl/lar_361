@@ -432,8 +432,15 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                     alloc.setDateAcct(p_posPanel.getToday());
                     alloc.saveEx();
 
+                    // Se recorren los cobros creados para asignale la factura generada
+                    // y crear la imputación de pago de los mismos.
                     for (final MPayment payment : p_posPanel.m_order.getPayments())
                     {
+                        // Asignación de la factura al cobro
+                        payment.setC_Invoice_ID(p_posPanel.m_order.getC_Invoice_ID());
+                        payment.save(trxName);
+
+                        // Imputación del cobro
                         final MAllocationLine line = new MAllocationLine(alloc,payment.getPayAmt(),
                                 payment.getDiscountAmt(), payment.getWriteOffAmt(), payment.getOverUnderAmt());
                         line.setDocInfo(payment.getC_BPartner_ID(), p_posPanel.m_order.getC_Order_ID(),
