@@ -655,6 +655,8 @@ import ar.com.ergio.util.LAR_Utils;
 
     private String deactivateWithholding(final MPayment payment, int timing)
     {
+        if(payment.isReceipt())
+            return null;
         // TODO - improve this way to avoid process reversal payments
         if (payment.getDescription() != null
                 && payment.getDescription().contains("{->")
@@ -664,17 +666,21 @@ import ar.com.ergio.util.LAR_Utils;
         else if (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT)
         {
             log.info("C_Payment_ID: " + payment.get_ID());
-            if(payment.isReceipt())
-                return null;
             MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
-            pwh.setIsActive(false);
-            if (!pwh.save()) {
-                return "Can not deactivate payment withholding";
+            if (!pwh.is_new())
+            {
+                pwh.setIsActive(false);
+                if (!pwh.save()) {
+                    return "Can not deactivate payment withholding";
+                }
             }
             MLARWithholdingCertificate whc = MLARWithholdingCertificate.get(payment);
-            whc.setIsActive(false);
-            if (!whc.save()) {
-                return "Can not deactivate payment withholding";
+            if (!whc.is_new())
+            {
+                whc.setIsActive(false);
+                if (!whc.save()) {
+                    return "Can not deactivate payment withholding";
+                }
             }
         }
         return null;

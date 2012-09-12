@@ -50,13 +50,16 @@ public class MLARPaymentWithholding extends X_LAR_PaymentWithholding
     }
 
     /**
-     *
-     * @param order
-     * @param trxName
-     * @return
-     */
+    * Recupera o crea una retención sobre el pago pasado como parámetro.
+    *
+    * @param payment
+    *        pago a partir del cual se busca la retención
+    * @return Rentención existente relaciona al pago, o nuevo objeto retención para el pago
+    *         dado.
+    */
     public static MLARPaymentWithholding get(final MPayment payment)
     {
+        //TODO Agregar cache
         MLARPaymentWithholding retValue = null;
         if (payment == null || payment.getC_Payment_ID() == 0) {
             log.info("No Payment");

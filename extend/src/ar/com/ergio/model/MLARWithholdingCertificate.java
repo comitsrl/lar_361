@@ -50,11 +50,13 @@ public class MLARWithholdingCertificate extends X_LAR_WithholdingCertificate
     }
 
     /**
-     *
-     * @param order
-     * @param trxName
-     * @return
-     */
+    * Recupera o crea una retención sobre el pago pasado como parámetro.
+    *
+    * @param payment
+    *        pago a partir del cual se busca la retención
+    * @return Rentención existente relaciona al pago, o nuevo objeto retención para el pago
+    *         dado.
+    */
     public static MLARWithholdingCertificate get(final MPayment payment)
     {
         MLARWithholdingCertificate retValue = null;
