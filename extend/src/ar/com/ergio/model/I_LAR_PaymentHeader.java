@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_PaymentHeader
  *  @author Adempiere (generated)
- *  @version 3.6.1LTS | P20111003 | LAR 1.0.1.RC1
+ *  @version 3.6.1LTS | P20111003 | LAR 1.0.1-8356c61
  */
 public interface I_LAR_PaymentHeader
 {
@@ -160,6 +160,19 @@ public interface I_LAR_PaymentHeader
 
 	/** Get Detail	  */
 	public boolean isDetail();
+
+    /** Column name DocAction */
+    public static final String COLUMNNAME_DocAction = "DocAction";
+
+	/** Set Document Action.
+	  * The targeted status of the document
+	  */
+	public void setDocAction (String DocAction);
+
+	/** Get Document Action.
+	  * The targeted status of the document
+	  */
+	public String getDocAction();
 
     /** Column name DocStatus */
     public static final String COLUMNNAME_DocStatus = "DocStatus";

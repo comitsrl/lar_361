@@ -16,6 +16,8 @@
  *****************************************************************************/
 package ar.com.ergio.model;
 
+import java.io.File;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,7 +28,9 @@ import java.util.logging.Level;
 
 import org.compiere.apps.ADialog;
 import org.compiere.model.MPayment;
-import org.compiere.util.CLogger;
+import org.compiere.process.DocAction;
+import org.compiere.process.DocOptions;
+import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
 
 /**
@@ -36,15 +40,15 @@ import org.compiere.util.DB;
  *
  * @contributor Marcos Zuñiga - http://www.ergio.com.ar
  */
-public class MLARPaymentHeader extends X_LAR_PaymentHeader
+public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction, DocOptions
 {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -2698873064570244615L;
 
-	/**	Logger							*/
-	private static CLogger	s_log = CLogger.getCLogger (MLARPaymentHeader.class);
+	/** Process Message             */
+    private String      m_processMsg = null;
 
 	/**************************************************************************
 	 * 	Payment Header Constructor
@@ -69,21 +73,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 	}	//	MLARPaymentHeader
 
 
+	@Override
 	protected boolean beforeSave(boolean newRecord)
 	{
 	    // TODO - Think about implement a determination of DocType similar to in MPayment.beforeSave()
 		if(!newRecord)
 		{
-			MPayment[] pays;
-			try
-			{
-				pays = getPayments(get_TrxName());
-			}
-			catch (SQLException e)
-			{
-				s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				return false;
-			}
+			MPayment[] pays = getPayments(get_TrxName());
+
             for (int i = 0; i < pays.length; i++)
 			{
 				pays[i].setC_DocType_ID(getC_DocType_ID());
@@ -101,45 +98,38 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 					}
 					catch (SQLException e)
 					{
-					    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					    log.log(Level.SEVERE, e.getLocalizedMessage(), e);
 					}
 					return false;
 				}
 			}
 		}
 		return true;
-	}
+	} // beforeSave
 
 	/**
 	 * @param success
 	 */
+	@Override
 	protected boolean afterDelete(boolean success)
 	{
 		if(success)
 		{
-			try
-			{
-                MPayment[] pays = getPayments(get_TrxName());
-                for (int i = 0; i < pays.length; i++)
+            MPayment[] pays = getPayments(get_TrxName());
+            for (int i = 0; i < pays.length; i++)
+            {
+                if (!pays[i].delete(false, get_TrxName()))
                 {
-					if(!pays[i].delete(false, get_TrxName()))
-					{
-						String msg = "No se pudo eliminar alguno de los pagos vinculados al documento que" +
-								"se está eliminando. Se cancelará la operación";
-						s_log.severe(msg);
-						ADialog.error(0, null, msg);
-						return false;
-					}
+                    String msg = "No se pudo eliminar alguno de los pagos vinculados al documento que"
+                            + "se está eliminando. Se cancelará la operación";
+                    log.severe(msg);
+                    ADialog.error(0, null, msg);
+                    return false;
                 }
-			}
-			catch (SQLException e)
-			{
-			    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				return false;
-			}
-		}
-		return success;
-	}
+            }
+        }
+        return success;
+	} // afterDelete
 
 	/**
 	 * Devuelve un array con todos los payments vinculados a la cabecera
@@ -147,7 +137,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 	 * @return MPayment[] array con los pagos vinculados al documento
 	 * @throws SQLException
 	 */
-	public MPayment[] getPayments(String trxName) throws SQLException
+	public MPayment[] getPayments(String trxName)
 	{
 	    //TODO - Analize genereate a cache for this payments
 		List<MPayment> pays = new ArrayList<MPayment>();
@@ -164,20 +154,20 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 			rs = pstmt.executeQuery();
 			while(rs.next())
 				pays.add(new MPayment(getCtx(),rs,trxName));
+
+			return pays.toArray(new MPayment[pays.size()]);
 		}
 		catch (SQLException e)
 		{
-			DB.close(rs, pstmt);
-			throw e;
+			log.log(Level.SEVERE, sql, e);
+			return new MPayment[0];
 		}
 		finally
 		{
 			DB.close(rs, pstmt);
 			rs = null; pstmt = null;
 		}
-
-		return pays.toArray(new MPayment[pays.size()]);
-	}
+	} // getPayments
 
 	/**
 	 * 	Process document
@@ -186,66 +176,182 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader
 	 */
 	public boolean processIt (String processAction)
 	{
-	    s_log.info(toString());
-		MPayment[] pays;
-		try
-		{
-			pays = getPayments(get_TrxName());
-		}
-		catch (SQLException e)
-		{
-		    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return false;
-		}
+        m_processMsg = null;
+        DocumentEngine engine = new DocumentEngine (this, getDocStatus());
+        return engine.processIt (processAction, getDocAction());
+	}	//	processIt
 
-		for(int i = 0; i < pays.length; i++)
-		{
-			if(!pays[i].processIt(processAction))
-			{
-				try
-				{
-					DB.rollback(false, get_TrxName());
-				}
-				catch (SQLException e)
-				{
-				    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				}
-				return false;
-			}
-			if(!pays[i].save(get_TrxName()))
-			{
-				try
-				{
-					DB.rollback(false, get_TrxName());
-				}
-				catch (SQLException e)
-				{
-				    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				}
-				return false;
-			}
-		}
 
-		if(!isProcessed())
-			setProcessed(true);
+    @Override
+    public boolean unlockIt()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-		setDocStatus(processAction);
+    @Override
+    public boolean invalidateIt()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-		if(!save())
-		{
-			try
-			{
-				DB.rollback(false, get_TrxName());
-			}
-			catch (SQLException e)
-			{
-			    s_log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			}
-			return false;
-		}
-		return true;
+    @Override
+    public String prepareIt()
+    {
+        log.info(toString());
+        // TODO - Por el momento, no realiza ningún proceso.
+        return DocAction.STATUS_InProgress;
+    }
 
-	}	//	process
+    @Override
+    public boolean approveIt()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean rejectIt()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public String completeIt()
+    {
+        log.info(toString());
+        MPayment[] pays = getPayments(get_TrxName());
+
+        for(int i = 0; i < pays.length; i++)
+        {
+            pays[i].processIt(ACTION_Complete);
+            pays[i].save(get_TrxName());
+            if (!DOCSTATUS_Completed.equals(pays[i].getDocStatus()))
+            {
+                m_processMsg = "@C_Payment_ID@: " + pays[i].getProcessMsg();
+                return DocAction.STATUS_Invalid;
+            }
+        }
+
+        setDocStatus(ACTION_Complete);
+        setDocAction(DOCACTION_Close);
+        setProcessed(true);
+        return DocAction.STATUS_Completed;
+    } // completeIt
+
+    @Override
+    public boolean voidIt()
+    {
+        log.info(toString());
+        MPayment[] pays = getPayments(get_TrxName());
+
+        for(int i = 0; i < pays.length; i++)
+        {
+            pays[i].processIt(ACTION_Void);
+            pays[i].save(get_TrxName());
+            if (!DOCSTATUS_Voided.equals(pays[i].getDocStatus()))
+            {
+                m_processMsg = "@C_Payment_ID@: " + pays[i].getProcessMsg();
+                return false;
+            }
+        }
+
+        setProcessed(true);
+        setDocStatus(ACTION_Void);
+        setDocAction(DOCACTION_None);
+        return true;
+    }
+
+    @Override
+    public boolean closeIt()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean reverseCorrectIt()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean reverseAccrualIt()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean reActivateIt()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public String getSummary()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getDocumentInfo()
+    {
+        return "Cabecera " + getDocumentNo();
+    }
+
+    @Override
+    public File createPDF()
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Operación no soportada");
+    }
+
+    @Override
+    public String getProcessMsg()
+    {
+        return m_processMsg;
+    }
+
+    @Override
+    public int getDoc_User_ID()
+    {
+        return getCreatedBy();
+    }
+
+    @Override
+    public int getC_Currency_ID()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public BigDecimal getApprovalAmt()
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Operación no soportada");
+    }
+
+    @Override
+    public int customizeValidActions(String docStatus, Object processing, String orderType, String isSOTrx, int AD_Table_ID,
+            String[] docAction, String[] options, int index)
+    {
+        // Este método permite agregar las acciones necesarias para
+        // operar con el documento "cabecera"
+        if (AD_Table_ID == Table_ID)
+        {
+            //  Complete
+            if (docStatus.equals(DocumentEngine.STATUS_Completed))
+                options[index++] = DocumentEngine.ACTION_Void;
+        }
+        return index;
+    }
 
 	@Override
 	public String toString()
