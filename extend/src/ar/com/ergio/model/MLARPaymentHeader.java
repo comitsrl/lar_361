@@ -28,6 +28,7 @@ import java.util.logging.Level;
 
 import org.compiere.apps.ADialog;
 import org.compiere.model.MPayment;
+import org.compiere.model.Query;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
@@ -50,28 +51,57 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 	/** Process Message             */
     private String      m_processMsg = null;
 
-	/**************************************************************************
-	 * 	Payment Header Constructor
-	 *	@param ctx context
-	 *	@param A_Asset_ID asset
-	 *	@param trxName transaction name
-	 */
+    /**
+     * Recupera la cabecera de pagos relacionada con el id de la factura dada
+     *
+     * @param ctx
+     *        contexto
+     * @param C_Invoice_ID
+     *        id de factura
+     * @param trxName
+     *        nombre de la transacción
+     * @return Cabecera de pago asociada a la factura dada
+     */
+    public static MLARPaymentHeader getFromInvoice(final Properties ctx, int C_Invoice_ID, final String trxName)
+    {
+        final String whereClause = COLUMNNAME_C_Invoice_ID + "=?";
+        final MLARPaymentHeader header = new Query(ctx, Table_Name, whereClause, trxName)
+                                                .setParameters(C_Invoice_ID)
+                                                .setClient_ID()
+                                                .setOnlyActiveRecords(true)
+                                                .firstOnly();
+        return header;
+    }
+
+    /**
+     * Constructor tradicional para una cabecera de cobros/pagos
+     *
+     * @param ctx
+     *        contexto
+     * @param LAR_PaymentHeader_ID
+     *        ID de la cabecera a crear o 0 si es nueva
+     * @param trxName
+     *        nombre de la transacción
+     */
 	public MLARPaymentHeader (Properties ctx, int LAR_PaymentHeader_ID, String trxName)
 	{
 		super (ctx, LAR_PaymentHeader_ID, trxName);
 	}	//	MLARPaymentHeader
 
-	/**
-	 *  Load Constructor
-	 *  @param ctx context
-	 *  @param rs result set record
-	 *	@param trxName transaction
-	 */
+    /**
+     * Constructor de carga para las cabecera de cobros/pagos
+     *
+     * @param ctx
+     *        contexto
+     * @param rs
+     *        result conjunto de resultado (jdbc)
+     * @param trxName
+     *        nombre de la transaction
+     */
 	public MLARPaymentHeader (Properties ctx, ResultSet rs, String trxName)
 	{
 		super(ctx, rs, trxName);
 	}	//	MLARPaymentHeader
-
 
 	@Override
 	protected boolean beforeSave(boolean newRecord)

@@ -38,16 +38,21 @@ import org.compiere.apps.SwingWorker;
 import org.compiere.apps.form.FormFrame;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MPInstance;
 import org.compiere.model.MPOS;
 import org.compiere.model.Query;
+import org.compiere.process.ProcessInfo;
+import org.compiere.process.ProcessInfoParameter;
 import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.Trx;
 
 import ar.com.ergio.model.FiscalDocumentPrint;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter.DialogActionListener;
+import ar.com.ergio.process.PosOrderGlobalVoiding;
 
 /**
  *	Point of Sales Main Window.
@@ -521,16 +526,28 @@ public class PosBasePanel extends CPanel
             @Override
             public Object construct()
             {
-                final MInvoice invoice = m_order.getInvoices()[0];
-                if (!invoice.processIt(MInvoice.DOCACTION_Void)) {
-                    errorMsg = Msg.parseTranslation(Env.getCtx(), "@ErrorVoidingInvoice@");
-                    return Boolean.FALSE;
-                }
-                if (!invoice.save()) {
-                    errorMsg = Msg.parseTranslation(Env.getCtx(), "@ErrorSavingVoidingInvoice@");
-                    return Boolean.FALSE;
-                }
-                return Boolean.TRUE;
+                // Crea parámetro que se enviará al proceso
+                final ProcessInfoParameter param = new ProcessInfoParameter("C_Order_ID", m_order.getC_Order_ID(), "", "", "");
+
+                // Crea información del proceso
+                int AD_Process_ID = 3000037;
+                final ProcessInfo pi = new ProcessInfo("PosOrderGlobalVoiding", AD_Process_ID);
+                pi.setParameter(new ProcessInfoParameter[]{ param });
+
+                // Crea una instancia de proceso (para registro y sincronizacion)
+                final MPInstance pinstance = new MPInstance(m_ctx, 0, null);
+                pinstance.setAD_Process_ID(AD_Process_ID);
+                pinstance.setRecord_ID(0);
+                pinstance.save();
+
+                // Conecta el proceso con la instancia de proceso
+                pi.setAD_PInstance_ID(pinstance.get_ID());
+
+                // Crea el proceso a ejecutar
+                final PosOrderGlobalVoiding process = new PosOrderGlobalVoiding();
+
+                log.info("Iniciando proceso global de anulaci\u00f3n");
+                return process.startProcess(m_ctx, pi, null);
             }
 
             @Override
