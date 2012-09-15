@@ -14,11 +14,14 @@
 package org.compiere.pos;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -309,6 +312,58 @@ public class PosOrderModel extends MOrder {
 		return orderCompleted;
 	}	// processOrder
 
+    @Override
+    public String completeIt()
+    {
+        // Se ejecuta el completeIt() estándar de ADempiere
+        if (super.completeIt().equals(DocAction.STATUS_Invalid))
+            return DocAction.STATUS_Invalid;
+
+        /* =========================================================================== */
+        /* Se ejecuta las acciones propias para completar las Ordenes POS de LAR       */
+        /* =========================================================================== */
+
+        // En caso de NO ser una transacción de ctacte, se crean y procesan
+        // las imputaciones de cobros y se relaciona la factura generada
+        // con la cabecera de cobros creada por la orden de venta PDV
+        if (!isPaidFromAccount)
+        {
+            // Se crean las imputaciones para cada cobro de la orden
+            final String desc = Msg.translate(Env.getCtx(), "C_Order_ID") + ": " + getDocumentNo();
+            final Timestamp today = Env.getContextAsDate(Env.getCtx(), "#Date");
+            final MAllocationHdr alloc = new MAllocationHdr(p_ctx, false, today,
+                    getC_Currency_ID(), desc, get_TrxName());
+            alloc.setAD_Org_ID(Env.getAD_Org_ID(Env.getCtx()));
+            alloc.setDateAcct(today);
+            alloc.saveEx();
+
+            // Se recorren los cobros creados para asignale la factura generada
+            // y crear la imputación de pago de los mismos.
+            for (final MPayment payment : getPayments())
+            {
+                // Asignación de la factura al cobro
+                payment.setC_Invoice_ID(getC_Invoice_ID());
+                payment.save(get_TrxName());
+
+                // Imputación del cobro
+                final MAllocationLine line = new MAllocationLine(alloc, payment.getPayAmt(),
+                        payment.getDiscountAmt(), payment.getWriteOffAmt(), payment.getOverUnderAmt());
+                line.setDocInfo(payment.getC_BPartner_ID(), getC_Order_ID(), getC_Invoice_ID());
+                line.setC_Payment_ID(payment.getC_Payment_ID());
+                line.saveEx(get_TrxName());
+            }
+            // Se completa la imputación de pago
+            alloc.processIt(DocAction.ACTION_Complete);
+            alloc.saveEx(get_TrxName());
+
+            // Se relaciona la factura generada con la cabecera de cobro
+            paymentHeader.setC_Invoice_ID(getC_Invoice_ID());
+            paymentHeader.saveEx(get_TrxName());
+        }
+
+        return DocAction.STATUS_Completed;
+    }
+
 	public BigDecimal getTaxAmt()	{
 		BigDecimal taxAmt = Env.ZERO;
 		for (MOrderTax tax : getTaxes(true))
@@ -423,18 +478,9 @@ public class PosOrderModel extends MOrder {
 
     boolean processPayments()
     {
-        // FIXME - Improve MLARPaymentHeader processes and convetions!!
         if (isPaidFromAccount)
             return true;
         return paymentHeader.processIt(DocAction.ACTION_Complete);
-    }
-
-    /**
-     * Recupera la cabezera de los pagos realizados por esta orden.
-     */
-    MLARPaymentHeader getMLARPaymentHeader()
-    {
-        return paymentHeader;
     }
 
     void clearPayments()

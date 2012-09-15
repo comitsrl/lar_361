@@ -38,14 +38,10 @@ import org.compiere.apps.ADialog;
 import org.compiere.grid.ed.VPAttributeDialog;
 import org.compiere.minigrid.ColumnInfo;
 import org.compiere.minigrid.IDColumn;
-import org.compiere.model.MAllocationHdr;
-import org.compiere.model.MAllocationLine;
 import org.compiere.model.MOrderLine;
-import org.compiere.model.MPayment;
 import org.compiere.model.MProduct;
 import org.compiere.model.MWarehousePrice;
 import org.compiere.model.PO;
-import org.compiere.process.DocAction;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CScrollPane;
@@ -423,40 +419,6 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                         String msg = Msg.translate(p_ctx, p_posPanel.m_order.getProcessMsg());
                         throw new AdempierePOSException(msg);
                     }
-
-                    // Creates payment allocation for earch payment of order
-                    final String desc = Msg.translate(Env.getCtx(), "C_Order_ID") + ": " + p_posPanel.m_order.getDocumentNo();
-                    final MAllocationHdr alloc = new MAllocationHdr(p_ctx, false, p_posPanel.getToday(),
-                            p_posPanel.m_order.getC_Currency_ID(), desc, trxName);
-                    alloc.setAD_Org_ID(Env.getAD_Org_ID(Env.getCtx()));
-                    alloc.setDateAcct(p_posPanel.getToday());
-                    alloc.saveEx();
-
-                    // Se recorren los cobros creados para asignale la factura generada
-                    // y crear la imputación de pago de los mismos.
-                    for (final MPayment payment : p_posPanel.m_order.getPayments())
-                    {
-                        // Asignación de la factura al cobro
-                        payment.setC_Invoice_ID(p_posPanel.m_order.getC_Invoice_ID());
-                        payment.save(trxName);
-
-                        // Imputación del cobro
-                        final MAllocationLine line = new MAllocationLine(alloc,payment.getPayAmt(),
-                                payment.getDiscountAmt(), payment.getWriteOffAmt(), payment.getOverUnderAmt());
-                        line.setDocInfo(payment.getC_BPartner_ID(), p_posPanel.m_order.getC_Order_ID(),
-                                p_posPanel.m_order.getC_Invoice_ID());
-                        line.setC_Payment_ID(payment.getC_Payment_ID());
-                        line.saveEx(trxName);
-                    }
-                    // Should start WF
-                    alloc.processIt(DocAction.ACTION_Complete);
-                    alloc.saveEx(trxName);
-
-                    // Relaciona la factura generada a la cabecera de pagos creada por la orden
-                    // TODO - Esta operación podría portarse al completamiento de PosOrderModel
-                    //        (el cual debería extender -no reemplazar- al de MOrder)
-                    p_posPanel.m_order.getMLARPaymentHeader().setC_Invoice_ID(p_posPanel.m_order.getC_Invoice_ID());
-                    p_posPanel.m_order.getMLARPaymentHeader().saveEx(trxName);
 
                     // set trx name to null again
                     p_posPanel.m_order.set_TrxName(null);

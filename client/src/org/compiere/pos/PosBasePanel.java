@@ -47,7 +47,6 @@ import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
-import org.compiere.util.Trx;
 
 import ar.com.ergio.model.FiscalDocumentPrint;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter;
