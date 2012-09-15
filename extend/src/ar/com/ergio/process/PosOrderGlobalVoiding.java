@@ -73,19 +73,18 @@ public class PosOrderGlobalVoiding extends SvrProcess
             int c_Invoice_ID = invoices[i].getC_Invoice_ID();
 
             // Recupera y anula la cabecera de cobros/pagos asociada a la factura
+            // en caso de tratarse de una factura de venta al contado (cabecera no nula)
             final MLARPaymentHeader header = MLARPaymentHeader.getFromInvoice(getCtx(), c_Invoice_ID, get_TrxName());
             if (header == null)
-                throw new AdempiereException("Factura sin cabecera de pago relacionada");
-
-            String headerType = invoices[i].isSOTrx() ? "Cabecera de cobro" : "Cabecera de pago";
+                continue;
 
             if (header.processIt(MLARPaymentHeader.ACTION_Void))
             {
                 header.save(get_TrxName());
-                m_processMsg.append(headerType).append(" anulada correctamente");
+                m_processMsg.append("Cabecera de cobros anulada correctamente");
             }
             else
-                m_processMsg.append(headerType).append(": ").append(order.getProcessMsg());
+                m_processMsg.append("Cabecera de corbos: ").append(order.getProcessMsg());
         }
 
         // Anula la orden y sus documentos asociados: remitos, facturas
