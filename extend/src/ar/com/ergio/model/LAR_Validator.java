@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.acct.Doc;
@@ -32,6 +33,7 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -48,7 +50,6 @@ import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
-import org.compiere.util.Msg;
 
 import static ar.com.ergio.model.LAR_TaxPayerType.RESPONSABLE_INSCRIPTO;
 import ar.com.ergio.util.LAR_Utils;
@@ -101,6 +102,7 @@ import ar.com.ergio.util.LAR_Utils;
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
          engine.addDocValidate(MInvoice.Table_Name, this);
+         engine.addDocValidate(MInOut.Table_Name, this);
          engine.addDocValidate(MAllocationHdr.Table_Name, this);
      }   //  initialize
 
@@ -359,6 +361,15 @@ import ar.com.ergio.util.LAR_Utils;
          }
          // Determine documentNo for voided invoices
          if (po.get_TableName().equals(MInvoice.Table_Name) &&
+                 (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
+         {
+             msg = changeVoidDocumentNo(po);
+             if (msg != null) {
+                 return msg;
+             }
+         }
+         // Determine documentNo for voided shipments
+         if (po.get_TableName().equals(MInOut.Table_Name) &&
                  (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
          {
              msg = changeVoidDocumentNo(po);
@@ -692,32 +703,82 @@ import ar.com.ergio.util.LAR_Utils;
     // TODO - Improve and add this behavior to ADempiere and make it configurable (ideal)
     private String changeVoidDocumentNo(final PO po)
     {
-        // fix documentno for reverse invoices
+        final Properties ctx = po.getCtx();
+        PO revPo = null;
+        MSequence seq = null;
+        // Corrije el nro de documento de la factura anulada y su reversa asociada
         if (po.get_TableName().equals(MInvoice.Table_Name))
         {
             final MInvoice invoice = (MInvoice) po;
             if (invoice.isSOTrx() && invoice.getReversal_ID() != 0)
             {
-                final MInvoice revInvoice = new MInvoice(invoice.getCtx(), invoice.getReversal_ID(), invoice.get_TrxName());
+                revPo = new MInvoice(ctx, invoice.getReversal_ID(), invoice.get_TrxName());
+                final MInvoice revInvoice = (MInvoice) revPo;
                 log.info("Change DocumentNo of " + revInvoice);
 
+                // Intenta recuperar la secuencia "definitiva". En caso que sea nula,
+                // recupera la secuencia "normal"
                 int AD_Sequence_ID = invoice.getC_DocType().getDefiniteSequence_ID();
-                final MSequence seq = new MSequence(invoice.getCtx(), AD_Sequence_ID, invoice.get_TrxName());
-                String newDocumentNo = Msg.translate(invoice.getCtx(), "Voided") + "-" + invoice.getDocumentNo();
+                if (AD_Sequence_ID == 0)
+                    AD_Sequence_ID = invoice.getC_DocType().getDocNoSequence_ID();
 
-                revInvoice.setDocumentNo(newDocumentNo);
-                if (!revInvoice.save())
-                    return "AccessCannotUpdate"; // TODO - Improve this message, addding new one
+                // Redefine los nros de documento y las descripciones de las facturas
+                seq = new MSequence(ctx, AD_Sequence_ID, invoice.get_TrxName());
+                String revDocumentNo = "Rev-" + invoice.getDocumentNo() + "-" + invoice.getC_Invoice_ID();
+                String voidDocumentNo = "Anu-" + invoice.getDocumentNo() + "-" + invoice.getC_Invoice_ID();
+                revInvoice.setDocumentNo(revDocumentNo);
+                revInvoice.setDescription("(" + voidDocumentNo + "<-)");
+                invoice.setDocumentNo(voidDocumentNo);
+                invoice.setDescription("(" + revDocumentNo + "<-)");
 
-                invoice.setDescription("(" + newDocumentNo + "<-)");
-                if (!invoice.save())
-                    return "AccessCannotUpdate"; // TODO - Improve this message, addding new one
-
-                seq.setCurrentNext(seq.getCurrentNext() - 1);
-                if (!seq.save())
-                    return "SequenceDocNotFound"; // TODO - Improve this message, addding new one
+                // Si la secuencia es automática, retrocede la numeración
+                if (seq.isAutoSequence())
+                    seq.setCurrentNext(seq.getCurrentNext() - 1);
             }
         }
+        // Corrije el nro de documento del remito anulado y su reverso asociado
+        if (po.get_TableName().equals(MInOut.Table_Name))
+        {
+            final MInOut shipment = (MInOut) po;
+            if (shipment.isSOTrx() && shipment.getReversal_ID() != 0)
+            {
+                revPo = new MInOut(ctx, shipment.getReversal_ID(), shipment.get_TrxName());
+                final MInOut revShipment = (MInOut) revPo;
+                log.info("Change DocumentNo of " + revShipment);
+
+                // Intenta recuperar la secuencia "definitiva". En caso que sea nula,
+                // recupera la secuencia "normal"
+                int AD_Sequence_ID = shipment.getC_DocType().getDefiniteSequence_ID();
+                if (AD_Sequence_ID == 0)
+                    AD_Sequence_ID = shipment.getC_DocType().getDocNoSequence_ID();
+
+                // Redefine los nros de documento y las descripciones de los remitos
+                seq = new MSequence(ctx, AD_Sequence_ID, shipment.get_TrxName());
+                int sufix = seq.hashCode() * shipment.getDocumentNo().hashCode();
+
+                String revDocumentNo = "R-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
+                String voidDocumentNo = "A-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
+                revShipment.setDocumentNo(revDocumentNo);
+                revShipment.setDescription("(" + voidDocumentNo + "<-)");
+                shipment.setDocumentNo(voidDocumentNo);
+                shipment.setDescription("(" + revDocumentNo + "<-)");
+
+                // Si la secuencia es automática, retrocede la numeración
+                if (seq.isAutoSequence())
+                    seq.setCurrentNext(seq.getCurrentNext() - 1);
+            }
+        }
+        // Guarda los cambios realizados sobre los nros de documento
+        // y las reversiones de las secuencias.
+        if (!revPo.save())
+            return "Error al guardar el documento inverso";
+
+        if (!po.save())
+            return "Error al guardar el documento anulado";
+
+        if (seq.is_Changed() && !seq.save())
+            return "Error al guardar la secuencia";
+
         return null;
     }
 
