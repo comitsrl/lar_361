@@ -786,7 +786,7 @@ public class FiscalDocumentPrint {
 	        final I_M_InOutLine ioline = line.getM_InOutLine();
 	        if (ioline.getM_InOutLine_ID() > 0)
 	        {
-	            String obs = Msg.translate(ctx, "M_InOut_ID") + ": " + ioline.getM_InOut().getDocumentNo();
+	            String obs = ioline.getM_InOut().getDocumentNo();
 	            if (!document.getObservations().contains(obs))
 	                document.addObservation(obs);
 	        }
@@ -877,8 +877,9 @@ public class FiscalDocumentPrint {
 		BigDecimal amt = ((BigDecimal) mInvoice.get_Value("WithHoldingAmt")).negate(); // LAR perception are negative
 		if (amt.compareTo(BigDecimal.ZERO) > 0)
 		{
-		    BigDecimal rate = amt.divide(totalLineAmt, 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
-		    String desc = String.format("Percepci\u00f3n (%2.2f%%)", rate);
+		    // TODO Corregir el calculo del porcentaje de percepción.
+		    // BigDecimal rate = amt.divide(totalLineAmt, 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
+		    String desc = "Percepci\u00f3n IIBB"; //String.format("Percepci\u00f3n", rate);
 		    PerceptionLine perceptionLine = new PerceptionLine(desc, amt, null);
 		    document.setPerceptionLine(perceptionLine);
 		}
