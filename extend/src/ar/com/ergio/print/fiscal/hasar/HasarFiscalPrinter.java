@@ -870,6 +870,10 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			// Comando: @PrintLineItem
 			loadDocumentLineItems(creditNote);
 
+            //////////////////////////////////////////////////////////////
+            // Se carga la percepción de la note de crédito
+            loadDocumentPerception(creditNote);
+
 			//////////////////////////////////////////////////////////////
 			// Se cierra el comprobante no fiscal homologado.
 			// Comando: @CloseDNFH
@@ -932,6 +936,10 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			// Se cargan los ítems de la nota de débito.
 			// Comando: @PrintLineItem
 			loadDocumentLineItems(debitNote);
+
+            //////////////////////////////////////////////////////////////
+            // Se carga la percepción de la note de crédito
+            loadDocumentPerception(debitNote);
 
 			//////////////////////////////////////////////////////////////
 			// Se cierra el comprobante fiscal.
