@@ -710,73 +710,81 @@ import ar.com.ergio.util.LAR_Utils;
         if (po.get_TableName().equals(MInvoice.Table_Name))
         {
             final MInvoice invoice = (MInvoice) po;
-            if (invoice.isSOTrx() && invoice.getReversal_ID() != 0)
-            {
-                revPo = new MInvoice(ctx, invoice.getReversal_ID(), invoice.get_TrxName());
-                final MInvoice revInvoice = (MInvoice) revPo;
-                log.info("Change DocumentNo of " + revInvoice);
+            // Si no se tiene la referencia a la reversión, no se procesa
+            if (invoice.getReversal_ID() == 0)
+                return null;
 
-                // Intenta recuperar la secuencia "definitiva". En caso que sea nula,
-                // recupera la secuencia "normal"
-                int AD_Sequence_ID = invoice.getC_DocType().getDefiniteSequence_ID();
-                if (AD_Sequence_ID == 0)
-                    AD_Sequence_ID = invoice.getC_DocType().getDocNoSequence_ID();
+            revPo = new MInvoice(ctx, invoice.getReversal_ID(), invoice.get_TrxName());
+            final MInvoice revInvoice = (MInvoice) revPo;
+            log.info("Change DocumentNo of " + revInvoice);
 
-                // Redefine los nros de documento y las descripciones de las facturas
-                seq = new MSequence(ctx, AD_Sequence_ID, invoice.get_TrxName());
-                String revDocumentNo = "Rev-" + invoice.getDocumentNo() + "-" + invoice.getC_Invoice_ID();
-                String voidDocumentNo = "Anu-" + invoice.getDocumentNo() + "-" + invoice.getC_Invoice_ID();
-                revInvoice.setDocumentNo(revDocumentNo);
-                revInvoice.setDescription("(" + voidDocumentNo + "<-)");
-                invoice.setDocumentNo(voidDocumentNo);
-                invoice.setDescription("(" + revDocumentNo + "<-)");
+            // Intenta recuperar la secuencia "definitiva". Si no tiene, intenta
+            // recupera la secuencia "normal". Si no tiene, no sea hace nada debido
+            // a que le documento NO tiene secuencia configurada
+            int ad_Sequence_ID = invoice.getC_DocType().getDefiniteSequence_ID();
+            if (ad_Sequence_ID == 0)
+                ad_Sequence_ID = invoice.getC_DocType().getDocNoSequence_ID();
 
-                // Si la secuencia es automática, retrocede la numeración
-                if (seq.isAutoSequence())
-                    seq.setCurrentNext(seq.getCurrentNext() - 1);
-            }
+            if (ad_Sequence_ID != 0)
+                seq = new MSequence(ctx, ad_Sequence_ID, invoice.get_TrxName());
+
+            // Redefine los nros de documento y las descripciones de las facturas
+            String revDocumentNo = "Rev-" + invoice.getDocumentNo() + "-" + invoice.getC_Invoice_ID();
+            String voidDocumentNo = "Anu-" + invoice.getDocumentNo() + "-" + invoice.getC_Invoice_ID();
+            revInvoice.setDocumentNo(revDocumentNo);
+            revInvoice.setDescription("(" + voidDocumentNo + "<-)");
+            invoice.setDocumentNo(voidDocumentNo);
+            invoice.setDescription("(" + revDocumentNo + "<-)");
+
+            // Si la secuencia es automática, retrocede la numeración
+            if (seq != null && seq.isAutoSequence())
+                seq.setCurrentNext(seq.getCurrentNext() - 1);
         }
         // Corrije el nro de documento del remito anulado y su reverso asociado
         if (po.get_TableName().equals(MInOut.Table_Name))
         {
             final MInOut shipment = (MInOut) po;
-            if (shipment.isSOTrx() && shipment.getReversal_ID() != 0)
-            {
-                revPo = new MInOut(ctx, shipment.getReversal_ID(), shipment.get_TrxName());
-                final MInOut revShipment = (MInOut) revPo;
-                log.info("Change DocumentNo of " + revShipment);
+            // Si no se tiene la referencia a la reversión, no se procesa
+            if (shipment.getReversal_ID() == 0)
+                return null;
 
-                // Intenta recuperar la secuencia "definitiva". En caso que sea nula,
-                // recupera la secuencia "normal"
-                int AD_Sequence_ID = shipment.getC_DocType().getDefiniteSequence_ID();
-                if (AD_Sequence_ID == 0)
-                    AD_Sequence_ID = shipment.getC_DocType().getDocNoSequence_ID();
+            revPo = new MInOut(ctx, shipment.getReversal_ID(), shipment.get_TrxName());
+            final MInOut revShipment = (MInOut) revPo;
+            log.info("Change DocumentNo of " + revShipment);
 
-                // Redefine los nros de documento y las descripciones de los remitos
+            // Intenta recuperar la secuencia "definitiva". En caso que sea nula,
+            // recupera la secuencia "normal"
+            int AD_Sequence_ID = shipment.getC_DocType().getDefiniteSequence_ID();
+            if (AD_Sequence_ID == 0)
+                AD_Sequence_ID = shipment.getC_DocType().getDocNoSequence_ID();
+
+            if (AD_Sequence_ID != 0)
                 seq = new MSequence(ctx, AD_Sequence_ID, shipment.get_TrxName());
-                int sufix = seq.hashCode() * shipment.getDocumentNo().hashCode();
 
-                String revDocumentNo = "R-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
-                String voidDocumentNo = "A-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
-                revShipment.setDocumentNo(revDocumentNo);
-                revShipment.setDescription("(" + voidDocumentNo + "<-)");
-                shipment.setDocumentNo(voidDocumentNo);
-                shipment.setDescription("(" + revDocumentNo + "<-)");
+            // Redefine los nros de documento y las descripciones de los remitos
+            int sufix = shipment.getM_InOut_ID() * shipment.getDocumentNo().hashCode();
 
-                // Si la secuencia es automática, retrocede la numeración
-                if (seq.isAutoSequence())
-                    seq.setCurrentNext(seq.getCurrentNext() - 1);
-            }
+            String revDocumentNo = "R-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
+            String voidDocumentNo = "A-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
+            revShipment.setDocumentNo(revDocumentNo);
+            revShipment.setDescription("(" + voidDocumentNo + "<-)");
+            shipment.setDocumentNo(voidDocumentNo);
+            shipment.setDescription("(" + revDocumentNo + "<-)");
+
+            // Si encontró una secuencia, y la misma es automática, retrocede la numeración
+            if (seq != null && seq.isAutoSequence())
+                seq.setCurrentNext(seq.getCurrentNext() - 1);
         }
         // Guarda los cambios realizados sobre los nros de documento
         // y las reversiones de las secuencias.
-        if (!revPo.save())
+        // (siempre y cuando hayan cambiado y no sean nulos)
+        if (revPo != null && !revPo.save())
             return "Error al guardar el documento inverso";
 
-        if (!po.save())
+        if (po.is_Changed() && !po.save())
             return "Error al guardar el documento anulado";
 
-        if (seq.is_Changed() && !seq.save())
+        if (seq != null && seq.is_Changed() && !seq.save())
             return "Error al guardar la secuencia";
 
         return null;
