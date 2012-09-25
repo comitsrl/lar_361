@@ -265,11 +265,15 @@ public class MAllocationLine extends X_C_AllocationLine
 				log.warning("C_BPartner_ID different - Invoice=" + getC_BPartner_ID() + " - Payment=" + payment.getC_BPartner_ID());
 			if (reverse)
 			{
-				if (!payment.isCashTrx())
-				{
+                // @emmie - SIEMPRE que se revierta una linea de asignación,
+                //          el cobro se marca como no-asignado
+                //if (!payment.isCashTrx())
+                //{
+				    payment.setC_Invoice_ID(0);
 					payment.setIsAllocated(false);
 					payment.saveEx();
-				}
+				//}
+                // @emmie
 			}
 			else
 			{
