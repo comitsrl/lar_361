@@ -420,6 +420,12 @@ public class PosBasePanel extends CPanel
     /**********************************************************************************************
      *                            LAR Fiscal Printing Implementation
      **********************************************************************************************/
+
+    ///////////////////////////////////////////////////////////////////////////
+    // TODO - Abstract Fiscal Printing behavior in order to avoid
+    //        duplicate code with InvoiceFiscalPrinting class
+    ///////////////////////////////////////////////////////////////////////////
+
     protected void startGlassPane(final String AD_Message)
     {
         m_frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));

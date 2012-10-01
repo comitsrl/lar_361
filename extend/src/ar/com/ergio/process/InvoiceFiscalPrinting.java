@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import org.compiere.apps.SwingWorker;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MSequence;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -130,8 +131,15 @@ public class InvoiceFiscalPrinting extends SvrProcess
             @Override
             public void actionVoidPerformed()
             {
+                // Anula la Factura/NC
                 invoice.processIt(MInvoice.DOCACTION_Void);
                 invoice.saveEx();
+
+                // Retrocede la secuencia en 1 (igual a lo que hace el proceso PosOrderGlobalVoing)
+                int AD_Sequence_ID = invoice.getC_DocType().getDefiniteSequence_ID();
+                final MSequence seq = new MSequence(getCtx(), AD_Sequence_ID, invoice.get_TrxName());
+                seq.setCurrentNext(seq.getCurrentNext() - 1);
+                seq.saveEx();
             }
 
             @Override
