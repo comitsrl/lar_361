@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
+<!--ADempiere(r) 3.6.1-P20111003 | LAR 1.0.1-e681d3f | Ergio 1.0.0-8e9d53f_2012-10-02 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-10-02 - Ergio(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Tab">
  <row id="100" trl="Y">
@@ -416,10 +416,10 @@
   <value column="Description" original="Shippers">Transportista</value>
   <value column="Help" original="The Shippers Tab defines any entity who will provide shipping to or shipping from an Organization.">La pestaña de transportistas define las entidades que proveerán entregas desde ó hacia una organización.</value>
  </row>
- <row id="186" trl="Y">
-  <value column="Name" original="Order">Orden</value>
+ <row id="186" trl="N">
+  <value column="Name" original="Order">Presupuesto / Orden</value>
   <value column="CommitWarning" original=""/>
-  <value column="Description" original="Order Header">Encabezamiento de la Orden</value>
+  <value column="Description" original="Order Header">Encabezamiento de la Orden / Presupuesto</value>
   <value column="Help" original="The Order Header Tab defines the parameters of an Order. Changing the Organization, Business Partner, Warehouse, Date Promised, etc. changes these values on all the lines. ">La pestaña del encabezamiento de la orden define los parámetros de una orden.</value>
  </row>
  <row id="187" trl="Y">
@@ -1095,10 +1095,10 @@
   <value column="Help" original="The Statement Line Tab defines the individual line items on the Bank Statement.  They can be entered manually or generated from payments entered.&#10;&lt;br&gt;For Posting, the bank account organization is used, if it is not a charge.">La pestaña Línea Edo. de Cuentas define las líneas individuales en el Estado de Cuentas bancario. Las líneas pueden ser introducidas manualmente ó generadas desde entradas de pagos.</value>
  </row>
  <row id="330" trl="Y">
-  <value column="Name" original="Payment">Pago / Cobro</value>
+  <value column="Name" original="Payment -&gt; Invoices"><![CDATA[Pago -> Facturas]]></value>
   <value column="CommitWarning" original=""/>
-  <value column="Description" original="Payment or Receipt">Pago</value>
-  <value column="Help" original="Enter payment or receipt for a Business Partner.  If it is for a single invoice it can be allocated directly to that invoice using this screen. You can also apply over/under payments:&lt;br&gt;&#10;You have an over-payment, if you received more money than due for a single invoice. Instead of writing the difference off (i.e. would be a gain), you can leave the amount unallocated and use it for later invoices or credit memos. Please note that the Amount is the payment amount, so you need to enter the over-payment as a negative amount.&lt;br&gt;&#10;You can also receive a partial payment (under-payment). If you decide not to write off the remaining invoice amount, enter the under-payment as a positive amount.&lt;br&gt;&#10;Note that printed payments are archived in Payment Selection (Prepared Payment).&#10;&lt;br&gt;For Posting, the bank account organization is used, if it is not a charge.">La pestaña Pagos define un pago hecho por un Socio del Negocio. Si el pago es para una sola factura; éste puede ser asignado a esa factura directamente usando esta pantalla. También es posible aplicar sobre/sub pagos; se tiene un sobrepago si se ha recibido más dinero que la que se debía por la factura. En lugar de eliminar la diferencia (ej. Volviendola una ganancia); es posible dejar el Total sin asignar y usarlo con futuras facturas ó cartas de crédito. Note que el Total es el Total pagado por lo tanto sobrepagos deben ser entrados como Totales negativos. Es posible también recibir un pago parcial (sub pago). Si se decide no eliminar el pago faltante; entre el sub pago como un Total positivo.</value>
+  <value column="Description" original="A Payment can be allocated to several Invoices">Permite asignar un Pago a una o varias Facturas.</value>
+  <value column="Help" original="Enter payment for a Business Partner.  If it is for a single invoice it can be allocated directly to that invoice using this screen. You can also apply over/under payments:&lt;br&gt;&#10;You have an over-payment, if you received more money than due for a single invoice. Instead of writing the difference off (i.e. would be a gain), you can leave the amount unallocated and use it for later invoices or credit memos. Please note that the Amount is the payment amount, so you need to enter the over-payment as a negative amount.&lt;br&gt;&#10;You can also receive a partial payment (under-payment). If you decide not to write off the remaining invoice amount, enter the under-payment as a positive amount.&lt;br&gt;&#10;Note that printed payments are archived in Payment Selection (Prepared Payment).&#10;&lt;br&gt;For Posting, the bank account organization is used, if it is not a charge."/>
  </row>
  <row id="331" trl="Y">
   <value column="Name" original="Accounting">Contabilidad</value>
@@ -3081,10 +3081,10 @@ Usted puede definir el contra de documentos para todas las organizaciones (de la
   <value column="Help" original="Price List schema defines calculation rules for price lists">El esquema de lista de precios define las reglas de cálculo para la lista de precios</value>
  </row>
  <row id="676" trl="Y">
-  <value column="Name" original="POS Terminal">Terminal PDV</value>
+  <value column="Name" original="POS Terminal">Configuración PDV</value>
   <value column="CommitWarning" original=""/>
-  <value column="Description" original="Point of Sales Terminal">Terminal de Punto de Venta</value>
-  <value column="Help" original="The POS Terminal defines the defaults and functions available for the POS Form">La Terminal de PV define los defaults y las funciones disponibles para las formas de PV</value>
+  <value column="Description" original="Point of Sales Terminal">Configuración del Punto de Venta</value>
+  <value column="Help" original="The POS Terminal defines the defaults and functions available for the POS Form">Define los Puntos de Venta habilitados con los valores por defecto y suss funciones disponibles.</value>
  </row>
  <row id="677" trl="Y">
   <value column="Name" original="POS Key Layout">Llave de PDV Layout</value>
@@ -3141,7 +3141,7 @@ Usted puede definir el contra de documentos para todas las organizaciones (de la
   <value column="Help" original="">Asignación de Facturas para pagos ó Efectivo</value>
  </row>
  <row id="686" trl="Y">
-  <value column="Name" original="Allocations">Asignación</value>
+  <value column="Name" original="Allocations">Asignaciones</value>
   <value column="CommitWarning" original=""/>
   <value column="Description" original="Display Allocation of the Payment/Receipt to Invoices">Asignación de Pagos/Entregas a Factura</value>
   <value column="Help" original=""/>
@@ -3546,7 +3546,7 @@ Note que la información es alamacenada. Para que tenga efecto debe ingresar nue
 Note que la información es almacenada en cache. Para que adquiera valor debe reingresar al sistema o restaurar el cache. </value>
  </row>
  <row id="755" trl="Y">
-  <value column="Name" original="Allocate">Asignación</value>
+  <value column="Name" original="Allocate to Invoices">Asignación a Facturas</value>
   <value column="CommitWarning" original=""/>
   <value column="Description" original="Allocate Payments to Invoices">Asignación de Pagos a Facturas</value>
   <value column="Help" original="You can directly allocate payments to invoices with the same currency when creating the Payment. &#10;Note that you can over- or under-allocate the payment.&lt;b&gt;&#10;When processing the payment, the allocation is created.&lt;b&gt;&#10;The Organization is set to the invoice organization">Usted puede asignar pagos a Facturas directamente con lamisma monéda al crear el pago.
@@ -5494,16 +5494,16 @@ La pestaña lista de materiales define aquellos productos que son generados desd
   <value column="Help" original=""/>
  </row>
  <row id="1000000" trl="Y">
-  <value column="Name" original="Withholding">Retención</value>
-  <value column="CommitWarning" original="Please take account that changes on Withholding will be lost if you change invoice lines after making this change."/>
-  <value column="Description" original=""/>
+  <value column="Name" original="Withholding">Percepción</value>
+  <value column="CommitWarning" original="Please take account that changes on Withholding will be lost if you change invoice lines after making this change.">Tener en cuenta que los cambios en la percepción se perderán si se cambian las líneas de la factura después de realizar el cambio.</value>
+  <value column="Description" original="">Percepción aplicada a la factura.</value>
   <value column="Help" original=""/>
  </row>
  <row id="1000001" trl="Y">
-  <value column="Name" original="Withholding">Tipo Contribuyente</value>
+  <value column="Name" original="Withholding">Retención</value>
   <value column="CommitWarning" original="Please take account that changes on Withholding will be lost if you change invoice lines after making this change."/>
-  <value column="Description" original="">Tipos de contribuyente</value>
-  <value column="Help" original="">Almacena los tipos de contribuyentes segun AFIP</value>
+  <value column="Description" original="">Retención Aplicada a la factura.</value>
+  <value column="Help" original=""/>
  </row>
  <row id="1000002" trl="Y">
   <value column="Name" original="Withholding">Retención</value>
@@ -5565,6 +5565,24 @@ La pestaña lista de materiales define aquellos productos que son generados desd
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
+ <row id="1000013" trl="Y">
+  <value column="Name" original="Allocate to Invoices">Asignar a Facturas</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original="Allocate Payments to Invoices">Lista las facturas a las cuales se asignará el pago.</value>
+  <value column="Help" original="You can directly allocate payments to invoices with the same currency when creating the Payment.&#10;Note that you can over- or under-allocate the payment.&lt;b&gt;&#10;When processing the payment, the allocation is created.&lt;b&gt;&#10;The Organization is set to the invoice organization"/>
+ </row>
+ <row id="1000014" trl="Y">
+  <value column="Name" original="Allocations">Asignaciones</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original="Display Allocation of the Payment/Receipt to Invoices">Lista las facturas a las cuales se asignará el recibo.</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="1000015" trl="Y">
+  <value column="Name" original="Withholding">Retención</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
  <row id="3000000" trl="Y">
   <value column="Name" original="Fiscal Printer">Impresora Fiscal</value>
   <value column="CommitWarning" original=""/>
@@ -5594,5 +5612,69 @@ La pestaña lista de materiales define aquellos productos que son generados desd
   <value column="CommitWarning" original=""/>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
+ </row>
+ <row id="3000007" trl="Y">
+  <value column="Name" original="Drawer Closing ">Cierre de Cajas</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original="Drawer Closing">Cierre de Cajas</value>
+  <value column="Help" original="The Drawer Closing Tab defines the Drawer to be reconciled/closed."/>
+ </row>
+ <row id="3000008" trl="Y">
+  <value column="Name" original="Drawer Closing Line">Línea Cierre de Cajas</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original="Drawer Closing Line">Línea Cierre de Cajas</value>
+  <value column="Help" original="Drawer Closing Line (The Drawer Closing Tab defines the individual line items on the Drawer Closing.  They can be entered manually or generated from payments entered.&#10;&lt;br&gt;For Posting, the bank account organization is used, if it is not a charge."/>
+ </row>
+ <row id="3000012" trl="Y">
+  <value column="Name" original="Receipt Header">Recibos</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000013" trl="Y">
+  <value column="Name" original="Receipt Detail">Detalle de Cobros</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000014" trl="Y">
+  <value column="Name" original="Allocation">Asignación</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000015" trl="Y">
+  <value column="Name" original="Payment Header">Orden de Pago</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000016" trl="Y">
+  <value column="Name" original="Payment Detail">Detalle de Pagos</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000017" trl="Y">
+  <value column="Name" original="Allocation">Asignación</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000018" trl="Y">
+  <value column="Name" original="On Drawer Checks">Cheques en Cartera</value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000026" trl="N">
+  <value column="Name" original="Receipt -&gt; Invoices"><![CDATA[Payment -> Invoices]]></value>
+  <value column="CommitWarning" original=""/>
+  <value column="Description" original="A Receipt can be allocated to several Invoices">A Payment can be allocated to several Invoices</value>
+  <value column="Help" original="Enter Receipt for a Business Partner.  If it is for a single invoice it can be allocated directly to that invoice using this screen. You can also apply over/under payments:&lt;br&gt;&#10;You have an over-payment, if you received more money than due for a single invoice. Instead of writing the difference off (i.e. would be a gain), you can leave the amount unallocated and use it for later invoices or credit memos. Please note that the Amount is the payment amount, so you need to enter the over-payment as a negative amount.&lt;br&gt;&#10;You can also receive a partial payment (under-payment). If you decide not to write off the remaining invoice amount, enter the under-payment as a positive amount.&lt;br&gt;&#10;Note that printed payments are archived in Payment Selection (Prepared Payment).&#10;&lt;br&gt;For Posting, the bank account organization is used, if it is not a charge."><![CDATA[Enter payment for a Business Partner.  If it is for a single invoice it can be allocated directly to that invoice using this screen. You can also apply over/under payments:<br>
+You have an over-payment, if you received more money than due for a single invoice. Instead of writing the difference off (i.e. would be a gain), you can leave the amount unallocated and use it for later invoices or credit memos. Please note that the Amount is the payment amount, so you need to enter the over-payment as a negative amount.<br>
+You can also receive a partial payment (under-payment). If you decide not to write off the remaining invoice amount, enter the under-payment as a positive amount.<br>
+Note that printed payments are archived in Payment Selection (Prepared Payment).
+<br>For Posting, the bank account organization is used, if it is not a charge.]]></value>
  </row>
 </adempiereTrl>

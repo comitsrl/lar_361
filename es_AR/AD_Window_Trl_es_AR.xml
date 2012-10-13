@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
+<!--ADempiere(r) 3.6.1-P20111003 | LAR 1.0.1-e681d3f | Ergio 1.0.0-8e9d53f_2012-10-02 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-10-02 - Ergio(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Window">
  <row id="100" trl="Y">
@@ -193,9 +193,9 @@
   <value column="Help" original="The Shipper Window defines the different shipping provides used by an Organization.  When a delivery method of Shipper is used on an Order a predefined Shipper must be selected.">La ventana define los diferentes proveedores de despachos que usa una organización. Cuando un método de despacho es usado en una orden; un transportador debe ser seleccionado</value>
  </row>
  <row id="143" trl="Y">
-  <value column="Name" original="Sales Order">Órdenes de Venta</value>
-  <value column="Description" original="Enter and change sales orders">Entrar y cambiar Órdenes de ventas</value>
-  <value column="Help" original="The Order Window allows you to enter and modify Sales Orders.  ">La ventana permite entrar y modificar Órdenes de venta</value>
+  <value column="Name" original="Sales Order">Presupuestos/Remitos</value>
+  <value column="Description" original="Enter and change sales orders">Ingresar y modificar Presupuestos y Órdenes de ventas</value>
+  <value column="Help" original="The Order Window allows you to enter and modify Sales Orders.  ">Ingresar y modificar Presupuestos y Órdenes de ventas</value>
  </row>
  <row id="144" trl="Y">
   <value column="Name" original="Product Category">Categoría de Producto</value>
@@ -288,8 +288,8 @@
   <value column="Help" original="The Physical Inventory Window allows you to generate inventory count lists.  These counts can then be processed which will update the actual inventory with the new counts. Normally you would create inventory count lines automaticelly. If you create them manually, make sure that the book value is correct.">Permite generar listas de conteo del inventario físico. Estos conteos pueden ser procesados para actualizar el inventario real con las cantidades contadas.</value>
  </row>
  <row id="169" trl="Y">
-  <value column="Name" original="Shipment (Customer)">Remitos (Cliente)</value>
-  <value column="Description" original="Customer Inventory Shipments Customer Returns">Entrega de Inventario a Clientes</value>
+  <value column="Name" original="Shipment (Customer)">Consulta Remitos (Cliente)</value>
+  <value column="Description" original="Customer Inventory Shipments Customer Returns">Entrega de Remitos (Cliente)</value>
   <value column="Help" original="The Shipment Window defines shipments made or to be made to a customer.  They are generated from an Customer Order.  The Shipment Document will generate the Customer Invoice.">Define las entregas hechos ó por hacer a un cliente. Las entregas son generadas desde una orden de un cliente. Los documentos de entrega generarán la factura del cliente.</value>
  </row>
  <row id="170" trl="Y">
@@ -388,9 +388,9 @@
   <value column="Help" original="The Process Bank Statements window allows you to reconcile your Bank Statements.  You can either enter the line items from the statement in the Statement Line tab or select the 'Create From' button to automatically generate the statement from all unreconciled payments to this bank account.  Once you have completed reconciling, select the 'Process Statement' button to mark the payments as reconciled and update the appropriate GL accounts.">Esta ventana permite conciliar sus saldos bancarios. Usted puede ya sea introducir líneas desde el estado de cuentas en la pestaña de línea de estado de cuentas ó seleccionar el botón `Crear desde` para generar automáticamente el balance de todos los pagos no conciliados para esta cuenta bancaria. Una vez que la conciliación esta completa; seleccione el botón `Procesar Estado de Cuentas` para marcar los pagos como conciliados y actualizar las cuentas correspondientes de la Contabilidad General</value>
  </row>
  <row id="195" trl="Y">
-  <value column="Name" original="Payment">Pagos / Cobros</value>
-  <value column="Description" original="Process Payments and Receipts">Procesar Pagos / Cobros</value>
-  <value column="Help" original="The Process Payments Window allows you to enter payments and reaipts for invoices.  If the payment is for a single invoice then it can be processed here.  If it is for multiple invoices or is a partial payment then it should be processed in the Payment Allocation Window.">Esta ventana permite entrar pagos que han sido recibido por pago de facturas. Si el pago es por una sola factura entonces éste pago puede ser procesado en esta ventana. Si se trata de múltiples facturas ó es un pago parcial; entonces el pago debe ser procesado en la ventana `Asignación de Pagos`</value>
+  <value column="Name" original="Payment -&gt; Invoices"><![CDATA[Pago -> Facturas]]></value>
+  <value column="Description" original="Process Payments">Permite procesar un Pago asignandolo a una o varias facturas.</value>
+  <value column="Help" original="The Process Payments Window allows you to enter payments for invoices.  If the payment is for a single invoice then it can be processed here.  If it is for multiple invoices or is a partial payment then it should be processed in the Payment Allocation Window."><![CDATA[Si el pago es asignado a una factura se realiza desde la pestaña Pago -> Facturas. Si la asignación es a varias facturas, se deben ingresar las facturas en la pestaña Asignación a Facturas.]]></value>
  </row>
  <row id="196" trl="Y">
   <value column="Name" original="Custom Attribute">Atributo Personalizado</value>
@@ -1064,7 +1064,7 @@ Antes(!) incorporando transacciones, comience la réplica funcionada al sistema 
   <value column="Help" original="Price List schema defines calculation rules for price lists">Esquema de lista de precios define las reglas de calculo para la lista de precios</value>
  </row>
  <row id="338" trl="Y">
-  <value column="Name" original="POS Terminal">Terminal PDV</value>
+  <value column="Name" original="POS Terminal">Configuración PDV</value>
   <value column="Description" original="Maintain your Point of Sales Terminal">Mantenimiento a terminales de punto de venta</value>
   <value column="Help" original="The POS Terminal defines the defaults and functions available for the POS Form">La terminal de PDV define los datos por omisión y las funciones disponibles para las formas de PDV.</value>
  </row>
@@ -1822,6 +1822,11 @@ MRP - 110	 No exists Dem</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
+ <row id="1000005" trl="Y">
+  <value column="Name" original="Receipt -&gt; Invoices">Recibo (1 Cobro)</value>
+  <value column="Description" original="Process Receipts">Procesa un Recibo (cobro) asignándolo a una o varias facturas.</value>
+  <value column="Help" original="The Receipt -&gt; Invoices Window allows you to enter a recipt and allocate it to several invoices."><![CDATA[Si el Pago es asignado a una factura se realiza desde la pestaña Recibo -> Facturas. Si la asignación es a varias facturas, se deben ingresar las facturas en la pestaña Asignación a Facturas. ]]></value>
+ </row>
  <row id="3000000" trl="Y">
   <value column="Name" original="Fiscal Printer">Impresora Fiscal</value>
   <value column="Description" original=""/>
@@ -1841,5 +1846,25 @@ MRP - 110	 No exists Dem</value>
   <value column="Name" original="WithholdingCertificate">Certificado de Retención</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
+ </row>
+ <row id="3000005" trl="Y">
+  <value column="Name" original="Drawer Closing">Cierre de Cajas</value>
+  <value column="Description" original="">Cierre de Cajas</value>
+  <value column="Help" original="The Process Drawer Closing window allows you to reconcile your Drawer.  Once you have completed reconciling, select the 'Process Statement' button to mark the payments as reconciled and update the appropriate GL accounts.">La ventana Cierre de Cajas permite realizar una conciliación del dinero, cupones, cheques etc con lo registrado en el Sistema.</value>
+ </row>
+ <row id="3000009" trl="Y">
+  <value column="Name" original="Receipts">Recibo (Varios Cobros)</value>
+  <value column="Description" original="Customers Receipts Registration">Permite procesar varios Cobros agrupados en un solo Recibo.</value>
+  <value column="Help" original="">Si se selecciona una factura se realiza la asignación de todos los cobros a esa factura.</value>
+ </row>
+ <row id="3000010" trl="Y">
+  <value column="Name" original="Payments">Pagos</value>
+  <value column="Description" original="Vendor Payments Registration">Permite procesar varios pagos agrupados en una sola orden de Pago.</value>
+  <value column="Help" original="">Si se selecciona una factura se realiza la asignación de todos los pagos a esa factura.</value>
+ </row>
+ <row id="3000011" trl="Y">
+  <value column="Name" original="On Drawer Checks">Cheques en Cartera</value>
+  <value column="Description" original="List all ARR Receipts with Check Tender Type which are on drawer">Lista todos los pagos cuya Forma de Pago es Cheque y están en cartera.</value>
+  <value column="Help" original="">Sacando el tilde a la casilla En Cartera permite eliminar el cheque del listado y elegir el destino del cheque (Depositado, Rechazado)</value>
  </row>
 </adempiereTrl>

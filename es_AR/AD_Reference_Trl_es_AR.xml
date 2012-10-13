@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
+<!--ADempiere(r) 3.6.1-P20111003 | LAR 1.0.1-e681d3f | Ergio 1.0.0-8e9d53f_2012-10-02 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-10-02 - Ergio(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Reference">
  <row id="1" trl="Y">
@@ -2211,6 +2211,41 @@
  </row>
  <row id="3000007" trl="N">
   <value column="Name" original="LAR_FiscalPrinterStatus">LAR_FiscalPrinterStatus</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000009" trl="N">
+  <value column="Name" original="LAR_BankAccount_Drawer">LAR_BankAccount</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000011" trl="N">
+  <value column="Name" original="LAR_FiscalClose_Types">LAR_FiscalClose_Types</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000012" trl="N">
+  <value column="Name" original="LAR_Invoices_For_Credit_Note">LAR_Invoices_For_Credit_Note</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000018" trl="N">
+  <value column="Name" original="AD_Org (list all but summary)">AD_Org (list all but summary)</value>
+  <value column="Description" original="Organization selection">Organization selection</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000021" trl="N">
+  <value column="Name" original="LAR C_TaxWithholding_ID">LAR C_TaxWithholding_ID</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000022" trl="N">
+  <value column="Name" original="LAR_POS_ID Login Org">LAR_POS_ID Login Org</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000023" trl="N">
+  <value column="Name" original="AD_Org Login">AD_Org Login</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>

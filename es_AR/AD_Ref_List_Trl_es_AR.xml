@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
+<!--ADempiere(r) 3.6.1-P20111003 | LAR 1.0.1-e681d3f | Ergio 1.0.0-8e9d53f_2012-10-02 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-10-02 - Ergio(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Ref_List">
  <row id="51" trl="Y">
@@ -340,7 +340,7 @@
  </row>
  <row id="188" trl="Y">
   <value column="Name" original="Re-activate">Reactivar</value>
-  <value column="Description" original="Reopen Document and Reverse automaticly generated documents; You need to Complete the transaction after the change. ">RRestaurar documentos/inventario y permite cambios ; usted necesita completar la transacción después del cambio</value>
+  <value column="Description" original="Reopen Document and Reverse automaticly generated documents; You need to Complete the transaction after the change. ">Permite modificaciones al documento actual. Si existe, cancela el Remito asociado. Al completar nuevamente genera un nuevo Remito.</value>
  </row>
  <row id="189" trl="Y">
   <value column="Name" original="&lt;None&gt;">Sin Acción</value>
@@ -1079,7 +1079,7 @@
   <value column="Description" original=""/>
  </row>
  <row id="402" trl="Y">
-  <value column="Name" original="Direct Deposit">ACH</value>
+  <value column="Name" original="Direct Deposit">Depósito Directo - Transferencia</value>
   <value column="Description" original="ACH Automatic Clearing House">Depósito Directo - Transferencia</value>
  </row>
  <row id="403" trl="Y">
@@ -1147,8 +1147,8 @@
   <value column="Description" original=""/>
  </row>
  <row id="419" trl="Y">
-  <value column="Name" original="Purchase Card">Tarjeta de Compras</value>
-  <value column="Description" original="Corporate Purchase Card">Tarjeta de Compras Corporativa</value>
+  <value column="Name" original="Purchase Card">Tarjeta de Débito</value>
+  <value column="Description" original="Corporate Purchase Card">Tarjeta de Débito</value>
  </row>
  <row id="420" trl="Y">
   <value column="Name" original="None">Ninguno</value>
@@ -4651,7 +4651,7 @@ Crear una orden de manufactura, recibir el producdto final y emitir los componen
   <value column="Description" original=""/>
  </row>
  <row id="3000005" trl="N">
-  <value column="Name" original="Debit Note">Credit Note</value>
+  <value column="Name" original="Debit Note">Debit Note</value>
   <value column="Description" original=""/>
  </row>
  <row id="3000006" trl="N">
@@ -4740,6 +4740,14 @@ Crear una orden de manufactura, recibir el producdto final y emitir los componen
  </row>
  <row id="3000027" trl="N">
   <value column="Name" original="IDLE">IDLE</value>
+  <value column="Description" original=""/>
+ </row>
+ <row id="3000031" trl="N">
+  <value column="Name" original="Cierre X">Cierre X</value>
+  <value column="Description" original=""/>
+ </row>
+ <row id="3000032" trl="N">
+  <value column="Name" original="Cierre Z">Cierre Z</value>
   <value column="Description" original=""/>
  </row>
 </adempiereTrl>
