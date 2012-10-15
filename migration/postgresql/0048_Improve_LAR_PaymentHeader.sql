@@ -163,31 +163,6 @@ UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3000899
 UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2012-09-11 20:21:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000899
 ;
 
--- 11/09/2012 20:23:59 ART
--- Incorporar flujo de trabajo para las cabeceras de pagos/cobros
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3000900,2,'Y','N','N',3000827,'N','Y',3000023,'N','You find the current status in the Document Status field. The options are listed in a popup','LAR','The targeted status of the document','Document Action',100,0,TO_TIMESTAMP('2012-09-11 20:23:52','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2012-09-11 20:23:52','YYYY-MM-DD HH24:MI:SS'))
-;
-
--- 11/09/2012 20:23:59 ART
--- Incorporar flujo de trabajo para las cabeceras de pagos/cobros
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3000900 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 11/09/2012 20:24:29 ART
--- Incorporar flujo de trabajo para las cabeceras de pagos/cobros
-UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=3000900
-;
-
--- 11/09/2012 20:24:30 ART
--- Incorporar flujo de trabajo para las cabeceras de pagos/cobros
-UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3000761
-;
-
--- 11/09/2012 20:24:44 ART
--- Incorporar flujo de trabajo para las cabeceras de pagos/cobros
-UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2012-09-11 20:24:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000900
-;
-
 -- 11/09/2012 20:27:12 ART
 -- Incorporar flujo de trabajo para las cabeceras de pagos/cobros
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3000901,2,'Y','N','N',3000827,'N','Y',3000012,'N','You find the current status in the Document Status field. The options are listed in a popup','LAR','The targeted status of the document','Document Action',100,0,TO_TIMESTAMP('2012-09-11 20:27:12','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2012-09-11 20:27:12','YYYY-MM-DD HH24:MI:SS'))
