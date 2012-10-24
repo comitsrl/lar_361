@@ -1,7 +1,7 @@
-ALTER TABLE C_Payment ADD COLUMN C_TaxWithholding_ID Number(10);
+ALTER TABLE C_Payment ADD C_TaxWithholding_ID Number(10);
 ALTER TABLE C_Payment ADD CONSTRAINT ctax_cpayment FOREIGN KEY (C_TaxWithholding_ID)
     REFERENCES C_Tax(C_Tax_ID);
-ALTER TABLE C_Payment ADD COLUMN WithholdingCertNo Varchar2(20);
+ALTER TABLE C_Payment ADD WithholdingCertNo Varchar2(20);
 
 -- 07/07/2012 13:55:25 GMT-03:00
 -- Add C_TaxWitholding_ID and WithholdingCertNo columns with their logics
@@ -90,7 +90,7 @@ UPDATE AD_Column SET AD_Reference_Value_ID=3000021, AD_Reference_ID=18,Updated=T
 
 -- 10/07/2012 22:58:12 GMT-03:00
 -- Add C_TaxWitholding_ID and WithholdingCertNo columns with their logics
-INSERT INTO AD_Field (SortNo,IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,SeqNo,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,DisplayLogic,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES (0,'N',3000885,0,'Y','N','N',3000816,'N',670,'Y',1000012,'N','@C_Invoice_ID@^'''' & @WriteOffAmt@!0','U','C_TaxWithholding_ID',100,0,TO_DATE('2012-07-10 22:58:10','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2012-07-10 22:58:10','YYYY-MM-DD HH24:MI:SS'))
+INSERT INTO AD_Field (SortNo,IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,SeqNo,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,DisplayLogic,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES (0,'N',3000885,0,'Y','N','N',3000816,'N',670,'Y',3000026,'N','@C_Invoice_ID@^'''' & @WriteOffAmt@!0','U','C_TaxWithholding_ID',100,0,TO_DATE('2012-07-10 22:58:10','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2012-07-10 22:58:10','YYYY-MM-DD HH24:MI:SS'))
 ;
 
 -- 10/07/2012 22:58:12 GMT-03:00
@@ -604,7 +604,7 @@ UPDATE AD_Field SET EntityType='LAR',Updated=TO_DATE('2012-07-23 18:50:38','YYYY
 
 -- 23/07/2012 18:52:32 ART
 -- Add C_TaxWitholding_ID and WithholdingCertNo columns with their logics
-INSERT INTO AD_Field (SortNo,IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,SeqNo,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,DisplayLogic,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES (0,'N',3000887,0,'Y','N','N',3000820,'N',680,'Y',1000012,'N','@C_Invoice_ID@^'''' & @WriteOffAmt@!0','LAR','WithholdingCertNo',100,0,TO_DATE('2012-07-23 18:52:31','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2012-07-23 18:52:31','YYYY-MM-DD HH24:MI:SS'))
+INSERT INTO AD_Field (SortNo,IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,SeqNo,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,DisplayLogic,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES (0,'N',3000887,0,'Y','N','N',3000820,'N',680,'Y',3000026,'N','@C_Invoice_ID@^'''' & @WriteOffAmt@!0','LAR','WithholdingCertNo',100,0,TO_DATE('2012-07-23 18:52:31','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2012-07-23 18:52:31','YYYY-MM-DD HH24:MI:SS'))
 ;
 
 -- 23/07/2012 18:52:32 ART
@@ -1078,23 +1078,23 @@ UPDATE AD_Column SET Callout='org.compiere.model.CalloutPayment.amounts;ar.com.e
 ;
 
 -- 29/07/2012 0:13:38 ART
--- Show Invoice Info on Header 
+-- Show Invoice Info on Header
 UPDATE AD_Column SET ColumnSQL='((SELECT InvoiceOpen( C_Invoice_ID, 0) FROM C_Invoice i WHERE i.C_Invoice_ID = LAR_PaymentHeader.C_Invoice_ID) - ((SELECT COALESCE(Sum(PayAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID) + (SELECT COALESCE(Sum(WriteOffAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID)))',Updated=TO_DATE('2012-07-29 00:13:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000264
 ;
 
 -- 29/07/2012 0:17:37 ART
--- Show Invoice Info on Header 
+-- Show Invoice Info on Header
 UPDATE AD_Column SET ColumnSQL='(COALESCE((SELECT InvoiceOpen( C_Invoice_ID, 0) FROM C_Invoice i WHERE i.C_Invoice_ID = LAR_PaymentHeader.C_Invoice_ID),0))',Updated=TO_DATE('2012-07-29 00:17:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000263
 ;
 
 -- 29/07/2012 0:18:49 ART
--- Show Invoice Info on Header 
+-- Show Invoice Info on Header
 UPDATE AD_Column SET ColumnSQL='((SELECT COALESCE(Sum(PayAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID) + (SELECT COALESCE(Sum(WriteOffAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID))',Updated=TO_DATE('2012-07-29 00:18:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000262
 ;
 
 
 -- 29/07/2012 0:24:45 ART
--- Show Invoice Info on Header 
+-- Show Invoice Info on Header
 UPDATE AD_Column SET DefaultValue=NULL,Updated=TO_DATE('2012-07-29 00:24:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000241
 ;
 
@@ -1115,12 +1115,12 @@ UPDATE AD_Field SET DisplayLogic='@C_Invoice_ID@>0 & @Processed@=N',Updated=TO_D
 
 -- 27/07/2012 22:45:08 ART
 -- Add mandatory logic to C_TaxWithholding_id y WithholdingcertNo
-INSERT INTO ad_message(ad_message_id, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby, value, msgtext, msgtip, msgtype, entitytype) VALUES ((SELECT CurrentNext FROM AD_Sequence WHERE AD_Sequence_ID=9), 1000000, 0, 'Y', getdate(), 100, getdate(), 100, 'PaymentNotAllowed', 'Payment not allowed', null, 'I', 'LAR')
+INSERT INTO ad_message(ad_message_id, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby, value, msgtext, msgtip, msgtype, entitytype) VALUES ((SELECT CurrentNext FROM AD_Sequence WHERE AD_Sequence_ID=9), 0, 0, 'Y', getdate(), 100, getdate(), 100, 'PaymentNotAllowed', 'Payment not allowed', null, 'I', 'LAR')
 ;
 
 -- 27/07/2012 22:45:08 ART
 -- Add mandatory logic to C_TaxWithholding_id y WithholdingcertNo
-INSERT INTO ad_message_trl(ad_message_id, ad_language, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby, msgtext, msgtip, istranslated) VALUES ((SELECT CurrentNext FROM AD_Sequence WHERE AD_Sequence_ID=9), 'es_AR', 1000000, 0, 'Y', getdate(), 100, getdate(), 100, 'Pago no permitido', null, 'Y')
+INSERT INTO ad_message_trl(ad_message_id, ad_language, ad_client_id, ad_org_id, isactive, created, createdby, updated, updatedby, msgtext, msgtip, istranslated) VALUES ((SELECT CurrentNext FROM AD_Sequence WHERE AD_Sequence_ID=9), 'es_AR', 0, 0, 'Y', getdate(), 100, getdate(), 100, 'Pago no permitido', null, 'Y')
 ;
 
 UPDATE AD_Sequence SET CurrentNext = CurrentNext + 1 WHERE AD_Sequence_ID=9
