@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
+<!--ADempiere(r) 3.6.1-P20111003 | LAR 1.0.1-e681d3f | Ergio 1.0.0-8e9d53f_2012-10-02 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-10-02 - Ergio(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Element">
  <row id="101" trl="Y">
@@ -4433,8 +4433,8 @@
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="1005" trl="Y">
-  <value column="Name" original="Activity">Tipo de Gasto</value>
-  <value column="PrintName" original="Activity">Tipo de Gasto</value>
+  <value column="Name" original="Activity">Actividad</value>
+  <value column="PrintName" original="Activity">Actividad</value>
   <value column="Description" original="Business Activity">Actividad de Negocio</value>
   <value column="Help" original="Activities indicate tasks that are performed and used to utilize Activity based Costing">Las actividades indican tareas que son ejecutadas en el curso de un negocio; las actividades son usadas para el costeo por actividad (ABC)</value>
   <value column="PO_Description" original=""/>
@@ -12834,8 +12834,8 @@ Si no se incorpora ninguna, se utiliza la impresora por default. Usted especific
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="2061" trl="Y">
-  <value column="Name" original="Change Log">Cambiar registro</value>
-  <value column="PrintName" original="Change Log">Cambiar registro</value>
+  <value column="Name" original="Change Log">Registro de Cambios</value>
+  <value column="PrintName" original="Change Log">Registro de Cambios</value>
   <value column="Description" original="Log of data changes">Registro de cambio de datos</value>
   <value column="Help" original="Log of data changes">Registro de cambio de datos</value>
   <value column="PO_Description" original=""/>
@@ -30126,6 +30126,36 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_Name" original=""/>
   <value column="PO_PrintName" original=""/>
  </row>
+ <row id="1000039" trl="N">
+  <value column="Name" original="To_C_BankAccount_ID">To_C_BankAccount_ID</value>
+  <value column="PrintName" original="Bank Account To">Bank Account To</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="1000040" trl="N">
+  <value column="Name" original="From_C_BankAccount_ID">From_C_BankAccount_ID</value>
+  <value column="PrintName" original="Bank Account From">Bank Account From</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="1000041" trl="N">
+  <value column="Name" original="CloseType">CloseType</value>
+  <value column="PrintName" original="CloseType">CloseType</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
  <row id="3000000" trl="Y">
   <value column="Name" original="LAR_Fiscal_Printer_Type">LAR_Fiscal_Printer_Type</value>
   <value column="PrintName" original="LAR_Fiscal_Printer_Type">LAR_Fiscal_Printer_Type</value>
@@ -30318,7 +30348,7 @@ Prepare genera documentos de entrega/recibo divididos
  </row>
  <row id="3000020" trl="Y">
   <value column="Name" original="Letter">Letra</value>
-  <value column="PrintName" original="Letter">Letter</value>
+  <value column="PrintName" original="Letter">Letra</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30338,7 +30368,7 @@ Prepare genera documentos de entrega/recibo divididos
  </row>
  <row id="3000022" trl="Y">
   <value column="Name" original="LCO_TaxPayerType_Vendor_ID">Categoría IVA Proveedor</value>
-  <value column="PrintName" original="LCO_TaxPayerType_Vendor_ID">lco_taxpayertype_vendor_id</value>
+  <value column="PrintName" original="LCO_TaxPayerType_Vendor_ID">Categoría IVA Proveedor</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30348,7 +30378,7 @@ Prepare genera documentos de entrega/recibo divididos
  </row>
  <row id="3000023" trl="Y">
   <value column="Name" original="LCO_TaxPayerType_Customer_ID">Categoría IVA Cliente</value>
-  <value column="PrintName" original="LCO_TaxPayerType_Customer_ID">lco_taxpayertype_customer_id</value>
+  <value column="PrintName" original="LCO_TaxPayerType_Customer_ID">Categoría IVA Cliente</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30358,8 +30388,8 @@ Prepare genera documentos de entrega/recibo divididos
  </row>
  <row id="3000024" trl="Y">
   <value column="Name" original="IsSaleWithoutStock">Vender sin Stock</value>
-  <value column="PrintName" original="IsSaleWithoutStock">issalewithoutstock</value>
-  <value column="Description" original=""/>
+  <value column="PrintName" original="IsSaleWithoutStock">Vender sin Stock</value>
+  <value column="Description" original="">Permite Vender sin Stock.</value>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
   <value column="PO_Help" original=""/>
@@ -30367,8 +30397,8 @@ Prepare genera documentos de entrega/recibo divididos
   <value column="PO_PrintName" original=""/>
  </row>
  <row id="3000025" trl="Y">
-  <value column="Name" original="PosNumber">Nro. Punto de Venta</value>
-  <value column="PrintName" original="PosNumber">posnumber</value>
+  <value column="Name" original="PosNumber">PDV</value>
+  <value column="PrintName" original="PosNumber">Nro. Punto de Venta</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30398,7 +30428,7 @@ Prepare genera documentos de entrega/recibo divididos
  </row>
  <row id="3000028" trl="Y">
   <value column="Name" original="WithholdingPercent">% Retención</value>
-  <value column="PrintName" original="WithholdingPercent">withholdingpercent</value>
+  <value column="PrintName" original="WithholdingPercent">% Retención</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30418,7 +30448,7 @@ Prepare genera documentos de entrega/recibo divididos
  </row>
  <row id="3000030" trl="Y">
   <value column="Name" original="IsCalcFromPayment">Calculado desde el Pago</value>
-  <value column="PrintName" original="IsCalcFromPayment">iscalcfrompayment</value>
+  <value column="PrintName" original="IsCalcFromPayment">Calculado desde el Pago</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
@@ -30429,6 +30459,316 @@ Prepare genera documentos de entrega/recibo divididos
  <row id="3000031" trl="N">
   <value column="Name" original="LAR_OrderPerception">LAR_OrderPerception</value>
   <value column="PrintName" original="LAR_OrderPerception">LAR_OrderPerception</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000032" trl="Y">
+  <value column="Name" original="IsAllowCreditExceeded">Permite Crédito Exedido</value>
+  <value column="PrintName" original="IsAllowCreditExceeded">Permite Crédito Exedido</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000036" trl="Y">
+  <value column="Name" original="IsGenerateWithholdingOnSale">Genera Retención</value>
+  <value column="PrintName" original="IsGenerateWithholdingOnSale">Genera Retención</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000037" trl="Y">
+  <value column="Name" original="IsDrawer">Caja</value>
+  <value column="PrintName" original="IsDrawer">Caja</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000038" trl="Y">
+  <value column="Name" original="CheckTotalAmt">Total Cheques</value>
+  <value column="PrintName" original="CheckTotalAmt">Total Cheques</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000039" trl="Y">
+  <value column="Name" original="CashTotalAmt">Total Efectivo</value>
+  <value column="PrintName" original="CashTotalAmt">Total Efectivo</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000040" trl="Y">
+  <value column="Name" original="CreditCardTotalAmt">Total Tarjetas de Crédito</value>
+  <value column="PrintName" original="CreditCardTotalAmt">Total Tarjetas de Crédito</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000041" trl="Y">
+  <value column="Name" original="DirectDebitTotalAmt">Total Débito Directo</value>
+  <value column="PrintName" original="DirectDebitTotalAmt">Total Débito Directo</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000042" trl="Y">
+  <value column="Name" original="ScrutinizedCheckAmt">Cheques Contabilizados</value>
+  <value column="PrintName" original="ScrutinizedCheckAmt">Cheques Contabilizados</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000043" trl="Y">
+  <value column="Name" original="ScrutinizedCashAmt">Efectivo Contabilizado</value>
+  <value column="PrintName" original="ScrutinizedCashAmt">Efectivo Contabilizado</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000044" trl="Y">
+  <value column="Name" original="ScrutinizedCreditCardAmt">T. Crédito Contabilizado</value>
+  <value column="PrintName" original="ScrutinizedCreditCardAmt">T. Crédito Contabilizado</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000045" trl="Y">
+  <value column="Name" original="ScrutinizedDirectDebitAmt">Débito Directo Contabilizado</value>
+  <value column="PrintName" original="ScrutinizedDirectDebitAmt">Débito Directo Contabilizado</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000047" trl="Y">
+  <value column="Name" original="CheckDifference">Diferencia Cheques</value>
+  <value column="PrintName" original="CheckDifference">Diferencia Cheques</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000048" trl="Y">
+  <value column="Name" original="CashDifference">Diferencia de Efectivo</value>
+  <value column="PrintName" original="CashDifference">CashDifference</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000049" trl="Y">
+  <value column="Name" original="CreditCardDifference">Diferencia Tarjetas Crédito</value>
+  <value column="PrintName" original="CreditCardDifference">Diferencia Tarjetas Crédito</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000050" trl="Y">
+  <value column="Name" original="DirectDebitDifference">Diferencia Débito Directo</value>
+  <value column="PrintName" original="DirectDebitDifference">Diferencia Débito Directo</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000051" trl="Y">
+  <value column="Name" original="TotalDifference">Total Diferencia</value>
+  <value column="PrintName" original="TotalDifference">Total Diferencia</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000068" trl="N">
+  <value column="Name" original="LAR_PaymentHeader">LAR_PaymentHeader</value>
+  <value column="PrintName" original="LAR_PaymentHeader">LAR_PaymentHeader</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000070" trl="Y">
+  <value column="Name" original="SearchPayments">Buscar Cheques en Cartera</value>
+  <value column="PrintName" original="SearchPayments">Buscar Cheques en Cartera</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000071" trl="Y">
+  <value column="Name" original="Detail">Detalle</value>
+  <value column="PrintName" original="Detail">Detalle</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000074" trl="N">
+  <value column="Name" original="LAR_PaymentSource_ID">lar_paymentsource_id</value>
+  <value column="PrintName" original="LAR_PaymentSource_ID">lar_paymentsource_id</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000075" trl="Y">
+  <value column="Name" original="Allocation">Asignación</value>
+  <value column="PrintName" original="Allocation">Asignación</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000076" trl="Y">
+  <value column="Name" original="IsOnDrawer">En Cartera</value>
+  <value column="PrintName" original="IsOnDrawer">En Cartera</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000077" trl="N">
+  <value column="Name" original="PayHeaderTotalAmt">PayHeaderTotalAmt</value>
+  <value column="PrintName" original="PayHeaderTotalAmt">PayHeaderTotalAmt</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000079" trl="N">
+  <value column="Name" original="Source_Invoice_ID">source_invoice_id</value>
+  <value column="PrintName" original="Source_Invoice_ID">source_invoice_id</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000080" trl="N">
+  <value column="Name" original="TargetDocBaseType">TargetDocBaseType</value>
+  <value column="PrintName" original="TargetDocBaseType">TargetDocBaseType</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000084" trl="N">
+  <value column="Name" original="TargetAccount">TargetAccount</value>
+  <value column="PrintName" original="TargetAccount">TargetAccount</value>
+  <value column="Description" original="Account where the check was deposited."/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000085" trl="N">
+  <value column="Name" original="IsBounced">IsBounced</value>
+  <value column="PrintName" original="IsBounced">IsBounced</value>
+  <value column="Description" original="Mark if the check was bounced."/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000086" trl="N">
+  <value column="Name" original="IsDeposited">IsDeposited</value>
+  <value column="PrintName" original="IsDeposited">IsDeposited</value>
+  <value column="Description" original="Mark if a check was deposited."/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000087" trl="N">
+  <value column="Name" original="C_Payment_DocType_ID">C_Payment_DocType_ID</value>
+  <value column="PrintName" original="C_Payment_DocType_ID">C_Payment_DocType_ID</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000124" trl="N">
+  <value column="Name" original="C_TaxWithholding_ID">c_taxwithholding_id</value>
+  <value column="PrintName" original="C_TaxWithholding_ID">c_taxwithholding_id</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+  <value column="PO_Description" original=""/>
+  <value column="PO_Help" original=""/>
+  <value column="PO_Name" original=""/>
+  <value column="PO_PrintName" original=""/>
+ </row>
+ <row id="3000125" trl="N">
+  <value column="Name" original="WithholdingCertNo">withholdingcertno</value>
+  <value column="PrintName" original="WithholdingCertNo">withholdingcertno</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
   <value column="PO_Description" original=""/>
