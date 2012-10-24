@@ -1,2 +1,2 @@
-ALTER TABLE c_payment ADD COLUMN withholdingamt NUMERIC;
-ALTER TABLE c_payment ADD COLUMN withholdingpercent NUMERIC;
+ALTER TABLE c_payment ADD withholdingamt NUMERIC;
+ALTER TABLE c_payment ADD withholdingpercent NUMERIC;

@@ -1,5 +1,5 @@
 --Add toggle withholding on sales
-ALTER TABLE C_POS ADD COLUMN IsGenerateWithholdingOnSale CHARACTER(1) NOT NULL DEFAULT 'N'
+ALTER TABLE C_POS ADD IsGenerateWithholdingOnSale CHARACTER(1) DEFAULT 'N' NOT NULL
 ;
 
 -- Mar 26, 2012 5:32:39 PM GMT-03:00

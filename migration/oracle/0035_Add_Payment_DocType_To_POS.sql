@@ -1,5 +1,5 @@
 -- Add payment doctype to POS
-ALTER TABLE C_POS ADD COLUMN C_Payment_DocType_ID Number(10,0);
+ALTER TABLE C_POS ADD C_Payment_DocType_ID Number(10,0);
 
 -- 14/05/2012 10:53:06 ART
 -- Add payment doctype to POS

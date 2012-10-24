@@ -1,5 +1,5 @@
 --Add Credit Limit Check Behavior
-ALTER TABLE C_POS ADD COLUMN IsAllowCreditExceeded CHARACTER(1) NOT NULL DEFAULT 'N'
+ALTER TABLE C_POS ADD IsAllowCreditExceeded CHARACTER(1) DEFAULT 'N' NOT NULL
 ;
 
 -- Mar 26, 2012 11:03:44 AM ART

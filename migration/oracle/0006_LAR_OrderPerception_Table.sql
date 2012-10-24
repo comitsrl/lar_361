@@ -1,43 +1,56 @@
 
 CREATE TABLE lar_orderperception
 (
-  lar_orderperception_id numeric(10,0) NOT NULL,
-  ad_client_id numeric(10,0) NOT NULL,
-  ad_org_id numeric(10,0) NOT NULL,
-  created timestamp without time zone NOT NULL,
-  createdby numeric(10,0) NOT NULL,
-  updated timestamp without time zone NOT NULL,
-  updatedby numeric(10,0) NOT NULL,
-  isactive character(1) NOT NULL DEFAULT 'Y'::bpchar,
-  c_order_id numeric(10,0) NOT NULL,
-  c_tax_id numeric(10,0) DEFAULT NULL::numeric,
-  lco_withholdingrule_id numeric(10,0) DEFAULT NULL::numeric,
-  lco_withholdingtype_id numeric(10,0) NOT NULL,
-  --c_allocationline_id numeric(10,0) DEFAULT NULL::numeric,
-  dateacct timestamp without time zone,
-  datetrx timestamp without time zone,
-  iscalconpayment character(1) DEFAULT 'N'::bpchar,
-  istaxincluded character(1) NOT NULL DEFAULT 'N'::bpchar,
-  percent numeric,
-  processed character(1) NOT NULL DEFAULT 'N'::bpchar,
-  taxamt numeric NOT NULL,
-  taxbaseamt numeric NOT NULL,
+  lar_orderperception_id number(10,0) NOT NULL,
+  ad_client_id number(10,0) NOT NULL,
+  ad_org_id number(10,0) NOT NULL,
+  created timestamp NOT NULL,
+  createdby number(10,0) NOT NULL,
+  updated timestamp NOT NULL,
+  updatedby number(10,0) NOT NULL,
+  isactive character(1) DEFAULT 'Y' NOT NULL,
+  c_order_id number(10,0) NOT NULL,
+  c_tax_id number(10,0) DEFAULT NULL,
+  lco_withholdingrule_id number(10,0) DEFAULT NULL,
+  lco_withholdingtype_id number(10,0) NOT NULL,
+  --c_allocationline_id number(10,0) DEFAULT NULL,
+  dateacct timestamp,
+  datetrx timestamp,
+  iscalconpayment character(1) DEFAULT 'N',
+  istaxincluded character(1) DEFAULT 'N' NOT NULL,
+  percent number,
+  processed character(1) DEFAULT 'N' NOT NULL,
+  taxamt number NOT NULL,
+  taxbaseamt number NOT NULL
+);
 
-  CONSTRAINT lar_orderperception_key PRIMARY KEY (lar_orderperception_id),
-  CONSTRAINT corder_larorderperception FOREIGN KEY (c_order_id)
-      REFERENCES c_order (c_order_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT ctax_larorderperception FOREIGN KEY (c_tax_id)
-      REFERENCES c_tax (c_tax_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT lcowithholdingrule_lcoorderw FOREIGN KEY (lco_withholdingrule_id)
-      REFERENCES lco_withholdingrule (lco_withholdingrule_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT lcowithholdingtype_lcoorderw FOREIGN KEY (lco_withholdingtype_id)
-      REFERENCES lco_withholdingtype (lco_withholdingtype_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT lar_orderperception_isactive_check CHECK (isactive = ANY (ARRAY['Y'::bpchar, 'N'::bpchar])),
-  CONSTRAINT lar_orderperception_iscalconpayment_check CHECK (iscalconpayment = ANY (ARRAY['Y'::bpchar, 'N'::bpchar])),
-  CONSTRAINT lar_orderperception_istaxincluded_check CHECK (istaxincluded = ANY (ARRAY['Y'::bpchar, 'N'::bpchar])),
-  CONSTRAINT lar_orderperception_processed_check CHECK (processed = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))
-)
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT lar_perception_key PRIMARY KEY (lar_orderperception_id);
+
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT corder_fkx FOREIGN KEY (c_order_id)
+      REFERENCES c_order (c_order_id);
+
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT ctax_fkx FOREIGN KEY (c_tax_id)
+      REFERENCES c_tax (c_tax_id);
+
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT whrule_fkx FOREIGN KEY (lco_withholdingrule_id)
+      REFERENCES lco_withholdingrule (lco_withholdingrule_id);
+
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT whtype_fkx FOREIGN KEY (lco_withholdingtype_id)
+      REFERENCES lco_withholdingtype (lco_withholdingtype_id);
+
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT op_active_ck CHECK (isactive IN ('Y', 'N'));
+
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT op_calc_ck CHECK (iscalconpayment IN ('Y', 'N'));
+
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT op_tax_ck CHECK (istaxincluded IN ('Y', 'N'));
+
+ALTER TABLE lar_orderperception ADD
+  CONSTRAINT op_processed_ck CHECK (processed IN ('Y', 'N'));
