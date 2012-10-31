@@ -29,6 +29,7 @@ import org.compiere.model.MPInstance;
 import org.compiere.model.MPInstancePara;
 import org.compiere.model.MPrivateAccess;
 import org.compiere.model.MRMA;
+import org.compiere.model.SystemIDs;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.ProcessInfo;
 import org.compiere.util.CLogger;
@@ -40,24 +41,24 @@ import org.compiere.util.Trx;
 
 /**
  * Generate Invoice (manual) controller class
- *
+ * 
  */
-public class InvoiceGen extends GenForm
+public class InvoiceGen extends GenForm implements SystemIDs
 {
 	/**	Logger			*/
 	private static CLogger log = CLogger.getCLogger(InvoiceGen.class);
 	//
-
+	
 	public Object 			m_AD_Org_ID = null;
 	public Object 			m_C_BPartner_ID = null;
-
+	
 	public void dynInit() throws Exception
 	{
 		setTitle("InvGenerateInfo");
 		setReportEngineType(ReportEngine.INVOICE);
 		setAskPrintMsg("PrintInvoices");
 	}
-
+	
 	public void configureMiniTable(IMiniTable miniTable)
 	{
 		//  create Columns
@@ -81,7 +82,7 @@ public class InvoiceGen extends GenForm
 		//
 		miniTable.autoSize();
 	}
-
+	
 	/**
 	 * Get SQL for Orders that needs to be shipped
 	 * @return sql
@@ -100,7 +101,7 @@ public class InvoiceGen extends GenForm
             sql.append(" AND ic.AD_Org_ID=").append(m_AD_Org_ID);
         if (m_C_BPartner_ID != null)
             sql.append(" AND ic.C_BPartner_ID=").append(m_C_BPartner_ID);
-
+        
         // bug - [ 1713337 ] "Generate Invoices (manual)" show locked records.
         /* begin - Exclude locked records; @Trifon */
         int AD_User_ID = Env.getContextAsInt(Env.getCtx(), "#AD_User_ID");
@@ -115,10 +116,10 @@ public class InvoiceGen extends GenForm
 
         //
         sql.append(" ORDER BY o.Name,bp.Name,DateOrdered");
-
+        
         return sql.toString();
 	}
-
+	
 	/**
 	 * Get SQL for Customer RMA that need to be invoiced
 	 * @return sql
@@ -142,24 +143,24 @@ public class InvoiceGen extends GenForm
         // sql.append("(SELECT M_InOutLine_ID FROM M_RMALine rl WHERE rl.M_RMA_ID=rma.M_RMA_ID ");
         // sql.append("AND rl.M_InOutLine_ID IS NOT NULL)) ");
         sql.append("AND rma.AD_Client_ID=?");
-
+        
         if (m_AD_Org_ID != null)
             sql.append(" AND rma.AD_Org_ID=").append(m_AD_Org_ID);
         if (m_C_BPartner_ID != null)
             sql.append(" AND bp.C_BPartner_ID=").append(m_C_BPartner_ID);
-
+        
         int AD_User_ID = Env.getContextAsInt(Env.getCtx(), "#AD_User_ID");
         String lockedIDs = MPrivateAccess.getLockedRecordWhere(MRMA.Table_ID, AD_User_ID);
         if (lockedIDs != null)
         {
             sql.append(" AND rma.M_RMA_ID").append(lockedIDs);
         }
-
+        
         sql.append(" ORDER BY org.Name, bp.Name, rma.Created ");
-
+        
         return sql.toString();
 	}
-
+	
 	/**
 	 *  Query Info
 	 */
@@ -168,9 +169,9 @@ public class InvoiceGen extends GenForm
 		log.info("");
 		int AD_Client_ID = Env.getAD_Client_ID(Env.getCtx());
 		//  Create SQL
-
+		
 		String sql = "";
-
+        
         if (docTypeKNPair.getKey() == MOrder.Table_ID)
         {
             sql = getOrderSQL();
@@ -216,7 +217,7 @@ public class InvoiceGen extends GenForm
 		miniTable.autoSize();
 	//	statusBar.setStatusDB(String.valueOf(miniTable.getRowCount()));
 	}   //  executeQuery
-
+	
 	/**
 	 *	Save Selection & return selecion Query or ""
 	 *  @return where clause like C_Order_ID IN (...)
@@ -244,7 +245,7 @@ public class InvoiceGen extends GenForm
 		setSelection(results);
 	}	//	saveSelection
 
-
+	
 	/**************************************************************************
 	 *	Generate Invoices
 	 */
@@ -255,21 +256,21 @@ public class InvoiceGen extends GenForm
 		String info = "";
 		String trxName = Trx.createTrxName("IVG");
 		Trx trx = Trx.get(trxName, true);	//trx needs to be committed too
-
+		
 		setSelectionActive(false);  //  prevents from being called twice
 		statusBar.setStatusLine(Msg.getMsg(Env.getCtx(), "InvGenerateGen"));
 		statusBar.setStatusDB(String.valueOf(getSelection().size()));
 
 		//	Prepare Process
 		int AD_Process_ID = 0;
-
+        
         if (docTypeKNPair.getKey() == MRMA.Table_ID)
         {
-            AD_Process_ID = 52002; // C_Invoice_GenerateRMA - org.adempiere.process.InvoiceGenerateRMA
+            AD_Process_ID = PROCESS_C_INVOICE_GENERATERMA_MANUAL; // C_Invoice_GenerateRMA - org.adempiere.process.InvoiceGenerateRMA
         }
         else
         {
-            AD_Process_ID = 134;  // HARDCODED    C_InvoiceCreate
+            AD_Process_ID = PROCESS_C_INVOICE_GENERATE_MANUAL;  // HARDCODED    C_InvoiceCreate
         }
 		MPInstance instance = new MPInstance(Env.getCtx(), AD_Process_ID, 0);
 		if (!instance.save())
@@ -277,7 +278,7 @@ public class InvoiceGen extends GenForm
 			info = Msg.getMsg(Env.getCtx(), "ProcessNoInstance");
 			return info;
 		}
-
+		
 		//insert selection
 		StringBuffer insert = new StringBuffer();
 		insert.append("INSERT INTO T_SELECTION(AD_PINSTANCE_ID, T_SELECTION_ID) ");
@@ -292,8 +293,8 @@ public class InvoiceGen extends GenForm
 			insert.append(", ");
 			insert.append(selectedId);
 			insert.append(" FROM DUAL ");
-
-			if (counter == 1000)
+			
+			if (counter == 1000) 
 			{
 				if ( DB.executeUpdate(insert.toString(), trxName) < 0 )
 				{
@@ -319,7 +320,7 @@ public class InvoiceGen extends GenForm
 				return info;
 			}
 		}
-
+		
 		ProcessInfo pi = new ProcessInfo ("", AD_Process_ID);
 		pi.setAD_PInstance_ID (instance.getAD_PInstance_ID());
 
@@ -333,10 +334,10 @@ public class InvoiceGen extends GenForm
 			log.log(Level.SEVERE, msg);
 			return info;
 		}
-
+		
 		para = new MPInstancePara(instance, 20);
 		para.setParameter("DocAction", docActionSelected);
-
+		
 		if (!para.save())
 		{
 			String msg = "No DocAction Parameter added";  //  not translated
@@ -359,7 +360,7 @@ public class InvoiceGen extends GenForm
 
 		setTrx(trx);
 		setProcessInfo(pi);
-
+		
 		return info;
 	}	//	generateInvoices
 }

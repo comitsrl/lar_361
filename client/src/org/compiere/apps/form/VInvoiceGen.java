@@ -36,12 +36,12 @@ import org.compiere.util.Msg;
 
 /**
  * Generate Invoice (manual) view class
- *
+ * 
  */
 public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener, VetoableChangeListener
 {
 	private VGenPanel panel;
-
+	
 	/**	Window No			*/
 	private int         	m_WindowNo = 0;
 	/**	FormFrame			*/
@@ -54,7 +54,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 	private CLabel lOrg = new CLabel();
 	private VLookup fOrg;
 	private CLabel lBPartner = new CLabel();
-	private VLookup fBPartner;
+	private VLookup fBPartner;	
 	private CLabel     lDocType = new CLabel();
 	private VComboBox  cmbDocType = new VComboBox();
 	private CLabel     lDocAction = new CLabel();
@@ -89,7 +89,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 			log.log(Level.SEVERE, "init", ex);
 		}
 	}	//	init
-
+	
 	/**
 	 * 	Dispose
 	 */
@@ -99,7 +99,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 			m_frame.dispose();
 		m_frame = null;
 	}	//	dispose
-
+	
 	/**
 	 *	Static Init.
 	 *  <pre>
@@ -120,7 +120,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		lDocAction.setLabelFor(docAction);
 		lDocAction.setText(Msg.translate(Env.getCtx(), "DocAction"));
 		lDocType.setLabelFor(cmbDocType);
-
+		
 		panel.getParameterPanel().add(lOrg, null);
 		panel.getParameterPanel().add(fOrg, null);
         // @emmie custom
@@ -136,7 +136,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		panel.getParameterPanel().add(lDocAction, null);
 		panel.getParameterPanel().add(docAction, null);
 	}	//	jbInit
-
+	
 	/**
 	 *	Fill Picks.
 	 *		Column_ID from C_Order
@@ -159,20 +159,20 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		}
 		//	lOrg.setText(Msg.translate(Env.getCtx(), "AD_Org_ID"));
 		fOrg.addVetoableChangeListener(this);
-
-		MLookup docActionL = MLookupFactory.get(Env.getCtx(), m_WindowNo, 3494 /* C_Invoice.DocStatus */,
+		
+		MLookup docActionL = MLookupFactory.get(Env.getCtx(), m_WindowNo, 3494 /* C_Invoice.DocStatus */, 
 				DisplayType.List, Env.getLanguage(Env.getCtx()), "DocAction", 135 /* _Document Action */,
 				false, "AD_Ref_List.Value IN ('PR')"); // @emmie - remove 'CO' for fiscal printing
 		docAction = new VLookup("DocAction", true, false, true,docActionL);
 		//  lDcoACtion.setText((Msg.translate(Env.getCtx(), "DocAction")););
 		docAction.addVetoableChangeListener(this);
-
+		
 		//
 		MLookup bpL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 0, 2762, DisplayType.Search);
 		fBPartner = new VLookup ("C_BPartner_ID", false, false, true, bpL);
 	//	lBPartner.setText(Msg.translate(Env.getCtx(), "C_BPartner_ID"));
 		fBPartner.addVetoableChangeListener(this);
-
+		
 		//Document Type Sales Order/Vendor RMA
         lDocType.setText(Msg.translate(Env.getCtx(), "C_DocType_ID"));
         cmbDocType.addItem(new KeyNamePair(MOrder.Table_ID, Msg.translate(Env.getCtx(), "Order")));
@@ -198,13 +198,13 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 
         panel.getStatusBar().setStatusLine(Msg.getMsg(Env.getCtx(), "InvGenerateSel"));//@@
 	}	//	fillPicks
-
+	
 	public void executeQuery()
 	{
 		KeyNamePair docTypeKNPair = (KeyNamePair)cmbDocType.getSelectedItem();
 		executeQuery(docTypeKNPair, panel.getMiniTable());
 	}   //  executeQuery
-
+	
 	/**
 	 *	Action Listener
 	 *  @param e event
@@ -216,16 +216,16 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		   executeQuery();
 		    return;
 		}
-
+		
 		validate();
 	}	//	actionPerformed
-
+	
 	public void validate()
 	{
 		panel.saveSelection();
-
+		
 		ArrayList<Integer> selection = getSelection();
-		if (selection != null && selection.size() > 0 && isSelectionActive())
+		if (selection != null && selection.size() > 0 && isSelectionActive())		
 			panel.generate();
 		else
 			panel.dispose();
@@ -247,7 +247,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		}
 		executeQuery();
 	}	//	vetoableChange
-
+	
 	/**************************************************************************
 	 *	Generate Shipments
 	 */
