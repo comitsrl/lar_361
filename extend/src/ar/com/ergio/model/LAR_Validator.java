@@ -453,19 +453,32 @@ import ar.com.ergio.util.LAR_Utils;
             log.info("Withholding conf >> " + wc);
 
             // Calculates subtotal and perception amounts
-            BigDecimal subtotal = BigDecimal.ZERO;
+            // BigDecimal subtotal = BigDecimal.ZERO;
             BigDecimal taxAmt = BigDecimal.ZERO;
-            if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType.getTaxPayerType(bp))) {
+            BigDecimal Gravado = BigDecimal.ZERO;
+            BigDecimal perceptionAmt = BigDecimal.ZERO;
+           // if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType.getTaxPayerType(bp))) {
                 for (MOrderTax tax : order.getTaxes(true)) {
                     taxAmt = taxAmt.add(tax.getTaxAmt());
                 }
-                subtotal = order.getGrandTotal().subtract(taxAmt);
-            } else {
-                subtotal = order.getGrandTotal();
-            }
-
-            BigDecimal perceptionAmt =  subtotal.multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_UP);
-
+            //    subtotal = order.getGrandTotal().subtract(taxAmt);
+            // } 
+                //else {
+                //      subtotal = order.getGrandTotal();
+           // }           
+        // Acumula la base imponible para calcular la Percepción de IIBB
+    for (MOrderLine oline : order.getLines()) {
+        if (oline.getM_Product().getC_TaxCategory_ID() == wc.getC_TaxCategory_ID()) {
+        Gravado = Gravado.add(oline.getLineNetAmt());
+        }
+    }
+    if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType.getTaxPayerType(bp))) {
+        perceptionAmt =  Gravado.multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+    else
+    {
+        perceptionAmt =  Gravado.add(taxAmt).multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
             // Create order perception
             MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
             perception.setC_Order_ID(order.get_ID());
@@ -473,7 +486,7 @@ import ar.com.ergio.util.LAR_Utils;
             perception.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
             perception.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
             perception.setTaxAmt(perceptionAmt);
-            perception.setTaxBaseAmt(subtotal);
+            perception.setTaxBaseAmt(Gravado);
             perception.setIsTaxIncluded(false);
             if (!perception.save()) {
                 return "Can not create preception";
@@ -871,6 +884,7 @@ import ar.com.ergio.util.LAR_Utils;
          private int lco_WithholdingType_ID;
          private int c_Tax_ID;
          private int c_DocType_ID;
+         private int c_TaxCategory_ID;
          private boolean isSOTrx;
 
          private String sql =
@@ -881,6 +895,7 @@ import ar.com.ergio.util.LAR_Utils;
                  + "     , F.IsCalcFromPayment"
                  + "     , F.PaymentThresholdMin"
                  + "     , F.C_DocType_ID"
+                 + "     , R.C_TaxCategory_ID"
                  + "  FROM C_BPartner B"
                  + "  JOIN LCO_WithholdingRule R ON R.LCO_BP_ISIC_ID = B.LCO_ISIC_ID"
                  + "       AND R.LCO_BP_TaxPayerType_ID = B.LCO_TaxPayerType_ID"
@@ -933,6 +948,10 @@ import ar.com.ergio.util.LAR_Utils;
          {
              return c_DocType_ID;
          }
+         private int getC_TaxCategory_ID()
+         {
+             return c_TaxCategory_ID;
+         }
 
          /**
           * Retrieve perception configuration variables for a given bpartner.
@@ -956,6 +975,7 @@ import ar.com.ergio.util.LAR_Utils;
                      isCalcFromPayment = rs.getString(5).equals("Y");
                      paymentThresholdMin = rs.getBigDecimal(6);
                      c_DocType_ID = rs.getInt(7);
+                     c_TaxCategory_ID = rs.getInt(8);
                  }
              } catch (Exception e) {
                  log.log(Level.SEVERE, sql, e);
@@ -974,6 +994,7 @@ import ar.com.ergio.util.LAR_Utils;
              sb.append(",IsSOTrx=").append(isSOTrx);
              sb.append(",IsCalcFromPayment=").append(isCalcFromPayment);
              sb.append(",C_DocType_ID=").append(c_DocType_ID);
+             sb.append(",C_TaxCategory_ID=").append(c_TaxCategory_ID);             
              sb.append(",C_Tax_ID=").append(c_Tax_ID);
              sb.append("]");
              return sb.toString();
