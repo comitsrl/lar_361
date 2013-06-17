@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import org.compiere.model.MPayment;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 
@@ -52,33 +51,33 @@ public class MLARWithholdingCertificate extends X_LAR_WithholdingCertificate
     /**
     * Recupera o crea una retención sobre el pago pasado como parámetro.
     *
-    * @param payment
+    * @param header
     *        pago a partir del cual se busca la retención
     * @return Rentención existente relaciona al pago, o nuevo objeto retención para el pago
     *         dado.
     */
-    public static MLARWithholdingCertificate get(final MPayment payment)
+    public static MLARWithholdingCertificate get(final MLARPaymentHeader header)
     {
         MLARWithholdingCertificate retValue = null;
-        if (payment == null || payment.getC_Payment_ID() == 0) {
-            log.info("No Payment");
+        if (header == null || header.getLAR_PaymentHeader_ID() == 0) {
+            log.info("Sin cabecera de pago");
             return null;
         }
 
-        String sql = "SELECT * FROM LAR_WithholdingCertificate WHERE C_Payment_ID=?";
+        String sql = "SELECT * FROM LAR_WithholdingCertificate WHERE LAR_PaymentHeader_ID=?";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
-            pstmt = DB.prepareStatement(sql, payment.get_TrxName());
-            pstmt.setInt(1, payment.getC_Payment_ID());
+            pstmt = DB.prepareStatement(sql, header.get_TrxName());
+            pstmt.setInt(1, header.getLAR_PaymentHeader_ID());
             rs = pstmt.executeQuery();
             if (rs.next())
-                retValue = new MLARWithholdingCertificate(payment.getCtx(), rs, payment.get_TrxName());
+                retValue = new MLARWithholdingCertificate(header.getCtx(), rs, header.get_TrxName());
             rs.close();
             pstmt.close();
             pstmt = null;
         } catch (Exception e) {
-            log.log(Level.SEVERE, "No withholding for payment", e);
+            log.log(Level.SEVERE, "No existe retenci\u00f3n para la cabezera de pago", e);
         } finally {
             DB.close(rs, pstmt);
             rs = null;
@@ -86,12 +85,12 @@ public class MLARWithholdingCertificate extends X_LAR_WithholdingCertificate
         }
 
         if (retValue != null) {
-            retValue.set_TrxName(payment.get_TrxName());
+            retValue.set_TrxName(header.get_TrxName());
             return retValue;
         }
 
         // Create new one
-        retValue = new MLARWithholdingCertificate(payment.getCtx(), 0, payment.get_TrxName());
+        retValue = new MLARWithholdingCertificate(header.getCtx(), 0, header.get_TrxName());
         log.info("(new)" + retValue);
         return retValue;
     } // get

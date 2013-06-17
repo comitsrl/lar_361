@@ -19,6 +19,7 @@ package ar.com.ergio.model;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -31,6 +32,7 @@ import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
+import org.compiere.model.MCharge;
 import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
@@ -47,6 +49,7 @@ import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.process.DocAction;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -98,12 +101,14 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addModelChange(MOrder.Table_Name, this);
          engine.addModelChange(MPayment.Table_Name, this);
          engine.addModelChange(MInvoice.Table_Name, this);
+         engine.addModelChange(MLARPaymentHeader.Table_Name, this);
 
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
          engine.addDocValidate(MInvoice.Table_Name, this);
          engine.addDocValidate(MInOut.Table_Name, this);
          engine.addDocValidate(MAllocationHdr.Table_Name, this);
+         engine.addDocValidate(MLARPaymentHeader.Table_Name, this);
      }   //  initialize
 
     /**
@@ -164,27 +169,16 @@ import ar.com.ergio.util.LAR_Utils;
                 return msg;
             }
         }
-        // Creates withholding on payments
-        if (po.get_TableName().equals(MPayment.Table_Name)
-                && (type == TYPE_AFTER_NEW || type == TYPE_AFTER_CHANGE))
+
+        // Elimina la retención sobre los pagos cuando se modifica el header
+        if (po.get_TableName().equals(MLARPaymentHeader.Table_Name) && type == TYPE_AFTER_CHANGE)
         {
-            MPayment payment = (MPayment) po;
-            int c_BPartner_ID = payment.getC_BPartner_ID();
-            MBPartner bp = new MBPartner(payment.getCtx(), c_BPartner_ID, payment.get_TrxName());
-            msg = calculateWithholdingOnPayment(bp, payment, type);
+            msg = clearPaymentWithholdingFromHeader((MLARPaymentHeader) po);
             if (msg != null) {
                 return msg;
             }
         }
-        // Delete withholding related to deleted payment
-        if (po.get_TableName().equals(MPayment.Table_Name) && type == TYPE_BEFORE_DELETE)
-        {
-            MPayment payment = (MPayment) po;
-            msg = deleteWithholdingOnPayment(payment);
-            if (msg != null) {
-                return msg;
-            }
-        }
+
         // Determine letter for sales invoices (from PosOrders)
         if (po.get_TableName().equals(MInvoice.Table_Name) && type == TYPE_AFTER_NEW)
         {
@@ -193,6 +187,20 @@ import ar.com.ergio.util.LAR_Utils;
             if (msg != null) {
                 return msg;
             }
+        }
+
+        // Despues de modificar un pago, se actualiza la retención y el total de al cabecera
+        if (po.get_TableName().equals(MPayment.Table_Name) &&
+                (type == TYPE_AFTER_NEW || type == TYPE_AFTER_CHANGE || type == TYPE_AFTER_DELETE)
+            )
+        {
+            msg = clearPaymentWithholdingFromPayments((MPayment) po, type);
+            if (msg != null)
+                return msg;
+
+            msg = updatePaymentHeaderTotalAmt((MPayment) po, type);
+            if (msg != null)
+                return msg;
         }
 
         //german wagner custom
@@ -340,25 +348,28 @@ import ar.com.ergio.util.LAR_Utils;
          log.info(po.get_TableName() + " Timing: "+timing);
          String msg;
 
-         // create withholding certificate on complete payment
-         if (po.get_TableName().equals(MPayment.Table_Name) && timing == TIMING_AFTER_COMPLETE)
-         {
-             MPayment payment = (MPayment) po;
-             msg = createWithholdingCertificate(payment, timing);
-             if (msg != null) {
-                 return msg;
-             }
-         }
-         // deactivate the withholding and its certificate when payment is voided
-         if (po.get_TableName().equals(MPayment.Table_Name)
-                 && (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT))
-         {
-             MPayment payment  = (MPayment) po;
-             msg = deactivateWithholding(payment, timing);
-             if (msg != null) {
-                 return msg;
-             }
-         }
+        // Antes de preparar la cabecera, se verifica si la retención fue generada
+        if (po.get_TableName().equals(MLARPaymentHeader.Table_Name) && timing == TIMING_BEFORE_PREPARE)
+        {
+            preparePaymentWithholding((MLARPaymentHeader) po);
+        }
+
+        // Después de completar crear el certificado de retención y actualiza las fechas
+        if (po.get_TableName().equals(MLARPaymentHeader.Table_Name) && timing == TIMING_AFTER_COMPLETE)
+        {
+            msg = completePaymentWithholding((MLARPaymentHeader) po);
+            if (msg != null)
+                return msg;
+        }
+
+        // Después de anular la cabecera, se elimina certificado retención y se crea una inversa
+        if (po.get_TableName().equals(MLARPaymentHeader.Table_Name) && timing == TIMING_AFTER_VOID)
+        {
+            msg = reversePaymentWithholding((MLARPaymentHeader) po);
+            if (msg != null)
+                return msg;
+        }
+
          // Determine documentNo for voided invoices
          if (po.get_TableName().equals(MInvoice.Table_Name) &&
                  (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
@@ -453,40 +464,35 @@ import ar.com.ergio.util.LAR_Utils;
             log.info("Withholding conf >> " + wc);
 
             // Calculates subtotal and perception amounts
-            // BigDecimal subtotal = BigDecimal.ZERO;
-            BigDecimal taxAmt = BigDecimal.ZERO;
-            BigDecimal Gravado = BigDecimal.ZERO;
-            BigDecimal perceptionAmt = BigDecimal.ZERO;
-           // if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType.getTaxPayerType(bp))) {
-                for (MOrderTax tax : order.getTaxes(true)) {
-                    taxAmt = taxAmt.add(tax.getTaxAmt());
-                }
-            //    subtotal = order.getGrandTotal().subtract(taxAmt);
-            // } 
-                //else {
-                //      subtotal = order.getGrandTotal();
-           // }           
-        // Acumula la base imponible para calcular la Percepción de IIBB
-    for (MOrderLine oline : order.getLines()) {
-        if (oline.getM_Product().getC_TaxCategory_ID() == wc.getC_TaxCategory_ID()) {
-        Gravado = Gravado.add(oline.getLineNetAmt());
-        }
-    }
-    if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType.getTaxPayerType(bp))) {
-        perceptionAmt =  Gravado.multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
-    else
-    {
-        perceptionAmt =  Gravado.add(taxAmt).multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
-            // Create order perception
+			BigDecimal taxAmt = BigDecimal.ZERO;
+			BigDecimal gravado = BigDecimal.ZERO;
+			BigDecimal perceptionAmt = BigDecimal.ZERO;
+			for (MOrderTax tax : order.getTaxes(true)) {
+				taxAmt = taxAmt.add(tax.getTaxAmt());
+			}
+			// Acumula la base imponible para calcular la Percepción de IIBB
+			for (MOrderLine oline : order.getLines()) {
+				if (oline.getM_Product().getC_TaxCategory_ID() == wc.getC_TaxCategory_ID()) {
+					gravado = gravado.add(oline.getLineNetAmt());
+				}
+			}
+			if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType
+					.getTaxPayerType(bp))) {
+				perceptionAmt = gravado.multiply(wc.getAliquot()).setScale(2,
+						BigDecimal.ROUND_HALF_UP);
+			} else {
+				perceptionAmt = gravado.add(taxAmt).multiply(wc.getAliquot())
+						.setScale(2, BigDecimal.ROUND_HALF_UP);
+			}
+
+			// Create order perception
             MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
             perception.setC_Order_ID(order.get_ID());
             perception.setC_Tax_ID(wc.getC_Tax_ID());
             perception.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
             perception.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
             perception.setTaxAmt(perceptionAmt);
-            perception.setTaxBaseAmt(Gravado);
+            perception.setTaxBaseAmt(gravado);
             perception.setIsTaxIncluded(false);
             if (!perception.save()) {
                 return "Can not create preception";
@@ -527,187 +533,332 @@ import ar.com.ergio.util.LAR_Utils;
         return null;
     }
 
-    private String deleteWithholdingOnPayment(final MPayment payment)
+    /**
+     * Elimina la retención asociada a la cabecera de pago dada.
+     * (basado en el cálculo de la LCO)
+     *
+     * @param header cabecera de pago a eliminar
+     * @param type tipo de modificación
+     * @return mensaje de error o nulo
+     */
+    private String clearPaymentWithholdingFromHeader(final MLARPaymentHeader header)
     {
-        if (!payment.isReceipt()) // Only process AP payments
-        {
-            int c_Payment_ID = payment.get_ID();
-            log.info("Delete withholding for payment " + c_Payment_ID);
-            String sql = "";
-            PreparedStatement pstmt = null;
-            try {
-                sql = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
-                pstmt = DB.prepareStatement(sql, payment.get_TrxName());
-                pstmt.setInt(1, c_Payment_ID);
-                pstmt.executeUpdate();
-
-                sql = "UPDATE C_Payment"
-                    + "   SET WriteOffAmt=?"
-                    + "     , WithholdingAmt=?"
-                    + "     , WithholdingPercent=?"
-                    + " WHERE C_Payment_ID=?";
-                pstmt = DB.prepareStatement(sql, payment.get_TrxName());
-                pstmt.setBigDecimal(1, BigDecimal.ZERO);
-                pstmt.setBigDecimal(2, BigDecimal.ZERO);
-                pstmt.setBigDecimal(3, BigDecimal.ZERO);
-                pstmt.setInt(4, payment.get_ID());
-                pstmt.executeUpdate();
-            } catch (Exception e) {
-                log.log(Level.SEVERE, sql, e);
-                return e.getMessage();
-            } finally {
-                DB.close(pstmt);
-                pstmt = null;
-            }
-        }
-        return null;
-    }
-
-    private String calculateWithholdingOnPayment(MBPartner bp, MPayment payment, int type)
-    {
-        // TODO - improve this way to avoid process reversal payments
-        if (payment.getDescription() != null
-                && payment.getDescription().contains("{->")
-                && payment.getDescription().endsWith(")")) {
-            // do nothing - is reversal payment
-        }
-        else if (type == TYPE_AFTER_NEW || (type == TYPE_AFTER_CHANGE && payment.is_ValueChanged("PayAmt")))
-        {
-            log.info("C_Payment_ID: " + payment.get_ID());
-            if (!payment.isReceipt()) // Only process AP payments
-            {
-                final WithholdingConfig wc = new WithholdingConfig(bp, false);
-                log.info("Withholding conf >> " + wc);
-
-                // if payment amt is greater than the limit, create a withholding
-                if (wc.isCalcFromPayment())
-                {
-                    if (payment.getPayAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
-                    {
-                        // create withholding
-                        BigDecimal taxAmt = payment.getPayAmt().multiply(wc.getAliquot())
-                                .setScale(2, BigDecimal.ROUND_HALF_EVEN);
-
-                        MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
-                        pwh.setC_Payment_ID(payment.get_ID());
-                        pwh.setC_Invoice_ID(payment.getC_Invoice_ID());
-                        pwh.setC_Tax_ID(wc.getC_Tax_ID());
-                        pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
-                        pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
-                        pwh.setDateAcct(payment.getDateAcct());
-                        pwh.setDateTrx(payment.getDateTrx());
-                        pwh.setPercent(wc.getAliquot());
-                        pwh.setProcessed(false);
-                        pwh.setTaxAmt(taxAmt);
-                        pwh.setTaxBaseAmt(payment.getPayAmt());
-                        if (!pwh.save()) {
-                            return "Can not create withholding on payment";
-                        }
-
-                        // update payment amounts (with sql in order to avoid circular events)
-                        // TODO - Review WriteOffAmt for withholding on invoices (IVA)
-                        // NewPayAmt = PayAmt - taxAmt
-                        String sql = "UPDATE C_Payment"
-                                   + "   SET WriteOffAmt=?"
-                                   + "     , PayAmt=?"
-                                   + "     , WithholdingAmt=?"
-                                   + "     , WithholdingPercent=?"
-                                   + " WHERE C_Payment_ID=?";
-
-                        PreparedStatement pstmt = null;
-                        try {
-                            pstmt = DB.prepareStatement(sql, payment.get_TrxName());
-                            pstmt.setBigDecimal(1, taxAmt);
-                            pstmt.setBigDecimal(2, payment.getPayAmt().subtract(taxAmt));
-                            pstmt.setBigDecimal(3, taxAmt);
-                            // save aliquot as percentage
-                            pstmt.setBigDecimal(4, wc.getAliquot().multiply(BigDecimal.valueOf(100L)));
-                            pstmt.setInt(5, payment.get_ID());
-                            pstmt.executeUpdate();
-                        } catch (Exception e) {
-                            log.log(Level.SEVERE, sql, e);
-                            return e.getMessage();
-                        } finally {
-                            DB.close(pstmt);
-                            pstmt = null;
-                        }
-                    } else {
-                        // if exists a withholding, deleted
-                        deleteWithholdingOnPayment(payment);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private String createWithholdingCertificate(final MPayment payment, int timing)
-    {
-        // TODO - improve this way to avoid process reversal payments
-        if (payment.getDescription() != null
-                && payment.getDescription().contains("{->")
-                && payment.getDescription().endsWith(")")) {
-            // do nothing - is reversal payment
-        }
-        else if (timing == TIMING_AFTER_COMPLETE)
-        {
-            log.info("C_Payment_ID: " + payment.get_ID());
-            if (!payment.isReceipt()) // Only process AP payments
-            {
-                final MBPartner bp = new MBPartner(payment.getCtx(), payment.getC_BPartner_ID(), payment.get_TrxName());
-                final WithholdingConfig wc = new WithholdingConfig(bp, false);
-
-                if (wc.isCalcFromPayment())
-                {
-                    if (payment.getPayAmt().compareTo(wc.getPaymentThresholdMin()) >= 0) {
-                        X_LAR_WithholdingCertificate whc = new X_LAR_WithholdingCertificate(payment.getCtx(), 0,
-                                payment.get_TrxName());
-                        whc.setC_DocType_ID(wc.getC_DocType_ID());
-                        whc.setC_Payment_ID(payment.get_ID());
-                        whc.setC_Invoice_ID(payment.getC_Invoice_ID());
-                        whc.setC_DocTypeTarget_ID(wc.getC_DocType_ID());
-                        whc.setDocumentNo(payment.getDocumentNo());
-                        if (!whc.save()) {
-                            return "Can not create a withholding certificate";
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private String deactivateWithholding(final MPayment payment, int timing)
-    {
-        if(payment.isReceipt())
+        // Solo se procesan cabeceras de pago
+        if (header.isReceipt())
             return null;
-        // TODO - improve this way to avoid process reversal payments
-        if (payment.getDescription() != null
-                && payment.getDescription().contains("{->")
-                && payment.getDescription().endsWith(")")) {
-            // do nothing - is reversal payment
-        }
-        else if (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT)
+
+        if (header.is_ValueChanged(MLARPaymentHeader.COLUMNNAME_AD_Org_ID)
+                ||  header.is_ValueChanged(MLARPaymentHeader.COLUMNNAME_C_BPartner_ID)
+                ||  header.is_ValueChanged(MLARPaymentHeader.COLUMNNAME_C_Invoice_ID)
+            )
         {
-            log.info("C_Payment_ID: " + payment.get_ID());
-            MLARPaymentWithholding pwh = MLARPaymentWithholding.get(payment);
-            if (!pwh.is_new())
+            boolean thereAreCalc;
+            try {
+                thereAreCalc = thereAreCalc(header);
+            } catch (SQLException e) {
+                String msg = "Error buscando las reglas de cálculo de retención sobre pagos";
+                log.log(Level.SEVERE, msg, e);
+                return msg;
+            }
+            // TODO - Debería eliminar el registro de retención? Creo que si, consultar con Marcos.
+            BigDecimal curWithholdingAmt = header.getWithholdingAmt();
+            if (thereAreCalc)
             {
-                pwh.setIsActive(false);
-                if (!pwh.save()) {
-                    return "Can not deactivate payment withholding";
+                if (curWithholdingAmt != null)
+                    header.setWithholdingAmt(null);
+            }
+            else
+            {
+                if (curWithholdingAmt == null)
+                    header.setWithholdingAmt(Env.ZERO);
+            }
+        }
+        return null;
+    } // clearPaymentWithholdingFromHeader
+
+    /**
+     * Elimina la retenci\u00f3n de la cabecera de pago cuando se modifican
+     * los pagos asociados a la misma.
+     *
+     * @param payment pago asociado a la cabecera
+     * @param type evento
+     * @return mensaje de error o nulo
+     */
+    private String clearPaymentWithholdingFromPayments(final MPayment payment, int type)
+    {
+        // Solo se procesan pagos
+        if (payment.isReceipt())
+            return null;
+        // No se procesan los pagos "retención"
+		if (payment.get_ValueAsBoolean("EsRetencionIIBB"))
+			return null;
+
+        if (type == TYPE_AFTER_NEW || type == TYPE_AFTER_DELETE
+                || (type == TYPE_AFTER_CHANGE
+                    && (    payment.is_ValueChanged(MPayment.COLUMNNAME_PayAmt)
+                        ||  payment.is_ValueChanged(MPayment.COLUMNNAME_C_Invoice_ID)
+                        ||  payment.is_ValueChanged(MPayment.COLUMNNAME_TenderType)
+                        )
+                    )
+            )
+        {
+            boolean thereAreCalc;
+            int lar_PaymentHeader_ID = payment.get_ValueAsInt("LAR_PaymentHeader_ID");
+            if (lar_PaymentHeader_ID == 0)
+                return null;
+
+            final MLARPaymentHeader header = new MLARPaymentHeader(payment.getCtx(), lar_PaymentHeader_ID, payment.get_TrxName());
+
+            try {
+                thereAreCalc = thereAreCalc(header);
+            } catch (SQLException e) {
+                String msg = "Error buscando las reglas de cálculo de retención sobre pagos";
+                log.log(Level.SEVERE, msg, e);
+                return msg;
+            }
+
+            BigDecimal curWithholdingAmt = header.getWithholdingAmt();
+            if (thereAreCalc)
+            {
+                if (curWithholdingAmt != null) {
+                    if (!MLARPaymentHeader.setWithholdingAmtDirectly(header, null))
+                        return "No se pudo actualizar la cabecera de pago vía setWithholdingAmtDirectly";
                 }
             }
-            MLARWithholdingCertificate whc = MLARWithholdingCertificate.get(payment);
-            if (!whc.is_new())
+            else
             {
-                whc.setIsActive(false);
-                if (!whc.save()) {
-                    return "Can not deactivate payment withholding";
+                if (curWithholdingAmt == null) {
+                    if (!MLARPaymentHeader.setWithholdingAmtDirectly(header, Env.ZERO))
+                        return "No se pudo actualizar la cabecera de pago vía setWithholdingAmtDirectly";
                 }
             }
         }
         return null;
+    } // clearPaymentWithholdingFromPayments
+
+    /**
+     * Actualiza el importe total de la cabecera de pago
+     *
+     * @param LAR_PaymentHeader_ID ID de la cabecera
+     * @param type evento
+     * @return mensaje de error o nulo
+     */
+    private String updatePaymentHeaderTotalAmt(final MPayment payment, int type)
+    {
+        // Solo se procesan pagos
+        if (payment.isReceipt())
+            return null;
+        // No se procesan los pagos "retención"
+		if (payment.get_ValueAsBoolean("EsRetencionIIBB"))
+			return null;
+
+        if (type == TYPE_AFTER_NEW || type == TYPE_AFTER_DELETE
+                || (type == TYPE_AFTER_CHANGE
+                    && (    payment.is_ValueChanged(MPayment.COLUMNNAME_PayAmt)
+                        ||  payment.is_ValueChanged(MPayment.COLUMNNAME_C_Invoice_ID)
+                        ||  payment.is_ValueChanged(MPayment.COLUMNNAME_TenderType)
+                        )
+                    )
+            )
+        {
+            int lar_PaymentHeader_ID = payment.get_ValueAsInt("LAR_PaymentHeader_ID");
+            if (lar_PaymentHeader_ID == 0)
+                return null;
+
+            String sql = "UPDATE LAR_PaymentHeader"
+                       + "   SET PayHeaderTotalAmt="
+                       + "         (SELECT COALESCE(SUM(PayAmt),0)"
+                       + "            FROM C_Payment p"
+                       + "           WHERE p.IsActive='Y'"
+                       + "             AND LAR_PaymentHeader.LAR_PaymentHeader_ID=p.LAR_PaymentHeader_ID)"
+                       + " WHERE LAR_PaymentHeader_ID=?";
+
+            int no = DB.executeUpdate(sql, lar_PaymentHeader_ID, payment.get_TrxName());
+            if (no != 1)
+                return "Error al actualizar el total de la cabecera de pago";
+        }
+        return null;
+    } // updatePaymentHeaderTotalAmt
+
+    /**
+     * Dependiendo de la configuración del tipo de documento, genera o exige
+     * tener generada la retención sobre la cabecera de pago.
+     *
+     * @param header cabecera de pago
+     * @return mensaje de error o nulo
+     */
+    private String preparePaymentWithholding(final MLARPaymentHeader header)
+    {
+        // Solo se procesan las cabeceras de pago
+        // Nota: recupera la retención con el método generico para poder comparar con null
+        //       y de esta forma, determinar de forma más apropiada si hay que generer o no retención
+        if (!header.isReceipt() && header.get_Value("WithholdingAmt") == null)
+        {
+            final MDocType dt = new MDocType(header.getCtx(), header.getC_DocType_ID(), header.get_TrxName());
+            String genwh = dt.get_ValueAsString("GenerateWithholding");
+            if (genwh != null) {
+
+                if (genwh.equals("Y")) {
+                    // tipo de documento configurado para obligar a la generación de retención
+                    return "Retenci\u00f3n no generada";
+                }
+
+                if (genwh.equals("A")) {
+                    // tipo de documento configurado para generar la retención automáticamente
+                    if (!header.recalcPaymentWithholding())
+                        return "No se pudo generar la retenci\u00f3n sobre la cabecera de pago";
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Completa el procesamiento de la cabecera de pago.
+     * Crea el certificado de retención, actualiza las fechas y la marca como procesada
+     *
+     * @param header cabecera de pago
+     * @return mensaje de error o nulo
+     */
+    private String completePaymentWithholding(final MLARPaymentHeader header)
+    {
+        // TODO - Revisar este forma de fuerzar la relectura del header
+        header.load(header.get_TrxName());
+        // Solo se procesan las cabeceras de pago que tengan
+        // importe de retención mayor a cero
+        if (!header.isReceipt() && header.getWithholdingAmt() != null &&
+                header.getWithholdingAmt().compareTo(Env.ZERO) > 0)
+        {
+            // Crea el pago con el importe de la retención
+            final MPayment newPay = crearPagoRetencion(header);
+            if (newPay == null)
+                return "Error al crear el pago retenci\u00f3n (no existe cargo configurado)";
+            if (!newPay.processIt(DocAction.ACTION_Complete))
+                return "Error al procesar el pago retenci\u00f3n de la cabecera: " + newPay.getProcessMsg();
+            if (!newPay.save(header.get_TrxName()))
+                return "Error guardar el pago retenci\u00f3n de la cabecera";
+
+            // Crea el certificado de retención
+            MLARWithholdingCertificate whc = new MLARWithholdingCertificate(
+                    header.getCtx(), 0, header.get_TrxName());
+            whc.setC_DocType_ID(header.getC_DocType_ID());
+            whc.setLAR_PaymentHeader_ID(header.get_ID());
+            whc.setC_DocTypeTarget_ID(header.getC_DocType_ID());
+            whc.setDocumentNo(header.getDocumentNo());
+            if (!whc.save())
+                return "No se pudo crear el certificado de retenci\u00f3n";
+
+            // Actualiza las fechas, y marca la retención como procesada
+            String sql = "UPDATE LAR_PaymentWithholding"
+                       + "   SET DateAcct ="
+                       + "          (SELECT DateTrx"
+                       + "             FROM LAR_PaymentHeader H"
+                       + "            WHERE H.LAR_PaymentHeader_ID = LAR_PaymentWithholding.LAR_PaymentHeader_ID)"
+                       + "     , DateTrx ="
+                       + "          (SELECT DateTrx"
+                       + "             FROM LAR_PaymentHeader H"
+                       + "            WHERE H.LAR_PaymentHeader_ID = LAR_PaymentWithholding.LAR_PaymentHeader_ID)"
+                       + "     , Processed = 'Y'"
+                       + " WHERE LAR_PaymentHeader_ID = ?";
+            int no = DB.executeUpdate(sql, header.getLAR_PaymentHeader_ID(), header.get_TrxName());
+            if (no != 1)
+                return "Error en la actualización de fechas de la retenci\u00f3n";
+        }
+        return null;
+    } // completePaymentWithholding
+
+    /**
+     * Crea el pago "retención" necesario para procesar la cabecera de pago
+     *
+     * @param header cabecera de pago
+     * @return pago retencion
+     */
+    private MPayment crearPagoRetencion(final MLARPaymentHeader header)
+    {
+        final MDocType dt = new MDocType(header.getCtx(), header.getC_DocType_ID(), header.get_TrxName());
+        int c_Charge_ID = dt.get_ValueAsInt("LAR_Withholding_Charge_ID");
+        if (c_Charge_ID == 0)
+            return null;
+
+        // Se crea el "pago retención"
+        final MPayment payment = new MPayment(header.getCtx(), 0, header.get_TrxName());
+        payment.setC_DocType_ID(header.getC_DocType_ID());
+        payment.setC_Currency_ID(header.getC_Currency_ID());
+        payment.setC_BankAccount_ID(header.getC_BankAccount_ID());
+        payment.setC_BPartner_ID(header.getC_BPartner_ID());
+        payment.setAD_Org_ID(header.getAD_Org_ID());
+        payment.setTrxType(MPayment.TRXTYPE_CreditPayment);
+        payment.setIsAllocated(false);
+        payment.setIsReconciled(true);
+        payment.set_ValueOfColumn("EsRetencionIIBB", true);
+        payment.set_ValueOfColumn("LAR_PaymentHeader_ID", header.getLAR_PaymentHeader_ID());
+        payment.setTenderType(MPayment.TENDERTYPE_Cash);
+        payment.setPayAmt(header.getWithholdingAmt());
+        payment.setC_Charge_ID(c_Charge_ID);
+        return payment;
+    }
+
+    /**
+     * Revierte la retención sobre la cabecera de pago cuando esta es anulada.
+     *
+     * @param header cabecera de pago anulada
+     * @return mensaje de error o nulo
+     */
+    private String reversePaymentWithholding(final MLARPaymentHeader header)
+    {
+        if (!header.isReceipt() && header.getWithholdingAmt() != null)
+        {
+            // Se crea la retención inversa
+            final MLARPaymentWithholding pwh = MLARPaymentWithholding.get(header);
+            final MLARPaymentWithholding pwhnew = new MLARPaymentWithholding(header.getCtx(), 0, header.get_TrxName());
+            pwhnew.setLAR_PaymentHeader_ID(pwh.getLAR_PaymentHeader_ID());
+            pwhnew.setC_Tax_ID(pwh.getC_Tax_ID());
+            pwhnew.setLCO_WithholdingRule_ID(pwh.getLCO_WithholdingRule_ID());
+            pwhnew.setLCO_WithholdingType_ID(pwh.getLCO_WithholdingType_ID());
+            pwhnew.setDateAcct(pwh.getDateAcct());
+            pwhnew.setDateTrx(pwh.getDateTrx());
+            pwhnew.setPercent(pwh.getPercent());
+            pwhnew.setProcessed(true);
+            pwhnew.setTaxAmt(pwh.getTaxAmt());
+            pwhnew.setTaxBaseAmt(pwh.getTaxBaseAmt().negate());
+            if (!pwhnew.save())
+                return "No se pudo guardar el la retenci\u00f3n inversa";
+
+            // Se elimina el certificado de retención
+            final MLARWithholdingCertificate cert = MLARWithholdingCertificate.get(header);
+            if (!cert.delete(true, header.get_TrxName()))
+                return "No se pudo eliminar el certificado de retenci\u00f3n de la cabecera anulada";
+        }
+        return null;
+    } // reversePaymentWithholding
+
+    /**
+     * Determina si existe o no configuración activa para retenciones sobre pagos.
+     *
+     * @param header cabecera de pago
+     * @return verdadero si existe al menos una configuración activa; falso en caso contrario
+     * @throws SQLException
+     */
+    private boolean thereAreCalc(final MLARPaymentHeader header) throws SQLException
+    {
+        boolean thereAreCalc = false;
+        String sql = "SELECT 1 FROM LCO_WithholdingType wt, LCO_WithholdingRuleConf wrc"
+                   + " WHERE wt.LCO_WithholdingType_ID = wrc.LCO_WithholdingType_ID"
+                   + "   AND wrc.IsCalcFromPayment = 'Y'";
+        PreparedStatement pstmt = DB.prepareStatement(sql, header.get_TrxName());
+        ResultSet rs = null;
+        try {
+            rs = pstmt.executeQuery();
+            if (rs.next())
+                thereAreCalc = true;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+        return thereAreCalc;
     }
 
     /**
@@ -808,10 +959,6 @@ import ar.com.ergio.util.LAR_Utils;
      */
     private String accountingForWithholdingOnPayment(final MAllocationHdr ah)
     {
-        // Only process sales payments
-        if (!Env.isSOTrx(Env.getCtx()))
-            return null;
-
         final Doc doc = ah.getDoc();
         final List<Fact> facts = doc.getFacts();
 
@@ -833,36 +980,66 @@ import ar.com.ergio.util.LAR_Utils;
                 if (payment == null || payment.getC_Payment_ID() == 0)
                     continue;
 
-                // Determine if is an withholding or not
-                int c_TaxWithholding_ID = payment.get_ValueAsInt("C_TaxWithholding_ID");
-                if (c_TaxWithholding_ID <= 0)
-                    continue;
-                if (payment.getWriteOffAmt().compareTo(Env.ZERO) <= 0)
-                    continue;
-
-                // Iterates over factlines, searching one with writeoff account
-                // in order to change it to the retrieved from processed payment
-                final FactLine[] factlines = fact.getLines();
-                for (int ifl = 0; ifl < factlines.length; ifl++)
+                // Se determina si se procesan cobros o pagos
+                if (payment.isReceipt())
                 {
-                    final FactLine fl = factlines[ifl];
-                    // if factline account is WriteOff, change it
-                    if (fl.getAccount().equals(doc.getAccount(Doc.ACCTTYPE_WriteOff, as)))
+                    //////////////////  PROCESA COBROS  //////////////////
+
+                    // Determine if is an withholding or not
+                    int c_TaxWithholding_ID = payment.get_ValueAsInt("C_TaxWithholding_ID");
+                    if (c_TaxWithholding_ID <= 0)
+                        continue;
+                    if (payment.getWriteOffAmt().compareTo(Env.ZERO) <= 0)
+                        continue;
+
+                    // Iterates over factlines, searching one with writeoff account
+                    // in order to change it to the retrieved from processed payment
+                    final FactLine[] factlines = fact.getLines();
+                    for (int ifl = 0; ifl < factlines.length; ifl++)
                     {
-                        // Creates factline with proper account (using c_taxwithholding_id from processed payment)
-                        final BigDecimal withholdingAmt = payment.getWriteOffAmt();
-                        final MTax tw = new MTax(ah.getCtx(), c_TaxWithholding_ID, ah.get_TrxName());
-                        final DocTax taxLine = new DocTax(c_TaxWithholding_ID, tw.getName(), tw.getRate(), Env.ZERO,
-                                withholdingAmt, tw.isSalesTax());
+                        final FactLine fl = factlines[ifl];
+                        // if factline account is WriteOff, change it
+                        if (fl.getAccount().equals(doc.getAccount(Doc.ACCTTYPE_WriteOff, as)))
+                        {
+                            // Creates factline with proper account (using c_taxwithholding_id from processed payment)
+                            final BigDecimal withholdingAmt = payment.getWriteOffAmt();
+                            final MTax tw = new MTax(ah.getCtx(), c_TaxWithholding_ID, ah.get_TrxName());
+                            final DocTax taxLine = new DocTax(c_TaxWithholding_ID, tw.getName(), tw.getRate(), Env.ZERO,
+                                    withholdingAmt, tw.isSalesTax());
 
-                        final FactLine newFactLine = fact.createLine(null, taxLine.getAccount(DocTax.ACCTTYPE_TaxCredit, as),
-                                as.getC_Currency_ID(), withholdingAmt, null);
-                        if (newFactLine != null)
-                            newFactLine.setC_Tax_ID(c_TaxWithholding_ID);
+                            final FactLine newFactLine = fact.createLine(null, taxLine.getAccount(DocTax.ACCTTYPE_TaxCredit, as),
+                                    as.getC_Currency_ID(), withholdingAmt, null);
+                            if (newFactLine != null)
+                                newFactLine.setC_Tax_ID(c_TaxWithholding_ID);
 
-                        // Removes factline with writeoff account from fact
-                        log.info(String.format("Replace factline: %s -> %s", fl, newFactLine));
-                        fact.remove(fl);
+                            // Removes factline with writeoff account from fact
+                            log.info(String.format("Replace factline: %s -> %s", fl, newFactLine));
+                            fact.remove(fl);
+                        }
+                    }
+                }
+                else
+                {
+                    //////////////////  PROCESA PAGOS  //////////////////
+
+                    // Verifica si es un cargo corresponde a un pago retención
+                    if (payment.getC_Charge_ID() != 0 && payment.get_ValueAsBoolean("EsRetencionIIBB"))
+                    {
+                        int c_Charge_ID = payment.get_ValueAsInt("C_Charge_ID");
+                        // Recorre las lineas de asiento buscando el cargo
+                        // para cambiarle la cuenta por la que corresponde.
+                        final FactLine[] factlines = fact.getLines();
+                        final MCharge ch = new MCharge(ah.getCtx(), c_Charge_ID, ah.get_TrxName());
+                        for (int ifl = 0; ifl < factlines.length; ifl++)
+                        {
+                            final FactLine fl = factlines[ifl];
+                            // Si es un asiento de cargo, se cambia la cuenta
+                            if (fl.getAmtAcctDr().equals(ch.getChargeAmt()))
+                            {
+                                final BigDecimal chargeAmt = payment.getChargeAmt();
+                                fl.setAccount(as, MCharge.getAccount(c_Charge_ID, as, chargeAmt));
+                            }
+                        }
                     }
                 }
             }

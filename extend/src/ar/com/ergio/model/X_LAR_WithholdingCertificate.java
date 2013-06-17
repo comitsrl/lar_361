@@ -26,14 +26,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for LAR_WithholdingCertificate
  *  @author Adempiere (generated)
- *  @version 360LTS.015 - $Id$ */
+ *  @version 3.6.1-P20111003 | LAR 1.0.1-1c3c4dd */
 public class X_LAR_WithholdingCertificate extends PO implements I_LAR_WithholdingCertificate, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120313L;
+	private static final long serialVersionUID = 20130218L;
 
     /** Standard Constructor */
     public X_LAR_WithholdingCertificate (Properties ctx, int LAR_WithholdingCertificate_ID, String trxName)
@@ -42,8 +42,8 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
       /** if (LAR_WithholdingCertificate_ID == 0)
         {
 			setC_Invoice_ID (0);
-			setC_Payment_ID (0);
 			setDocumentNo (null);
+			setLAR_PaymentHeader_ID (0);
 			setLAR_WithholdingCertificate_ID (0);
         } */
     }
@@ -211,34 +211,6 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
 		return (String)get_Value(COLUMNNAME_C_Location_ID);
 	}
 
-	public I_C_Payment getC_Payment() throws RuntimeException
-    {
-		return (I_C_Payment)MTable.get(getCtx(), I_C_Payment.Table_Name)
-			.getPO(getC_Payment_ID(), get_TrxName());	}
-
-	/** Set Payment.
-		@param C_Payment_ID
-		Payment identifier
-	  */
-	public void setC_Payment_ID (int C_Payment_ID)
-	{
-		if (C_Payment_ID < 1)
-			set_Value (COLUMNNAME_C_Payment_ID, null);
-		else
-			set_Value (COLUMNNAME_C_Payment_ID, Integer.valueOf(C_Payment_ID));
-	}
-
-	/** Get Payment.
-		@return Payment identifier
-	  */
-	public int getC_Payment_ID ()
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_C_Payment_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
 	/** Set Document Date.
 		@param DateDoc
 		Date of the Document
@@ -286,6 +258,31 @@ public class X_LAR_WithholdingCertificate extends PO implements I_LAR_Withholdin
 	public String getDUNS ()
 	{
 		return (String)get_Value(COLUMNNAME_DUNS);
+	}
+
+	public ar.com.ergio.model.I_LAR_PaymentHeader getLAR_PaymentHeader() throws RuntimeException
+    {
+		return (ar.com.ergio.model.I_LAR_PaymentHeader)MTable.get(getCtx(), ar.com.ergio.model.I_LAR_PaymentHeader.Table_Name)
+			.getPO(getLAR_PaymentHeader_ID(), get_TrxName());	}
+
+	/** Set LAR_PaymentHeader.
+		@param LAR_PaymentHeader_ID LAR_PaymentHeader	  */
+	public void setLAR_PaymentHeader_ID (int LAR_PaymentHeader_ID)
+	{
+		if (LAR_PaymentHeader_ID < 1)
+			set_Value (COLUMNNAME_LAR_PaymentHeader_ID, null);
+		else
+			set_Value (COLUMNNAME_LAR_PaymentHeader_ID, Integer.valueOf(LAR_PaymentHeader_ID));
+	}
+
+	/** Get LAR_PaymentHeader.
+		@return LAR_PaymentHeader	  */
+	public int getLAR_PaymentHeader_ID ()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_LAR_PaymentHeader_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set LAR_WithholdingCertificate.

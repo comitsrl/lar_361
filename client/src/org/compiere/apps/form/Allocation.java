@@ -120,7 +120,9 @@ public class Allocation
 		StringBuffer sql = new StringBuffer("SELECT p.DateTrx,p.DocumentNo,p.C_Payment_ID,"  //  1..3
 			+ "c.ISO_Code,p.PayAmt,"                            //  4..5
 			+ "currencyConvert(p.PayAmt,p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"//  6   #1, #2
-			+ "currencyConvert(paymentAvailable(C_Payment_ID),p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"  //  7   #3, #4
+            //begin @emmie issue #17
+			+ "currencyConvert(paymentAvailable_LAR(C_Payment_ID),p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"  //  7   #3, #4
+            //end @emmie issue #17
 			+ "p.MultiplierAP, "
 		//TODO nuevo by German Wagner
 		//{
@@ -129,6 +131,9 @@ public class Allocation
 			+ "RLCCT.name AS CreditCardType, "// Tipo Tarjeta
 			+ "p.CreditCardNumber "// Nº Tarjeta
 		//}
+			//begin @emmie issue #17
+			+ ", p.EsRetencionIIBB "      // 13
+            //end @emmie issue #17
 			+ "FROM C_Payment_v p"		//	Corrected for AP/AR
 			+ " INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID) "
 		//TODO nuevo by German Wagner
@@ -145,8 +150,11 @@ public class Allocation
 		    + "AND RLCCT.ad_reference_id = REFCCT.ad_reference_id) "
 	    //}
 			+ "WHERE p.IsAllocated='N' AND p.Processed='Y'"
-			+ " AND p.C_Charge_ID IS NULL"		//	Prepayments OK
-			+ " AND p.C_BPartner_ID=?"                   		//      #5
+			//begin @emmie issue #17
+			+ "  AND ((p.C_Charge_ID IS NULL AND p.EsRetencionIIBB='N') OR "		//	Prepayments OK
+			+ "      (p.C_Charge_ID IS NOT NULL AND p.EsRetencionIIBB='Y'))"
+			//end @emmie issue #17}
+			+ "  AND p.C_BPartner_ID=?"                   		//      #5
 			);
 		if (!isMultiCurrency)
 			sql.append(" AND p.C_Currency_ID=?");				//      #6
@@ -183,7 +191,10 @@ public class Allocation
 				}
 				line.add(rs.getBigDecimal(6));      //  3/5-ConvAmt
 				BigDecimal available = rs.getBigDecimal(7);
-				if (available == null || available.signum() == 0)	//	nothing available
+	            //begin @emmie issue #17
+				boolean esRetencion = rs.getString(13).equals("Y"); //  13-EsRetencionIIBB
+				if (!esRetencion && (available == null || available.signum() == 0))	//	nothing available
+			    //end @emmie issue #17
 					continue;
 				line.add(available);				//  4/6-ConvOpen/Available
 				line.add(Env.ZERO);					//  5/7-Payment
