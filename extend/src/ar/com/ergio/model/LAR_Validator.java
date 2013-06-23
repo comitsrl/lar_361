@@ -218,11 +218,14 @@ import ar.com.ergio.util.LAR_Utils;
     			msg=setReconcilied(source, "Y", pay.get_TrxName());
     			if(msg!=null)
     				return msg;
-    			// Marcos Zúñiga -Excludes payment source from drawer
+    			// Marcos Zúñiga -Excludes payment source from drawer (when is not reversal payment)
+    			if (pay.getReversal_ID() == 0)
+    			{
     			msg=setIsOnDrawer(source, "N", pay.get_TrxName());
     			if(msg!=null)
     				return msg;
-
+    			}
+    			
     			msg=setReconcilied(pay.getC_Payment_ID(),"Y", pay.get_TrxName());
     			if(msg!=null)
     				return msg;
@@ -370,6 +373,18 @@ import ar.com.ergio.util.LAR_Utils;
                 return msg;
         }
 
+        // Return source payment to drawer
+        if ((po.get_TableName().equals(MPayment.Table_Name))
+                && (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT))
+        {
+            MPayment payment  = (MPayment) po;
+            Integer source = (Integer) payment.get_Value("LAR_PaymentSource_ID");
+            msg = setIsOnDrawer(source, "Y", payment.get_TrxName());
+            if (msg != null) {
+                return msg;
+            }
+        }
+        
          // Determine documentNo for voided invoices
          if (po.get_TableName().equals(MInvoice.Table_Name) &&
                  (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
@@ -1079,7 +1094,7 @@ import ar.com.ergio.util.LAR_Utils;
 
 	 		int result = DB.executeUpdate(sql, trxName);
 	 		if(result<0)
-	 			return "ERROR al excluir los pagos Cartera";
+	 			return "ERROR al modificar la condición del Cheque (Cartera)";
 
 	 		return null;
 	 	}
