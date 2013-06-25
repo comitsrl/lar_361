@@ -821,7 +821,8 @@ import ar.com.ergio.util.LAR_Utils;
      */
     private String reversePaymentWithholding(final MLARPaymentHeader header)
     {
-        if (!header.isReceipt() && header.getWithholdingAmt() != null)
+        if (!header.isReceipt() && header.getWithholdingAmt() != null &&
+                header.getWithholdingAmt().compareTo(Env.ZERO) > 0)
         {
             // Se crea la retención inversa
             final MLARPaymentWithholding pwh = MLARPaymentWithholding.get(header);
