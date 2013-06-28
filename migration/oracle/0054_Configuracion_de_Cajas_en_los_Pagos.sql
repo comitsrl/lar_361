@@ -93,3 +93,4 @@ UPDATE AD_Field SET IsMandatory='Y',Updated=TO_DATE('2013-06-27 18:43:38','YYYY-
 UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2013-06-27 18:45:11','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000426
 ;
 
+SELECT register_migration_script_lar('0054_Configuracion_de_Cajas_en_los_Pagos.sql','LAR','') FROM dual;
