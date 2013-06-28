@@ -215,7 +215,7 @@ import ar.com.ergio.util.LAR_Utils;
     			if((source==null)||(source <=0))
     				return null;
 
-    			msg=setReconcilied(source, "Y", pay.get_TrxName());
+    			msg=setReconciled(source, "N", pay.get_TrxName());
     			if(msg!=null)
     				return msg;
     			// Marcos Zúñiga -Excludes payment source from drawer (when is not reversal payment)
@@ -226,7 +226,7 @@ import ar.com.ergio.util.LAR_Utils;
     				return msg;
     			}
     			
-    			msg=setReconcilied(pay.getC_Payment_ID(),"Y", pay.get_TrxName());
+    			msg=setReconciled(pay.getC_Payment_ID(),"N", pay.get_TrxName());
     			if(msg!=null)
     				return msg;
 
@@ -241,7 +241,7 @@ import ar.com.ergio.util.LAR_Utils;
     			if((source==null)||(source <=0))
     				return null;
 
-    			msg=setReconcilied(source, "N", pay.get_TrxName());
+    			msg=setReconciled(source, "N", pay.get_TrxName());
     			if(msg!=null)
     				return msg;
     			// Marcos Zúñiga
@@ -1070,7 +1070,7 @@ import ar.com.ergio.util.LAR_Utils;
 	 	 * @param trxName
 	 	 * @return
 	 	 */
-	 	private String setReconcilied(Integer payID, String value, String trxName)
+	 	private String setReconciled(Integer payID, String value, String trxName)
 	 	{
 	 		String sql="UPDATE C_Payment SET isReconciled='"+value+"' WHERE C_Payment_ID="+payID;
 
