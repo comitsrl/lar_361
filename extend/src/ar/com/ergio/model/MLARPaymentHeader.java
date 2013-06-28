@@ -27,12 +27,17 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.apps.ADialog;
+import org.compiere.model.MBPartner;
+import org.compiere.model.MDocType;
 import org.compiere.model.MPayment;
+import org.compiere.model.ModelValidationEngine;
+import org.compiere.model.ModelValidator;
 import org.compiere.model.Query;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 
 /**
  * Payment Header
@@ -50,6 +55,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
 	/** Process Message             */
     private String      m_processMsg = null;
+    /** Just Prepared Flag          */
+    private boolean     m_justPrepared = false;
 
     /**
      * Recupera la cabecera de pagos relacionada con el id de la factura dada
@@ -72,6 +79,98 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                                                 .firstOnly();
         return header;
     }
+
+    /**
+     * Actualiza la retenci\u00f3n y el total de pago en la cabecera via sql.
+     * (Esta forma evita el disparo de la validaci\u00f3n)
+     *
+     * @return verdadero si se actualiza la cabecera
+     */
+    public static boolean updateHeaderWithholding(int LAR_PaymentHeader_ID, String trxName)
+    {
+        String sql = "UPDATE LAR_PaymentHeader"
+                   + "   SET WithholdingAmt ="
+                   + "         (SELECT COALESCE(SUM(TaxAmt),0)"
+                   + "            FROM LAR_PaymentWithholding iw"
+                   + "           WHERE iw.IsActive='Y'"
+                   + "             AND LAR_PaymentHeader.LAR_PaymentHeader_ID=iw.LAR_PaymentHeader_ID)"
+                   + "     , PayHeaderTotalAmt = "
+                   + "         (SELECT COALESCE(SUM(PayAmt),0)"
+                   + "            FROM C_Payment p"
+                   + "           WHERE p.IsActive='Y'"
+                   + "             AND LAR_PaymentHeader.LAR_PaymentHeader_ID=p.LAR_PaymentHeader_ID)"
+                   + "          + "
+                   + "         (SELECT COALESCE(SUM(TaxAmt),0)"
+                   + "            FROM LAR_PaymentWithholding iw"
+                   + "           WHERE iw.IsActive='Y'"
+                   + "             AND LAR_PaymentHeader.LAR_PaymentHeader_ID=iw.LAR_PaymentHeader_ID)"
+                   + " WHERE LAR_PaymentHeader_ID=?";
+        int no = DB.executeUpdate(sql, LAR_PaymentHeader_ID, trxName);
+
+        return no == 1;
+    }   //  updateHeaderWithholding
+
+    /**
+     * Establece un valor al campo retención directamente (via sql)
+     *
+     * @param header cabecera de pago
+     * @param amt importe de retención
+     * @return verdadero si se actualiza la cabecera
+     */
+    public static boolean setWithholdingAmtDirectly(final MLARPaymentHeader header, final BigDecimal amt)
+    {
+        DB.executeUpdate("UPDATE LAR_PaymentHeader SET WithholdingAmt=? WHERE LAR_PaymentHeader_ID=?",
+                new Object[] {amt, header.getLAR_PaymentHeader_ID()},
+                true,
+                header.get_TrxName());
+        return true;
+    }
+
+    /**
+     * Realiza el cálculo de la retención sobre la cabezera de pago dada.
+     * Esto lo lleva a cabo creando un registro de retención sobre pagos
+     * y un pago con el importe de la retención el campo WriteOff para su
+     * posterior contabilización.
+     *
+     * @return cantidad de retenciones generadas o -1 en caso de error
+     */
+    public boolean recalcPaymentWithholding()
+    {
+        final MDocType dt = new MDocType(getCtx(), getC_DocType_ID(), get_TrxName());
+        String genwh = dt.get_ValueAsString("GenerateWithholding");
+        if (genwh == null || genwh.equals("N"))
+            return true;
+
+        // Recupera la configuración y calcula
+        final MBPartner bp = new MBPartner(getCtx(), getC_BPartner_ID(), get_TrxName());
+        final WithholdingConfig wc = new WithholdingConfig(bp, false);
+        log.config("Withholding conf >> " + wc);
+
+        if (wc.isCalcFromPayment() &&
+                getPayHeaderTotalAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+        {
+            // Crea la retención
+            BigDecimal taxAmt = getPayHeaderTotalAmt().multiply(wc.getAliquot())
+                    .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+
+            final MLARPaymentWithholding pwh = MLARPaymentWithholding.get(this);
+            pwh.setLAR_PaymentHeader_ID(getLAR_PaymentHeader_ID());
+            pwh.setC_Tax_ID(wc.getC_Tax_ID());
+            pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
+            pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
+            pwh.setDateAcct(Env.getContextAsDate(getCtx(), "#Date"));
+            pwh.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
+            pwh.setPercent(wc.getRate());
+            pwh.setProcessed(false);
+            pwh.setTaxAmt(taxAmt);
+            pwh.setTaxBaseAmt(getPayHeaderTotalAmt());
+            // Cuando se guarda la retención, se actualiza la cabecera
+            // de pago con mediante MLARPaymentWithholding.afterSave()
+            if (!pwh.save(get_TrxName()))
+                return false;
+        }
+        return true;
+    } // recalcPaymentWithholding
 
     /**
      * Constructor tradicional para una cabecera de cobros/pagos
@@ -230,7 +329,26 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     public String prepareIt()
     {
         log.info(toString());
-        // TODO - Por el momento, no realiza ningún proceso.
+        // Dispara la validación del documento
+        m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_PREPARE);
+        if (m_processMsg != null)
+            return DocAction.STATUS_Invalid;
+
+        //
+        // TODO - ACCIONES NECESARIAS DE PREPARACION DEL DOCUMENTO.
+        // (¿no necesitamos realizar ninguna acción de preparación
+        //   de las cabeceras de cobros/pagos?)
+        // Accioens: - cargar los cobros/pagos (y dejarlso en un variable de instancia?
+        //           - controlar que al menos existe un cobro/pago para la cabecera?
+
+        // Dispara la validación del documento
+        m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
+        if (m_processMsg != null)
+            return DocAction.STATUS_Invalid;
+
+        m_justPrepared = true;
+        if (!DOCACTION_Complete.equals(getDocAction()))
+            setDocAction(DOCACTION_Complete);
         return DocAction.STATUS_InProgress;
     }
 
@@ -252,10 +370,27 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     public String completeIt()
     {
         log.info(toString());
+
+        //  Re-Check
+        if (!m_justPrepared)
+        {
+            String status = prepareIt();
+            if (!DocAction.STATUS_InProgress.equals(status))
+                return status;
+        }
+
+        // Dispara la validación del documento
+        m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_COMPLETE);
+        if (m_processMsg != null)
+            return DocAction.STATUS_Invalid;
+
         MPayment[] pays = getPayments(get_TrxName());
 
         for(int i = 0; i < pays.length; i++)
         {
+            pays[i].setDateAcct(getDateTrx());
+            pays[i].setDateTrx(getCreated());
+            pays[i].setTrxType(MPayment.TRXTYPE_CreditPayment);
             pays[i].processIt(ACTION_Complete);
             pays[i].save(get_TrxName());
             if (!DOCSTATUS_Completed.equals(pays[i].getDocStatus()))
@@ -264,6 +399,12 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 return DocAction.STATUS_Invalid;
             }
         }
+
+        //setC_BankAccount_ID(C_BankAccount_ID);
+        // Dispara la validación del documento
+        m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_COMPLETE);
+        if (m_processMsg != null)
+            return DocAction.STATUS_Invalid;
 
         setDocStatus(ACTION_Complete);
         setDocAction(DOCACTION_Close);
@@ -275,6 +416,22 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     public boolean voidIt()
     {
         log.info(toString());
+
+        // Dispara la validación del documento
+        m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_VOID);
+        if (m_processMsg != null)
+            return false;
+
+        // Cheque si ya fue procesado
+        if (DOCSTATUS_Closed.equals(getDocStatus()) || DOCSTATUS_Voided.equals(getDocStatus()))
+        {
+            m_processMsg = "Documento cerrado: " + getDocStatus();
+            setDocAction(DOCACTION_None);
+            return false;
+        }
+
+        // Procesa la anulación
+        // NOTA: No se tiene el concepto de "reversión" de las cabeceras de cobros/pagos.
         MPayment[] pays = getPayments(get_TrxName());
 
         for(int i = 0; i < pays.length; i++)
@@ -287,6 +444,11 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 return false;
             }
         }
+
+        // Dispara la validación del documento
+        m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
+        if (m_processMsg != null)
+            return false;
 
         setProcessed(true);
         setDocStatus(ACTION_Void);
@@ -357,8 +519,9 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     @Override
     public int getC_Currency_ID()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        // TODO - Si es necesario, agregar la columna C_Currency_ID a la
+        //        tabla LAR_PaymentHeader y generar el modelo nuevamente
+        return Env.getContextAsInt(getCtx(), "$C_Currency_ID"); // ARS
     }
 
     @Override

@@ -277,7 +277,7 @@ public class InfoOnDrawerChecks extends Info
 		}
 		sql.append(" AND p.IsReceipt=?");
 
-		sql.append(" AND p.IsReconciled='N'");
+		// sql.append(" AND p.IsReconciled='N'");
 
 		log.fine(sql.toString());
 		return sql.toString();
