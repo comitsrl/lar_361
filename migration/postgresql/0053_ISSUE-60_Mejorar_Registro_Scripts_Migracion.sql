@@ -62,6 +62,7 @@ BEGIN
     RETURN v_return;
 END;
 $function$
+;
 
 -- 27/06/2013 23:08:48 ART
 -- Minor Changes to Drawer Closing Window
