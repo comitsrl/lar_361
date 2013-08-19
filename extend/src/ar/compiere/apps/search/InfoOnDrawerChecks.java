@@ -94,7 +94,7 @@ public class InfoOnDrawerChecks extends Info
 		//
 		pack();
 		//	Focus
-		fDocumentNo.requestFocus();
+		fCheckNo.requestFocus();
 	}   //  InfoPayment
 
 	//  Static Info
