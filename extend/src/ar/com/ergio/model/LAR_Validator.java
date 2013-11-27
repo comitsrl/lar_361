@@ -325,7 +325,8 @@ import ar.com.ergio.util.LAR_Utils;
              */
             MOrder order = new MOrder(invoice.getCtx(), invoice.getC_Order_ID(), invoice.get_TrxName());
             MDocType dt = new MDocType(invoice.getCtx(), order.getC_DocTypeTarget_ID(), invoice.get_TrxName());
-            if (dt.getDocSubTypeSO() != null && dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder))
+            // Marcos Zúñiga : Se consideran también las Warehouse Orders (WP)
+            if (dt.getDocSubTypeSO() != null && (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder) || dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder)))
                 invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
 
             invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
