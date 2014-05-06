@@ -52,6 +52,13 @@ public class HasarPrinterP330F extends HasarFiscalPrinter {
 	}
 	
 	@Override
+	public FiscalPacket cmdPrintEmbarkItem(String description, BigDecimal quantity, Integer display) {
+	    // El parámetro display no tiene utilidad en este modelo.
+	    // Siempre se asigna a 0.
+	    return super.cmdPrintEmbarkItem(description, quantity, 0);
+	}
+
+	@Override
 	public FiscalPacket cmdPrintFiscalText(String text, Integer display) {
 		// El parámetro display no tiene utilidad en este modelo.
 		// Siempre se asigna a 0.

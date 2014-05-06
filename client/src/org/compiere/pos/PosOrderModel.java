@@ -323,10 +323,10 @@ public class PosOrderModel extends MOrder {
         /* Se ejecuta las acciones propias para completar las Ordenes POS de LAR       */
         /* =========================================================================== */
 
-        // En caso de NO ser una transacción de ctacte, se crean y procesan
-        // las imputaciones de cobros y se relaciona la factura generada
+        // En caso de NO ser una transacción de ctacte, y NO ser un POS de remitos,
+        // se crean y procesan las imputaciones de cobros y se relaciona la factura generada
         // con la cabecera de cobros creada por la orden de venta PDV
-        if (!isPaidFromAccount)
+        if (!isPaidFromAccount && !m_pos.get_ValueAsBoolean("IsShipment"))
         {
             // Se crean las imputaciones para cada cobro de la orden
             final String desc = Msg.translate(Env.getCtx(), "C_Order_ID") + ": " + getDocumentNo();

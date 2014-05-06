@@ -37,9 +37,11 @@ import org.compiere.apps.ADialog;
 import org.compiere.apps.SwingWorker;
 import org.compiere.apps.form.FormFrame;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPInstance;
 import org.compiere.model.MPOS;
+import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.process.ProcessInfo;
 import org.compiere.process.ProcessInfoParameter;
@@ -441,9 +443,9 @@ public class PosBasePanel extends CPanel
         m_frame.setCursor(Cursor.getDefaultCursor());
     }
 
-	protected boolean printFiscalTicket(final MInvoice invoice)
+	protected boolean printFiscalTicket(final PO document)
 	{
-        log.info("Printing fiscal ticket for " + invoice);
+        log.info("Printing fiscal ticket for " + document);
 
         final SwingWorker worker = new SwingWorker()
         {
@@ -451,7 +453,7 @@ public class PosBasePanel extends CPanel
             public Object construct()
             {
                 boolean success = true;
-                int c_DocType_ID = invoice.getC_DocType_ID();
+                int c_DocType_ID = document.get_ValueAsInt("C_DocType_ID");
                 try {
                     final MDocType docType = new MDocType(m_ctx, c_DocType_ID, null);
                     int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
@@ -462,7 +464,7 @@ public class PosBasePanel extends CPanel
                     log.info("fiscal document print created: " + fdp);
 
                     infoFiscalPrinter.setFiscalDocumentPrint(fdp);
-                    success = fdp.printDocument(invoice);
+                    success = printDocument(fdp, document);
                 } catch (Exception e) {
                     log.log(Level.SEVERE, "Fiscal printing error", e);
                     success = false;
@@ -485,6 +487,22 @@ public class PosBasePanel extends CPanel
 
         return (Boolean) worker.get();
 	} // printFiscalTicket
+
+	/**
+	 * Imprime el tipo de documento correspondiende según el tipo de orden
+	 */
+	private boolean printDocument(final FiscalDocumentPrint fdp, final PO document)
+	{
+	    if (document instanceof MInOut)
+	        return fdp.printShipmentDocument(document);
+
+	    else if (document instanceof MInvoice)
+	    {
+	        return fdp.printDocument(document);
+	    }
+	    else
+	        throw new AdempierePOSException("Sub tipo de orden de POS incorrecto");
+	} // printDocument
 
     private void createInfoFiscalPrinter()
     {

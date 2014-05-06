@@ -405,14 +405,20 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                     // set the proper trx name to order
                     p_posPanel.m_order.set_TrxName(trxName);
 
-                    if (!PosPayment.pay(p_posPanel)) {
-                        String msg = Msg.translate(p_ctx, "PosPaymentCancel");
-                        throw new AdempierePOSException(msg);
-                    }
+                    // Si se procesa un remito por el POS no es necesario
+                    // definir medio de pago ni crear los mismos
+                    if (!p_pos.get_ValueAsBoolean("IsShipment"))
+                    {
 
-                    if (!p_posPanel.m_order.processPayments()) {
-                        String msg = Msg.translate(p_ctx, "FailProcessPaymentHeader");
-                        throw new AdempierePOSException(msg);
+                        if (!PosPayment.pay(p_posPanel)) {
+                            String msg = Msg.translate(p_ctx, "PosPaymentCancel");
+                            throw new AdempierePOSException(msg);
+                        }
+
+                        if (!p_posPanel.m_order.processPayments()) {
+                            String msg = Msg.translate(p_ctx, "FailProcessPaymentHeader");
+                            throw new AdempierePOSException(msg);
+                        }
                     }
 
                     if (!p_posPanel.m_order.isProcessed() && !p_posPanel.m_order.processOrder()) {
