@@ -18,6 +18,26 @@ INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTra
 UPDATE AD_Ref_List_Trl SET Name='Remito',Updated=TO_TIMESTAMP('2014-03-21 10:54:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000047 AND AD_Language='es_AR'
 ;
 
+-- 23/03/2014 19:44:57 ART
+-- Leimat #12: Impresión de Remitos por CF
+INSERT INTO AD_Process (AD_Process_ID,IsDirectPrint,IsReport,AccessLevel,IsBetaFunctionality,IsServerProcess,ShowHelp,EntityType,Statistic_Seconds,Statistic_Count,Classname,CopyFromProcess,Value,Name,AD_Org_ID,AD_Client_ID,Created,CreatedBy,Updated,UpdatedBy,IsActive) VALUES (3000071,'N','N','3','N','N','Y','LAR',23329,2005,'ar.com.ergio.process.ShipmentFiscalPrinting','N','LAR_ShipmentFiscalPrinting','LAR_ShipmentFiscalPrinting',0,0,TO_TIMESTAMP('2014-03-23 19:44:56','YYYY-MM-DD HH24:MI:SS'),100,TO_TIMESTAMP('2014-03-23 19:44:56','YYYY-MM-DD HH24:MI:SS'),100,'Y')
+;
+
+-- 23/03/2014 19:44:57 ART
+-- Leimat #12: Impresión de Remitos por CF
+INSERT INTO AD_Process_Trl (AD_Language,AD_Process_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_ID=3000071 AND NOT EXISTS (SELECT * FROM AD_Process_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_ID=t.AD_Process_ID)
+;
+
+-- 23/04/2014 17:06:36 ART
+-- Leimat #12 - LAR #64: Impresión de Remitos por CF
+INSERT INTO AD_WF_Node (AD_WF_Node_ID,Cost,DynPriorityChange,Priority,DocAction,Duration,EntityType,IsCentrallyMaintained,JoinElement,"limit",WaitTime,WorkingTime,XPosition,YPosition,WaitingTime,AD_Process_ID,AD_Workflow_ID,"action",SplitElement,Value,Name,UpdatedBy,Created,AD_Org_ID,CreatedBy,IsActive,Updated,AD_Client_ID) VALUES (3000007,0,0,0,'CO',0,'LAR','Y','X',0,0,0,0,0,0,3000071,117,'P','X','(DocFiscalPrinting)','LAR_ShipmentFiscalPrinting',100,TO_TIMESTAMP('2014-04-23 17:06:35','YYYY-MM-DD HH24:MI:SS'),0,100,'Y',TO_TIMESTAMP('2014-04-23 17:06:35','YYYY-MM-DD HH24:MI:SS'),0)
+;
+
+-- 23/04/2014 17:06:36 ART
+-- Leimat #12 - LAR #64: Impresión de Remitos por CF
+INSERT INTO AD_WF_Node_Trl (AD_Language,AD_WF_Node_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_WF_Node_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_WF_Node t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_WF_Node_ID=3000007 AND NOT EXISTS (SELECT * FROM AD_WF_Node_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_WF_Node_ID=t.AD_WF_Node_ID)
+;
+
 -- 29/04/2014 17:23:21 ART
 -- Leimat #12 - LAR #64: Impresión de Remitos por CF
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3000160,'isshipment','LAR','isshipment','isshipment',0,TO_TIMESTAMP('2014-04-29 17:23:21','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2014-04-29 17:23:21','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)

@@ -14,46 +14,50 @@
  * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
  * or via info@compiere.org or http://www.compiere.org/license.html           *
  *****************************************************************************/
-package ar.com.ergio.process;
+package ar.com.ergio.print.fiscal.view;
 
-import org.compiere.model.MInvoice;
-import org.compiere.process.SvrProcess;
+import org.compiere.model.MInOut;
+import org.compiere.model.MOrder;
+import org.compiere.model.MSequence;
+import org.compiere.model.PO;
+import org.compiere.process.DocAction;
 
-import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
-import ar.com.ergio.util.LAR_Utils;
+import ar.com.ergio.model.FiscalDocumentPrint;
 
 /**
- * Print fiscal ticket for an invoice
  *
  * @author Emiliano Pereyra - http://www.ergio.com.ar
  *
  */
-public class InvoiceFiscalPrinting extends SvrProcess
+public class ShipmentFiscalDocumentPrintManager extends FiscalDocumentPrintManager
 {
-    /** Current invoice id */
-    private int p_C_Invoice_ID;
-    /** Process result message */
-    private String m_ResultMsg = "";
-    /** Current invoice model object */
-    private MInvoice invoice;
+    private final MInOut shipment;
 
-    @Override
-    protected void prepare()
+    public ShipmentFiscalDocumentPrintManager(final PO document)
     {
-        p_C_Invoice_ID = getRecord_ID();
-        invoice = new MInvoice(getCtx(), p_C_Invoice_ID, get_TrxName());
+        super(document);
+        shipment = (MInOut) document;
     }
 
     @Override
-    protected String doIt() throws Exception
+    protected boolean printDocument(final FiscalDocumentPrint fdp)
     {
-        log.info(String.format("Processing invoice %s", invoice));
-        // Check if invoice exists and has proper doctype
-        if (invoice != null && LAR_Utils.isFiscalDocType(invoice.getC_DocType_ID()))
-        {
-            final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(invoice);
-            manager.print();
-        }
-        return m_ResultMsg;
+        final MOrder order = new MOrder(shipment.getCtx(), shipment.getC_Order_ID(), shipment.get_TrxName());
+        return fdp.printDeliveryDocument(order);
     }
+
+    @Override
+    protected void voidDocument()
+    {
+        // Anula el remito
+        shipment.processIt(DocAction.ACTION_Void);
+        shipment.saveEx();
+
+        // Retrocede la secuencia en 1
+        int ad_Sequence_ID = shipment.getC_DocType().getDefiniteSequence_ID();
+        final MSequence seq = new MSequence(shipment.getCtx(), ad_Sequence_ID, shipment.get_TrxName());
+        seq.setCurrentNext(seq.getCurrentNext() - 1);
+        seq.saveEx();
+    }
+
 }

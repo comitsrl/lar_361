@@ -16,44 +16,45 @@
  *****************************************************************************/
 package ar.com.ergio.process;
 
-import org.compiere.model.MInvoice;
+import org.compiere.model.MInOut;
 import org.compiere.process.SvrProcess;
 
-import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
+import ar.com.ergio.print.fiscal.view.ShipmentFiscalDocumentPrintManager;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
- * Print fiscal ticket for an invoice
+ * Impresión fiscal de un remito (documento no fiscal)
  *
  * @author Emiliano Pereyra - http://www.ergio.com.ar
  *
  */
-public class InvoiceFiscalPrinting extends SvrProcess
+public class ShipmentFiscalPrinting extends SvrProcess
 {
-    /** Current invoice id */
-    private int p_C_Invoice_ID;
+    /** Current shipment id */
+    private int p_M_InOut_ID;
     /** Process result message */
     private String m_ResultMsg = "";
-    /** Current invoice model object */
-    private MInvoice invoice;
+    /** Current shipment model object */
+    private MInOut shipment;
 
     @Override
     protected void prepare()
     {
-        p_C_Invoice_ID = getRecord_ID();
-        invoice = new MInvoice(getCtx(), p_C_Invoice_ID, get_TrxName());
+        p_M_InOut_ID = getRecord_ID();
+        shipment = new MInOut(getCtx(), p_M_InOut_ID, get_TrxName());
     }
 
     @Override
     protected String doIt() throws Exception
     {
-        log.info(String.format("Processing invoice %s", invoice));
+        log.info(String.format("Processing shipment %s", shipment));
         // Check if invoice exists and has proper doctype
-        if (invoice != null && LAR_Utils.isFiscalDocType(invoice.getC_DocType_ID()))
+        if (shipment != null && LAR_Utils.isFiscalDocType(shipment.getC_DocType_ID()))
         {
-            final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(invoice);
-            manager.print();
+            final ShipmentFiscalDocumentPrintManager process = new ShipmentFiscalDocumentPrintManager(shipment);
+            process.print();
         }
         return m_ResultMsg;
     }
+
 }
