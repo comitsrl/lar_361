@@ -369,7 +369,9 @@ import ar.com.ergio.util.LAR_Utils;
         // Antes de preparar la cabecera, se verifica si la retención fue generada
         if (po.get_TableName().equals(MLARPaymentHeader.Table_Name) && timing == TIMING_BEFORE_PREPARE)
         {
-            preparePaymentWithholding((MLARPaymentHeader) po);
+            msg = preparePaymentWithholding((MLARPaymentHeader) po);
+            if (msg != null)
+                return msg;
         }
 
         // Después de completar crear el certificado de retención y actualiza las fechas
