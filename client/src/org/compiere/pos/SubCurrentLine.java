@@ -590,7 +590,8 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 
 		if ( p_posPanel.m_order == null )
 		{
-			p_posPanel.m_order = PosOrderModel.createOrder(p_posPanel.p_pos, p_posPanel.f_order.getBPartner(),trxName);
+			p_posPanel.m_order = PosOrderModel.createOrder(p_posPanel.p_pos, p_posPanel.f_order.getBPartner(),
+			        p_posPanel.f_order.getC_BPartner_Location_ID(), trxName);
 		}
 
 		MOrderLine line = null;

@@ -49,6 +49,7 @@ import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.pos.PosOrderModel;
 import org.compiere.process.DocAction;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -109,6 +110,7 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addDocValidate(MInOut.Table_Name, this);
          engine.addDocValidate(MAllocationHdr.Table_Name, this);
          engine.addDocValidate(MLARPaymentHeader.Table_Name, this);
+         engine.addDocValidate(PosOrderModel.Table_Name, this);
      }   //  initialize
 
     /**
@@ -407,6 +409,15 @@ import ar.com.ergio.util.LAR_Utils;
          // before posting the allocation - post the payment withholdings vs writeoff amount
          if (po.get_TableName().equals(MAllocationHdr.Table_Name) && timing == TIMING_BEFORE_POST) {
              msg = accountingForWithholdingOnPayment((MAllocationHdr) po);
+             if (msg != null)
+                 return msg;
+         }
+
+         // Antes de completar una Orde de Venta (POS), cambia el tipo de documento de la
+         // misma, dependiendo el medio de pago
+         if (po.get_TableName().equals(MOrder.Table_Name) && timing == TIMING_BEFORE_PREPARE)
+         {
+             msg = changeShipmentDocType((MOrder) po);
              if (msg != null)
                  return msg;
          }
@@ -1063,6 +1074,36 @@ import ar.com.ergio.util.LAR_Utils;
         }
         return null;
     }
+
+    /**
+     * Si la orden POS fue pagada en CtaCte, se realiza el cambio del tipo de
+     * documento de la misma:
+     * <ul>
+     *   <li>Contado -> PosOrderModel.C_DocTypeTarget_ID sin cambios
+     *   <li>CtaCte -> PosOrderModel.C_DocTypeTarget_ID = MPOS.C_DocTypeOnCredit_ID
+     * </ul>
+     *
+     * @param order Orden a procesar
+     * @return null si el proceso fue correcto; caso contrario el mensaje de error
+     */
+    private String changeShipmentDocType(final MOrder order)
+    {
+        // Solo se procesan las ordenes POS
+        if (order instanceof PosOrderModel)
+        {
+            final MPOS pos = new MPOS(order.getCtx(), order.getC_POS_ID(), order.get_TrxName());
+
+            if (!pos.get_ValueAsBoolean("IsShipment") &&
+                order.getC_PaymentTerm_ID() == PosOrderModel.PAYMENTTERMS_Account)
+            {
+                // Se cambia el tipo de orden para la operación en ctacte
+                order.setC_DocTypeTarget_ID(pos.get_ValueAsInt("C_DocTypeOnCredit_ID"));
+                if (!order.save())
+                    return "No se pudo realizar el cambio de tipo de documento de la orden pdv";
+            }
+        }
+        return null;
+    } // changeShipmentDocType
 
 	 	/**
 	 	 * german wagner

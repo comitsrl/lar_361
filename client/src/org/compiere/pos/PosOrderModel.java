@@ -50,8 +50,8 @@ public class PosOrderModel extends MOrder {
 
 	private static final long serialVersionUID = 5253837037827124425L;
 	//LAR payment terms.
-	private static final int PAYMENTTERMS_Account = 3000000;
-	private static final int PAYMENTTERMS_Cash = 3000001;
+	public static final int PAYMENTTERMS_Account = 3000000;
+	public static final int PAYMENTTERMS_Cash = 3000001;
 
 	private MPOS m_pos;
 	private List<MPayment> payments = new ArrayList<MPayment>();
@@ -69,7 +69,7 @@ public class PosOrderModel extends MOrder {
 	 *
 	 * @return order or null
 	 */
-	public static PosOrderModel createOrder(MPOS pos, MBPartner partner, String trxName) {
+	public static PosOrderModel createOrder(MPOS pos, MBPartner partner, int bpLocation_ID, String trxName) {
 
 		PosOrderModel order = new PosOrderModel(Env.getCtx(), 0, trxName, pos);
 		order.setAD_Org_ID(pos.getAD_Org_ID());
@@ -88,6 +88,7 @@ public class PosOrderModel extends MOrder {
 			throw new AdempierePOSException("No BPartner for order");
 		}
 		order.setBPartner(partner);
+		order.setC_BPartner_Location_ID(bpLocation_ID);
 		//
 		order.setM_PriceList_ID(m_PriceList_ID);
 		order.setM_Warehouse_ID(pos.getM_Warehouse_ID());
@@ -101,6 +102,20 @@ public class PosOrderModel extends MOrder {
 		return order;
 	} //	createOrder
 
+	/**
+	 * Establece <code>solo</code> solo la dirección de envío de la orden
+	 * para se usada en la generacion del remito
+	 */
+	@Override
+	public void setC_BPartner_Location_ID(int c_BPartner_Location_ID)
+	{
+	    if (c_BPartner_Location_ID > 0)
+	    {
+	        int bill_Location_ID = getBill_Location_ID();
+	        super.setC_BPartner_Location_ID(c_BPartner_Location_ID);
+	        super.setBill_Location_ID(bill_Location_ID);
+	    }
+	}
 
 	/**
 	 * @author Community Development OpenXpertya

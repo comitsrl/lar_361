@@ -77,7 +77,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	protected PosTextField	f_bpName;
 	private CButton 		f_bNew;
 	private CButton 		f_bSearch; // @emmie - bp search
-	private CComboBox		f_location;
+	//private CComboBox		f_location;
 	private CComboBox		f_user;
 	private CButton 		f_process;
 	private CButton 		f_print;
@@ -91,6 +91,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	private MBPartner	m_bpartner;
 	/**	Price List Version to use	*/
 	private int			m_M_PriceList_Version_ID = 0;
+    private int m_C_BPartner_Location_ID;
 	private CTextField f_currency = new CTextField();
 	//private CButton f_bEdit;
 	private CButton f_bSettings;
@@ -410,11 +411,13 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
         log.info("C_BPartner_ID=" + C_BPartner_ID);
         if (C_BPartner_ID == 0) {
             m_bpartner = null;
+            m_C_BPartner_Location_ID = 0;
         }
         else {
             m_bpartner = new MBPartner(p_ctx, C_BPartner_ID, null);
             if (m_bpartner.get_ID() == 0) {
                 m_bpartner = null;
+                m_C_BPartner_Location_ID = 0;
             }
         }
 
@@ -430,6 +433,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
         // fillCombos();
         if (p_posPanel.m_order != null && m_bpartner != null) {
             p_posPanel.m_order.setBPartner(m_bpartner); // added by ConSerTi to update the client in the request
+            p_posPanel.m_order.setC_BPartner_Location_ID(m_C_BPartner_Location_ID);
             p_posPanel.f_curLine.updateTable(p_posPanel.m_order);
         }
     } // setC_BPartner_ID
@@ -483,17 +487,27 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 	}	//	getBPartner
 
     /**
+     * Establece la ubicación elegida para el BPartner
+     *
+     * @param c_BPartner_Location_ID ID de la direccion del BP
+     */
+    void setC_BPartner_Location_ID(int c_BPartner_Location_ID)
+    {
+        if (p_posPanel.m_order != null)
+            p_posPanel.m_order.setC_BPartner_Location_ID(c_BPartner_Location_ID);
+
+        m_C_BPartner_Location_ID = c_BPartner_Location_ID;
+    }
+
+    /**
      * Get BPartner Location
      * @return C_BPartner_Location_ID
      */
     public int getC_BPartner_Location_ID()
     {
-        if (m_bpartner != null) {
-            KeyNamePair pp = (KeyNamePair) f_location.getSelectedItem();
-            if (pp != null) {
-                return pp.getKey();
-            }
-        }
+        if (m_bpartner != null)
+            return m_C_BPartner_Location_ID > 0 ? m_C_BPartner_Location_ID : 0;
+
         return 0;
     } // getC_BPartner_Location_ID
 
