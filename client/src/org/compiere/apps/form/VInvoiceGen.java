@@ -162,7 +162,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 
 		MLookup docActionL = MLookupFactory.get(Env.getCtx(), m_WindowNo, 3494 /* C_Invoice.DocStatus */,
 				DisplayType.List, Env.getLanguage(Env.getCtx()), "DocAction", 135 /* _Document Action */,
-				false, "AD_Ref_List.Value IN ('PR')"); // @emmie - remove 'CO' for fiscal printing
+				false, "AD_Ref_List.Value IN ('CO','PR')");
 		docAction = new VLookup("DocAction", true, false, true,docActionL);
 		//  lDcoACtion.setText((Msg.translate(Env.getCtx(), "DocAction")););
 		docAction.addVetoableChangeListener(this);
