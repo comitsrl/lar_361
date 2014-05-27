@@ -89,11 +89,13 @@ public class InvoiceGen extends GenForm
 	private String getOrderSQL()
 	{
 	    StringBuffer sql = new StringBuffer(
-	            "SELECT C_Order_ID, o.Name, dt.Name, DocumentNo, bp.Name, DateOrdered, TotalLines "
+	            "SELECT ic.C_Order_ID, o.Name, dt.Name, io.DocumentNo, bp.Name, ic.DateOrdered, ic.TotalLines "
 	            + "FROM C_Invoice_Candidate_v ic, AD_Org o, C_BPartner bp, C_DocType dt "
+	            + "   , M_InOut io " // @emmie - Proyectar información del remito (tipo de doc y documentNo)
 	            + "WHERE ic.AD_Org_ID=o.AD_Org_ID"
 	            + " AND ic.C_BPartner_ID=bp.C_BPartner_ID"
-	            + " AND ic.C_DocType_ID=dt.C_DocType_ID"
+	            + " AND io.C_DocType_ID=dt.C_DocType_ID"
+	            + " AND io.C_Order_ID=ic.C_Order_ID"
 	            + " AND ic.AD_Client_ID=?");
 
         if (m_AD_Org_ID != null)
@@ -109,7 +111,7 @@ public class InvoiceGen extends GenForm
         {
             if (sql.length() > 0)
                 sql.append(" AND ");
-            sql.append("C_Order_ID").append(lockedIDs);
+            sql.append("ic.C_Order_ID").append(lockedIDs);
         }
         /* eng - Exclude locked records; @Trifon */
 
