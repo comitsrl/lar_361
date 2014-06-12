@@ -29,6 +29,7 @@ public class DNFH extends Document
      *
      */
     private static final long serialVersionUID = -7477250088894436720L;
+    private int numberOfCopies = 0;
 
     @Override
     public String getDocumentType()
@@ -52,5 +53,15 @@ public class DNFH extends Document
         // Validar cantidad de líneas mayor que 0.
         if (getLines().isEmpty())
             throw createDocumentException("InvalidDocumentLinesCount", this);
+    }
+
+    public int getNumberOfCopies()
+    {
+        return numberOfCopies;
+    }
+
+    public void setNumberOfCopies(int numberOfCopies)
+    {
+        this.numberOfCopies = numberOfCopies;
     }
 }

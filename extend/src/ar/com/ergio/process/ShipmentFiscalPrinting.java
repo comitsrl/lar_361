@@ -16,7 +16,9 @@
  *****************************************************************************/
 package ar.com.ergio.process;
 
+import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
+import org.compiere.model.MOrder;
 import org.compiere.process.SvrProcess;
 
 import ar.com.ergio.print.fiscal.view.ShipmentFiscalDocumentPrintManager;
@@ -31,30 +33,38 @@ import ar.com.ergio.util.LAR_Utils;
 public class ShipmentFiscalPrinting extends SvrProcess
 {
     /** Current shipment id */
-    private int p_M_InOut_ID;
+    private int p_C_Order_ID;
     /** Process result message */
     private String m_ResultMsg = "";
     /** Current shipment model object */
-    private MInOut shipment;
+    private MOrder order;
 
     @Override
     protected void prepare()
     {
-        p_M_InOut_ID = getRecord_ID();
-        shipment = new MInOut(getCtx(), p_M_InOut_ID, get_TrxName());
+        p_C_Order_ID = getRecord_ID();
+        order = new MOrder(getCtx(), p_C_Order_ID, get_TrxName());
     }
 
     @Override
     protected String doIt() throws Exception
     {
-        log.info(String.format("Processing shipment %s", shipment));
-        // Check if invoice exists and has proper doctype
-        if (shipment != null && LAR_Utils.isFiscalDocType(shipment.getC_DocType_ID()))
+        log.info(String.format("Procesando orden %s", order));
+
+        // Determina si la orden es de remito para continuar con el proceso
+        final MDocType dtTarget = new MDocType(getCtx(), order.getC_DocTypeTarget_ID(), get_TrxName());
+        if (dtTarget.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
         {
-            final ShipmentFiscalDocumentPrintManager process = new ShipmentFiscalDocumentPrintManager(shipment);
-            process.print();
+            final MInOut shipment = order.getShipments()[0];
+
+            // Verifica si el remito existe y si el mismo el de tipo fiscal
+            // para imprimir o no el mismo en el controlador fiscal
+            if (shipment != null && LAR_Utils.isFiscalDocType(shipment.getC_DocType_ID()))
+            {
+                final ShipmentFiscalDocumentPrintManager process = new ShipmentFiscalDocumentPrintManager(shipment);
+                process.print();
+            }
         }
         return m_ResultMsg;
     }
-
 }

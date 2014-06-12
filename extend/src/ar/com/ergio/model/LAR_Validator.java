@@ -103,6 +103,7 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addModelChange(MPayment.Table_Name, this);
          engine.addModelChange(MInvoice.Table_Name, this);
          engine.addModelChange(MLARPaymentHeader.Table_Name, this);
+         engine.addModelChange(MInOut.Table_Name, this);
 
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
@@ -170,6 +171,15 @@ import ar.com.ergio.util.LAR_Utils;
             if (msg != null) {
                 return msg;
             }
+        }
+
+        // Sincroniza el nro de documento de los remitos "manuales"
+        // con el asignado en su orden de remito origen
+        if (po.get_TableName().equals(MInOut.Table_Name) && type == TYPE_BEFORE_NEW)
+        {
+            msg = changeShipmentDocumentNo((MInOut) po);
+            if (msg != null)
+                return msg;
         }
 
         // Elimina la retención sobre los pagos cuando se modifica el header
@@ -1104,6 +1114,25 @@ import ar.com.ergio.util.LAR_Utils;
         }
         return null;
     } // changeShipmentDocType
+
+    /**
+     * Cambia la numeración <i>solo</i> a los remitos que no estan
+     * configurados para ser impresos en el controlador fiscal
+     *
+     * @param shipment remito
+     * @return null si el cambio de nro fue correcto; caso contrario,
+     *         mensaje de error
+     */
+    private String changeShipmentDocumentNo(final MInOut shipment)
+    {
+        if (!LAR_Utils.isFiscalDocType(shipment.getC_DocType_ID()))
+        {
+            final MOrder order = new MOrder(shipment.getCtx(), shipment.getC_Order_ID(), shipment.get_TrxName());
+            shipment.setDocumentNo(order.getDocumentNo());
+        }
+
+        return null;
+    } // changeShipmentDocumentNo
 
 	 	/**
 	 	 * german wagner

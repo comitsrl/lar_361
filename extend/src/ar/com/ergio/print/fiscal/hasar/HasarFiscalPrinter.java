@@ -931,7 +931,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
             //////////////////////////////////////////////////////////////
             // Se cierra el comprobante no fiscal homologado.
             // Comando: @CloseDNFH
-            response = execute(cmdCloseDNFH(null));
+            response = execute(cmdCloseDNFH(dnfh.getNumberOfCopies()));
             setDocumentOpened(false);
             setCancelAllowed(false);
             // Se obtiene el número del remito emitido.

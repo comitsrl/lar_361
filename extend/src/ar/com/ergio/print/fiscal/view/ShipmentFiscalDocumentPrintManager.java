@@ -42,8 +42,7 @@ public class ShipmentFiscalDocumentPrintManager extends FiscalDocumentPrintManag
     @Override
     protected boolean printDocument(final FiscalDocumentPrint fdp)
     {
-        final MOrder order = new MOrder(shipment.getCtx(), shipment.getC_Order_ID(), shipment.get_TrxName());
-        return fdp.printDeliveryDocument(order);
+        return fdp.printShipmentDocument(shipment);
     }
 
     @Override

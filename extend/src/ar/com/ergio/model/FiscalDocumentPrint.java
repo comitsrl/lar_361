@@ -46,6 +46,7 @@ import org.compiere.model.MPayment;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MProduct;
 import org.compiere.model.MRefList;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.model.PO;
 import org.compiere.util.CLogger;
@@ -520,12 +521,18 @@ public class FiscalDocumentPrint {
         fireActionStarted(FiscalDocumentListener.AC_PRINT_DOCUMENT);
         // Crea el documento no fiscal y luego obtiene todas las líneas del pedido
         final DNFH dnfh = createDNFH(shipment);
+        // Recupera el numero de copias a imprimir
+        int numberOfCopies = MSysConfig.getIntValue("LAR_Remitos_NumeroDeCopias", 0, Env.getAD_Client_ID(shipment.getCtx()));
+        dnfh.setNumberOfCopies(numberOfCopies);
 
         // Se asigna el documento OXP.
         setOxpDocument(shipment);
 
         // Manda a imprimir el documento en la impresora fiscal
         getFiscalPrinter().printDocument(dnfh);
+
+        // Guarda la info devuelta por el controlador
+        saveShipmentData(shipment, dnfh);
 
         // Se dispara el evento de impresión finalizada.
         fireDocumentPrintEndedOk();
@@ -731,6 +738,28 @@ public class FiscalDocumentPrint {
 
         return dnfh;
 	} // createDNFH
+
+	private void saveShipmentData(final MInOut shipment, final DNFH dnfh)
+	{
+	    // Recupera el Nro de POS (tamaño 4)
+	    final MDocType dt = new MDocType(shipment.getCtx(), shipment.getC_DocType_ID(), shipment.get_TrxName());
+	    final String sql = "SELECT PosNumber FROM C_POS WHERE C_POS_ID=?";
+	    int nroPOS = DB.getSQLValue(shipment.get_TrxName(), sql, dt.get_ValueAsInt("C_POS_ID"));
+
+	    String pos = Integer.valueOf(nroPOS).toString();
+	    pos = ("0000" + pos).substring(pos.length(), pos.length() + 4);
+
+	    // Recupera el Nro de Remito generado (tamaño 8)
+	    String documentNo = dnfh.getDocumentNo();
+	    documentNo = ("00000000" + documentNo).substring(documentNo.length(), documentNo.length() + 8);
+
+	    // Marca el remito como impreso en controlador y registra info recuperada
+	    documentNo = "R" + pos + documentNo;
+	    shipment.set_ValueOfColumn("FiscalReceiptNumber", dnfh.getDocumentNo());
+	    shipment.set_ValueOfColumn("IsFiscalPrinted", true);
+	    shipment.setDocumentNo(documentNo);
+	    shipment.saveEx();
+	}
 
 	/**
 	 * Impresión de una factura.
