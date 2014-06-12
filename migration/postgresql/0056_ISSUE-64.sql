@@ -493,3 +493,6 @@ INSERT INTO AD_WF_Node_Trl (AD_Language,AD_WF_Node_ID, Help,Name,Description, Is
 INSERT INTO AD_WF_NodeNext (SeqNo,EntityType,IsStdUserWorkflow,AD_WF_NodeNext_ID,AD_WF_Node_ID,AD_WF_Next_ID,Created,UpdatedBy,CreatedBy,AD_Org_ID,IsActive,Updated,AD_Client_ID) VALUES (10,'LAR','N',3000006,186,3000008,TO_TIMESTAMP('2014-05-18 22:07:58','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',TO_TIMESTAMP('2014-05-18 22:07:58','YYYY-MM-DD HH24:MI:SS'),0)
 ;
 
+-- Registración de script
+SELECT register_migration_script_lar('0056_ISSUE-64.sql', 'LAR', '')
+;
