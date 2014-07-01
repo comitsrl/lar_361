@@ -1059,7 +1059,8 @@ public class FiscalDocumentPrint {
             }
 		}
 		// TODO - Improve this behavior
-		BigDecimal amt = ((BigDecimal) mInvoice.get_Value("WithHoldingAmt")).negate(); // LAR perception are negative
+		BigDecimal amt = mInvoice.get_Value("WithHoldingAmt") == null ? Env.ZERO :
+		    ((BigDecimal) mInvoice.get_Value("WithHoldingAmt")).negate(); // LAR perception are negative
 		if (amt.compareTo(BigDecimal.ZERO) > 0)
 		{
 		    // TODO Corregir el calculo del porcentaje de percepción.
