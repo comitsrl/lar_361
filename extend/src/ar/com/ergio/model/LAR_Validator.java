@@ -407,14 +407,19 @@ import ar.com.ergio.util.LAR_Utils;
                  return msg;
              }
          }
-         // Determine documentNo for voided shipments
+         // Después de anular remitos, procesa numeración y ordenes relacionea
          if (po.get_TableName().equals(MInOut.Table_Name) &&
                  (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
          {
+             // Cambia el documentNo del remito
              msg = changeVoidDocumentNo(po);
-             if (msg != null) {
+             if (msg != null)
                  return msg;
-             }
+
+             msg = voidWarehouseOrder((MInOut) po);
+             if (msg != null)
+                 return msg;
+
          }
          // before posting the allocation - post the payment withholdings vs writeoff amount
          if (po.get_TableName().equals(MAllocationHdr.Table_Name) && timing == TIMING_BEFORE_POST) {
@@ -963,11 +968,8 @@ import ar.com.ergio.util.LAR_Utils;
             if (AD_Sequence_ID != 0)
                 seq = new MSequence(ctx, AD_Sequence_ID, shipment.get_TrxName());
 
-            // Redefine los nros de documento y las descripciones de los remitos
-            int sufix = shipment.getM_InOut_ID() * shipment.getDocumentNo().hashCode();
-
-            String revDocumentNo = "R-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
-            String voidDocumentNo = "A-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
+            String revDocumentNo = "Rev-" + shipment.getDocumentNo() + "-" + shipment.getM_InOut_ID();
+            String voidDocumentNo = "Anu-" + shipment.getDocumentNo() + "-" + shipment.getM_InOut_ID();
             revShipment.setDocumentNo(revDocumentNo);
             revShipment.setDescription("(" + voidDocumentNo + "<-)");
             shipment.setDocumentNo(voidDocumentNo);
@@ -991,6 +993,32 @@ import ar.com.ergio.util.LAR_Utils;
 
         return null;
     }
+
+    /**
+     * Anula la orden de remito relacionada con el remito dado
+     * (siempre y cuando el mismo tenga una orden de este tipo como origen)
+     *
+     * @param shipment remito a procesar
+     * @return mensaje de error o null
+     */
+    private String voidWarehouseOrder(final MInOut shipment)
+    {
+        final String trx = shipment.get_TrxName();
+        final MOrder order = new MOrder(Env.getCtx(), shipment.getC_Order_ID(), trx);
+        final MDocType dt = new MDocType(Env.getCtx(), order.getC_DocType_ID(), trx);
+
+        // Controla si el tipo de la orden es "Orden de Remito"
+        // ("Orden de Remito" <=> "Warehouse Order")
+        if (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
+        {
+            if (order.processIt(MOrder.ACTION_Void))
+                order.saveEx(trx);
+            else
+                return "Falló la anulaci\u00f3n de la Orden de Remito";
+        }
+
+        return null;
+    } // voidWarehouseOrder
 
     /**
      * Process acounting for withholding on sales payment
