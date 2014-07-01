@@ -1,5 +1,6 @@
-2014-06-12
-==========
+v1.2.0 - 2014-06-12
+===================
+
 Scripts de migración incorporados desde el último release oficial
 
   - 0038_Fix_for_payments_and_recipts_windows.sql
