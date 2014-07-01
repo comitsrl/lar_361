@@ -175,7 +175,6 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 		    {
 		        ///// Procesa Facturas /////
                 final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
-                final MInOut shipment = p_posPanel.m_order.getShipments()[0];
                 int C_DocType_ID = invoice.getC_DocType_ID();
                 isFiscal = LAR_Utils.isFiscalDocType(C_DocType_ID);
 
@@ -187,19 +186,10 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                         log.log(Level.SEVERE, "Error en impresi\u00f3n de factura fiscal");
                         return;
                     }
-                    // Impresión del remito asociado en caso de ser una venta en ctacte
-                    if (order.getC_PaymentTerm_ID() == PosOrderModel.PAYMENTTERMS_Account)
-                    {
-                        if (!p_posPanel.printFiscalTicket(shipment))
-                        {
-                            log.log(Level.SEVERE, "Error en impresi\u00f3n de remito no-fiscal");
-                            return;
-                        }
-                    }
                 }
                 else
                 {
-                    reportType = ReportEngine.SHIPMENT;
+                    reportType = ReportEngine.INVOICE;
                     documentId = invoice.getC_Invoice_ID();
                 }
 		    } // if (isShipment)

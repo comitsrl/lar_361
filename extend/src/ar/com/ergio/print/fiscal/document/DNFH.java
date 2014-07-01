@@ -30,6 +30,8 @@ public class DNFH extends Document
      */
     private static final long serialVersionUID = -7477250088894436720L;
     private int numberOfCopies = 0;
+    // Inicador de cierre de impresión fiscal. Por defecto se cierra.
+    private boolean printEnded = true;
 
     @Override
     public String getDocumentType()
@@ -63,5 +65,27 @@ public class DNFH extends Document
     public void setNumberOfCopies(int numberOfCopies)
     {
         this.numberOfCopies = numberOfCopies;
+    }
+
+    /**
+     * Indica si se tiene que cerrar la impresión fiscal al
+     * finalizar el procesamiento de este documento.
+     *
+     * @return
+     */
+    public boolean isPrintEnded()
+    {
+        return printEnded;
+    }
+
+    /**
+     * Determina si se debe finalizar o no la impresión fiscal
+     * al finalizar el procesamiento del documento
+     *
+     * @param printEnded indica si se debe cerrar o no la impresión fiscal
+     */
+    public void setPrintEnded(boolean printEnded)
+    {
+        this.printEnded = printEnded;
     }
 }

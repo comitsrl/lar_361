@@ -1104,6 +1104,7 @@ import ar.com.ergio.util.LAR_Utils;
             final MPOS pos = new MPOS(order.getCtx(), order.getC_POS_ID(), order.get_TrxName());
 
             if (!pos.get_ValueAsBoolean("IsShipment") &&
+                order.get_ValueAsBoolean("PrintShipment") &&
                 order.getC_PaymentTerm_ID() == PosOrderModel.PAYMENTTERMS_Account)
             {
                 // Se cambia el tipo de orden para la operación en ctacte

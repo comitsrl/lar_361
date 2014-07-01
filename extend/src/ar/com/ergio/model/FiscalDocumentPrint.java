@@ -49,6 +49,7 @@ import org.compiere.model.MRefList;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.model.PO;
+import org.compiere.pos.PosOrderModel;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -521,9 +522,6 @@ public class FiscalDocumentPrint {
         fireActionStarted(FiscalDocumentListener.AC_PRINT_DOCUMENT);
         // Crea el documento no fiscal y luego obtiene todas las líneas del pedido
         final DNFH dnfh = createDNFH(shipment);
-        // Recupera el numero de copias a imprimir
-        int numberOfCopies = MSysConfig.getIntValue("LAR_Remitos_NumeroDeCopias", 0, Env.getAD_Client_ID(shipment.getCtx()));
-        dnfh.setNumberOfCopies(numberOfCopies);
 
         // Se asigna el documento OXP.
         setOxpDocument(shipment);
@@ -733,6 +731,10 @@ public class FiscalDocumentPrint {
         }
         dnfh.setCustomer(customer);
 
+        // Recupera el numero de copias a imprimir
+        int numberOfCopies = MSysConfig.getIntValue("LAR_Remitos_NumeroDeCopias", 0, Env.getAD_Client_ID(shipment.getCtx()));
+        dnfh.setNumberOfCopies(numberOfCopies);
+
         // Cargar las lineas del remito
         loadDNFHLines(shipment, dnfh);
 
@@ -775,9 +777,33 @@ public class FiscalDocumentPrint {
 	// TODO - Redesign this method
 	private void printInvoice(final Document document) throws FiscalPrinterStatusError, FiscalPrinterIOException, Exception {
 		MInvoice mInvoice = (MInvoice)getOxpDocument();
-		log.info("FIXME - Document: " + document + " mInvoice: " + mInvoice);
 		// Se valida el documento OXP.
 		validateOxpDocument(mInvoice);
+
+        /*
+         * @emmie inicio - Impresion remito En caso de tratarse de una venta en
+         * ctacte, se imprime el remito asocido a la factura ANTES de imprimir
+         * la factura
+         */
+        final MOrder order = new MOrder(ctx, mInvoice.getC_Order_ID(), getTrxName());
+        boolean printShipment = order.get_ValueAsBoolean("PrintShipment");
+        if (printShipment && mInvoice.getC_PaymentTerm_ID() == PosOrderModel.PAYMENTTERMS_Account)
+        {
+            // Se recupera el remito de la primera linea (se asume 1 remito)
+            int m_InOut_ID = mInvoice.getLines()[0].getM_InOutLine().getM_InOut_ID();
+            final MInOut shipment = new MInOut(ctx, m_InOut_ID, getTrxName());
+
+            // Crea el documento no-fiscal y luego obtiene todas las líneas del pedido
+            final DNFH dnfh = createDNFH(shipment);
+            // Se le indica al documento no-fiscal que no finalice la impresión
+            dnfh.setPrintEnded(false);
+            // Manda a imprimir el documento en la impresora fiscal
+            getFiscalPrinter().printDocument(dnfh);
+            // Guarda la info devuelta por el controlador
+            saveShipmentData(shipment, dnfh);
+        }
+        // @emmie fin - Impresion remito
+
 		// Se crea la factura imprimible en caso que no exista como parámetro
 		final Invoice printeableInvoice;
 		if (document != null) {
