@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import javax.swing.KeyStroke;
 
 import org.compiere.apps.AppsAction;
+import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPOS;
@@ -142,27 +143,66 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 			return;
 
 		final MOrder order = p_posPanel.m_order;
+		boolean isFiscal = false;
+		int reportType = 0;
+		int documentId = 0;
 
 		if (order != null)
 		{
-            final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
-            int C_DocType_ID = invoice.getC_DocType_ID();
-            if (LAR_Utils.isFiscalDocType(C_DocType_ID))
-            {
-                // LAR Fiscal Printing
-                if (!p_posPanel.printFiscalTicket(invoice)) {
-                    log.log(Level.SEVERE, "Error in Fiscal Printing Ticket");
-                    return;
+		    if (p_pos.get_ValueAsBoolean("IsShipment"))
+		    {
+		        ///// Procesa Remitos /////
+		        final MInOut shipment = p_posPanel.m_order.getShipments()[0];
+		        int C_DocType_ID = shipment.getC_DocType_ID();
+		        isFiscal = LAR_Utils.isFiscalDocType(C_DocType_ID);
+
+		        if (isFiscal)
+		        {
+		            // Impresión fiscal del de remito generado
+		            if (!p_posPanel.printFiscalTicket(shipment))
+		            {
+		                log.log(Level.SEVERE, "Error in Fiscal Printing Ticket");
+		                return;
+		            }
+		        }
+		        else
+		        {
+		            reportType = ReportEngine.SHIPMENT;
+		            documentId = order.getC_Order_ID();
+		        }
+		    }
+		    else
+		    {
+		        ///// Procesa Facturas /////
+                final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
+                int C_DocType_ID = invoice.getC_DocType_ID();
+                isFiscal = LAR_Utils.isFiscalDocType(C_DocType_ID);
+
+                if (isFiscal)
+                {
+                    // Impresión fiscal de factura
+                    if (!p_posPanel.printFiscalTicket(invoice))
+                    {
+                        log.log(Level.SEVERE, "Error en impresi\u00f3n de factura fiscal");
+                        return;
+                    }
                 }
-            }
-            else // Print document in tradicinal way
-            {
-                p_posPanel.newOrder();
-                log.info("Printing tradicional document for " + invoice);
-                ReportCtl.startDocumentPrint(ReportEngine.INVOICE, invoice.getC_Invoice_ID(), null, Env.getWindowNo(this), false);
-                p_posPanel.stopGlassPane();
-            }
-		}
+                else
+                {
+                    reportType = ReportEngine.INVOICE;
+                    documentId = invoice.getC_Invoice_ID();
+                }
+		    } // if (isShipment)
+
+		    // Si no se trata de un documento fiscal, se imprime de forma tradicional
+		    if (!isFiscal)
+		    {
+		        p_posPanel.newOrder();
+		        ReportCtl.startDocumentPrint(reportType, documentId, null, Env.getWindowNo(this), false);
+		    }
+
+		    p_posPanel.stopGlassPane();
+		} // if (order != null)
 	}
 
 }	//	PosSubPanel

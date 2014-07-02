@@ -37,9 +37,14 @@ import org.compiere.apps.ADialog;
 import org.compiere.apps.SwingWorker;
 import org.compiere.apps.form.FormFrame;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MPInstance;
 import org.compiere.model.MPOS;
+import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.process.ProcessInfo;
+import org.compiere.process.ProcessInfoParameter;
 import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
@@ -48,6 +53,7 @@ import org.compiere.util.Msg;
 import ar.com.ergio.model.FiscalDocumentPrint;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter.DialogActionListener;
+import ar.com.ergio.process.PosOrderGlobalVoiding;
 
 /**
  *	Point of Sales Main Window.
@@ -416,6 +422,12 @@ public class PosBasePanel extends CPanel
     /**********************************************************************************************
      *                            LAR Fiscal Printing Implementation
      **********************************************************************************************/
+
+    ///////////////////////////////////////////////////////////////////////////
+    // TODO - Abstract Fiscal Printing behavior in order to avoid
+    //        duplicate code with InvoiceFiscalPrinting class
+    ///////////////////////////////////////////////////////////////////////////
+
     protected void startGlassPane(final String AD_Message)
     {
         m_frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -431,9 +443,9 @@ public class PosBasePanel extends CPanel
         m_frame.setCursor(Cursor.getDefaultCursor());
     }
 
-	protected boolean printFiscalTicket(final MInvoice invoice)
+	protected boolean printFiscalTicket(final PO document)
 	{
-        log.info("Printing fiscal ticket for " + invoice);
+        log.info("Printing fiscal ticket for " + document);
 
         final SwingWorker worker = new SwingWorker()
         {
@@ -441,7 +453,7 @@ public class PosBasePanel extends CPanel
             public Object construct()
             {
                 boolean success = true;
-                int c_DocType_ID = invoice.getC_DocType_ID();
+                int c_DocType_ID = document.get_ValueAsInt("C_DocType_ID");
                 try {
                     final MDocType docType = new MDocType(m_ctx, c_DocType_ID, null);
                     int lar_Fiscal_Printer_ID = docType.get_ValueAsInt("LAR_Fiscal_Printer_ID");
@@ -452,7 +464,7 @@ public class PosBasePanel extends CPanel
                     log.info("fiscal document print created: " + fdp);
 
                     infoFiscalPrinter.setFiscalDocumentPrint(fdp);
-                    success = fdp.printDocument(invoice);
+                    success = printDocument(fdp, document);
                 } catch (Exception e) {
                     log.log(Level.SEVERE, "Fiscal printing error", e);
                     success = false;
@@ -475,6 +487,22 @@ public class PosBasePanel extends CPanel
 
         return (Boolean) worker.get();
 	} // printFiscalTicket
+
+	/**
+	 * Imprime el tipo de documento correspondiende según el tipo de orden
+	 */
+	private boolean printDocument(final FiscalDocumentPrint fdp, final PO document)
+	{
+	    if (document instanceof MInOut)
+	        return fdp.printShipmentDocument(document);
+
+	    else if (document instanceof MInvoice)
+	    {
+	        return fdp.printDocument(document);
+	    }
+	    else
+	        throw new AdempierePOSException("Sub tipo de orden de POS incorrecto");
+	} // printDocument
 
     private void createInfoFiscalPrinter()
     {
@@ -521,16 +549,28 @@ public class PosBasePanel extends CPanel
             @Override
             public Object construct()
             {
-                final MInvoice invoice = m_order.getInvoices()[0];
-                if (!invoice.processIt(MInvoice.DOCACTION_Void)) {
-                    errorMsg = Msg.parseTranslation(Env.getCtx(), "@ErrorVoidingInvoice@");
-                    return Boolean.FALSE;
-                }
-                if (!invoice.save()) {
-                    errorMsg = Msg.parseTranslation(Env.getCtx(), "@ErrorSavingVoidingInvoice@");
-                    return Boolean.FALSE;
-                }
-                return Boolean.TRUE;
+                // Crea parámetro que se enviará al proceso
+                final ProcessInfoParameter param = new ProcessInfoParameter("C_Order_ID", m_order.getC_Order_ID(), "", "", "");
+
+                // Crea información del proceso
+                int AD_Process_ID = 3000037;
+                final ProcessInfo pi = new ProcessInfo("PosOrderGlobalVoiding", AD_Process_ID);
+                pi.setParameter(new ProcessInfoParameter[]{ param });
+
+                // Crea una instancia de proceso (para registro y sincronizacion)
+                final MPInstance pinstance = new MPInstance(m_ctx, 0, null);
+                pinstance.setAD_Process_ID(AD_Process_ID);
+                pinstance.setRecord_ID(0);
+                pinstance.save();
+
+                // Conecta el proceso con la instancia de proceso
+                pi.setAD_PInstance_ID(pinstance.get_ID());
+
+                // Crea el proceso a ejecutar
+                final PosOrderGlobalVoiding process = new PosOrderGlobalVoiding();
+
+                log.info("Iniciando proceso global de anulaci\u00f3n");
+                return process.startProcess(m_ctx, pi, null);
             }
 
             @Override

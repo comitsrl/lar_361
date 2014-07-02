@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import org.compiere.model.MPayment;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 
@@ -50,33 +49,36 @@ public class MLARPaymentWithholding extends X_LAR_PaymentWithholding
     }
 
     /**
-     *
-     * @param order
-     * @param trxName
-     * @return
-     */
-    public static MLARPaymentWithholding get(final MPayment payment)
+    * Recupera o crea una retención a partir de una cabecera de pago
+    *
+    * @param header
+    *        cabecera de pago a partir del cual se busca la retención
+    * @return Rentención existente relaciona a la cabecera de pago,
+    *         o nuevo objeto retención para la cabezara de pago dada.
+    */
+    public static MLARPaymentWithholding get(final MLARPaymentHeader header)
     {
+        //TODO Agregar cache
         MLARPaymentWithholding retValue = null;
-        if (payment == null || payment.getC_Payment_ID() == 0) {
-            log.info("No Payment");
+        if (header == null || header.getLAR_PaymentHeader_ID() == 0) {
+            log.info("No existe cabecera de pago");
             return null;
         }
 
-        String sql = "SELECT * FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
+        String sql = "SELECT * FROM LAR_PaymentWithholding WHERE LAR_PaymentHeader_ID=?";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
-            pstmt = DB.prepareStatement(sql, payment.get_TrxName());
-            pstmt.setInt(1, payment.getC_Payment_ID());
+            pstmt = DB.prepareStatement(sql, header.get_TrxName());
+            pstmt.setInt(1, header.getLAR_PaymentHeader_ID());
             rs = pstmt.executeQuery();
             if (rs.next())
-                retValue = new MLARPaymentWithholding(payment.getCtx(), rs, payment.get_TrxName());
+                retValue = new MLARPaymentWithholding(header.getCtx(), rs, header.get_TrxName());
             rs.close();
             pstmt.close();
             pstmt = null;
         } catch (Exception e) {
-            log.log(Level.SEVERE, "No withholding for payment", e);
+            log.log(Level.SEVERE, "Sin retención para la cabecera de pago", e);
         } finally {
             DB.close(rs, pstmt);
             rs = null;
@@ -84,13 +86,41 @@ public class MLARPaymentWithholding extends X_LAR_PaymentWithholding
         }
 
         if (retValue != null) {
-            retValue.set_TrxName(payment.get_TrxName());
+            retValue.set_TrxName(header.get_TrxName());
             return retValue;
         }
 
         // Create new one
-        retValue = new MLARPaymentWithholding(payment.getCtx(), 0, payment.get_TrxName());
+        retValue = new MLARPaymentWithholding(header.getCtx(), 0, header.get_TrxName());
         log.info("(new)" + retValue);
         return retValue;
     } // get
-}
+
+    /**
+     *  After Save
+     *  @param newRecord new
+     *  @param success success
+     *  @return saved
+     */
+    protected boolean afterSave (boolean newRecord, boolean success)
+    {
+        if (!success)
+            return success;
+
+        return MLARPaymentHeader.updateHeaderWithholding(getLAR_PaymentHeader_ID(), get_TrxName());
+    } // afterSave
+
+    /**
+     *  After Delete
+     *  @param success success
+     *  @return deleted
+     */
+    protected boolean afterDelete (boolean success)
+    {
+        if (!success)
+            return success;
+
+        return MLARPaymentHeader.updateHeaderWithholding(getLAR_PaymentHeader_ID(), get_TrxName());
+    } // afterDelete
+
+} // MLARPaymentWithholding

@@ -26,14 +26,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for LAR_PaymentWithholding
  *  @author Adempiere (generated)
- *  @version 360LTS.015 - $Id$ */
+ *  @version 3.6.1-P20111003 | LAR 1.0.1-1c3c4dd - $Id$ */
 public class X_LAR_PaymentWithholding extends PO implements I_LAR_PaymentWithholding, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120313L;
+	private static final long serialVersionUID = 20121203L;
 
     /** Standard Constructor */
     public X_LAR_PaymentWithholding (Properties ctx, int LAR_PaymentWithholding_ID, String trxName)
@@ -41,8 +41,7 @@ public class X_LAR_PaymentWithholding extends PO implements I_LAR_PaymentWithhol
       super (ctx, LAR_PaymentWithholding_ID, trxName);
       /** if (LAR_PaymentWithholding_ID == 0)
         {
-			setC_Invoice_ID (0);
-			setC_Payment_ID (0);
+			setLAR_PaymentHeader_ID (0);
 			setLAR_PaymentWithholding_ID (0);
 			setLCO_WithholdingType_ID (0);
 			setProcessed (false);
@@ -78,62 +77,6 @@ public class X_LAR_PaymentWithholding extends PO implements I_LAR_PaymentWithhol
         .append(get_ID()).append("]");
       return sb.toString();
     }
-
-	public I_C_Invoice getC_Invoice() throws RuntimeException
-    {
-		return (I_C_Invoice)MTable.get(getCtx(), I_C_Invoice.Table_Name)
-			.getPO(getC_Invoice_ID(), get_TrxName());	}
-
-	/** Set Invoice.
-		@param C_Invoice_ID
-		Invoice Identifier
-	  */
-	public void setC_Invoice_ID (int C_Invoice_ID)
-	{
-		if (C_Invoice_ID < 1)
-			set_Value (COLUMNNAME_C_Invoice_ID, null);
-		else
-			set_Value (COLUMNNAME_C_Invoice_ID, Integer.valueOf(C_Invoice_ID));
-	}
-
-	/** Get Invoice.
-		@return Invoice Identifier
-	  */
-	public int getC_Invoice_ID ()
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_C_Invoice_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
-	public I_C_Payment getC_Payment() throws RuntimeException
-    {
-		return (I_C_Payment)MTable.get(getCtx(), I_C_Payment.Table_Name)
-			.getPO(getC_Payment_ID(), get_TrxName());	}
-
-	/** Set Payment.
-		@param C_Payment_ID
-		Payment identifier
-	  */
-	public void setC_Payment_ID (int C_Payment_ID)
-	{
-		if (C_Payment_ID < 1)
-			set_Value (COLUMNNAME_C_Payment_ID, null);
-		else
-			set_Value (COLUMNNAME_C_Payment_ID, Integer.valueOf(C_Payment_ID));
-	}
-
-	/** Get Payment.
-		@return Payment identifier
-	  */
-	public int getC_Payment_ID ()
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_C_Payment_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
 
 	public I_C_Tax getC_Tax() throws RuntimeException
     {
@@ -195,6 +138,31 @@ public class X_LAR_PaymentWithholding extends PO implements I_LAR_PaymentWithhol
 	public Timestamp getDateTrx ()
 	{
 		return (Timestamp)get_Value(COLUMNNAME_DateTrx);
+	}
+
+	public ar.com.ergio.model.I_LAR_PaymentHeader getLAR_PaymentHeader() throws RuntimeException
+    {
+		return (ar.com.ergio.model.I_LAR_PaymentHeader)MTable.get(getCtx(), ar.com.ergio.model.I_LAR_PaymentHeader.Table_Name)
+			.getPO(getLAR_PaymentHeader_ID(), get_TrxName());	}
+
+	/** Set LAR_PaymentHeader.
+		@param LAR_PaymentHeader_ID LAR_PaymentHeader	  */
+	public void setLAR_PaymentHeader_ID (int LAR_PaymentHeader_ID)
+	{
+		if (LAR_PaymentHeader_ID < 1)
+			set_Value (COLUMNNAME_LAR_PaymentHeader_ID, null);
+		else
+			set_Value (COLUMNNAME_LAR_PaymentHeader_ID, Integer.valueOf(LAR_PaymentHeader_ID));
+	}
+
+	/** Get LAR_PaymentHeader.
+		@return LAR_PaymentHeader	  */
+	public int getLAR_PaymentHeader_ID ()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_LAR_PaymentHeader_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set LAR_PaymentWithholding.

@@ -1,10 +1,10 @@
 -- Add drawer transfer behavior
-ALTER TABLE C_BankStatementLine ADD COLUMN IsTransferred Character(1) NOT NULL DEFAULT 'N';
-ALTER TABLE C_BankAccount       ADD COLUMN IsDrawer      Character(1) NOT NULL DEFAULT 'N';
-ALTER TABLE C_BankStatement     ADD COLUMN ScrutinizedCheckAmt       Numeric NOT NULL DEFAULT 0;
-ALTER TABLE C_BankStatement     ADD COLUMN ScrutinizedCashAmt        Numeric NOT NULL DEFAULT 0;
-ALTER TABLE C_BankStatement     ADD COLUMN ScrutinizedCreditCardAmt  Numeric NOT NULL DEFAULT 0;
-ALTER TABLE C_BankStatement     ADD COLUMN ScrutinizedDirectDebitAmt Numeric NOT NULL DEFAULT 0;
+ALTER TABLE C_BankStatementLine ADD IsTransferred Character(1) DEFAULT 'N' NOT NULL;
+ALTER TABLE C_BankAccount       ADD IsDrawer      Character(1) DEFAULT 'N' NOT NULL;
+ALTER TABLE C_BankStatement     ADD ScrutinizedCheckAmt       Numeric DEFAULT 0 NOT NULL;
+ALTER TABLE C_BankStatement     ADD ScrutinizedCashAmt        Numeric DEFAULT 0 NOT NULL;
+ALTER TABLE C_BankStatement     ADD ScrutinizedCreditCardAmt  Numeric DEFAULT 0 NOT NULL;
+ALTER TABLE C_BankStatement     ADD ScrutinizedDirectDebitAmt Numeric DEFAULT 0 NOT NULL;
 
 -- 04/04/2012 9:13:21 ART
 -- Add drawer transfer behavior

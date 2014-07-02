@@ -14,11 +14,14 @@
 package org.compiere.pos;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -47,8 +50,8 @@ public class PosOrderModel extends MOrder {
 
 	private static final long serialVersionUID = 5253837037827124425L;
 	//LAR payment terms.
-	private static final int PAYMENTTERMS_Account = 3000000;
-	private static final int PAYMENTTERMS_Cash = 3000001;
+	public static final int PAYMENTTERMS_Account = 3000000;
+	public static final int PAYMENTTERMS_Cash = 3000001;
 
 	private MPOS m_pos;
 	private List<MPayment> payments = new ArrayList<MPayment>();
@@ -66,7 +69,7 @@ public class PosOrderModel extends MOrder {
 	 *
 	 * @return order or null
 	 */
-	public static PosOrderModel createOrder(MPOS pos, MBPartner partner, String trxName) {
+	public static PosOrderModel createOrder(MPOS pos, MBPartner partner, int bpLocation_ID, String trxName) {
 
 		PosOrderModel order = new PosOrderModel(Env.getCtx(), 0, trxName, pos);
 		order.setAD_Org_ID(pos.getAD_Org_ID());
@@ -76,14 +79,18 @@ public class PosOrderModel extends MOrder {
 			order.setC_DocTypeTarget_ID(pos.getC_DocType_ID());
 		else
 			order.setC_DocTypeTarget_ID(MOrder.DocSubTypeSO_POS);
+        int m_PriceList_ID = pos.getM_PriceList_ID();
+        if (partner != null)
+            m_PriceList_ID = partner.getM_PriceList_ID();
 		if (partner == null || partner.get_ID() == 0)
 			partner = pos.getBPartner();
 		if (partner == null || partner.get_ID() == 0) {
 			throw new AdempierePOSException("No BPartner for order");
 		}
 		order.setBPartner(partner);
+		order.setC_BPartner_Location_ID(bpLocation_ID);
 		//
-		order.setM_PriceList_ID(pos.getM_PriceList_ID());
+		order.setM_PriceList_ID(m_PriceList_ID);
 		order.setM_Warehouse_ID(pos.getM_Warehouse_ID());
 		order.setSalesRep_ID(pos.getSalesRep_ID());
 		if (!order.save())
@@ -95,6 +102,20 @@ public class PosOrderModel extends MOrder {
 		return order;
 	} //	createOrder
 
+	/**
+	 * Establece <code>solo</code> solo la dirección de envío de la orden
+	 * para se usada en la generacion del remito
+	 */
+	@Override
+	public void setC_BPartner_Location_ID(int c_BPartner_Location_ID)
+	{
+	    if (c_BPartner_Location_ID > 0)
+	    {
+	        int bill_Location_ID = getBill_Location_ID();
+	        super.setC_BPartner_Location_ID(c_BPartner_Location_ID);
+	        super.setBill_Location_ID(bill_Location_ID);
+	    }
+	}
 
 	/**
 	 * @author Community Development OpenXpertya
@@ -306,6 +327,58 @@ public class PosOrderModel extends MOrder {
 		return orderCompleted;
 	}	// processOrder
 
+    @Override
+    public String completeIt()
+    {
+        // Se ejecuta el completeIt() estándar de ADempiere
+        if (super.completeIt().equals(DocAction.STATUS_Invalid))
+            return DocAction.STATUS_Invalid;
+
+        /* =========================================================================== */
+        /* Se ejecuta las acciones propias para completar las Ordenes POS de LAR       */
+        /* =========================================================================== */
+
+        // En caso de NO ser una transacción de ctacte, y NO ser un POS de remitos,
+        // se crean y procesan las imputaciones de cobros y se relaciona la factura generada
+        // con la cabecera de cobros creada por la orden de venta PDV
+        if (!isPaidFromAccount && !m_pos.get_ValueAsBoolean("IsShipment"))
+        {
+            // Se crean las imputaciones para cada cobro de la orden
+            final String desc = Msg.translate(Env.getCtx(), "C_Order_ID") + ": " + getDocumentNo();
+            final Timestamp today = Env.getContextAsDate(Env.getCtx(), "#Date");
+            final MAllocationHdr alloc = new MAllocationHdr(p_ctx, false, today,
+                    getC_Currency_ID(), desc, get_TrxName());
+            alloc.setAD_Org_ID(Env.getAD_Org_ID(Env.getCtx()));
+            alloc.setDateAcct(today);
+            alloc.saveEx();
+
+            // Se recorren los cobros creados para asignale la factura generada
+            // y crear la imputación de pago de los mismos.
+            for (final MPayment payment : getPayments())
+            {
+                // Asignación de la factura al cobro
+                payment.setC_Invoice_ID(getC_Invoice_ID());
+                payment.save(get_TrxName());
+
+                // Imputación del cobro
+                final MAllocationLine line = new MAllocationLine(alloc, payment.getPayAmt(),
+                        payment.getDiscountAmt(), payment.getWriteOffAmt(), payment.getOverUnderAmt());
+                line.setDocInfo(payment.getC_BPartner_ID(), getC_Order_ID(), getC_Invoice_ID());
+                line.setC_Payment_ID(payment.getC_Payment_ID());
+                line.saveEx(get_TrxName());
+            }
+            // Se completa la imputación de pago
+            alloc.processIt(DocAction.ACTION_Complete);
+            alloc.saveEx(get_TrxName());
+
+            // Se relaciona la factura generada con la cabecera de cobro
+            paymentHeader.setC_Invoice_ID(getC_Invoice_ID());
+            paymentHeader.saveEx(get_TrxName());
+        }
+
+        return DocAction.STATUS_Completed;
+    }
+
 	public BigDecimal getTaxAmt()	{
 		BigDecimal taxAmt = Env.ZERO;
 		for (MOrderTax tax : getTaxes(true))
@@ -382,6 +455,7 @@ public class PosOrderModel extends MOrder {
 		payment.setC_BankAccount_ID(m_pos.getC_BankAccount_ID());
 		payment.setCreditCard(MPayment.TRXTYPE_Sales, cardtype,
 				cardNo, cvc, month, year);
+		payment.setA_Name(accountName);
 		setPaymentRule(MOrder.PAYMENTRULE_CreditCard);
         setC_PaymentTerm_ID(PAYMENTTERMS_Cash);
 		payment.saveEx();
@@ -391,14 +465,17 @@ public class PosOrderModel extends MOrder {
 
 	private MPayment createPayment(String tenderType)
 	{
-        paymentHeader = new MLARPaymentHeader(getCtx(), 0, get_TrxName());
-        paymentHeader.setAD_Org_ID(m_pos.getAD_Org_ID());
-        paymentHeader.setC_DocType_ID(m_pos.get_ValueAsInt("C_Payment_DocType_ID"));
-        paymentHeader.setC_BPartner_ID(getC_BPartner_ID());
-        paymentHeader.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
-        paymentHeader.setDocStatus(DocAction.STATUS_Drafted);
-        paymentHeader.setIsReceipt(true);
-        paymentHeader.saveEx();
+	    if (paymentHeader == null)
+	    {
+	        paymentHeader = new MLARPaymentHeader(getCtx(), 0, get_TrxName());
+	        paymentHeader.setAD_Org_ID(m_pos.getAD_Org_ID());
+	        paymentHeader.setC_DocType_ID(m_pos.get_ValueAsInt("C_Payment_DocType_ID"));
+	        paymentHeader.setC_BPartner_ID(getC_BPartner_ID());
+	        paymentHeader.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
+	        paymentHeader.setDocStatus(DocAction.STATUS_Drafted);
+	        paymentHeader.setIsReceipt(true);
+	        paymentHeader.saveEx();
+	    }
 		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setAD_Org_ID(m_pos.getAD_Org_ID());
 		payment.setTenderType(tenderType);
@@ -416,7 +493,6 @@ public class PosOrderModel extends MOrder {
 
     boolean processPayments()
     {
-        // FIXME - Improve MLARPaymentHeader processes and convetions!!
         if (isPaidFromAccount)
             return true;
         return paymentHeader.processIt(DocAction.ACTION_Complete);

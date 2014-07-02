@@ -25,7 +25,9 @@ import org.compiere.process.SvrProcess;
 /**
  *
  * @author german wagner
- *
+ * @deprecated Desde commit de002ca se incorporó el flujo de trabajo para
+ *             el proceso de las cabeceras de cobros/pagos, por tal razón
+ *             esta clase queda en desuso.
  */
 public class LAR_ProcessPaymentHeader extends SvrProcess
 {

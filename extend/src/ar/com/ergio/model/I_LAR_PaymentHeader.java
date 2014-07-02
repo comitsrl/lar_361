@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_PaymentHeader
  *  @author Adempiere (generated)
- *  @version 3.6.1LTS | P20111003 | LAR 1.0.1.RC1
+ *  @version 3.6.1-P20111003 | LAR 1.0.1-1c3c4dd
  */
 public interface I_LAR_PaymentHeader
 {
@@ -161,6 +161,19 @@ public interface I_LAR_PaymentHeader
 	/** Get Detail	  */
 	public boolean isDetail();
 
+    /** Column name DocAction */
+    public static final String COLUMNNAME_DocAction = "DocAction";
+
+	/** Set Document Action.
+	  * The targeted status of the document
+	  */
+	public void setDocAction (String DocAction);
+
+	/** Get Document Action.
+	  * The targeted status of the document
+	  */
+	public String getDocAction();
+
     /** Column name DocStatus */
     public static final String COLUMNNAME_DocStatus = "DocStatus";
 
@@ -186,6 +199,15 @@ public interface I_LAR_PaymentHeader
 	  * Document sequence number of the document
 	  */
 	public String getDocumentNo();
+
+    /** Column name InvoiceAmt */
+    public static final String COLUMNNAME_InvoiceAmt = "InvoiceAmt";
+
+	/** Set Invoice Amt	  */
+	public void setInvoiceAmt (BigDecimal InvoiceAmt);
+
+	/** Get Invoice Amt	  */
+	public BigDecimal getInvoiceAmt();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
@@ -222,6 +244,15 @@ public interface I_LAR_PaymentHeader
 	/** Get LAR_PaymentHeader	  */
 	public int getLAR_PaymentHeader_ID();
 
+    /** Column name PayHeaderTotalAmt */
+    public static final String COLUMNNAME_PayHeaderTotalAmt = "PayHeaderTotalAmt";
+
+	/** Set PayHeaderTotalAmt	  */
+	public void setPayHeaderTotalAmt (BigDecimal PayHeaderTotalAmt);
+
+	/** Get PayHeaderTotalAmt	  */
+	public BigDecimal getPayHeaderTotalAmt();
+
     /** Column name Processed */
     public static final String COLUMNNAME_Processed = "Processed";
 
@@ -235,23 +266,27 @@ public interface I_LAR_PaymentHeader
 	  */
 	public boolean isProcessed();
 
-    /** Column name ProcessIt */
-    public static final String COLUMNNAME_ProcessIt = "ProcessIt";
+    /** Column name RemainingAmt */
+    public static final String COLUMNNAME_RemainingAmt = "RemainingAmt";
 
-	/** Set ProcessIt	  */
-	public void setProcessIt (boolean ProcessIt);
+	/** Set Remaining Amt.
+	  * Remaining Amount
+	  */
+	public void setRemainingAmt (BigDecimal RemainingAmt);
 
-	/** Get ProcessIt	  */
-	public boolean isProcessIt();
+	/** Get Remaining Amt.
+	  * Remaining Amount
+	  */
+	public BigDecimal getRemainingAmt();
 
     /** Column name SearchPayments */
     public static final String COLUMNNAME_SearchPayments = "SearchPayments";
 
 	/** Set SearchPayments	  */
-	public void setSearchPayments (boolean SearchPayments);
+	public void setSearchPayments (String SearchPayments);
 
 	/** Get SearchPayments	  */
-	public boolean isSearchPayments();
+	public String getSearchPayments();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
@@ -268,4 +303,13 @@ public interface I_LAR_PaymentHeader
 	  * User who updated this records
 	  */
 	public int getUpdatedBy();
+
+    /** Column name WithholdingAmt */
+    public static final String COLUMNNAME_WithholdingAmt = "WithholdingAmt";
+
+	/** Set Withholding Amount	  */
+	public void setWithholdingAmt (BigDecimal WithholdingAmt);
+
+	/** Get Withholding Amount	  */
+	public BigDecimal getWithholdingAmt();
 }

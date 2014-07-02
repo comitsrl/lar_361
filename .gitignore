@@ -1,5 +1,5 @@
 #eclipse
-bin/*
+/bin
 #temp files
 *~
 *.swp

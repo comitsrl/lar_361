@@ -54,6 +54,7 @@ import org.compiere.model.MPOSKey;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentValidate;
 import org.compiere.swing.CButton;
+import org.compiere.swing.CCheckBox;
 import org.compiere.swing.CComboBox;
 import org.compiere.swing.CDialog;
 import org.compiere.swing.CLabel;
@@ -126,8 +127,13 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 			String tenderType = ((ValueNamePair) tenderTypePick.getValue()).getID();
             String tenderAmt = fTenderAmt.getText().equals("") ? "0" : fTenderAmt.getText();
 			BigDecimal amt = BigDecimal.valueOf(nf.parse(tenderAmt).doubleValue());
+			BigDecimal pay =  BigDecimal.valueOf(nf.parse(fPayAmt.getText()).doubleValue());
 			if (amt.compareTo(BigDecimal.ZERO) <= 0)
 			    return;
+			if (amt.compareTo(pay) > 0)
+			{
+			    amt = pay;
+			}
 			if ( tenderType.equals(MPayment.TENDERTYPE_Cash) )
 			{
 				p_posPanel.m_order.payCash(amt);
@@ -165,6 +171,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 			else if ( tenderType.equals(MPayment.TENDERTYPE_Account) )
 			{
 		        p_posPanel.m_order.setPaidFromAccount();
+		        p_posPanel.m_order.set_ValueOfColumn("PrintShipment", fPrintShipment.isSelected());
 			}
 			else
 			{
@@ -216,6 +223,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 	private CButton f_bCancel;
 	private CComboBox fCPaymentTerm = new CComboBox();
 	private CLabel lCPaymentTerm;
+	private CCheckBox fPrintShipment = new CCheckBox();
 
     private ValueNamePair accountKey;
 
@@ -454,6 +462,10 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		fCCardVC.setFont(font);
 		fCCardVC.setHorizontalAlignment(JTextField.TRAILING);
 
+        fPrintShipment.setText("Imprimir Remito");
+        fPrintShipment.setSelected(true);
+        mainPanel.add(fPrintShipment, "skip, wrap, growx");
+
 		AppsAction actCancel = new AppsAction("Cancel", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), false);
 		actCancel.setDelegate(this);
 		f_bCancel = (CButton)actCancel.getButton();
@@ -508,6 +520,7 @@ public class PosPayment extends CDialog implements PosKeyListener, ActionListene
 		lCPaymentTerm.setVisible(account);
 		fPayAmt.setVisible(!account);
 		lPayAmt.setVisible(!account);
+		fPrintShipment.setVisible(account);
 
 		fTotal.setValue(nf.format(p_order.getGrandTotal()));
 

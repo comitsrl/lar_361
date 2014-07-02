@@ -26,6 +26,7 @@ import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
 import org.compiere.model.MOrder;
 import org.compiere.model.MRMA;
+import org.compiere.model.MSysConfig;
 import org.compiere.swing.CLabel;
 import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
@@ -126,6 +127,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
         lPOS.setLabelFor(fPOS);
         panel.getParameterPanel().add(lPOS, null);
         panel.getParameterPanel().add(fPOS, null);
+        lDocAction.setText(Msg.translate(Env.getCtx(), "Action"));
         // @emmie custom
 		panel.getParameterPanel().add(lBPartner, null);
 		panel.getParameterPanel().add(fBPartner, null);
@@ -142,8 +144,19 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 	 */
 	public void dynInit() throws Exception
 	{
-		MLookup orgL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 0, 2163, DisplayType.TableDir);
-		fOrg = new VLookup ("AD_Org_ID", false, false, true, orgL);
+        // @m_zuniga custom
+		if (MSysConfig.getBooleanValue("ERGIO_InvoiceGen_Login_ORG_and_PDV", true, Env.getAD_Client_ID(Env.getCtx())))
+		{
+			MLookup orgL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 2163 /*C_Order.AD_Org_ID */, DisplayType.Table, Env.getLanguage(Env.getCtx()), "AD_Org_ID", 3000023 /* AD_Org Login*/,
+			false,""); // @marcos - Muestra unicamente la Organización con que se logueó
+			fOrg = new VLookup ("AD_Org_ID", true, false, true, orgL); //@m_zuniga Campo obligatorio para evitar selección vacía y que se muestren órdenes de otras organizaciones
+		}
+        // @m_zuniga custom
+		else
+		{
+			MLookup orgL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 0, 2163, DisplayType.TableDir);
+			fOrg = new VLookup ("AD_Org_ID", false, false, true, orgL);
+		}
 		//	lOrg.setText(Msg.translate(Env.getCtx(), "AD_Org_ID"));
 		fOrg.addVetoableChangeListener(this);
 
@@ -166,10 +179,21 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
         cmbDocType.addItem(new KeyNamePair(MRMA.Table_ID, Msg.translate(Env.getCtx(), "CustomerRMA")));
         cmbDocType.addActionListener(this);
 
+        // @m_zuniga custom
+        if (MSysConfig.getBooleanValue("ERGIO_InvoiceGen_Login_ORG_and_PDV", true, Env.getAD_Client_ID(Env.getCtx())))
+        {
+            MLookup posL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 3000068 /* C_Invoice.C_POS_ID */, DisplayType.Table, Env.getLanguage(Env.getCtx()), "C_POS_ID", 3000022 /* LAR_POS_ID Login Org*/,
+			false,""); // @m_zuniga - Muestra PDVS disponibles para la Organización con que se logueó
+            fPOS = new VLookup ("C_POS_ID", true, false, true, posL);
+        }
+        // @m_zuniga custom
+        else
         // @emmie custom
-        MLookup posL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 0, 3000068, DisplayType.Table);
-        fPOS = new VLookup ("C_POS_ID", true, false, true, posL);
-        lPOS.setText(Msg.translate(Env.getCtx(), "C_POS_ID"));
+        {
+            MLookup posL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 0, 3000068, DisplayType.Table);
+            fPOS = new VLookup ("C_POS_ID", true, false, true, posL);
+        }
+        lPOS.setText("PDV");
         // @emmie custom
 
         panel.getStatusBar().setStatusLine(Msg.getMsg(Env.getCtx(), "InvGenerateSel"));//@@

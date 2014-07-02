@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 
 import org.adempiere.plaf.AdempierePLAF;
 import org.compiere.apps.ALayout;
@@ -31,10 +30,8 @@ import org.compiere.apps.search.Info;
 import org.compiere.apps.search.Info_Column;
 import org.compiere.grid.ed.VCheckBox;
 import org.compiere.grid.ed.VDate;
-import org.compiere.grid.ed.VLookup;
 import org.compiere.grid.ed.VNumber;
 import org.compiere.minigrid.IDColumn;
-import org.compiere.model.MLookupFactory;
 import org.compiere.model.MQuery;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CTextField;
@@ -61,13 +58,13 @@ public class InfoOnDrawerChecks extends Info
 	}
 
 	/**
-	 *  Detail Protected Contructor
+	 *  Detail Protected Constructor
 	 *  @param frame parent frame
 	 *  @param modal modal
 	 *  @param WindowNo window no
 	 *  @param value query value
 	 *  @param multiSelection multiple selections
-	 *  @param whereClause whwre clause
+	 *  @param whereClause where clause
 	 */
 	protected InfoOnDrawerChecks(Frame frame, boolean modal, int WindowNo, String value,
 		boolean multiSelection, String whereClause)
@@ -97,26 +94,24 @@ public class InfoOnDrawerChecks extends Info
 		//
 		pack();
 		//	Focus
-		fDocumentNo.requestFocus();
+		fCheckNo.requestFocus();
 	}   //  InfoPayment
-
-	/**  String Array of Column Info    */
-	private Info_Column[] m_generalLayout;
-	/** list of query columns           */
-	private ArrayList 	m_queryColumns = new ArrayList();
-	/** Table Name              */
-	private String      m_tableName;
-	/** Key Column Name         */
-	private String      m_keyColumn;
 
 	//  Static Info
 	private CLabel lDocumentNo = new CLabel(Msg.translate(Env.getCtx(), "DocumentNo"));
 	private CTextField fDocumentNo = new CTextField(10);
-	//
+	// Begin Marcos Zúñiga - Add new search fields
+    private CLabel lRoutingNo = new CLabel(Msg.translate(Env.getCtx(), "RoutingNo"));
+    private CTextField fRoutingNo = new CTextField(10);
+    private CLabel lCheckNo = new CLabel(Msg.translate(Env.getCtx(), "CheckNo"));
+    private CTextField fCheckNo = new CTextField(10);
+	// End Marcos Zúñiga
 //	private CLabel lOrg_ID = new CLabel(Msg.translate(Env.getCtx(), "AD_Org_ID"));
 //	private VLookup fOrg_ID;
-	private CLabel lBPartner_ID = new CLabel(Msg.translate(Env.getCtx(), "BPartner"));
-	private VLookup fBPartner_ID;
+    // Begin Marcos Zúñiga
+	private CLabel lA_Name = new CLabel(Msg.translate(Env.getCtx(), "A_Name"));
+    private CTextField fA_Name = new CTextField(10);
+    // End Marcos Zúñiga
 	//
 	private CLabel lDateFrom = new CLabel(Msg.translate(Env.getCtx(), "DateTrx"));
 	private VDate fDateFrom = new VDate("DateFrom", false, false, true, DisplayType.Date, Msg.translate(Env.getCtx(), "DateFrom"));
@@ -133,12 +128,18 @@ public class InfoOnDrawerChecks extends Info
 		new Info_Column(" ", "p.C_Payment_ID", IDColumn.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "C_BankAccount_ID"),
 			"(SELECT b.Name || ' ' || ba.AccountNo FROM C_Bank b, C_BankAccount ba WHERE b.C_Bank_ID=ba.C_Bank_ID AND ba.C_BankAccount_ID=p.C_BankAccount_ID)", String.class),
-		new Info_Column(Msg.translate(Env.getCtx(), "C_BPartner_ID"),
-			"(SELECT Name FROM C_BPartner bp WHERE bp.C_BPartner_ID=p.C_BPartner_ID)", String.class),
+		new Info_Column(Msg.translate(Env.getCtx(), "A_Name"),
+			"p.A_Name", String.class), // Marcos Zúñiga - Show Account Name instead of C_Bpartner_ID
 		new Info_Column(Msg.translate(Env.getCtx(), "DateTrx"),
 			"p.DateTrx", Timestamp.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "DocumentNo"),
 			"p.DocumentNo", String.class),
+			// Begin Marcos Zúñiga
+	    new Info_Column(Msg.translate(Env.getCtx(), "RoutingNo"),
+            "p.RoutingNo", String.class),
+	    new Info_Column(Msg.translate(Env.getCtx(), "CheckNo"),
+	        "p.CheckNo", String.class),
+	     // End Marcos Zúñiga
 		new Info_Column(Msg.translate(Env.getCtx(), "IsReceipt"),
 			"p.IsReceipt", Boolean.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "C_Currency_ID"),
@@ -147,10 +148,6 @@ public class InfoOnDrawerChecks extends Info
 			"p.PayAmt",  BigDecimal.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "ConvertedAmount"),
 			"currencyBase(p.PayAmt,p.C_Currency_ID,p.DateTrx, p.AD_Client_ID,p.AD_Org_ID)", BigDecimal.class),
-		new Info_Column(Msg.translate(Env.getCtx(), "DiscountAmt"),
-			"p.DiscountAmt",  BigDecimal.class),
-		new Info_Column(Msg.translate(Env.getCtx(), "WriteOffAmt"),
-			"p.WriteOffAmt",  BigDecimal.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "IsAllocated"),
 			"p.IsAllocated",  Boolean.class),
 	};
@@ -164,14 +161,21 @@ public class InfoOnDrawerChecks extends Info
 		lDocumentNo.setLabelFor(fDocumentNo);
 		fDocumentNo.setBackground(AdempierePLAF.getInfoBackground());
 		fDocumentNo.addActionListener(this);
+        // Begin Marcos Zúñiga
+        lRoutingNo.setLabelFor(fRoutingNo);
+        fRoutingNo.setBackground(AdempierePLAF.getInfoBackground());
+        fRoutingNo.addActionListener(this);
+        lCheckNo.setLabelFor(fCheckNo);
+        fCheckNo.setBackground(AdempierePLAF.getInfoBackground());
+        fCheckNo.addActionListener(this);
+        // End Marcos Zúñiga
 		fIsReceipt.setSelected(!"N".equals(Env.getContext(Env.getCtx(), p_WindowNo, "IsSOTrx")));
 		fIsReceipt.addActionListener(this);
-
-		fBPartner_ID = new VLookup("C_BPartner_ID", false, false, true,
-			MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, 3499, DisplayType.Search));
-		lBPartner_ID.setLabelFor(fBPartner_ID);
-		fBPartner_ID.setBackground(AdempierePLAF.getInfoBackground());
-		//
+        // Begin Marcos Zúñiga
+		lA_Name.setLabelFor(fA_Name);
+		fA_Name.setBackground(AdempierePLAF.getInfoBackground());
+		fA_Name.addActionListener(this);
+        // End Marcos Zúñiga
 		lDateFrom.setLabelFor(fDateFrom);
 		fDateFrom.setBackground(AdempierePLAF.getInfoBackground());
 		fDateFrom.setToolTipText(Msg.translate(Env.getCtx(), "DateFrom"));
@@ -189,15 +193,19 @@ public class InfoOnDrawerChecks extends Info
 		//  First Row
 		parameterPanel.add(lDocumentNo, new ALayoutConstraint(0,0));
 		parameterPanel.add(fDocumentNo, null);
-		parameterPanel.add(lBPartner_ID, null);
-		parameterPanel.add(fBPartner_ID, null);
+		parameterPanel.add(lA_Name, null); // Marcos Zúñiga
+		parameterPanel.add(fA_Name, null); // Marcos Zúñiga
 		parameterPanel.add(fIsReceipt, new ALayoutConstraint(0,5));
 		//  2nd Row
+        parameterPanel.add(lRoutingNo, new ALayoutConstraint(1,0)); // Marcos Zúñiga
+        parameterPanel.add(fRoutingNo, null); // Marcos Zúñiga
 		parameterPanel.add(lDateFrom, new ALayoutConstraint(1,2));
 		parameterPanel.add(fDateFrom, null);
 		parameterPanel.add(lDateTo, null);
 		parameterPanel.add(fDateTo, null);
 		//  3rd Row
+        parameterPanel.add(lCheckNo, new ALayoutConstraint(2,0)); // Marcos Zúñiga
+        parameterPanel.add(fCheckNo, null); // Marcos Zúñiga
 		parameterPanel.add(lAmtFrom, new ALayoutConstraint(2,2));
 		parameterPanel.add(fAmtFrom, null);
 		parameterPanel.add(lAmtTo, null);
@@ -213,11 +221,6 @@ public class InfoOnDrawerChecks extends Info
 	 */
 	private boolean initInfo ()
 	{
-		//  Set Defaults
-		String bp = Env.getContext(Env.getCtx(), p_WindowNo, "C_BPartner_ID");
-		if (bp != null && bp.length() != 0)
-			fBPartner_ID.setValue(new Integer(bp));
-
 		//  prepare table
 		StringBuffer where = new StringBuffer("p.IsActive='Y'");
 		if (p_whereClause.length() > 0)
@@ -236,17 +239,19 @@ public class InfoOnDrawerChecks extends Info
 	 *	Construct SQL Where Clause and define parameters
 	 *  (setParameters needs to set parameters)
 	 *  Includes first AND
-	 *  @return sql where clause
+	 *  @return SQL where clause
 	 */
 	protected String getSQLWhere()
 	{
 		StringBuffer sql = new StringBuffer();
 		if (fDocumentNo.getText().length() > 0)
 			sql.append(" AND UPPER(p.DocumentNo) LIKE ?");
-		//
-		if (fBPartner_ID.getValue() != null)
-			sql.append(" AND p.C_BPartner_ID=?");
-		//
+        if (fRoutingNo.getText().length() > 0)
+            sql.append(" AND UPPER(p.RoutingNo) LIKE ?"); // Marcos Zúñiga
+        if (fCheckNo.getText().length() > 0)
+            sql.append(" AND UPPER(p.CheckNo) LIKE ?"); // Marcos Zúñiga
+        if (fA_Name.getText().length() > 0)
+            sql.append(" AND UPPER(p.A_Name) LIKE ?"); // Marcos Zúñiga
 		if (fDateFrom.getValue() != null || fDateTo.getValue() != null)
 		{
 			Timestamp from = (Timestamp)fDateFrom.getValue();
@@ -272,7 +277,7 @@ public class InfoOnDrawerChecks extends Info
 		}
 		sql.append(" AND p.IsReceipt=?");
 
-		sql.append(" AND p.IsReconciled='N'");
+		// sql.append(" AND p.IsReconciled='N'");
 
 		log.fine(sql.toString());
 		return sql.toString();
@@ -290,13 +295,12 @@ public class InfoOnDrawerChecks extends Info
 		int index = 1;
 		if (fDocumentNo.getText().length() > 0)
 			pstmt.setString(index++, getSQLText(fDocumentNo));
-		//
-		if (fBPartner_ID.getValue() != null)
-		{
-			Integer bp = (Integer)fBPartner_ID.getValue();
-			pstmt.setInt(index++, bp.intValue());
-			log.fine("BPartner=" + bp);
-		}
+        if (fRoutingNo.getText().length() > 0)
+            pstmt.setString(index++, getSQLText(fRoutingNo)); // Marcos Zúñiga
+        if (fCheckNo.getText().length() > 0)
+            pstmt.setString(index++, getSQLText(fCheckNo)); // Marcos Zúñiga
+        if (fA_Name.getText().length() > 0)
+            pstmt.setString(index++, getSQLText(fA_Name)); // Marcos Zúñiga
 		//
 		if (fDateFrom.getValue() != null || fDateTo.getValue() != null)
 		{

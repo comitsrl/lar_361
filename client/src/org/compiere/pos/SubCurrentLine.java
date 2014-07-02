@@ -38,14 +38,10 @@ import org.compiere.apps.ADialog;
 import org.compiere.grid.ed.VPAttributeDialog;
 import org.compiere.minigrid.ColumnInfo;
 import org.compiere.minigrid.IDColumn;
-import org.compiere.model.MAllocationHdr;
-import org.compiere.model.MAllocationLine;
 import org.compiere.model.MOrderLine;
-import org.compiere.model.MPayment;
 import org.compiere.model.MProduct;
 import org.compiere.model.MWarehousePrice;
 import org.compiere.model.PO;
-import org.compiere.process.DocAction;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CScrollPane;
@@ -409,41 +405,26 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                     // set the proper trx name to order
                     p_posPanel.m_order.set_TrxName(trxName);
 
-                    if (!PosPayment.pay(p_posPanel)) {
-                        String msg = Msg.translate(p_ctx, "PosPaymentCancel");
-                        throw new AdempierePOSException(msg);
-                    }
+                    // Si se procesa un remito por el POS no es necesario
+                    // definir medio de pago ni crear los mismos
+                    if (!p_pos.get_ValueAsBoolean("IsShipment"))
+                    {
 
-                    if (!p_posPanel.m_order.processPayments()) {
-                        String msg = Msg.translate(p_ctx, "FailProcessPaymentHeader");
-                        throw new AdempierePOSException(msg);
+                        if (!PosPayment.pay(p_posPanel)) {
+                            String msg = Msg.translate(p_ctx, "PosPaymentCancel");
+                            throw new AdempierePOSException(msg);
+                        }
+
+                        if (!p_posPanel.m_order.processPayments()) {
+                            String msg = Msg.translate(p_ctx, "FailProcessPaymentHeader");
+                            throw new AdempierePOSException(msg);
+                        }
                     }
 
                     if (!p_posPanel.m_order.isProcessed() && !p_posPanel.m_order.processOrder()) {
                         String msg = Msg.translate(p_ctx, p_posPanel.m_order.getProcessMsg());
                         throw new AdempierePOSException(msg);
                     }
-
-                    // Creates payment allocation for earch payment of order
-                    final String desc = Msg.translate(Env.getCtx(), "C_Order_ID") + ": " + p_posPanel.m_order.getDocumentNo();
-                    final MAllocationHdr alloc = new MAllocationHdr(p_ctx, false, p_posPanel.getToday(),
-                            p_posPanel.m_order.getC_Currency_ID(), desc, trxName);
-                    alloc.setAD_Org_ID(Env.getAD_Org_ID(Env.getCtx()));
-                    alloc.setDateAcct(p_posPanel.getToday());
-                    alloc.saveEx();
-
-                    for (final MPayment payment : p_posPanel.m_order.getPayments())
-                    {
-                        final MAllocationLine line = new MAllocationLine(alloc,payment.getPayAmt(),
-                                payment.getDiscountAmt(), payment.getWriteOffAmt(), payment.getOverUnderAmt());
-                        line.setDocInfo(payment.getC_BPartner_ID(), p_posPanel.m_order.getC_Order_ID(),
-                                p_posPanel.m_order.getC_Invoice_ID());
-                        line.setC_Payment_ID(payment.getC_Payment_ID());
-                        line.saveEx(trxName);
-                    }
-                    // Should start WF
-                    alloc.processIt(DocAction.ACTION_Complete);
-                    alloc.saveEx(trxName);
 
                     // set trx name to null again
                     p_posPanel.m_order.set_TrxName(null);
@@ -609,7 +590,8 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 
 		if ( p_posPanel.m_order == null )
 		{
-			p_posPanel.m_order = PosOrderModel.createOrder(p_posPanel.p_pos, p_posPanel.f_order.getBPartner(),trxName);
+			p_posPanel.m_order = PosOrderModel.createOrder(p_posPanel.p_pos, p_posPanel.f_order.getBPartner(),
+			        p_posPanel.f_order.getC_BPartner_Location_ID(), trxName);
 		}
 
 		MOrderLine line = null;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
+<!--ADempiere(r) 3.6.1-P20111003 | LAR 1.0.1-e681d3f | Ergio 1.0.0-8e9d53f_2012-10-02 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-10-02 - Ergio(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Process">
  <row id="100" trl="Y">
@@ -203,8 +203,8 @@
   <value column="Help" original="If you copy and overwrite the current default values, you may have to repeat previous updates (e.g. set the revenue account, ...). If no Accounting Schema is selected all Accounting Schemas will be updated / inserted for products of this category.">El proceso de copiar cuentas tomará las cuentas definidas para una categoría de producto y las copiará a cualquier producto que que haga referencia a esta categoría. Si una cuenta existe a nivel de producto sera sobreescrita. Si no selecciona un Esquema Contable serán actualizados para todos los que estén definidos.</value>
  </row>
  <row id="142" trl="Y">
-  <value column="Name" original="Generate Receipt from Invoice">Generar Recibos desde Facturas</value>
-  <value column="Description" original="Create and process delivery Receipt from this invoice.">Crear y procesar recibo de la Entrega desde esta factura. La factura debe estar correcta y completa</value>
+  <value column="Name" original="Generate Receipt from Invoice">Generar Remito desde Factura</value>
+  <value column="Description" original="Create and process delivery Receipt from this invoice.">Crear y procesar el Remito desde esta factura. La factura debe estar correcta y en estado Completo.</value>
   <value column="Help" original="The invoice should be correct and completed."/>
  </row>
  <row id="144" trl="Y">
@@ -258,8 +258,8 @@
   <value column="Help" original=""/>
  </row>
  <row id="154" trl="Y">
-  <value column="Name" original="Generate Invoice from Receipt">Generar Facturas desde Recibos</value>
-  <value column="Description" original="Create and process Invoice from this receipt.  The receipt should be correct and completed.">Crear y procesar la factura desde este recibo. El recibo debe esta correcto y completo</value>
+  <value column="Name" original="Generate Invoice from Receipt">Generar Factura desde Remito</value>
+  <value column="Description" original="Create and process Invoice from this receipt.  The receipt should be correct and completed.">Crear y procesar la factura desde este Remito. El Remito debe esta correcto y en estado Completo</value>
   <value column="Help" original="Generate Invoice from Receipt will create an invoice based on the selected receipt and match the invoice to that receipt. You can set the document number only if the invoice document type allows to set the document number manually."/>
  </row>
  <row id="155" trl="Y">
@@ -683,9 +683,9 @@ Los costos estan en el actual esquema contable - Las líneas estan en la actual 
   <value column="Help" original=""/>
  </row>
  <row id="244" trl="Y">
-  <value column="Name" original="Warehouse Organization">Deposito de Organización</value>
-  <value column="Description" original="Set and verify Organization ownership of Warehouse">Active y verifique la propiedad de la organizacion del Deposito.</value>
-  <value column="Help" original="The process allows you to change or verify the organization ownership of a warehouse and its dependent entities (Location, Storage).">El proceso permite que usted cambie o que verifique la propiedad de la organización de un Deposito y de sus entidades dependientes, (Localización, Almacenaje).</value>
+  <value column="Name" original="Warehouse Organization">Depósito de Organización</value>
+  <value column="Description" original="Set and verify Organization ownership of Warehouse">Active y verifique la pertenencia del Depósito a la Organización.</value>
+  <value column="Help" original="The process allows you to change or verify the organization ownership of a warehouse and its dependent entities (Location, Storage).">El proceso permite que usted cambie o que verifique la pertenencia de un Deposito y de sus entidades dependientes, (Localización, Almacenaje) a una Organización.</value>
  </row>
  <row id="245" trl="Y">
   <value column="Name" original="Product Organization">Organización del Producto</value>
@@ -761,7 +761,7 @@ Nos ayudará, si usted permitirá publicar su uso en Adempiere. Nos pondremos en
   <value column="Help" original="Check that System and Document sequences are correct.  Run this process, if you get Duplicate Key error messages.">Compruebe que la secuencia del documento y del sistema estén correctas. Arranque este proceso, si usted consigue mensajes de error del articulo con valores identicos de validación.</value>
  </row>
  <row id="259" trl="Y">
-  <value column="Name" original="Create Orders">Crea Ordenes</value>
+  <value column="Name" original="Create Orders">Crea Órdenes</value>
   <value column="Description" original="Create orders based on Distribution List line items">Cree las órdenes basadas en la línea de artículos de la lista de distribución</value>
   <value column="Help" original="Please note that due to rounding, the total quantity of the order(s) is likely to be higher then the quantity entered.">Observe al hacer el redondeo, la cantidad total de orden(es) es probable ser más alto a la cantidad incorporada.
 </value>
@@ -824,7 +824,7 @@ Entonces las valuaciones de todas las respuestas de cantidad se adicionan a la v
   <value column="Help" original=""/>
  </row>
  <row id="271" trl="Y">
-  <value column="Name" original="Create Orders">Crea Ordenes</value>
+  <value column="Name" original="Create Orders">Crea Órdenes</value>
   <value column="Description" original="Create orders based on Distribution List line items">Crea Oden Basada en las líneas de la lista de distribución de los productos.</value>
   <value column="Help" original="Please note that due to rounding, the total quantity of the order(s) is likely to be higher then the quantity entered.">Observe al hacer el redondeo, la cantidad total de orden(es) es probable ser más alto a la cantidad incorporada.
 </value>
@@ -891,13 +891,13 @@ Entonces las valuaciones de todas las respuestas de cantidad se adicionan a la v
  </row>
  <row id="284" trl="Y">
   <value column="Name" original="Open Confirmation Details">Detalle de Confirmaciones Abiertas</value>
-  <value column="Description" original="Open Shipment or Receipt Confirmation Details">Detalle de Confirmaciones de entregas/Recibos abiertas </value>
-  <value column="Help" original="The Report lists the open confirmation lines">Informe de lines de confirmación abiertas.</value>
+  <value column="Description" original="Open Shipment or Receipt Confirmation Details">Detalle de Confirmaciones de Remitos de entregas/recepciones abiertas </value>
+  <value column="Help" original="The Report lists the open confirmation lines">Se listan las confirmaciones abiertas existentes.</value>
  </row>
  <row id="285" trl="Y">
   <value column="Name" original="Open Confirmations">Confirmaciones Abiertas</value>
-  <value column="Description" original="Open Shipment or Receipt Confirmations">Confirmaciones de entregas/Recibos abiertas </value>
-  <value column="Help" original="The report lists the open confirmations">El reporte de listas de confirmaciones abiertas</value>
+  <value column="Description" original="Open Shipment or Receipt Confirmations">Confirmaciones de Remitos de entregas/recepciones abiertas </value>
+  <value column="Help" original="The report lists the open confirmations">Se listan las confirmaciones abiertas existentes.</value>
  </row>
  <row id="286" trl="Y">
   <value column="Name" original="Process Confirmation">Procesa Confirmación</value>
@@ -1055,7 +1055,7 @@ Si se selecciona una cuenta, el balance es calculado en base al  tipo de cuenta 
  </row>
  <row id="316" trl="Y">
   <value column="Name" original="UnAllocated Invoices">Asignación de Facturas</value>
-  <value column="Description" original="Invoices not allocated to Payments">Facturas no asignadas a los pagos</value>
+  <value column="Description" original="Invoices not allocated to Payments">Asignar pagos a Facturas.</value>
   <value column="Help" original="Report of not allocated Invoices (for partially paid/allocated invoices see Open Item)">Reporte de Facturas no asignadas (Para las Facturas de vea parcialmente el articulo </value>
  </row>
  <row id="317" trl="Y">
@@ -1180,8 +1180,8 @@ y Recibi/Línea o directamente para el producto. </value>
  </row>
  <row id="340" trl="Y">
   <value column="Name" original="Monthly Invoice Product">Producto Facturado Mensualmente</value>
-  <value column="Description" original="Invoice Report by Product per Month">Reporte de Factura por Producto por Més  </value>
-  <value column="Help" original="Invoiced Amount by Product and Month">Cantidad Facturada por Producto y Més.</value>
+  <value column="Description" original="Invoice Report by Product per Month">Reporte de Facturación por Producto por es</value>
+  <value column="Help" original="Invoiced Amount by Product and Month">Cantidad Facturada por Producto y es.</value>
  </row>
  <row id="341" trl="Y">
   <value column="Name" original="Quarter Invoice Product">Facturación Trimestral por producto</value>
@@ -1580,8 +1580,8 @@ Crea múltiples formatos de exportación basado en una ventana
   <value column="Help" original=""/>
  </row>
  <row id="53097" trl="Y">
-  <value column="Name" original="Asset Disposal Expense Entry Rpt">Asset Disposal Expense Entry</value>
-  <value column="Description" original="Used to review Assets Disposed Entry">Used to review Assets Disposed Entry</value>
+  <value column="Name" original="Asset Disposal Expense Entry Rpt">Gastos Venta de Bienes</value>
+  <value column="Description" original="Used to review Assets Disposed Entry">Utilizado para revisar los Gastos en la Venta de Bienes.</value>
   <value column="Help" original=""/>
  </row>
  <row id="53099" trl="Y">
@@ -1630,7 +1630,7 @@ Crea múltiples formatos de exportación basado en una ventana
   <value column="Help" original=""/>
  </row>
  <row id="53117" trl="Y">
-  <value column="Name" original="RV_Depreciation_Table">Tabla Depreciación</value>
+  <value column="Name" original="RV_Depreciation_Table">Tabla Devaluación.</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>
@@ -1795,9 +1795,9 @@ This process should be implemented when the users are not connected.</value>
   <value column="Help" original=""/>
  </row>
  <row id="53199" trl="Y">
-  <value column="Name" original="Reset Allocation Direct">Ajustar Asignación Directa</value>
-  <value column="Description" original="Reset (delete) allocation of invoices to payments">Borra alocacion de facturas a pagos.</value>
-  <value column="Help" original="Delete individual allocation. In contrast to &quot;Reverse&quot;, the allocation is deleted (no trace), if the period is open.">Borra alocacion individual. A diferencia de "Revierte", si el periodo esta abierto, la alocacion es borrada (sin rastros).</value>
+  <value column="Name" original="Reset Allocation Direct">Eliminar Asignación (Directo)</value>
+  <value column="Description" original="Reset (delete) allocation of invoices to payments">Borra la signación de facturas a pagos.</value>
+  <value column="Help" original="Delete individual allocation. In contrast to &quot;Reverse&quot;, the allocation is deleted (no trace), if the period is open.">Borra la asignación individual. A diferencia de "Revierte", si el periodo esta abierto, la asignación se borra (sin dejar historial).</value>
  </row>
  <row id="53200" trl="Y">
   <value column="Name" original="Import Product Planning and Forecast">Importar Planificacion y Proyeccion Producto</value>
@@ -1836,6 +1836,36 @@ This process should be implemented when the users are not connected.</value>
  </row>
  <row id="3000000" trl="Y">
   <value column="Name" original="LAR_WithholdingCertificate">Certificado de Retención LAR</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000001" trl="Y">
+  <value column="Name" original="LAR_DrawerTransfer">Transferencia de Caja</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000004" trl="N">
+  <value column="Name" original="LAR_InvoiceFiscalPrinting">LAR_InvoiceFiscalPrinting</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000006" trl="Y">
+  <value column="Name" original="LAR On Drawer Checks Selection">Buscar Cheques en Cartera</value>
+  <value column="Description" original="Selects ARR receipts with Check Tender Type which are on drawer">Busca los Pagos cuya forma de pago es Cheque y están en Cartera.</value>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000013" trl="N">
+  <value column="Name" original="LAR_FiscalPrinterClosing">LAR_FiscalPrinterClosing</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000036" trl="N">
+  <value column="Name" original="Process LAR_PaymentHeader">Process LAR_PaymentHeader</value>
+  <value column="Description" original=""/>
+  <value column="Help" original=""/>
+ </row>
+ <row id="3000037" trl="N">
+  <value column="Name" original="LAR_PosOrderGlobalVoiding">LAR_PosOrderGlobalVoiding</value>
   <value column="Description" original=""/>
   <value column="Help" original=""/>
  </row>

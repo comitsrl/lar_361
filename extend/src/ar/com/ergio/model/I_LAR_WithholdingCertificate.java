@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_WithholdingCertificate
  *  @author Adempiere (generated)
- *  @version 360LTS.015
+ *  @version 3.6.1-P20111003 | LAR 1.0.1-1c3c4dd
  */
 public interface I_LAR_WithholdingCertificate
 {
@@ -147,21 +147,6 @@ public interface I_LAR_WithholdingCertificate
 	  */
 	public String getC_Location_ID();
 
-    /** Column name C_Payment_ID */
-    public static final String COLUMNNAME_C_Payment_ID = "C_Payment_ID";
-
-	/** Set Payment.
-	  * Payment identifier
-	  */
-	public void setC_Payment_ID (int C_Payment_ID);
-
-	/** Get Payment.
-	  * Payment identifier
-	  */
-	public int getC_Payment_ID();
-
-	public I_C_Payment getC_Payment() throws RuntimeException;
-
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
@@ -229,6 +214,17 @@ public interface I_LAR_WithholdingCertificate
 	  * The record is active in the system
 	  */
 	public boolean isActive();
+
+    /** Column name LAR_PaymentHeader_ID */
+    public static final String COLUMNNAME_LAR_PaymentHeader_ID = "LAR_PaymentHeader_ID";
+
+	/** Set LAR_PaymentHeader	  */
+	public void setLAR_PaymentHeader_ID (int LAR_PaymentHeader_ID);
+
+	/** Get LAR_PaymentHeader	  */
+	public int getLAR_PaymentHeader_ID();
+
+	public ar.com.ergio.model.I_LAR_PaymentHeader getLAR_PaymentHeader() throws RuntimeException;
 
     /** Column name LAR_WithholdingCertificate_ID */
     public static final String COLUMNNAME_LAR_WithholdingCertificate_ID = "LAR_WithholdingCertificate_ID";
