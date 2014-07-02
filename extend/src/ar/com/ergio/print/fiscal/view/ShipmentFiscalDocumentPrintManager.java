@@ -17,8 +17,6 @@
 package ar.com.ergio.print.fiscal.view;
 
 import org.compiere.model.MInOut;
-import org.compiere.model.MOrder;
-import org.compiere.model.MSequence;
 import org.compiere.model.PO;
 import org.compiere.process.DocAction;
 
@@ -51,12 +49,6 @@ public class ShipmentFiscalDocumentPrintManager extends FiscalDocumentPrintManag
         // Anula el remito
         shipment.processIt(DocAction.ACTION_Void);
         shipment.saveEx();
-
-        // Retrocede la secuencia en 1
-        int ad_Sequence_ID = shipment.getC_DocType().getDefiniteSequence_ID();
-        final MSequence seq = new MSequence(shipment.getCtx(), ad_Sequence_ID, shipment.get_TrxName());
-        seq.setCurrentNext(seq.getCurrentNext() - 1);
-        seq.saveEx();
     }
 
 }

@@ -938,8 +938,10 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
             setLastDocumentNo(response.getString(3));
             dnfh.setDocumentNo(getLastDocumentNo());
 
-            // Se indica al manejador de eventos que la impresión ha finalizado.
-            firePrintEnded();
+            // El documento no-fiscal indica al manejador de eventos
+            // si tiene que finalizar la impresión o no
+            if (dnfh.isPrintEnded())
+                firePrintEnded();
 
         } catch (FiscalPrinterIOException e) {
             // Si ocurrió algún error se intenta cancelar el documento
