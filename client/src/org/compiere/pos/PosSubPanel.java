@@ -68,8 +68,6 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 	/** Context								*/
 	protected Properties			p_ctx = Env.getCtx();
 
-	protected static CButton 		f_cashPayment;
-
 	/** Button Width = 50			*/
 	private static final int	WIDTH = 50;
 	/** Button Height = 50			*/

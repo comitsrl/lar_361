@@ -277,8 +277,12 @@ import ar.com.ergio.util.LAR_Utils;
             final MOrgInfo orgInfo = MOrgInfo.get(invoice.getCtx(), ad_Org_ID, invoice.get_TrxName());
             int lco_TaxPayerType_Vendor_ID = orgInfo.get_ValueAsInt("LCO_TaxPayerType_ID");
             int lco_TaxPayerType_Customer_ID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
-            int c_POS_ID = Env.getContextAsInt(invoice.getCtx(),Env.POS_ID) != 0 ? Env.getContextAsInt(invoice.getCtx(),Env.POS_ID)
-                    : invoice.get_ValueAsInt("C_POS_ID");
+            /*
+             * @emmie - Siempre se recupera el ID del POS desde la factura, ya que el mismo o se
+             *          asigna en las ventanas correspondientes, o se asigna en el contructor de
+             *          la orden cuando se crea una factura desde una orden (venta desde POS)
+             */
+            int c_POS_ID = invoice.get_ValueAsInt("C_POS_ID");
 
             // Check vendor taxpayertype
             if (lco_TaxPayerType_Vendor_ID == 0) {
@@ -328,12 +332,11 @@ import ar.com.ergio.util.LAR_Utils;
             }
 
             /*
-             * TODO - Revisar esta forma de determinación del origen de una factura
-             *        (desde el POS o desde ventana de Facturas)
-             *
              * Si la factura fue generada desde una POS Order, se asume que provino
              * del POS y se le cambia el tipo de documento destino por el obtenido
              * a partir del BP y la Letra.
+             *
+             * Algo similar sucede si la orden fue generada desde una Orden de Remito
              */
             MOrder order = new MOrder(invoice.getCtx(), invoice.getC_Order_ID(), invoice.get_TrxName());
             MDocType dt = new MDocType(invoice.getCtx(), order.getC_DocTypeTarget_ID(), invoice.get_TrxName());
@@ -342,7 +345,6 @@ import ar.com.ergio.util.LAR_Utils;
                 invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
 
             invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
-            invoice.set_ValueOfColumn("C_POS_ID", c_POS_ID);
             if (!invoice.save()) {
                 return "CannotChangeInvoiceDocType";
             }
@@ -367,7 +369,9 @@ import ar.com.ergio.util.LAR_Utils;
         // Antes de preparar la cabecera, se verifica si la retención fue generada
         if (po.get_TableName().equals(MLARPaymentHeader.Table_Name) && timing == TIMING_BEFORE_PREPARE)
         {
-            preparePaymentWithholding((MLARPaymentHeader) po);
+            msg = preparePaymentWithholding((MLARPaymentHeader) po);
+            if (msg != null)
+                return msg;
         }
 
         // Después de completar crear el certificado de retención y actualiza las fechas
