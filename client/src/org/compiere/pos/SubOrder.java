@@ -611,7 +611,9 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
   				//f_bEdit.setEnabled(true);
   				f_process.setEnabled(true);
   				f_print.setEnabled(order.isProcessed());
-  				f_cashPayment.setEnabled(order.getLines().length != 0);
+                log.warning("boton pago (pre set)="+ p_posPanel.f_curLine.getPaymentButton().hashCode() + ".  isEnabled=" + p_posPanel.f_curLine.getPaymentButton().isEnabled());
+                p_posPanel.f_curLine.getPaymentButton().setEnabled(order.getLines().length != 0);
+                log.warning("boton pago (post set)="+ p_posPanel.f_curLine.getPaymentButton().hashCode() + ".  isEnabled=" + p_posPanel.f_curLine.getPaymentButton().isEnabled());
 			}
 			else
 			{
@@ -621,7 +623,7 @@ public class SubOrder extends PosSubPanel implements ActionListener, FocusListen
 				//f_bEdit.setEnabled(false);
 				f_process.setEnabled(false);
 				f_print.setEnabled(false);
-				f_cashPayment.setEnabled(false);
+                p_posPanel.f_curLine.getPaymentButton().setEnabled(false);
 			}
 		}
 	}
