@@ -333,6 +333,17 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		setC_BPartner_ID(order.getBill_BPartner_ID());
 		setC_BPartner_Location_ID(order.getBill_Location_ID());
 		setAD_User_ID(order.getBill_User_ID());
+        /*
+         * @emmie custom - Setea el POS ID
+         * Esto es necesario debido a que la venta desde el POS no
+         * controla la creación de la factura, sino que la misma se
+         * crea desde el proceso de completamiento de la orden utilizando
+         * este constructor.
+         *
+         * A su vez, esto evita tener que utlizar variables de entornos
+         * globales en el validador LAR.
+         */
+        set_ValueOfColumn("C_POS_ID", order.get_ValueAsInt("C_POS_ID"));
 	}	//	MInvoice
 
 	/**
