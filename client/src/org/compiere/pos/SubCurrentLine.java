@@ -90,6 +90,11 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	private CButton			f_bSearch;
 	private int orderLineId = 0;
 
+    /*
+     * @emmie - Botón como variable de instancia privada
+     *          para evitar efectos laterales indeseados
+     */
+    private CButton  f_cashPayment;
 
 	/**	The Product					*/
 	private MProduct		m_product = null;
@@ -156,6 +161,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		f_cashPayment.setActionCommand("Payment");
 		add (f_cashPayment, "w 75!, h 50!, pushx, wrap");
 		f_cashPayment.setEnabled(false);
+		log.warning("boton pago (hash)="+ f_cashPayment.hashCode() + ".  isEnabled=" + f_cashPayment.isEnabled());
 
 		m_table = new PosTable();
 		CScrollPane scroll = new CScrollPane(m_table);
@@ -800,6 +806,15 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			setPrice(ol.getPriceActual());
 			setQty(ol.getQtyOrdered());
 		}
+	}
+
+	/**
+	 * Recupera el botón de pago
+	 * @return botón de pago
+	 */
+	CButton getPaymentButton()
+	{
+	    return f_cashPayment;
 	}
 
 	/**
