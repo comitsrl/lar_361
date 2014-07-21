@@ -1065,7 +1065,11 @@ public class FiscalDocumentPrint {
 		{
 		    // TODO Corregir el calculo del porcentaje de percepción.
 		    // BigDecimal rate = amt.divide(totalLineAmt, 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
-		    String desc = "Percepci\u00f3n IIBB"; //String.format("Percepci\u00f3n", rate);
+            // @mzuniga - Se agrega la provincia correspondiente a la Percepción en la descripción de la línea
+            String sql = "SELECT l.RegionName FROM AD_OrgInfo oi JOIN C_Location l ON oi.C_Location_ID = l.C_Location_ID WHERE oi.AD_Org_ID=?";
+            String prov = DB.getSQLValueString(mInvoice.get_TrxName(), sql, (Integer) mInvoice.get_Value("AD_Org_ID"));
+            String desc = "Perc. IIBB " + prov; //String.format("Percepci\u00f3n", rate);
+            // @mzuniga
 		    PerceptionLine perceptionLine = new PerceptionLine(desc, amt, null);
 		    document.setPerceptionLine(perceptionLine);
 		}
