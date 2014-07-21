@@ -68,6 +68,8 @@ public class QueryBPartner extends PosQuery
 	private CTextField		f_city;
 
 	private int				m_C_BPartner_ID;
+	private int m_C_BPartner_Location_ID;
+	private MBPartnerInfo[] m_Result = new MBPartnerInfo[0];
 	private CButton f_refresh;
 	private CButton f_ok;
 	private CButton f_cancel;
@@ -242,6 +244,7 @@ public class QueryBPartner extends PosQuery
 	public void setResults (MBPartnerInfo[] results)
 	{
 		m_table.loadTable(results);
+		m_Result = results;
 		enableButtons();
 	}	//	setResults
 
@@ -251,6 +254,7 @@ public class QueryBPartner extends PosQuery
 	protected void enableButtons()
 	{
 		m_C_BPartner_ID = -1;
+		m_C_BPartner_Location_ID = -1;
 		int row = m_table.getSelectedRow();
 		boolean enabled = row != -1;
 		if (enabled)
@@ -259,6 +263,7 @@ public class QueryBPartner extends PosQuery
 			if (ID != null)
 			{
 				m_C_BPartner_ID = ID.intValue();
+				m_C_BPartner_Location_ID = m_Result[row].getC_BPartner_Location_ID();
 			}
 		}
 		f_ok.setEnabled(enabled);
@@ -276,6 +281,7 @@ public class QueryBPartner extends PosQuery
 		if (m_C_BPartner_ID > 0)
 		{
 			p_posPanel.f_order.setC_BPartner_ID(m_C_BPartner_ID);
+            p_posPanel.f_order.setC_BPartner_Location_ID(m_C_BPartner_Location_ID);
 		}
 		else
 		{

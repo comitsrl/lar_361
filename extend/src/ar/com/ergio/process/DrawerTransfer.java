@@ -28,6 +28,7 @@ import org.compiere.model.MBankAccount;
 import org.compiere.model.MBankStatement;
 import org.compiere.model.MBankStatementLine;
 import org.compiere.model.MPayment;
+import org.compiere.model.MUser;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
@@ -102,9 +103,9 @@ public class DrawerTransfer extends SvrProcess
             throw new IllegalArgumentException("Document No required");
 
         if (p_To_C_BankAccount_ID == p_From_C_BankAccount_ID)
-            throw new AdempiereUserError("Banks From and To must be different");
+            throw new AdempiereUserError("Accounts From and To must be different");
 
-        p_C_BPartner_ID = Env.getAD_User_ID(getCtx());
+        p_C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();        
         if (p_C_BPartner_ID == 0)
             throw new AdempiereUserError ("Business Partner required");
 
@@ -121,7 +122,7 @@ public class DrawerTransfer extends SvrProcess
             p_DateAcct = p_StatementDate;
 
         generateDrawerTransfer();
-        return "@Transferred@ = " + m_transferred;
+        return "@Se transfirieron@ " + m_transferred + " líneas.";
     } // doIt
 
     /**
@@ -135,7 +136,7 @@ public class DrawerTransfer extends SvrProcess
 
         BigDecimal cashAmt = BigDecimal.ZERO;
         BigDecimal totalAmt = BigDecimal.ZERO;
-        // Iterates over concialiates payments
+        // Iterates over conciliated payments
         for (final MBankStatementLine line : getLines(mBankFrom))
         {
             final MPayment paymentFrom = new MPayment(getCtx(), line.getC_Payment_ID(), get_TrxName());
@@ -192,7 +193,7 @@ public class DrawerTransfer extends SvrProcess
             m_transferred++;
         }
 
-        // Creates a debit for tranference total amount
+        // Creates a debit for transference total amount
         final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
         paymentBankFrom.setC_BankAccount_ID(mBankFrom.getC_BankAccount_ID());
         paymentBankFrom.setDocumentNo(p_DocumentNo);

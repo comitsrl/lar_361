@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 
 import ar.com.ergio.print.fiscal.comm.FiscalComm;
 import ar.com.ergio.print.fiscal.document.CreditNote;
+import ar.com.ergio.print.fiscal.document.DNFH;
 import ar.com.ergio.print.fiscal.document.DebitNote;
 import ar.com.ergio.print.fiscal.document.Invoice;
 import ar.com.ergio.print.fiscal.document.NonFiscalDocument;
@@ -146,6 +147,20 @@ public interface FiscalPrinterDevice {
 	 * puede ser enviado a imprimir.
 	 */
 	public void printDocument(NonFiscalDocument nonFiscalDocument) throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException;
+
+    /**
+     * Impresión de un documento no-fiscal homologado
+     *
+     * @param dnfh Documento no-fiscal homologado a imprimir
+     *
+     * @throws FiscalPrinterStatusError cuando la impresora fiscal retorna un error en su estado a
+     *             partir de la ejecución de algún comando.
+     * @throws FiscalPrinterIOException cuando se produce algún error inesperado en la comunicación
+     *             con el dispositivo fiscal.
+     * @throws DocumentException cuando el documento no fiscal contiene errores y no puede ser
+     *             enviado a imprimir.
+     */
+    public void printDocument(DNFH dnfh) throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException;
 
 	/**
 	 * Realiza el cierre fiscal.

@@ -62,13 +62,17 @@ public class MLAROrderPerception extends X_LAR_OrderPerception
     }
 
     /**
+     * Recupera o crea una percepción sobre la orden pasada como parámetro.
      *
      * @param order
-     * @param trxName
-     * @return
+     *        orden a partir de la cual se busca la percepción
+     * @return Percepción existente relacionada a la orden, o nuevo objeto percepción para la
+     *         orden dada
      */
+    // TODO quitar la transacción, porque se puede recuperar de la orden.
     public static MLAROrderPerception get(final MOrder order, final String trxName)
     {
+        // TODO incoporar el uso de s_cache para evitar consultas reiteradas a la base
         MLAROrderPerception retValue = null;
         if (order == null || order.getC_Order_ID() == 0) {
             log.info("No Order");

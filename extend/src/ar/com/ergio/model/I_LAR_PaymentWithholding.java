@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for LAR_PaymentWithholding
  *  @author Adempiere (generated)
- *  @version 360LTS.015
+ *  @version 3.6.1-P20111003 | LAR 1.0.1-1c3c4dd
  */
 public interface I_LAR_PaymentWithholding
 {
@@ -62,36 +62,6 @@ public interface I_LAR_PaymentWithholding
 	  * Organizational entity within client
 	  */
 	public int getAD_Org_ID();
-
-    /** Column name C_Invoice_ID */
-    public static final String COLUMNNAME_C_Invoice_ID = "C_Invoice_ID";
-
-	/** Set Invoice.
-	  * Invoice Identifier
-	  */
-	public void setC_Invoice_ID (int C_Invoice_ID);
-
-	/** Get Invoice.
-	  * Invoice Identifier
-	  */
-	public int getC_Invoice_ID();
-
-	public I_C_Invoice getC_Invoice() throws RuntimeException;
-
-    /** Column name C_Payment_ID */
-    public static final String COLUMNNAME_C_Payment_ID = "C_Payment_ID";
-
-	/** Set Payment.
-	  * Payment identifier
-	  */
-	public void setC_Payment_ID (int C_Payment_ID);
-
-	/** Get Payment.
-	  * Payment identifier
-	  */
-	public int getC_Payment_ID();
-
-	public I_C_Payment getC_Payment() throws RuntimeException;
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -162,6 +132,17 @@ public interface I_LAR_PaymentWithholding
 	  * The record is active in the system
 	  */
 	public boolean isActive();
+
+    /** Column name LAR_PaymentHeader_ID */
+    public static final String COLUMNNAME_LAR_PaymentHeader_ID = "LAR_PaymentHeader_ID";
+
+	/** Set LAR_PaymentHeader	  */
+	public void setLAR_PaymentHeader_ID (int LAR_PaymentHeader_ID);
+
+	/** Get LAR_PaymentHeader	  */
+	public int getLAR_PaymentHeader_ID();
+
+	public ar.com.ergio.model.I_LAR_PaymentHeader getLAR_PaymentHeader() throws RuntimeException;
 
     /** Column name LAR_PaymentWithholding_ID */
     public static final String COLUMNNAME_LAR_PaymentWithholding_ID = "LAR_PaymentWithholding_ID";

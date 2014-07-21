@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
+<!--ADempiere(r) 3.6.1-P20111003 | LAR 1.0.1-e681d3f | Ergio 1.0.0-8e9d53f_2012-10-02 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-10-02 - Ergio(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="C_ElementValue">
  <row id="419" trl="N">
@@ -1886,13 +1886,13 @@
   <value column="Name" original="Bancos">Bancos</value>
   <value column="Description" original=""/>
  </row>
- <row id="1000093" trl="N">
-  <value column="Name" original="Banco XX">Banco XX</value>
-  <value column="Description" original="Banco XX">Banco XX</value>
+ <row id="1000093" trl="Y">
+  <value column="Name" original="Banco XX">Banco Macro C/C</value>
+  <value column="Description" original="Banco XX">Banco Macro C/C</value>
  </row>
- <row id="1000094" trl="N">
-  <value column="Name" original="Banco YY">Banco YY</value>
-  <value column="Description" original="Banco YY">Banco YY</value>
+ <row id="1000094" trl="Y">
+  <value column="Name" original="Banco YY">Banco Provincia Neuquen</value>
+  <value column="Description" original="Banco YY">Banco Provincia Neuquen</value>
  </row>
  <row id="1000095" trl="N">
   <value column="Name" original="Banco en Transferencia">Banco en Transferencia</value>
@@ -1966,21 +1966,21 @@
   <value column="Name" original="Creditos Impositivos">Creditos Impositivos</value>
   <value column="Description" original=""/>
  </row>
- <row id="1000113" trl="N">
-  <value column="Name" original="Retenciones Imp.a las Ganancias">Retenciones Imp.a las Ganancias</value>
-  <value column="Description" original="Retenciones Imp.a las Ganancias">Retenciones Imp.a las Ganancias</value>
+ <row id="1000113" trl="Y">
+  <value column="Name" original="Retenciones Imp.a las Ganancias">Retenciones y Percep. Imp.a las Ganancias</value>
+  <value column="Description" original="Retenciones Imp.a las Ganancias">Retenciones y Percep. Imp.a las Ganancias</value>
  </row>
  <row id="1000114" trl="N">
   <value column="Name" original="Anticipo Imp.a las Ganancias">Anticipo Imp.a las Ganancias</value>
   <value column="Description" original="Anticipo Imp.a las Ganancias">Anticipo Imp.a las Ganancias</value>
  </row>
  <row id="1000115" trl="Y">
-  <value column="Name" original="Retenciones IIBB Sufridas">Retenciones IIBB Sufridas</value>
-  <value column="Description" original="Retenciones IIBB Sufridas">Retenciones IIBB Sufridas</value>
+  <value column="Name" original="Retenciones IIBB Sufridas">Retenciones IIBB Neuquén Sufridas</value>
+  <value column="Description" original="Retenciones IIBB Sufridas">Retenciones IIBB Neuquén Sufridas</value>
  </row>
  <row id="1000116" trl="Y">
-  <value column="Name" original="Percepciones IIBB Sufridas">Percepciones IIBB Sufridas</value>
-  <value column="Description" original="Percepciones IIBB Sufridas">Percepciones IIBB Sufridas</value>
+  <value column="Name" original="Percepciones IIBB Sufridas">Percepciones IIBB Río Negro Sufridas</value>
+  <value column="Description" original="Percepciones IIBB Sufridas">Percepciones IIBB Río Negro Sufridas</value>
  </row>
  <row id="1000117" trl="N">
   <value column="Name" original="Retenciones IVA">Retenciones IVA</value>
@@ -1998,13 +1998,13 @@
   <value column="Name" original="IVA Saldo a Favor">IVA Saldo a Favor</value>
   <value column="Description" original="IVA Saldo a Favor">IVA Saldo a Favor</value>
  </row>
- <row id="1000121" trl="N">
-  <value column="Name" original="Retenciones Contribuciones Patronales">Retenciones Contribuciones Patronales</value>
-  <value column="Description" original="Retenciones Contribuciones Patronales">Retenciones Contribuciones Patronales</value>
+ <row id="1000121" trl="Y">
+  <value column="Name" original="Retenciones Contribuciones Patronales">SUSS Retenciones</value>
+  <value column="Description" original="Retenciones Contribuciones Patronales">SUSS Retenciones</value>
  </row>
- <row id="1000122" trl="N">
-  <value column="Name" original="Otros Creditos Impositivos">Otros Creditos Impositivos</value>
-  <value column="Description" original=""/>
+ <row id="1000122" trl="Y">
+  <value column="Name" original="Otros Creditos Impositivos">IIBB Saldo a Favor</value>
+  <value column="Description" original="">IIBB Saldo a Favor</value>
  </row>
  <row id="1000123" trl="N">
   <value column="Name" original="Otros Creditos">Otros Creditos</value>
@@ -2014,9 +2014,9 @@
   <value column="Name" original="Deudores varios">Deudores varios</value>
   <value column="Description" original="Deudores varios">Deudores varios</value>
  </row>
- <row id="1000125" trl="N">
-  <value column="Name" original="Accionistas  ( Socio X Cuenta aporte)">Accionistas  ( Socio X Cuenta aporte)</value>
-  <value column="Description" original="Accionistas  ( Socio X Cuenta aporte)">Accionistas  ( Socio X Cuenta aporte)</value>
+ <row id="1000125" trl="Y">
+  <value column="Name" original="Accionistas  ( Socio X Cuenta aporte)">Matzkin Aron Moises Cta Particular</value>
+  <value column="Description" original="Accionistas  ( Socio X Cuenta aporte)">Matzkin Aron Moises Cta Particular</value>
  </row>
  <row id="1000126" trl="N">
   <value column="Name" original="Prestamos al Personal">Prestamos al Personal</value>
@@ -2050,12 +2050,12 @@
   <value column="Name" original="Anticipo a Proveedores">Anticipo a Proveedores</value>
   <value column="Description" original="Anticipo a Proveedores">Anticipo a Proveedores</value>
  </row>
- <row id="1000134" trl="N">
-  <value column="Name" original="Payment discount expense">Payment discount expense</value>
+ <row id="1000134" trl="Y">
+  <value column="Name" original="Payment discount expense">Descuento en Pagos Gastos</value>
   <value column="Description" original=""/>
  </row>
- <row id="1000135" trl="N">
-  <value column="Name" original="Payment discount revenue">Payment discount revenue</value>
+ <row id="1000135" trl="Y">
+  <value column="Name" original="Payment discount revenue">Descuento en Pagos Ingresos</value>
   <value column="Description" original=""/>
  </row>
  <row id="1000136" trl="N">
@@ -2086,13 +2086,13 @@
   <value column="Name" original="Productos Terminados">Productos Terminados</value>
   <value column="Description" original=""/>
  </row>
- <row id="1000143" trl="N">
-  <value column="Name" original="Productos Terminados">Productos Terminados</value>
-  <value column="Description" original="Productos Terminados">Productos Terminados</value>
+ <row id="1000143" trl="Y">
+  <value column="Name" original="Productos Terminados">Baterías</value>
+  <value column="Description" original="Productos Terminados">Baterías</value>
  </row>
- <row id="1000144" trl="N">
-  <value column="Name" original="Productos Terminados en Transito">Productos Terminados en Transito</value>
-  <value column="Description" original="Productos Terminados en Transito">Productos Terminados en Transito</value>
+ <row id="1000144" trl="Y">
+  <value column="Name" original="Productos Terminados en Transito">Repuestos Varios</value>
+  <value column="Description" original="Productos Terminados en Transito">Repuestos Varios</value>
  </row>
  <row id="1000145" trl="N">
   <value column="Name" original="Ajuste de Inventario">Ajuste de Inventario</value>
@@ -2202,9 +2202,9 @@
   <value column="Name" original="Maquinarias">Maquinarias</value>
   <value column="Description" original=""/>
  </row>
- <row id="1000172" trl="N">
-  <value column="Name" original="Maquinarias V.O.">Maquinarias V.O.</value>
-  <value column="Description" original="Maquinarias V.O.">Maquinarias V.O.</value>
+ <row id="1000172" trl="Y">
+  <value column="Name" original="Maquinarias V.O.">Maquinarias y Equipos</value>
+  <value column="Description" original="Maquinarias V.O.">Maquinarias y Equipos</value>
  </row>
  <row id="1000173" trl="N">
   <value column="Name" original="Amort.Acum. Maquinarias">Amort.Acum. Maquinarias</value>
@@ -2214,9 +2214,9 @@
   <value column="Name" original="Equipos de Computacion">Equipos de Computacion</value>
   <value column="Description" original=""/>
  </row>
- <row id="1000175" trl="N">
-  <value column="Name" original="Equipos de Computacion V.O.">Equipos de Computacion V.O.</value>
-  <value column="Description" original="Equipos de Computacion V.O.">Equipos de Computacion V.O.</value>
+ <row id="1000175" trl="Y">
+  <value column="Name" original="Equipos de Computacion V.O.">Equipos de Computacion</value>
+  <value column="Description" original="Equipos de Computacion V.O.">Equipos de Computacion</value>
  </row>
  <row id="1000176" trl="N">
   <value column="Name" original="Amort. Acum. Equipos de Computacion">Amort. Acum. Equipos de Computacion</value>
@@ -2238,9 +2238,9 @@
   <value column="Name" original="Muebles y utiles">Muebles y utiles</value>
   <value column="Description" original=""/>
  </row>
- <row id="1000181" trl="N">
-  <value column="Name" original="Muebles y ultiles V.O.">Muebles y ultiles V.O.</value>
-  <value column="Description" original="Muebles y ultiles V.O.">Muebles y ultiles V.O.</value>
+ <row id="1000181" trl="Y">
+  <value column="Name" original="Muebles y ultiles V.O.">Muebles y Utiles</value>
+  <value column="Description" original="Muebles y ultiles V.O.">Muebles y Utiles</value>
  </row>
  <row id="1000182" trl="N">
   <value column="Name" original="Amort.Acum. Muebles y utiles">Amort.Acum. Muebles y utiles</value>
@@ -2330,21 +2330,21 @@
   <value column="Name" original="Proveedores">Proveedores</value>
   <value column="Description" original="Proveedores">Proveedores</value>
  </row>
- <row id="1000204" trl="N">
-  <value column="Name" original="Obligaciones a Pagar">Obligaciones a Pagar</value>
+ <row id="1000204" trl="Y">
+  <value column="Name" original="Obligaciones a Pagar">Acreedores Varios</value>
   <value column="Description" original="Obligaciones a Pagar">Obligaciones a Pagar</value>
  </row>
- <row id="1000205" trl="N">
-  <value column="Name" original="Acreedores Varios Servicios">Acreedores Varios Servicios</value>
-  <value column="Description" original="Acreedores Varios">Acreedores Varios</value>
+ <row id="1000205" trl="Y">
+  <value column="Name" original="Acreedores Varios Servicios">Honorarios a Pagar</value>
+  <value column="Description" original="Acreedores Varios">Honorarios a Pagar</value>
  </row>
  <row id="1000206" trl="N">
   <value column="Name" original="Int.negativos a devengar (reg.del pasivo)">Int.negativos a devengar (reg.del pasivo)</value>
   <value column="Description" original="Int.negativos a devengar (reg.del pasivo)">Int.negativos a devengar (reg.del pasivo)</value>
  </row>
- <row id="1000207" trl="N">
-  <value column="Name" original="Otros Gastos a Pagar">Otros Gastos a Pagar</value>
-  <value column="Description" original="Otros Gastos a Pagar">Otros Gastos a Pagar</value>
+ <row id="1000207" trl="Y">
+  <value column="Name" original="Otros Gastos a Pagar">Cheques Rechazados</value>
+  <value column="Description" original="Otros Gastos a Pagar">Cheques Rechazados</value>
  </row>
  <row id="1000208" trl="N">
   <value column="Name" original="Anticipos de Clientes">Anticipos de Clientes</value>
@@ -2418,13 +2418,13 @@
   <value column="Name" original="Sueldos a Pagar">Sueldos a Pagar</value>
   <value column="Description" original="Sueldos a Pagar">Sueldos a Pagar</value>
  </row>
- <row id="1000226" trl="N">
-  <value column="Name" original="Cargas Sociales a Pagar">Cargas Sociales a Pagar</value>
-  <value column="Description" original="Cargas Sociales a Pagar">Cargas Sociales a Pagar</value>
+ <row id="1000226" trl="Y">
+  <value column="Name" original="Cargas Sociales a Pagar">Aportes y Contr. SUSS a depositar</value>
+  <value column="Description" original="Cargas Sociales a Pagar">Aportes y Contr. SUSS a depositar</value>
  </row>
- <row id="1000227" trl="N">
-  <value column="Name" original="Cuota Sindical a Pagar">Cuota Sindical a Pagar</value>
-  <value column="Description" original="Cuota Sindical a Pagar">Cuota Sindical a Pagar</value>
+ <row id="1000227" trl="Y">
+  <value column="Name" original="Cuota Sindical a Pagar">Aportes y Contribuciones Ob. Social a Dep.</value>
+  <value column="Description" original="Cuota Sindical a Pagar">Aportes y Contribuciones Ob. Social a Dep.</value>
  </row>
  <row id="1000228" trl="N">
   <value column="Name" original="Provision para SAC">Provision para SAC</value>
@@ -2466,8 +2466,8 @@
   <value column="Name" original="Otros Gastos a Pagar">Otros Gastos a Pagar</value>
   <value column="Description" original="Otros Gastos a Pagar">Otros Gastos a Pagar</value>
  </row>
- <row id="1000238" trl="N">
-  <value column="Name" original="Purchase price variance offset">Purchase price variance offset</value>
+ <row id="1000238" trl="Y">
+  <value column="Name" original="Purchase price variance offset">Variación del precio de compra</value>
   <value column="Description" original=""/>
  </row>
  <row id="1000239" trl="N">
@@ -2590,17 +2590,17 @@
   <value column="Name" original="Ingresos Ordinarios">Ingresos Ordinarios</value>
   <value column="Description" original=""/>
  </row>
- <row id="1000269" trl="N">
-  <value column="Name" original="Venta de Bienes">Venta de Bienes</value>
-  <value column="Description" original="Venta de Bienes">Venta de Bienes</value>
+ <row id="1000269" trl="Y">
+  <value column="Name" original="Venta de Bienes">Ingresos por Ventas Baterías</value>
+  <value column="Description" original="Venta de Bienes">Ingresos por Ventas Baterías</value>
  </row>
- <row id="1000270" trl="N">
-  <value column="Name" original="Venta de Servicios">Venta de Servicios</value>
-  <value column="Description" original="Venta de Servicios">Venta de Servicios</value>
+ <row id="1000270" trl="Y">
+  <value column="Name" original="Venta de Servicios">Ingresos por Servicios</value>
+  <value column="Description" original="Venta de Servicios">Ingresos por Servicios</value>
  </row>
- <row id="1000271" trl="N">
-  <value column="Name" original="Comisiones">Comisiones</value>
-  <value column="Description" original="Comisiones">Comisiones</value>
+ <row id="1000271" trl="Y">
+  <value column="Name" original="Comisiones">Ingreso por venta Repuestos</value>
+  <value column="Description" original="Comisiones">Ingreso por venta Repuestos</value>
  </row>
  <row id="1000272" trl="N">
   <value column="Name" original="Descuentos Obtenidos">Descuentos Obtenidos</value>
@@ -2738,9 +2738,9 @@
   <value column="Name" original="Publicidad">Publicidad</value>
   <value column="Description" original="Publicidad">Publicidad</value>
  </row>
- <row id="1000306" trl="N">
-  <value column="Name" original="Marketing">Marketing</value>
-  <value column="Description" original="Marketing">Marketing</value>
+ <row id="1000306" trl="Y">
+  <value column="Name" original="Marketing">Marketing Promociones</value>
+  <value column="Description" original="Marketing">Marketing Promociones</value>
  </row>
  <row id="1000307" trl="N">
   <value column="Name" original="Gtos de Embarque">Gtos de Embarque</value>
@@ -2766,9 +2766,9 @@
   <value column="Name" original="Descuentos Otorgados">Descuentos Otorgados</value>
   <value column="Description" original="Descuentos Otorgados">Descuentos Otorgados</value>
  </row>
- <row id="1000313" trl="N">
-  <value column="Name" original="Deudores Incobrables">Deudores Incobrables</value>
-  <value column="Description" original="Deudores Incobrables">Deudores Incobrables</value>
+ <row id="1000313" trl="Y">
+  <value column="Name" original="Deudores Incobrables">Retenciones IIBB Río Negro Sufridas</value>
+  <value column="Description" original="Deudores Incobrables">Retenciones IIBB Río Negro Sufridas</value>
  </row>
  <row id="1000314" trl="N">
   <value column="Name" original="Otros">Otros</value>
@@ -2930,8 +2930,8 @@
   <value column="Name" original="Percepciones IIBB a depositar">Percepciones IIBB a depositar</value>
   <value column="Description" original="Percepciones IIBB a depositar">Percepciones IIBB a depositar</value>
  </row>
- <row id="1000354" trl="N">
-  <value column="Name" original="IIBB Saldo a favor">IIBB Saldo a favor</value>
-  <value column="Description" original="IIBB Saldo a favor">IIBB Saldo a favor</value>
+ <row id="1000354" trl="Y">
+  <value column="Name" original="IIBB Saldo a favor">IVA Saldo a favor de libre Disp.</value>
+  <value column="Description" original="IIBB Saldo a favor">IVA Saldo a favor de libre Disp.</value>
  </row>
 </adempiereTrl>

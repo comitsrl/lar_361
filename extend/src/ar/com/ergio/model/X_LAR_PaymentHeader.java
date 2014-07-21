@@ -17,21 +17,23 @@
 /** Generated Model - DO NOT CHANGE */
 package ar.com.ergio.model;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
+import org.compiere.util.Env;
 
 /** Generated Model for LAR_PaymentHeader
  *  @author Adempiere (generated)
- *  @version 3.6.1LTS | P20111003 | LAR 1.0.1.RC1 - $Id$ */
+ *  @version 3.6.1-P20111003 | LAR 1.0.1-1c3c4dd - $Id$ */
 public class X_LAR_PaymentHeader extends PO implements I_LAR_PaymentHeader, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120430L;
+	private static final long serialVersionUID = 20130205L;
 
     /** Standard Constructor */
     public X_LAR_PaymentHeader (Properties ctx, int LAR_PaymentHeader_ID, String trxName)
@@ -39,6 +41,12 @@ public class X_LAR_PaymentHeader extends PO implements I_LAR_PaymentHeader, I_Pe
       super (ctx, LAR_PaymentHeader_ID, trxName);
       /** if (LAR_PaymentHeader_ID == 0)
         {
+			setC_BPartner_ID (0);
+			setC_DocType_ID (0);
+			setDocAction (null);
+// CO
+			setDocStatus (null);
+// DR
 			setLAR_PaymentHeader_ID (0);
         } */
     }
@@ -111,9 +119,9 @@ public class X_LAR_PaymentHeader extends PO implements I_LAR_PaymentHeader, I_Pe
 	public void setC_BPartner_ID (int C_BPartner_ID)
 	{
 		if (C_BPartner_ID < 1)
-			set_Value (COLUMNNAME_C_BPartner_ID, null);
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, null);
 		else
-			set_Value (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
+			set_ValueNoCheck (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
 	}
 
 	/** Get Business Partner .
@@ -221,12 +229,87 @@ public class X_LAR_PaymentHeader extends PO implements I_LAR_PaymentHeader, I_Pe
 		return false;
 	}
 
+	/** DocAction AD_Reference_ID=135 */
+	public static final int DOCACTION_AD_Reference_ID=135;
+	/** Complete = CO */
+	public static final String DOCACTION_Complete = "CO";
+	/** Approve = AP */
+	public static final String DOCACTION_Approve = "AP";
+	/** Reject = RJ */
+	public static final String DOCACTION_Reject = "RJ";
+	/** Post = PO */
+	public static final String DOCACTION_Post = "PO";
+	/** Void = VO */
+	public static final String DOCACTION_Void = "VO";
+	/** Close = CL */
+	public static final String DOCACTION_Close = "CL";
+	/** Reverse - Correct = RC */
+	public static final String DOCACTION_Reverse_Correct = "RC";
+	/** Reverse - Accrual = RA */
+	public static final String DOCACTION_Reverse_Accrual = "RA";
+	/** Invalidate = IN */
+	public static final String DOCACTION_Invalidate = "IN";
+	/** Re-activate = RE */
+	public static final String DOCACTION_Re_Activate = "RE";
+	/** <None> = -- */
+	public static final String DOCACTION_None = "--";
+	/** Prepare = PR */
+	public static final String DOCACTION_Prepare = "PR";
+	/** Unlock = XL */
+	public static final String DOCACTION_Unlock = "XL";
+	/** Wait Complete = WC */
+	public static final String DOCACTION_WaitComplete = "WC";
+	/** Set Document Action.
+		@param DocAction
+		The targeted status of the document
+	  */
+	public void setDocAction (String DocAction)
+	{
+
+		set_Value (COLUMNNAME_DocAction, DocAction);
+	}
+
+	/** Get Document Action.
+		@return The targeted status of the document
+	  */
+	public String getDocAction ()
+	{
+		return (String)get_Value(COLUMNNAME_DocAction);
+	}
+
+	/** DocStatus AD_Reference_ID=131 */
+	public static final int DOCSTATUS_AD_Reference_ID=131;
+	/** Drafted = DR */
+	public static final String DOCSTATUS_Drafted = "DR";
+	/** Completed = CO */
+	public static final String DOCSTATUS_Completed = "CO";
+	/** Approved = AP */
+	public static final String DOCSTATUS_Approved = "AP";
+	/** Not Approved = NA */
+	public static final String DOCSTATUS_NotApproved = "NA";
+	/** Voided = VO */
+	public static final String DOCSTATUS_Voided = "VO";
+	/** Invalid = IN */
+	public static final String DOCSTATUS_Invalid = "IN";
+	/** Reversed = RE */
+	public static final String DOCSTATUS_Reversed = "RE";
+	/** Closed = CL */
+	public static final String DOCSTATUS_Closed = "CL";
+	/** Unknown = ?? */
+	public static final String DOCSTATUS_Unknown = "??";
+	/** In Progress = IP */
+	public static final String DOCSTATUS_InProgress = "IP";
+	/** Waiting Payment = WP */
+	public static final String DOCSTATUS_WaitingPayment = "WP";
+	/** Waiting Confirmation = WC */
+	public static final String DOCSTATUS_WaitingConfirmation = "WC";
 	/** Set Document Status.
 		@param DocStatus
 		The current status of the document
 	  */
 	public void setDocStatus (String DocStatus)
 	{
+
 		set_Value (COLUMNNAME_DocStatus, DocStatus);
 	}
 
@@ -253,6 +336,22 @@ public class X_LAR_PaymentHeader extends PO implements I_LAR_PaymentHeader, I_Pe
 	public String getDocumentNo ()
 	{
 		return (String)get_Value(COLUMNNAME_DocumentNo);
+	}
+
+	/** Set Invoice Amt.
+		@param InvoiceAmt Invoice Amt	  */
+	public void setInvoiceAmt (BigDecimal InvoiceAmt)
+	{
+		throw new IllegalArgumentException ("InvoiceAmt is virtual column");	}
+
+	/** Get Invoice Amt.
+		@return Invoice Amt	  */
+	public BigDecimal getInvoiceAmt ()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_InvoiceAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Receipt.
@@ -299,6 +398,23 @@ public class X_LAR_PaymentHeader extends PO implements I_LAR_PaymentHeader, I_Pe
 		return ii.intValue();
 	}
 
+	/** Set PayHeaderTotalAmt.
+		@param PayHeaderTotalAmt PayHeaderTotalAmt	  */
+	public void setPayHeaderTotalAmt (BigDecimal PayHeaderTotalAmt)
+	{
+		set_Value (COLUMNNAME_PayHeaderTotalAmt, PayHeaderTotalAmt);
+	}
+
+	/** Get PayHeaderTotalAmt.
+		@return PayHeaderTotalAmt	  */
+	public BigDecimal getPayHeaderTotalAmt ()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_PayHeaderTotalAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
 	/** Set Processed.
 		@param Processed
 		The document has been processed
@@ -323,45 +439,53 @@ public class X_LAR_PaymentHeader extends PO implements I_LAR_PaymentHeader, I_Pe
 		return false;
 	}
 
-	/** Set ProcessIt.
-		@param ProcessIt ProcessIt	  */
-	public void setProcessIt (boolean ProcessIt)
+	/** Set Remaining Amt.
+		@param RemainingAmt
+		Remaining Amount
+	  */
+	public void setRemainingAmt (BigDecimal RemainingAmt)
 	{
-		set_Value (COLUMNNAME_ProcessIt, Boolean.valueOf(ProcessIt));
-	}
+		throw new IllegalArgumentException ("RemainingAmt is virtual column");	}
 
-	/** Get ProcessIt.
-		@return ProcessIt	  */
-	public boolean isProcessIt ()
+	/** Get Remaining Amt.
+		@return Remaining Amount
+	  */
+	public BigDecimal getRemainingAmt ()
 	{
-		Object oo = get_Value(COLUMNNAME_ProcessIt);
-		if (oo != null)
-		{
-			 if (oo instanceof Boolean)
-				 return ((Boolean)oo).booleanValue();
-			return "Y".equals(oo);
-		}
-		return false;
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_RemainingAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set SearchPayments.
 		@param SearchPayments SearchPayments	  */
-	public void setSearchPayments (boolean SearchPayments)
+	public void setSearchPayments (String SearchPayments)
 	{
-		set_Value (COLUMNNAME_SearchPayments, Boolean.valueOf(SearchPayments));
+		set_Value (COLUMNNAME_SearchPayments, SearchPayments);
 	}
 
 	/** Get SearchPayments.
 		@return SearchPayments	  */
-	public boolean isSearchPayments ()
+	public String getSearchPayments ()
 	{
-		Object oo = get_Value(COLUMNNAME_SearchPayments);
-		if (oo != null)
-		{
-			 if (oo instanceof Boolean)
-				 return ((Boolean)oo).booleanValue();
-			return "Y".equals(oo);
-		}
-		return false;
+		return (String)get_Value(COLUMNNAME_SearchPayments);
+	}
+
+	/** Set Withholding Amount.
+		@param WithholdingAmt Withholding Amount	  */
+	public void setWithholdingAmt (BigDecimal WithholdingAmt)
+	{
+		set_Value (COLUMNNAME_WithholdingAmt, WithholdingAmt);
+	}
+
+	/** Get Withholding Amount.
+		@return Withholding Amount	  */
+	public BigDecimal getWithholdingAmt ()
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_WithholdingAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 }

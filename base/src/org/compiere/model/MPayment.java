@@ -665,7 +665,9 @@ public final class MPayment extends X_C_Payment
 	public BigDecimal getAllocatedAmt ()
 	{
 		BigDecimal retValue = null;
-		if (getC_Charge_ID() != 0)
+		// begin @emmie issue #17
+		if (getC_Charge_ID() != 0 && !get_ValueAsBoolean("EsRetencionIIBB"))
+		// end @emmie
 			return getPayAmt();
 		//
 		String sql = "SELECT SUM(currencyConvert(al.Amount,"
@@ -1782,7 +1784,9 @@ public final class MPayment extends X_C_Payment
 		log.info(toString());
 
 		//	Charge Handling
-		if (getC_Charge_ID() != 0)
+        // begin @emmie issue #17
+		if (getC_Charge_ID() != 0 && !get_ValueAsBoolean("EsRetencionIIBB"))
+        // end @emmie
 		{
 			setIsAllocated(true);
 		}

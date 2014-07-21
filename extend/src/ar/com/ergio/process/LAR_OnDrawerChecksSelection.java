@@ -108,7 +108,7 @@ public class LAR_OnDrawerChecksSelection extends SvrProcess
 			pay.setDateAcct(header.getDateTrx());
 			pay.setErrorMessage("");
 			pay.setC_BPartner_ID(header.getC_BPartner_ID());
-//			pay.setC_BankAccount_ID(header.getC_BankAccount_ID()); //No se modifica, ya que la cuenta de salida debe ser la misma que la de entrada
+			pay.setC_BankAccount_ID(header.getC_BankAccount_ID());
 			pay.setIsReceipt(header.isReceipt());
 //			pay.setProcessed(header.isProcessed());
 			pay.setProcessed(false);

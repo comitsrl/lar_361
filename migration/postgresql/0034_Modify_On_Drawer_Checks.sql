@@ -5,6 +5,37 @@ ADD COLUMN isbounced 			Char(1) NULL DEFAULT 'N'::bpchar,
 ADD COLUMN isdeposited 			Char(1) NULL DEFAULT 'N'::bpchar
 ;
 
+-- 25/08/2012 11:06:07 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000084,'TargetAccount','LAR','TargetAccount','TargetAccount',0,TO_TIMESTAMP('2012-08-25 11:06:07','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2012-08-25 11:06:07','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 25/08/2012 11:06:07 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000084 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 25/08/2012 11:07:28 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000085,'IsBounced','LAR','IsBounced','IsBounced',0,TO_TIMESTAMP('2012-08-25 11:07:28','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2012-08-25 11:07:28','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 25/08/2012 11:07:28 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000085 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 25/08/2012 11:07:51 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000086,'IsDeposited','LAR','IsDeposited','IsDeposited',0,TO_TIMESTAMP('2012-08-25 11:07:51','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2012-08-25 11:07:51','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 25/08/2012 11:07:51 ART
+-- Modify On Drawer Checks Window
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000086 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+
 -- 14/05/2012 8:37:08 ART
 -- Modify On Drawer Checks Window
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3000273,335,'LAR',0,'N','N','N','N',60,'N',10,'N',3000084,'N','Y','N','targetaccount','targetaccount',0,TO_TIMESTAMP('2012-05-14 08:37:08','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2012-05-14 08:37:08','YYYY-MM-DD HH24:MI:SS'),0)
@@ -514,4 +545,105 @@ UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_TIMESTAMP('2012-05-14 08:
 -- Modify On Drawer Checks Window
 UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_TIMESTAMP('2012-05-14 08:50:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=0 WHERE AD_Column_ID=3000275
 ;
+
+-- 10/09/2012 7:11:10 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Column SET IsSelectionColumn='Y',Updated=TO_TIMESTAMP('2012-09-10 07:11:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3873
+;
+
+-- 10/09/2012 7:11:24 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Column SET IsSelectionColumn='Y',Updated=TO_TIMESTAMP('2012-09-10 07:11:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=5303
+;
+
+-- 10/09/2012 7:16:09 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Tab SET WhereClause='IsReceipt=''Y'' AND TenderType=''K'' AND IsReconciled=''N'' AND Docstatus NOT IN (''DR'', ''VO'', ''RE'')',Updated=TO_TIMESTAMP('2012-09-10 07:16:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000018
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000592
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000590
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000894
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000591
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000898
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000595
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3000895
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3000896
+;
+
+-- 10/09/2012 7:17:16 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=3000897
+;
+
+-- 10/09/2012 7:19:44 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET DisplayLogic='@IsOnDrawer@=''N''',Updated=TO_TIMESTAMP('2012-09-10 07:19:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000895
+;
+
+-- 10/09/2012 7:20:59 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET DisplayLogic='@IsOnDrawer@=''N'' & @IsBounced@=''N''',Updated=TO_TIMESTAMP('2012-09-10 07:20:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000896
+;
+
+-- 10/09/2012 7:22:41 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET DisplayLogic='@IsOnDrawer@=''N'' & @IsDeposited@=''Y''',Updated=TO_TIMESTAMP('2012-09-10 07:22:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000897
+;
+
+-- 10/09/2012 7:23:35 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2012-09-10 07:23:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000896
+;
+
+-- 10/09/2012 7:28:12 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Table SET AD_Window_ID=3000009, IsHighVolume='Y',Updated=TO_TIMESTAMP('2012-09-10 07:28:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Table_ID=335
+;
+
+-- 10/09/2012 7:28:45 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Table SET AD_Window_ID=NULL,Updated=TO_TIMESTAMP('2012-09-10 07:28:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Table_ID=335
+;
+
+-- 10/09/2012 7:34:27 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_TIMESTAMP('2012-09-10 07:34:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000826
+;
+
+-- 10/09/2012 7:35:19 ART
+-- On drawer Checks, new columns and fields
+UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_TIMESTAMP('2012-09-10 07:35:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000824
+;
+
 

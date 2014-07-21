@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--ADempiere(r) 3.6.1LTS | P20111003 | LAR 1.0.0.RC1_2012-03-16 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-03-16 - Ergio(r) & Openbiz(r)-->
+<!--ADempiere(r) 3.6.1-P20111003 | LAR 1.0.1-e681d3f | Ergio 1.0.0-8e9d53f_2012-10-02 -Smart Suite ERP,CRM and SCM- (c) 1999-2010 ADempiere(r); Implementation: 2012-10-02 - Ergio(r)-->
 <!--<!DOCTYPE adempiereTrl PUBLIC "-//ComPiere, Inc.//DTD Adempiere Translation 1.0//EN" "http://www.adempiere.com/dtd/adempiereTrl.dtd">-->
 <adempiereTrl language="es_AR" table="AD_Message">
  <row id="101" trl="Y">
@@ -155,7 +155,7 @@
   <value column="MsgTip" original=""/>
  </row>
  <row id="139" trl="Y">
-  <value column="MsgText" original="Record cannot be changed">Registro no puede ser cambiado</value>
+  <value column="MsgText" original="Record cannot be changed">Registro no puede ser modificado. Ya se encuentra contabilizado.</value>
   <value column="MsgTip" original=""/>
  </row>
  <row id="140" trl="Y">
@@ -3706,11 +3706,11 @@ Un error ha ocurrido mientras se intentaba comunicación con el servidor. Por fa
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52128" trl="Y">
-  <value column="MsgText" original="Custom">Custom</value>
+  <value column="MsgText" original="Custom">Personalizado</value>
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52129" trl="Y">
-  <value column="MsgText" original="Custom Sales Report">Custom Sales Report</value>
+  <value column="MsgText" original="Custom Sales Report">Reporte de Ventas Personalizado</value>
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52130" trl="Y">
@@ -3726,7 +3726,7 @@ Un error ha ocurrido mientras se intentaba comunicación con el servidor. Por fa
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52133" trl="Y">
-  <value column="MsgText" original="Customer Returned Order">Customer Returned Order</value>
+  <value column="MsgText" original="Customer Returned Order">Orden devuelta por el Cliente</value>
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52134" trl="Y">
@@ -4704,7 +4704,7 @@ Esta Utilidad es para importar una lista de cheque sin fondos desde una archivo 
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52376" trl="Y">
-  <value column="MsgText" original="Payment Allocations History">Historico Alocacion Pagos</value>
+  <value column="MsgText" original="Payment Allocations History">Histórico Asignacion de Pagos</value>
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52377" trl="Y">
@@ -4868,7 +4868,7 @@ Esta Utilidad es para importar una lista de cheque sin fondos desde una archivo 
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52418" trl="Y">
-  <value column="MsgText" original="Unallocated Payments">Pagos sin Alocar</value>
+  <value column="MsgText" original="Unallocated Payments">Pagos sin Asignar</value>
   <value column="MsgTip" original=" "> </value>
  </row>
  <row id="52419" trl="Y">
@@ -5286,8 +5286,8 @@ Please contact administrator.</value>
   <value column="MsgTip" original="Show only orders with the same warehouse as selected in the material receipt">Show only orders with the same warehouse as selected in the material receipt</value>
  </row>
  <row id="53029" trl="Y">
-  <value column="MsgText" original="Choose the date of the most recent payment that you plan to allocate, but it must be in an open accounting period or it will not post.">Choose the date of the most recent payment that you plan to allocate, but it must be in an open accounting period or it will not post.</value>
-  <value column="MsgTip" original="Prefer most recent payment date, within open period.">Prefer most recent payment date, within open period.</value>
+  <value column="MsgText" original="Choose the date of the most recent payment that you plan to allocate, but it must be in an open accounting period or it will not post.">Elija la fecha del pago mas reciente que desee asignar, éste debe estar en un periodo contable abierto, de lo contrario, no se contabilizará.</value>
+  <value column="MsgTip" original="Prefer most recent payment date, within open period.">Seleccionar la fecha del pago más reciente, dentro de un periodo contable abierto.</value>
  </row>
  <row id="53031" trl="Y">
   <value column="MsgText" original="MRP Info">MRP Info</value>
@@ -5667,6 +5667,202 @@ Patrón de agendamiento crontab no válido - chequee la sintaxis
  </row>
  <row id="1000013" trl="Y">
   <value column="MsgText" original="Please fill city">Por favor complete Ciudad</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000014" trl="Y">
+  <value column="MsgText" original="Printing fiscal document">Imprimiendo documento fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000015" trl="Y">
+  <value column="MsgText" original="Void invoice">Anular factura</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000016" trl="Y">
+  <value column="MsgText" original="Voiding invoice">Anulando factura</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000017" trl="Y">
+  <value column="MsgText" original="Please wait">Por favor espere</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000018" trl="Y">
+  <value column="MsgText" original="Save POS Order changes?">¿Desea guardar los cambios de la orden PDV?</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000019" trl="Y">
+  <value column="MsgText" original="Attribute set instance saved">Conjuto de atributos de instancia guardados</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000020" trl="Y">
+  <value column="MsgText" original="Attribute set instance saved error">Error al guardar conjuto de atributos de instancia</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000021" trl="Y">
+  <value column="MsgText" original="Printing ticket">Imprimiendo factura fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000022" trl="Y">
+  <value column="MsgText" original="Cancel payment">Pago cancelado</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000023" trl="Y">
+  <value column="MsgText" original="Cashier">Cajero</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000024" trl="Y">
+  <value column="MsgText" original="Customer">Cliente</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000025" trl="Y">
+  <value column="MsgText" original="TOTAL">TOTAL</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000026" trl="Y">
+  <value column="MsgText" original="Reprint">Reimprimir</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000027" trl="Y">
+  <value column="MsgText" original="Payment terms">Términos de pago</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000028" trl="Y">
+  <value column="MsgText" original="Verification code">Código de verificación</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000029" trl="Y">
+  <value column="MsgText" original="Checking fiscal printer status">Verificando estado de impresora fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000030" trl="Y">
+  <value column="MsgText" original="Waiting fiscal printer connection">Esperando conexión con impresora fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000031" trl="Y">
+  <value column="MsgText" original="Fiscal printer busy">Impresora fiscal opcupada</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000032" trl="Y">
+  <value column="MsgText" original="Connecting fiscal printer">Conectando con impresora fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000033" trl="Y">
+  <value column="MsgText" original="Unexpected communication error">Error de comunicación inesperado</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000034" trl="Y">
+  <value column="MsgText" original="Fiscal printer status error">Error en el estado de la impresora fiscal.</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000035" trl="Y">
+  <value column="MsgText" original="Fiscal printer driver not found">No se encontró el controlador para la impresora fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000036" trl="Y">
+  <value column="MsgText" original="Fiscal printer driver instanciation error">Error en la instanciación del controlador para la impresora fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000037" trl="Y">
+  <value column="MsgText" original="Fiscal printer communication error">Error en la comunicación con la impresora fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000038" trl="Y">
+  <value column="MsgText" original="Fiscal printer busy timeout exhausted. Try again">Tiempo de espera por impresora fiscal ocupada agotado. Intente nuevamente</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000039" trl="Y">
+  <value column="MsgText" original="Fiscal printer idle">Impresora fiscal disponible</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000040" trl="Y">
+  <value column="MsgText" original="Fiscal printer control panel">Panel de control de impresoras fiscales</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000041" trl="Y">
+  <value column="MsgText" original="Fiscal printer connected">Impresora fiscal conectada</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000042" trl="Y">
+  <value column="MsgText" original="Print fiscal document error">Error al imprimir el documento fiscal.</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000043" trl="Y">
+  <value column="MsgText" original="Document validation error">Error al validar documento fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000044" trl="Y">
+  <value column="MsgText" original="Fiscal print ended ok">Impresión fiscal finalizada con éxito</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000045" trl="Y">
+  <value column="MsgText" original="Delete POS Order?">¿Desea eliminar la orden PDV?</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000046" trl="Y">
+  <value column="MsgText" original="Product without attribut set">Producto sin conjunto de atributos</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000047" trl="Y">
+  <value column="MsgText" original="Check">Cheque</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000048" trl="Y">
+  <value column="MsgText" original="Transfer">Transferencia</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000049" trl="Y">
+  <value column="MsgText" original="Others">Otro</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000050" trl="Y">
+  <value column="MsgText" original="Fiscal ticket already printed">Documento fiscal ya impreso</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000051" trl="Y">
+  <value column="MsgText" original="Missing mandatory fiscal closed data">Faltan datos para realizar el cierre fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000052" trl="Y">
+  <value column="MsgText" original="Document type is no fiscal">Tipo de documento no fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000053" trl="Y">
+  <value column="MsgText" original="Fiscal close error">Error en cierre fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000054" trl="Y">
+  <value column="MsgText" original="Executing fiscal commands">Ejecución de comandos fiscales</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000055" trl="Y">
+  <value column="MsgText" original="Fiscal printer in error state">La impresora fiscal se encuentra en estado de error</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000056" trl="Y">
+  <value column="MsgText" original="The fiscal printer was in error state after its last use. It is possible that the device has been recovered from this error and can continue printing. Attempt to continue printing?">La impresora fiscal quedó en estado de error luego de su última utilización. Es posible que el dispositivo se haya recuperado de este error y se pueda continuar con la impresión. Desea intentar continuar con la impresión?</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000057" trl="Y">
+  <value column="MsgText" original="Action completed ok">Acción completada correctamente</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000058" trl="Y">
+  <value column="MsgText" original="Action completed wrong">Acción completada incorrectamente</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000059" trl="Y">
+  <value column="MsgText" original="Fiscal close type">Tipo de cierre fiscal</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000060" trl="Y">
+  <value column="MsgText" original="Can not delete POS order">No se puedo eliminar la orden PDV</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000061" trl="Y">
+  <value column="MsgText" original="Payment not allowed">Pago no permitido</value>
+  <value column="MsgTip" original=""/>
+ </row>
+ <row id="1000062" trl="Y">
+  <value column="MsgText" original="Can not change invoice payment header">No se puede cambiar la factura de la cabezera de pagos</value>
   <value column="MsgTip" original=""/>
  </row>
 </adempiereTrl>
