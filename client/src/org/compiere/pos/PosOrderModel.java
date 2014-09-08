@@ -508,6 +508,7 @@ public class PosOrderModel extends MOrder {
 	void setPaidFromAccount()
 	{
 	    isPaidFromAccount = true;
+	    setPaymentRule(PAYMENTRULE_OnCredit);
 	    setC_PaymentTerm_ID(PAYMENTTERMS_Account);
 	    saveEx();
 	}
