@@ -261,7 +261,7 @@ import ar.com.ergio.util.LAR_Utils;
             log.info("Changing doctype for " + invoice);
             final MBPartner bp = new MBPartner(invoice.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
             int ad_Client_ID = Env.getAD_Client_ID(invoice.getCtx());
-            int ad_Org_ID = Env.getAD_Org_ID(invoice.getCtx());
+            int ad_Org_ID = invoice.getAD_Org_ID(); //Utiliza la Organización de la factura
             final MOrgInfo orgInfo = MOrgInfo.get(invoice.getCtx(), ad_Org_ID, invoice.get_TrxName());
             int lco_TaxPayerType_Vendor_ID = orgInfo.get_ValueAsInt("LCO_TaxPayerType_ID");
             int lco_TaxPayerType_Customer_ID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
