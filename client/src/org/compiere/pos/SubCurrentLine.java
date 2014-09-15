@@ -161,7 +161,6 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		f_cashPayment.setActionCommand("Payment");
 		add (f_cashPayment, "w 75!, h 50!, pushx, wrap");
 		f_cashPayment.setEnabled(false);
-		log.warning("boton pago (hash)="+ f_cashPayment.hashCode() + ".  isEnabled=" + f_cashPayment.isEnabled());
 
 		m_table = new PosTable();
 		CScrollPane scroll = new CScrollPane(m_table);
