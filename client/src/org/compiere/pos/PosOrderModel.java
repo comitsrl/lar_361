@@ -480,8 +480,8 @@ public class PosOrderModel extends MOrder {
 		payment.setAD_Org_ID(m_pos.getAD_Org_ID());
 		payment.setTenderType(tenderType);
 		payment.setC_Order_ID(getC_Order_ID());
-		//payment.setIsReceipt(true);
-		//payment.setC_BPartner_ID(getC_BPartner_ID());
+		payment.setIsReceipt(true);
+		payment.setC_BPartner_ID(getC_BPartner_ID());
 		payment.set_ValueOfColumn("LAR_PaymentHeader_ID", paymentHeader.getLAR_PaymentHeader_ID());
 		return payment;
 	}
@@ -508,6 +508,7 @@ public class PosOrderModel extends MOrder {
 	void setPaidFromAccount()
 	{
 	    isPaidFromAccount = true;
+	    setPaymentRule(PAYMENTRULE_OnCredit);
 	    setC_PaymentTerm_ID(PAYMENTTERMS_Account);
 	    saveEx();
 	}

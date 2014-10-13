@@ -472,15 +472,9 @@ import ar.com.ergio.util.LAR_Utils;
      {
          String msg = null;
          String nroIIBB = (bp.get_ValueAsString("DUNS")).replace("-", "").trim();
-         String sqlTipoIIBB = "SELECT value FROM lco_isic WHERE lco_isic_id = ?";
-         String tipoIIBB = DB.getSQLValueString(bp.get_TrxName(), sqlTipoIIBB, bp.get_ValueAsInt("LCO_ISIC_ID"));
-
-         if ((tipoIIBB == null)
-                 || (tipoIIBB.equals("D") && nroIIBB.length() != 8)
-                 || (tipoIIBB.equals("CM") && nroIIBB.length() != 10)) {
-
+         if (!LAR_Utils.validateIIBBNumber(nroIIBB, bp.get_ValueAsInt("LCO_ISIC_ID")))
              msg = "ERROR: número de IIBB invalido";
-         }
+
          return msg;
      }
 
