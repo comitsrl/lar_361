@@ -260,11 +260,7 @@ import ar.com.ergio.util.LAR_Utils;
         {
             log.info("Changing doctype for " + invoice);
             final MBPartner bp = new MBPartner(invoice.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
-            int ad_Client_ID = Env.getAD_Client_ID(invoice.getCtx());
             int ad_Org_ID = invoice.getAD_Org_ID(); //Utiliza la Organización de la factura
-            final MOrgInfo orgInfo = MOrgInfo.get(invoice.getCtx(), ad_Org_ID, invoice.get_TrxName());
-            int lco_TaxPayerType_Vendor_ID = orgInfo.get_ValueAsInt("LCO_TaxPayerType_ID");
-            int lco_TaxPayerType_Customer_ID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
             /*
              * @emmie - Siempre se recupera el ID del POS desde la factura, ya que el mismo o se
              *          asigna en las ventanas correspondientes, o se asigna en el contructor de
@@ -272,48 +268,10 @@ import ar.com.ergio.util.LAR_Utils;
              */
             int c_POS_ID = invoice.get_ValueAsInt("C_POS_ID");
 
-            // Check vendor taxpayertype
-            if (lco_TaxPayerType_Vendor_ID == 0) {
-                return "VendorTaxPayerTypeNotFound";
-            }
-            // Check customer taxpayertype
-            if (lco_TaxPayerType_Customer_ID == 0) {
-                return "CustomerTaxPayerTypeNotFound";
-            }
-            // Check posnumber
-            if (c_POS_ID == 0) {
-                return "PosConfigNotFound";
-            }
+            // @emmie @mzuniga Se abstrae la forma de recuperar el tipo de documento
+            final FindInvoiceDocType findDocType = new FindInvoiceDocType(bp, c_POS_ID, ad_Org_ID); 
+            final MDocType docType = findDocType.getDocType();
 
-            // Determines document letter to bill
-            // Vendor > AD_Org | Customer > BPartner
-            String sql = "SELECT L.LAR_DocumentLetter_ID"
-                       + "  FROM LAR_DocumentLetter L"
-                       + "  JOIN LAR_LetterRule R ON R.LAR_DocumentLetter_ID = L.LAR_DocumentLetter_ID"
-                       + " WHERE R.LCO_TaxPayerType_Vendor_ID=?"
-                       + "   AND R.LCO_TaxPayerType_Customer_ID=?";
-
-            int lar_DocumentLetter_ID = DB.getSQLValue(invoice.get_TrxName(), sql,
-                    lco_TaxPayerType_Vendor_ID, lco_TaxPayerType_Customer_ID);
-
-            // Check document letter config
-            if (lar_DocumentLetter_ID == 0) {
-                return "LetterRuleNotFount";
-            }
-
-            // Retrieve and asign proper doctype to invoice
-            StringBuilder whereClause = new StringBuilder("AD_Client_ID=?")
-                                                  .append(" AND AD_Org_ID=?")
-                                                  .append(" AND IsActive=?")
-                                                  .append(" AND DocBaseType=?")
-                                                  .append(" AND FiscalDocument=?") // 'F' > Invoice
-                                                  .append(" AND LAR_DocumentLetter_ID=?")
-                                                  .append(" AND C_POS_ID=?");
-            Object[] params = new Object[]{ad_Client_ID, ad_Org_ID, "Y", MDocType.DOCBASETYPE_ARInvoice,
-                                           LAR_MDocType.FISCALDOCUMENT_Invoice, lar_DocumentLetter_ID, c_POS_ID};
-            MDocType docType = new Query(invoice.getCtx(), MDocType.Table_Name, whereClause.toString(), invoice.get_TrxName())
-                    .setParameters(params)
-                    .firstOnly();
             // Check retrieved doctype
             if (docType == null) {
                 return "DocTypeNotFound";
@@ -331,7 +289,7 @@ import ar.com.ergio.util.LAR_Utils;
             if (dt.getDocSubTypeSO() != null && dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder))
                 invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
 
-            invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
+            invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", findDocType.getLAR_DocumentLetter_ID());
             if (!invoice.save()) {
                 return "CannotChangeInvoiceDocType";
             }
