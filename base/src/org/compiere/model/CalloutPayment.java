@@ -113,9 +113,12 @@ public class CalloutPayment extends CalloutEngine
 				BigDecimal InvoiceOpen = rs.getBigDecimal (3); // Set Invoice
 
 				// @emmie custom
-				if (InvoiceOpen != null)
+                // Avoid null pointer exception when not working on a Header
+				int LAR_PaymentHeader_ID = 0;
+				if (mTab.getValue("LAR_PaymentHeader_ID") != null)
+				    LAR_PaymentHeader_ID = (Integer) mTab.getValue("LAR_PaymentHeader_ID");
+				if (InvoiceOpen != null && LAR_PaymentHeader_ID !=  0)
 				{
-				    int LAR_PaymentHeader_ID = (Integer) mTab.getValue("LAR_PaymentHeader_ID");
 			        // Retrieve existing payments and writeoff for this invoice
 			        sql = "SELECT COALESCE(Sum(PayAmt),0) + COALESCE(Sum(WriteOffAmt),0)"
 			            + "  FROM C_Payment WHERE LAR_PaymentHeader_ID = ?";
@@ -363,6 +366,7 @@ public class CalloutPayment extends CalloutEngine
 //      } end german custom
 
         int C_Invoice_ID = Env.getContextAsInt (ctx, WindowNo, "C_Invoice_ID");
+        int LAR_PaymentHeader_ID = Env.getContextAsInt (ctx, WindowNo, "LAR_PaymentHeader_ID");
 		// New Payment
 		if (Env.getContextAsInt (ctx, WindowNo, "C_Payment_ID") == 0
 			&& Env.getContextAsInt (ctx, WindowNo, "C_BPartner_ID") == 0
@@ -494,82 +498,90 @@ public class CalloutPayment extends CalloutEngine
 			mTab.setValue ("OverUnderAmt", OverUnderAmt);
 		}
 		// No Invoice - Set Discount, Witeoff, Under/Over to 0
-		else if (C_Invoice_ID == 0)
+		else if (C_Invoice_ID == 0 && LAR_PaymentHeader_ID == 0)
 		{
-			if (Env.ZERO.compareTo (DiscountAmt) != 0)
-				mTab.setValue ("DiscountAmt", Env.ZERO);
-			if (Env.ZERO.compareTo (WriteOffAmt) != 0)
-				mTab.setValue ("WriteOffAmt", Env.ZERO);
-			if (Env.ZERO.compareTo (OverUnderAmt) != 0)
-				mTab.setValue ("OverUnderAmt", Env.ZERO);
-		} else {
-			boolean processed = mTab.getValueAsBoolean(MPayment.COLUMNNAME_Processed);
-			if (colName.equals ("PayAmt")
-				&& (!processed)
-				&& "Y".equals (Env.getContext (ctx, WindowNo, "IsOverUnderPayment")))
-			{
-				OverUnderAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (
-					DiscountAmt).subtract (WriteOffAmt);
-				mTab.setValue ("OverUnderAmt", OverUnderAmt);
-			}
-			else if (colName.equals ("PayAmt")
-				&& (!processed))
-			{
-				WriteOffAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (
-					DiscountAmt).subtract (OverUnderAmt);
-				mTab.setValue ("WriteOffAmt", WriteOffAmt);
-			}
-			else if (colName.equals ("IsOverUnderPayment")
-				&& (!processed))
-			{
-				boolean overUnderPaymentActive = "Y".equals (Env.getContext (ctx,
-					WindowNo, "IsOverUnderPayment"));
-				if (overUnderPaymentActive)
-				{
-					OverUnderAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (
-						DiscountAmt);
-					mTab.setValue ("WriteOffAmt", Env.ZERO);
-					mTab.setValue ("OverUnderAmt", OverUnderAmt);
-				}else{
-					WriteOffAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (
-						DiscountAmt);
-					mTab.setValue ("WriteOffAmt", WriteOffAmt);
-					mTab.setValue ("OverUnderAmt", Env.ZERO);
-				}
-			}
-			// Added Lines By Goodwill (02-03-2006)
-			// Reason: we must make the callout is called just when docstatus is
-			// draft
-			// Old Code : else // calculate PayAmt
-			// New Code :
-			else if ((!processed)) // calculate
-			// PayAmt
-			// End By Goodwill
-			{
-	            if(!ofpi)   //german custom
-	            {           //german custom
-	                PayAmt = InvoiceOpenAmt.subtract (DiscountAmt).subtract (
-	                    WriteOffAmt).subtract (OverUnderAmt);
-	                mTab.setValue ("PayAmt", PayAmt);
-	            }           //german custom
-	            //german custom
-	            //{
-	            else
+                if (Env.ZERO.compareTo (DiscountAmt) != 0)
+                    mTab.setValue ("DiscountAmt", Env.ZERO);
+                if (Env.ZERO.compareTo (WriteOffAmt) != 0)
+                    mTab.setValue ("WriteOffAmt", Env.ZERO);
+                if (Env.ZERO.compareTo (OverUnderAmt) != 0)
+                    mTab.setValue ("OverUnderAmt", Env.ZERO);
+		} else
+		  {
+          // Check if there are Invoices under the Header
+	      String sql = "SELECT (C_Invoice_ID)"
+	                 + "  FROM C_PaymentAllocate WHERE LAR_PaymentHeader_ID = ?";
+
+	      BigDecimal existsAmt = DB.getSQLValueBD(null, sql, LAR_PaymentHeader_ID);
+	      if (existsAmt == null && LAR_PaymentHeader_ID != 0 && mTab.getValueAsBoolean("EsRetencionSufrida"))
+	          return Msg.translate(Env.getCtx(), "No Existen Facturas cargadas para aplicar la retención");
+	      else
+	          {
+	            boolean processed = mTab.getValueAsBoolean(MPayment.COLUMNNAME_Processed);
+	            if (colName.equals ("PayAmt")
+	                    && (!processed)
+	                    && "Y".equals (Env.getContext (ctx, WindowNo, "IsOverUnderPayment")))
 	            {
-	                boolean overUnderPaymentActive = "Y".equals (Env.getContext (ctx,WindowNo, "IsOverUnderPayment"));
-	                if (overUnderPaymentActive)
-	                {
-	                    OverUnderAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (DiscountAmt).subtract(WriteOffAmt);
-	                    mTab.setValue ("OverUnderAmt", OverUnderAmt);
-	                }
-	                else
-	                {
-	                    WriteOffAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (DiscountAmt);
-	                    mTab.setValue ("WriteOffAmt", WriteOffAmt);
-	                    mTab.setValue ("OverUnderAmt", Env.ZERO);
-	                }
+	                OverUnderAmt = InvoiceOpenAmt.subtract (PayAmt).subtract (
+	                        DiscountAmt).subtract (WriteOffAmt);
+	                mTab.setValue ("OverUnderAmt", OverUnderAmt);
 	            }
-	            //} end german custom
+	            else if (colName.equals("PayAmt") && (!processed))
+                {
+                    WriteOffAmt = InvoiceOpenAmt.subtract(PayAmt).subtract(DiscountAmt)
+                            .subtract(OverUnderAmt);
+                    mTab.setValue("WriteOffAmt", WriteOffAmt);
+                } else if (colName.equals("IsOverUnderPayment") && (!processed))
+                {
+                    boolean overUnderPaymentActive = "Y".equals(Env.getContext(ctx, WindowNo,
+                            "IsOverUnderPayment"));
+                    if (overUnderPaymentActive)
+                    {
+                        OverUnderAmt = InvoiceOpenAmt.subtract(PayAmt).subtract(DiscountAmt);
+                        mTab.setValue("WriteOffAmt", Env.ZERO);
+                        mTab.setValue("OverUnderAmt", OverUnderAmt);
+                    } else
+                    {
+                        WriteOffAmt = InvoiceOpenAmt.subtract(PayAmt).subtract(DiscountAmt);
+                        mTab.setValue("WriteOffAmt", WriteOffAmt);
+                        mTab.setValue("OverUnderAmt", Env.ZERO);
+                    }
+                }
+                // Added Lines By Goodwill (02-03-2006)
+                // Reason: we must make the callout is called just when docstatus is
+                // draft
+                // Old Code : else // calculate PayAmt
+                // New Code :
+                else if ((!processed)) // calculate
+                // PayAmt
+                // End By Goodwill
+                {
+                    if (!ofpi) // german custom
+                    { // german custom
+                        PayAmt = InvoiceOpenAmt.subtract(DiscountAmt).subtract(WriteOffAmt)
+                                .subtract(OverUnderAmt);
+                        mTab.setValue("PayAmt", PayAmt);
+                    } // german custom
+                    // german custom
+                    // {
+                    else
+                    {
+                        boolean overUnderPaymentActive = "Y".equals(Env.getContext(ctx, WindowNo,
+                                "IsOverUnderPayment"));
+                        if (overUnderPaymentActive)
+                        {
+                            OverUnderAmt = InvoiceOpenAmt.subtract(PayAmt).subtract(DiscountAmt)
+                                    .subtract(WriteOffAmt);
+                            mTab.setValue("OverUnderAmt", OverUnderAmt);
+                        } else
+                        {
+                            WriteOffAmt = InvoiceOpenAmt.subtract(PayAmt).subtract(DiscountAmt);
+                            mTab.setValue("WriteOffAmt", WriteOffAmt);
+                            mTab.setValue("OverUnderAmt", Env.ZERO);
+                        }
+                    }
+                    // } end german custom
+                }
 			}
 		}
 		return "";

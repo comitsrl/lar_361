@@ -27,9 +27,13 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.apps.ADialog;
+import org.compiere.model.MAllocationHdr;
+import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
+import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.Query;
@@ -270,8 +274,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 	{
 	    //TODO - Analize genereate a cache for this payments
 		List<MPayment> pays = new ArrayList<MPayment>();
-
-        String sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ?";
+		// @mzuniga -  Se Agrega la condición de ordenamiento, recupera primero las retenciones
+        String sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ? ORDER BY EsRetencionSufrida DESC";
 
 		PreparedStatement pstmt;
 		pstmt = DB.prepareStatement(sql, trxName);
@@ -334,12 +338,42 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         if (m_processMsg != null)
             return DocAction.STATUS_Invalid;
 
-        //
-        // TODO - ACCIONES NECESARIAS DE PREPARACION DEL DOCUMENTO.
-        // (¿no necesitamos realizar ninguna acción de preparación
-        //   de las cabeceras de cobros/pagos?)
-        // Accioens: - cargar los cobros/pagos (y dejarlso en un variable de instancia?
-        //           - controlar que al menos existe un cobro/pago para la cabecera?
+        // Validar que la cabecera tiene al menos un cobro/pago
+        MPayment[] pays = getPayments(get_TrxName());
+        if (pays.length == 0)
+        {
+            ADialog.error(0, null, "El recibo no tiene cobros");
+            return DocAction.STATUS_Invalid;
+        }
+        // Recibos: Validar que la suma de los Pagos Retención sea >=
+        // que la suma del importe abierto (impago) de las facturas
+        // @begin
+        if (this.isReceipt())
+        {
+            BigDecimal sumPagosRet = Env.ZERO;
+            for (int p = 0; p < pays.length; p++)
+                if (pays[p].get_ValueAsBoolean("EsRetencionSufrida"))
+                    sumPagosRet = sumPagosRet.add(pays[p].getWriteOffAmt());
+            // Si existen Pagos Retención
+            if (!(sumPagosRet.compareTo(Env.ZERO) == 0))
+            {
+                MPaymentAllocate[] invoices = getInvoices(get_TrxName());
+                if (invoices.length != 0)
+                {
+                    BigDecimal sumaFacturas = Env.ZERO;
+                    for (int i = 0; i < invoices.length; i++)
+                        sumaFacturas = sumaFacturas.add(invoices[i].getAmount());
+
+                    if (sumaFacturas.compareTo(sumPagosRet) == -1)
+                    {
+                        ADialog.error(0, null,
+                                "El importe de las Retenciones es menor que el de las Facturas");
+                        return DocAction.STATUS_Invalid;
+                    }
+                }
+            }
+        }
+        // @end
 
         // Dispara la validación del documento
         m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
@@ -380,32 +414,99 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         }
 
         // Dispara la validación del documento
-        m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_COMPLETE);
+        m_processMsg = ModelValidationEngine.get().fireDocValidate(this,
+                ModelValidator.TIMING_BEFORE_COMPLETE);
         if (m_processMsg != null)
             return DocAction.STATUS_Invalid;
 
         MPayment[] pays = getPayments(get_TrxName());
-
-        for(int i = 0; i < pays.length; i++)
+        int p = 0;
+        for (; p < pays.length; p++)
         {
-            pays[i].setDateAcct(getDateTrx());
-            pays[i].setDateTrx(getCreated());
-            pays[i].setTrxType(MPayment.TRXTYPE_CreditPayment);
-            pays[i].processIt(ACTION_Complete);
-            pays[i].save(get_TrxName());
-            if (!DOCSTATUS_Completed.equals(pays[i].getDocStatus()))
+            pays[p].setDateAcct(getDateTrx());
+            pays[p].setDateTrx(getCreated());
+            pays[p].setTrxType(MPayment.TRXTYPE_CreditPayment);
+            pays[p].processIt(ACTION_Complete);
+            pays[p].save(get_TrxName());
+            if (!DOCSTATUS_Completed.equals(pays[p].getDocStatus()))
             {
-                m_processMsg = "@C_Payment_ID@: " + pays[i].getProcessMsg();
+                m_processMsg = "@C_Payment_ID@: " + pays[p].getProcessMsg();
                 return DocAction.STATUS_Invalid;
             }
         }
-
-        //setC_BankAccount_ID(C_BankAccount_ID);
+        // Asigna los cobros/pagos a las facturas
+        MPaymentAllocate[] invoices = getInvoices(get_TrxName());
+        if (invoices.length != 0)
+        {
+            p = 0;
+            // Asignaciones
+            for (int i = 0; (i < invoices.length && p < pays.length);)
+            {
+                MAllocationHdr alloc = new MAllocationHdr(getCtx(), false, getDateTrx(),
+                        getC_Currency_ID(), "Asignación Pagos a Facturas - Cabecera: "
+                                + getDocumentNo(), get_TrxName());
+                alloc.setAD_Org_ID(getAD_Org_ID());
+                if (!alloc.save())
+                {
+                    log.severe("La Cabecera de Asignacion no pudo crearse");
+                    return DocAction.STATUS_Invalid;
+                }
+                MPaymentAllocate pa = invoices[i];
+                MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
+                int comp = (pays[p].getPayAmt().add(pays[p].getWriteOffAmt()).subtract(pays[p]
+                        .getAllocatedAmt())).compareTo(invoice.getOpenAmt());
+                MAllocationLine aLine = null;
+                BigDecimal alineOUAmt = pa.getOverUnderAmt();
+                BigDecimal alineAmt;
+                // Evita Sobrepagos
+                if (!((comp != -1) && (comp != 0)))
+                {
+                    alineAmt = pays[p].getPayAmt().add(pays[p].getWriteOffAmt())
+                            .subtract(pays[p].getAllocatedAmt());
+                    alineOUAmt = invoice.getOpenAmt().subtract(alineAmt);
+                } else
+                    alineAmt = invoice.getOpenAmt();
+                if (isReceipt())
+                    aLine = new MAllocationLine(alloc, alineAmt, pa.getDiscountAmt(),
+                            pa.getWriteOffAmt(), alineOUAmt);
+                else
+                    aLine = new MAllocationLine(alloc, alineAmt.negate(), pa.getDiscountAmt()
+                            .negate(), pa.getWriteOffAmt().negate(), alineOUAmt.negate());
+                aLine.setDocInfo(pa.getC_BPartner_ID(), 0, pa.getC_Invoice_ID());
+                aLine.setPaymentInfo(pays[p].getC_Payment_ID(), 0);
+                if (!aLine.save(get_TrxName()))
+                    log.warning("Asignación: No se pudo guradar la línea");
+                else
+                {
+                    pa.setC_AllocationLine_ID(aLine.getC_AllocationLine_ID());
+                    pa.saveEx();
+                }
+                if (comp != -1)
+                {
+                    i = i + 1;
+                    if (comp == 0)
+                        p = p + 1;
+                } else
+                    p = p + 1;
+                // Cabecera de Asignación: Comienzo de WF
+                alloc.processIt(DocAction.ACTION_Complete);
+                alloc.save(get_TrxName());
+                m_processMsg = "@C_AllocationHdr_ID@: " + alloc.getDocumentNo();
+                log.fine(m_processMsg);
+            }
+        }
+        // setC_BankAccount_ID(C_BankAccount_ID);
         // Dispara la validación del documento
-        m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_COMPLETE);
+        m_processMsg = ModelValidationEngine.get().fireDocValidate(this,
+                ModelValidator.TIMING_AFTER_COMPLETE);
         if (m_processMsg != null)
             return DocAction.STATUS_Invalid;
-
+        // @mzuniga - Marca los cobros/pagos como asignados si corresponde
+        for (p = 0; p < pays.length; p++)
+        {
+            pays[p].testAllocation();
+            pays[p].saveEx();
+        }
         setDocStatus(ACTION_Complete);
         setDocAction(DOCACTION_Close);
         setProcessed(true);
@@ -556,4 +657,36 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             .append ("]");
         return sb.toString ();
 	}
+
+    public MPaymentAllocate[] getInvoices(String trxName)
+    {
+        // TODO - Analize genereate a cache for this invoices
+        List<MPaymentAllocate> invoices = new ArrayList<MPaymentAllocate>();
+
+        String sql = "SELECT * FROM C_PaymentAllocate WHERE LAR_PaymentHeader_ID = ?";
+
+        PreparedStatement pstmt;
+        pstmt = DB.prepareStatement(sql, trxName);
+        ResultSet rs = null;
+
+        try
+        {
+            pstmt.setInt(1, getLAR_PaymentHeader_ID());
+            rs = pstmt.executeQuery();
+            while (rs.next())
+                invoices.add(new MPaymentAllocate(getCtx(), rs, trxName));
+
+            return invoices.toArray(new MPaymentAllocate[invoices.size()]);
+        } catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+            return new MPaymentAllocate[0];
+        } finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+    } // getInvoices
+
 }	//	MLARPaymentHeader
