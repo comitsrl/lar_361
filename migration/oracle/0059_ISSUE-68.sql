@@ -442,6 +442,5 @@ UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Es Retención Sufrida',Updated=TO
 
 
 -- Registración de Script
-SELECT register_migration_script_lar('0050_BUG-23.sql','LAR_Leimat','');
-
-
+SELECT register_migration_script_lar('0059_ISSUE-68.sql','LAR','') FROM DUAL
+;
