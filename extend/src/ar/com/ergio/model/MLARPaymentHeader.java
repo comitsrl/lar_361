@@ -358,18 +358,15 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             if (!(sumPagosRet.compareTo(Env.ZERO) == 0))
             {
                 MPaymentAllocate[] invoices = getInvoices(get_TrxName());
-                if (invoices.length != 0)
-                {
-                    BigDecimal sumaFacturas = Env.ZERO;
-                    for (int i = 0; i < invoices.length; i++)
-                        sumaFacturas = sumaFacturas.add(invoices[i].getAmount());
+                BigDecimal sumaFacturas = Env.ZERO;
+                for (int i = 0; i < invoices.length; i++)
+                    sumaFacturas = sumaFacturas.add(invoices[i].getAmount());
 
-                    if (sumaFacturas.compareTo(sumPagosRet) == -1)
-                    {
-                        ADialog.error(0, null,
-                                "El importe de las Retenciones es menor que el de las Facturas");
-                        return DocAction.STATUS_Invalid;
-                    }
+                if (sumaFacturas.compareTo(sumPagosRet) == -1)
+                {
+                    ADialog.error(0, null,
+                            "El importe de las Retenciones es mayor que el de las Facturas");
+                    return DocAction.STATUS_Invalid;
                 }
             }
         }

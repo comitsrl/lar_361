@@ -36,6 +36,10 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
 	 * 
 	 */
 	private static final long serialVersionUID = 2894385378672375131L;
+    /** AP Credit Memo = APC */
+    public static final String DOCBASETYPE_APCreditMemo = "APC";
+    /** AR Credit Memo = ARC */
+    public static final String DOCBASETYPE_ARCreditMemo = "ARC";
 
 	/**
 	 * 	Get active Payment Allocation of Payment
@@ -157,6 +161,14 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
 			if (m_invoice != null)
 				setAD_Org_ID(m_invoice.getAD_Org_ID());
 		}
+        // Evita que se puedan agregar Notas de Crédito
+        MDocType docType = new MDocType(Env.getCtx(), m_invoice.getC_DocType_ID(), get_TrxName());
+        if (docType.getDocBaseType().equals(DOCBASETYPE_APCreditMemo)
+                || docType.getDocBaseType().equals(DOCBASETYPE_ARCreditMemo))
+        {
+            log.saveError("Error", "No está permitido ingresar Notas de Crédito");
+            return false;
+        }
 		
 		return true;
 	}	//	beforeSave
