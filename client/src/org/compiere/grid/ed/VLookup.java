@@ -53,6 +53,7 @@ import org.compiere.apps.FieldRecordInfo;
 import org.compiere.apps.search.Info;
 import org.compiere.apps.search.InfoBPartner;
 import org.compiere.apps.search.InfoFactory;
+import org.compiere.apps.search.InfoInvoice;
 import org.compiere.apps.search.InfoProduct;
 import org.compiere.model.GridField;
 import org.compiere.model.Lookup;
@@ -61,6 +62,7 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MProductPrice;
 import org.compiere.model.MQuery;
 import org.compiere.model.MRole;
@@ -902,6 +904,19 @@ public class VLookup extends JComponent
 			cancelled = ip.isCancelled();
 			result = ip.getSelectedKeys();
 		}
+		else if (col.equals("C_Invoice_ID"))
+        {
+            // Replace Value with name if no value exists
+            if (queryValue.length() == 0 && m_text.getText().length() > 0)
+                queryValue = m_text.getText();
+            int AD_Table_ID = MColumn.getTable_ID(Env.getCtx(), m_mField.getAD_Column_ID(), null);
+            multipleSelection = (MPaymentAllocate.Table_ID ==  AD_Table_ID);
+            InfoInvoice ii = new InfoInvoice(frame, true, m_lookup.getWindowNo(), queryValue,
+                    multipleSelection, whereClause);
+            ii.setVisible(true);
+            cancelled = ii.isCancelled();
+            result = ii.getSelectedKeys();
+        }
 		else	//	General Info
 		{
 			if (m_tableName == null)	//	sets table name & key column

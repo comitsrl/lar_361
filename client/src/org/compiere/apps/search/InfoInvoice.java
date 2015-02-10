@@ -17,11 +17,13 @@
 package org.compiere.apps.search;
 
 import java.awt.Frame;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+
 
 import org.adempiere.plaf.AdempierePLAF;
 import org.compiere.apps.ALayout;
@@ -67,7 +69,7 @@ public class InfoInvoice extends Info
 	 *  @param multiSelection multiple selections
 	 *  @param whereClause where clause
 	 */
-	protected InfoInvoice(Frame frame, boolean modal, int WindowNo, String value,
+	public InfoInvoice(Frame frame, boolean modal, int WindowNo, String value,
 		boolean multiSelection, String whereClause)
 	{
 		super (frame, modal, WindowNo, "i", "C_Invoice_ID", multiSelection, whereClause);
@@ -149,6 +151,9 @@ public class InfoInvoice extends Info
 		new Info_Column(Msg.translate(Env.getCtx(), "POReference"), "i.POReference", String.class),
 		new Info_Column("", "''", KeyNamePair.class, "i.C_InvoicePaySchedule_ID")
 	};
+    private static final int OPEN_AMT = 8;
+    private static final int SELECTION = 0;
+    private BigDecimal sumOpenAmt = Env.ZERO;
 	private static int INDEX_PAYSCHEDULE = s_invoiceLayout.length - 1;	//	last item
 
 	/**
@@ -431,5 +436,34 @@ public class InfoInvoice extends Info
 			Env.setContext(Env.getCtx(), p_WindowNo, Env.TAB_INFO, "C_InvoicePaySchedule_ID", String.valueOf(C_InvoicePaySchedule_ID));
 	}	//	saveSelectionDetail
 	
+	   /**************************************************************************
+     *  Mouse Clicked
+     *  @param e event
+     */
+	@Override
+    public void mouseClicked(MouseEvent e)
+    {
+        super.mouseClicked(e);
+        // @mzuniga Suma el importe abierto de los documentos
+        // seleccionados y los muestra en la línea de status
+        if (e.getClickCount() < 2 && p_table.getSelectedRow() != -1 && p_multiSelection)
+        {
+            int row = p_table.getSelectedRow();
+            String sel = p_table.getValueAt(row, SELECTION).toString();
+            int col = p_table.getSelectedColumn();
+            if (sel.contains("Selected=true") && col == SELECTION )
+            {
+                Object valor = p_table.getValueAt(row, OPEN_AMT);
+                sumOpenAmt = sumOpenAmt.add((BigDecimal) valor);
+                setStatusLine("Suma importe abierto seleccionado = " + sumOpenAmt, false);
+            }
+            else if (col == SELECTION)
+            {
+                Object valor = p_table.getValueAt(row, OPEN_AMT);
+                sumOpenAmt = sumOpenAmt.subtract((BigDecimal) valor);
+                setStatusLine("Suma importe abierto seleccionado = " + sumOpenAmt, false);
+            }
+        }
+    } // mouseClicked
 	
 }   //  InfoInvoice

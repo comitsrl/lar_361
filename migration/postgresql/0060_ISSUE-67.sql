@@ -1155,5 +1155,95 @@ UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3001630
 UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3001640
 ;
 
+-- 03/02/2015 12:36:46 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Total Facturas',Updated=TO_TIMESTAMP('2015-02-03 12:36:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001296 AND AD_Language='es_AR'
+;
+
+-- 03/02/2015 12:37:45 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Tab_Trl SET IsTranslated='Y',Name='Facturas a las cuales se asignarán los cobros.',Updated=TO_TIMESTAMP('2015-02-03 12:37:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000045 AND AD_Language='es_AR'
+;
+
+-- 03/02/2015 12:39:13 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field_Trl SET Description='Suma del importe a asignar de las facturas bajo el Recibo.',Updated=TO_TIMESTAMP('2015-02-03 12:39:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001296 AND AD_Language='es_AR'
+;
+
+-- 03/02/2015 12:41:12 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Tab_Trl SET Description='Facturas a las cuales se asignarán los cobros',Updated=TO_TIMESTAMP('2015-02-03 12:41:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000045 AND AD_Language='es_AR'
+;
+
+-- 03/02/2015 12:41:20 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Tab_Trl SET Name='Facturas',Updated=TO_TIMESTAMP('2015-02-03 12:41:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000045 AND AD_Language='es_AR'
+;
+
+-- 03/02/2015 12:45:03 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Es Retención Sufrida',Description='Indica si en el registro se cargará una retención.',Updated=TO_TIMESTAMP('2015-02-03 12:45:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001624 AND AD_Language='es_AR'
+;
+
+-- 07/02/2015 9:29:34 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3000602
+;
+
+-- 07/02/2015 9:30:19 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field SET IsReadOnly='Y', DisplayLogic=NULL,Updated=TO_TIMESTAMP('2015-02-07 09:30:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000602
+;
+
+-- 07/02/2015 9:31:41 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Column SET ColumnSQL=NULL,Updated=TO_TIMESTAMP('2015-02-07 09:31:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000264
+;
+
+-- 07/02/2015 9:33:08 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Column SET ColumnSQL='(SELECT COALESCE(Sum(Amount),0) FROM C_PaymentAllocate i WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = i.LAR_PaymentHeader_ID) -((SELECT COALESCE(Sum(PayAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID) + (SELECT COALESCE(Sum(WriteOffAmt),0) FROM C_Payment p WHERE  LAR_PaymentHeader.LAR_PaymentHeader_ID = p.LAR_PaymentHeader_ID))', IsUpdateable='N',Updated=TO_TIMESTAMP('2015-02-07 09:33:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000264
+;
+
+-- 07/02/2015 9:33:29 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field SET SeqNo=130,IsDisplayed='Y' WHERE AD_Field_ID=3000602
+;
+
+-- 07/02/2015 9:33:29 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3000269
+;
+
+-- 09/02/2015 8:26:58 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field SET IsCentrallyMaintained='N',Updated=TO_TIMESTAMP('2015-02-09 08:26:58','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001296
+;
+
+-- 09/02/2015 8:28:00 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Total Facturas',Description='Suma el total a pagar de las facturas bajo la cabecera',Help='Suma del importe impago de las facturas cargadas bajo la cabecera.',Updated=TO_TIMESTAMP('2015-02-09 08:28:00','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001296 AND AD_Language='es_AR'
+;
+
+-- 10/02/2015 9:38:28 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field SET IsCentrallyMaintained='N',Updated=TO_TIMESTAMP('2015-02-10 09:38:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001624
+;
+
+-- 10/02/2015 9:39:09 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Es Retención Sufrida',Description='Indica si el documento es una Retención Sufrida',Updated=TO_TIMESTAMP('2015-02-10 09:39:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001624 AND AD_Language='es_AR'
+;
+
+-- 10/02/2015 9:38:28 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field SET IsCentrallyMaintained='N',Updated=TO_DATE('2015-02-10 09:38:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001624
+;
+
+-- 10/02/2015 9:39:09 ART
+-- ISSUE#67 Agrega Tab Facturas a Ventana Recibo (Varios Cobros)
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Es Retención Sufrida',Description='Indica si el documento es una Retención Sufrida',Updated=TO_DATE('2015-02-10 09:39:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001624 AND AD_Language='es_AR'
+;
+
 -- Registración de Script
-SELECT register_migration_script_lar('0059_ISSUE-67.sql','LAR','');
+SELECT register_migration_script_lar('0060_ISSUE-67.sql','LAR','');
