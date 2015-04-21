@@ -45,6 +45,8 @@ public abstract class Document implements Serializable{
 	public static final String DT_CREDIT_NOTE = "CN";
 	/** Tipo de documento: Nota de Débito */
 	public static final String DT_DEBIT_NOTE = "DN";
+    /** Tipo de documento: Remito */
+	public static final String DT_SHIPMENT = "S";
 	
 	// Letras de documento.
 	/** Letra de Documento: A */

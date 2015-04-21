@@ -90,6 +90,11 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 	private CButton			f_bSearch;
 	private int orderLineId = 0;
 
+    /*
+     * @emmie - Botón como variable de instancia privada
+     *          para evitar efectos laterales indeseados
+     */
+    private CButton  f_cashPayment;
 
 	/**	The Product					*/
 	private MProduct		m_product = null;
@@ -405,14 +410,20 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
                     // set the proper trx name to order
                     p_posPanel.m_order.set_TrxName(trxName);
 
-                    if (!PosPayment.pay(p_posPanel)) {
-                        String msg = Msg.translate(p_ctx, "PosPaymentCancel");
-                        throw new AdempierePOSException(msg);
-                    }
+                    // Si se procesa un remito por el POS no es necesario
+                    // definir medio de pago ni crear los mismos
+                    if (!p_pos.get_ValueAsBoolean("IsShipment"))
+                    {
 
-                    if (!p_posPanel.m_order.processPayments()) {
-                        String msg = Msg.translate(p_ctx, "FailProcessPaymentHeader");
-                        throw new AdempierePOSException(msg);
+                        if (!PosPayment.pay(p_posPanel)) {
+                            String msg = Msg.translate(p_ctx, "PosPaymentCancel");
+                            throw new AdempierePOSException(msg);
+                        }
+
+                        if (!p_posPanel.m_order.processPayments()) {
+                            String msg = Msg.translate(p_ctx, "FailProcessPaymentHeader");
+                            throw new AdempierePOSException(msg);
+                        }
                     }
 
                     if (!p_posPanel.m_order.isProcessed() && !p_posPanel.m_order.processOrder()) {
@@ -584,7 +595,8 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 
 		if ( p_posPanel.m_order == null )
 		{
-			p_posPanel.m_order = PosOrderModel.createOrder(p_posPanel.p_pos, p_posPanel.f_order.getBPartner(),trxName);
+			p_posPanel.m_order = PosOrderModel.createOrder(p_posPanel.p_pos, p_posPanel.f_order.getBPartner(),
+			        p_posPanel.f_order.getC_BPartner_Location_ID(), trxName);
 		}
 
 		MOrderLine line = null;
@@ -793,6 +805,15 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			setPrice(ol.getPriceActual());
 			setQty(ol.getQtyOrdered());
 		}
+	}
+
+	/**
+	 * Recupera el botón de pago
+	 * @return botón de pago
+	 */
+	CButton getPaymentButton()
+	{
+	    return f_cashPayment;
 	}
 
 	/**

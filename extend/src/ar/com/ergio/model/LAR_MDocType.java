@@ -142,6 +142,8 @@ public class LAR_MDocType extends MDocType
     public static final String FISCALDOCUMENT_DebitNote = "D";
     /** Credit Note = C */
     public static final String FISCALDOCUMENT_CreditNote = "C";
+    /** Shipment = R */
+    public static final String FISCALDOCUMENT_Shipment = "R";
 
     public String getFiscalDocument()
     {

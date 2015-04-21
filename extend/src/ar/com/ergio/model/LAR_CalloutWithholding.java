@@ -49,7 +49,12 @@ public class LAR_CalloutWithholding extends CalloutEngine
         }
         // if writeoffamt is greater tha zero, TT is always cash
         if (writeOffAmt == null || writeOffAmt.compareTo(Env.ZERO) > 0)
+        {
             mTab.setValue("TenderType", MPayment.TENDERTYPE_Cash);
+
+            //mTab.setValue("OverUnderAmt", mTab.getValue("PayAmt"));
+            mTab.setValue("PayAmt", Env.ZERO);
+        }
 
         return "";
     }

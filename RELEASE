@@ -1,3 +1,59 @@
+v1.2.4 - 2015-02-10
+===================
+
+Scripts de migración incorporados desde el último release oficial:
+
+  - 0059_ISSUE-68.sql
+  - 0060_ISSUE-67.sql
+
+v1.2.3 - 2014-10-13
+===================
+
+No se incorporaron nuevos scripts.
+
+v1.2.2 - 2014-07-21
+===================
+
+Scripts de migración incorporados desde el último release oficial
+
+  -- 
+
+v1.2.1 - 2014-07-03
+===================
+
+Scripts de migración incorporados desde el último release oficial
+
+  - 0058_ISSUE-65.sql
+
+v1.2.0 - 2014-07-01
+===================
+
+Scripts de migración incorporados desde el último release oficial
+
+  - 0038_Fix_for_payments_and_recipts_windows.sql
+  - 0039_Add_Org_Table_Reference.sql
+  - 0040_Minor_Change_to_Receipt_Invoices_Window.sql
+  - 0041_Add_C_DocType_Logged_Org_Validation.sql
+  - 0042_C_Invoice_not_updateable_on_LAR_PaymentHeader.sql
+  - 0043_Withholding_On_Receipts.sql
+  - 0044_Fix_And_Improve_CreditNotes_Behavior.sql
+  - 0045_InvoiceGen_login_Org_and_POS_validation.sql
+  - 0046_C_Invoice_Updateable_On_LAR_PaymentHeader.sql
+  - 0047_NOT_Allow_Copy_For_Columns_in_C_Invoice.sql
+  - 0048_Improve_LAR_PaymentHeader.sql
+  - 0049_Add_PosOrderVoiding_Process.sql
+  - 0050_ISSUE-51.sql
+  - 0051_ISSUE-57.sql
+  - 0052_ISSUE-17_C_Payment_V.sql
+  - 0052_ISSUE-17_PaymentAvailable_LAR.sql
+  - 0052_ISSUE-17.sql
+  - 0053_ISSUE-60_Mejorar_Registro_Scripts_Migracion.sql
+  - 0054_Configuracion_de_Cajas_en_los_Pagos.sql
+  - 0055_Agrega_Campo_VCDescription_Ventana_DiarioCG.sql
+  - 0056_ISSUE-64.sql
+  - 0057_ISSUE-65.sql
+
+
 2012-06-15
 ==========
 

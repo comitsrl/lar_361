@@ -35,6 +35,8 @@ import org.compiere.model.I_C_OrderLine;
 import org.compiere.model.I_M_InOutLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInOut;
+import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLocation;
@@ -44,8 +46,10 @@ import org.compiere.model.MPayment;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MProduct;
 import org.compiere.model.MRefList;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.model.PO;
+import org.compiere.pos.PosOrderModel;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -62,6 +66,7 @@ import ar.com.ergio.print.fiscal.document.DiscountLine;
 import ar.com.ergio.print.fiscal.document.Document;
 import ar.com.ergio.print.fiscal.document.DocumentLine;
 import ar.com.ergio.print.fiscal.document.Invoice;
+import ar.com.ergio.print.fiscal.document.DNFH;
 import ar.com.ergio.print.fiscal.document.NonFiscalDocument;
 import ar.com.ergio.print.fiscal.document.Payment;
 import ar.com.ergio.print.fiscal.document.PerceptionLine;
@@ -86,7 +91,8 @@ public class FiscalDocumentPrint {
 	public enum Actions {
 		ACTION_PRINT_DOCUMENT,
 		ACTION_FISCAL_CLOSE,
-		ACTION_PRINT_DELIVERY_DOCUMENT
+		ACTION_PRINT_DELIVERY_DOCUMENT,
+		ACTION_PRINT_SHIPMENT_DOCUMENT
 	}
 
 	/** Cantidad maxima de esperas cuando la impresora se encuentra en estado ocupado */
@@ -304,6 +310,9 @@ public class FiscalDocumentPrint {
         case ACTION_PRINT_DELIVERY_DOCUMENT:
             doPrintDeliveryDocument(args);
             break;
+        case ACTION_PRINT_SHIPMENT_DOCUMENT:
+            doPrintShipmentDocument(args);
+            break;
         default:
             throw new Exception(Msg.getMsg(ctx, "InvalidAction"));
         }
@@ -486,6 +495,47 @@ public class FiscalDocumentPrint {
 		return execute(Actions.ACTION_PRINT_DELIVERY_DOCUMENT, new Object[] {order});
 	}
 
+    /**
+     * Imprime un remito en un documento no-fiscal homologado (DFNH) que en sus
+     * líneas contiene el detalle de cada artículo que tiene dicho remito.
+     *
+     * @param shipment remito a imprimir
+     * @return <code>true</code> en caso de que el documento se haya emitido
+     *         correctamente, <code>false</false> en caso contrario.
+     */
+    public boolean printShipmentDocument(final PO shipment)
+    {
+        return execute(Actions.ACTION_PRINT_SHIPMENT_DOCUMENT, new Object[] { shipment });
+    }
+
+    /**
+     * Realiza la impresión del documento no fiscal homologado
+     * con los artículos a entregar.
+     *
+     * @param args Arreglo con los argumentos requeridos por esta funcionalidad
+     * @throws Exception
+     */
+    private void doPrintShipmentDocument(final Object[] args) throws Exception
+    {
+        final MInOut shipment = (MInOut) args[0];
+        // Informa el inicio de la impresión
+        fireActionStarted(FiscalDocumentListener.AC_PRINT_DOCUMENT);
+        // Crea el documento no fiscal y luego obtiene todas las líneas del pedido
+        final DNFH dnfh = createDNFH(shipment);
+
+        // Se asigna el documento OXP.
+        setOxpDocument(shipment);
+
+        // Manda a imprimir el documento en la impresora fiscal
+        getFiscalPrinter().printDocument(dnfh);
+
+        // Guarda la info devuelta por el controlador
+        saveShipmentData(shipment, dnfh);
+
+        // Se dispara el evento de impresión finalizada.
+        fireDocumentPrintEndedOk();
+    }
+
 	/**
 	 * Realiza la impresión del documento no fiscal con los artículos a entregar.
 	 * @param args Arreglo con los argumentos requeridos por esta funcionalidad
@@ -654,6 +704,65 @@ public class FiscalDocumentPrint {
 		return creditNote;
 	}
 
+	private DNFH createDNFH(final MInOut shipment)
+	{
+	    final DNFH dnfh = new DNFH();
+	    // Se asigna el cliente.
+	    Customer customer = null;
+        final MBPartner bPartner = new MBPartner(Env.getCtx(), shipment.getC_BPartner_ID(), null);
+        if (bPartner != null)
+        {
+            customer = new Customer();
+            // Se asigna la categoría de iva del cliente.
+            LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bPartner);
+            customer.setIvaResponsibility(traduceTaxPayerType(taxPayerType.getName()));
+            // Se asigna el nombre del cliente a partir del BPartner.
+            customer.setName(bPartner.getName());
+            // Se asigna el domicilio.
+            final MLocation location = MLocation.getBPLocation(Env.getCtx(), shipment.getC_BPartner_Location_ID(), getTrxName());
+            customer.setLocation(location.toString());
+
+            // Se identifica al cliente con el C.U.I.T. configurado en el Bpartner.
+            if (bPartner.getTaxID() != null && !bPartner.getTaxID().trim().equals(""))
+            {
+                customer.setIdentificationType(Customer.CUIT);
+                customer.setIdentificationNumber(bPartner.getTaxID());
+            }
+        }
+        dnfh.setCustomer(customer);
+
+        // Recupera el numero de copias a imprimir
+        int numberOfCopies = MSysConfig.getIntValue("LAR_Remitos_NumeroDeCopias", 0, Env.getAD_Client_ID(shipment.getCtx()));
+        dnfh.setNumberOfCopies(numberOfCopies);
+
+        // Cargar las lineas del remito
+        loadDNFHLines(shipment, dnfh);
+
+        return dnfh;
+	} // createDNFH
+
+	private void saveShipmentData(final MInOut shipment, final DNFH dnfh)
+	{
+	    // Recupera el Nro de POS (tamaño 4)
+	    final MDocType dt = new MDocType(shipment.getCtx(), shipment.getC_DocType_ID(), shipment.get_TrxName());
+	    final String sql = "SELECT PosNumber FROM C_POS WHERE C_POS_ID=?";
+	    int nroPOS = DB.getSQLValue(shipment.get_TrxName(), sql, dt.get_ValueAsInt("C_POS_ID"));
+
+	    String pos = Integer.valueOf(nroPOS).toString();
+	    pos = ("0000" + pos).substring(pos.length(), pos.length() + 4);
+
+	    // Recupera el Nro de Remito generado (tamaño 8)
+	    String documentNo = dnfh.getDocumentNo();
+	    documentNo = ("00000000" + documentNo).substring(documentNo.length(), documentNo.length() + 8);
+
+	    // Marca el remito como impreso en controlador y registra info recuperada
+	    documentNo = "R" + pos + documentNo;
+	    shipment.set_ValueOfColumn("FiscalReceiptNumber", dnfh.getDocumentNo());
+	    shipment.set_ValueOfColumn("IsFiscalPrinted", true);
+	    shipment.setDocumentNo(documentNo);
+	    shipment.saveEx();
+	}
+
 	/**
 	 * Impresión de una factura.
 	 *
@@ -668,9 +777,33 @@ public class FiscalDocumentPrint {
 	// TODO - Redesign this method
 	private void printInvoice(final Document document) throws FiscalPrinterStatusError, FiscalPrinterIOException, Exception {
 		MInvoice mInvoice = (MInvoice)getOxpDocument();
-		log.info("FIXME - Document: " + document + " mInvoice: " + mInvoice);
 		// Se valida el documento OXP.
 		validateOxpDocument(mInvoice);
+
+        /*
+         * @emmie inicio - Impresion remito En caso de tratarse de una venta en
+         * ctacte, se imprime el remito asocido a la factura ANTES de imprimir
+         * la factura
+         */
+        final MOrder order = new MOrder(ctx, mInvoice.getC_Order_ID(), getTrxName());
+        boolean printShipment = order.get_ValueAsBoolean("PrintShipment");
+        if (printShipment && mInvoice.getC_PaymentTerm_ID() == PosOrderModel.PAYMENTTERMS_Account)
+        {
+            // Se recupera el remito de la primera linea (se asume 1 remito)
+            int m_InOut_ID = mInvoice.getLines()[0].getM_InOutLine().getM_InOut_ID();
+            final MInOut shipment = new MInOut(ctx, m_InOut_ID, getTrxName());
+
+            // Crea el documento no-fiscal y luego obtiene todas las líneas del pedido
+            final DNFH dnfh = createDNFH(shipment);
+            // Se le indica al documento no-fiscal que no finalice la impresión
+            dnfh.setPrintEnded(false);
+            // Manda a imprimir el documento en la impresora fiscal
+            getFiscalPrinter().printDocument(dnfh);
+            // Guarda la info devuelta por el controlador
+            saveShipmentData(shipment, dnfh);
+        }
+        // @emmie fin - Impresion remito
+
 		// Se crea la factura imprimible en caso que no exista como parámetro
 		final Invoice printeableInvoice;
 		if (document != null) {
@@ -793,6 +926,58 @@ public class FiscalDocumentPrint {
 	    }
 	}
 
+    /**
+     * Carga las lineas del remito en el documento no-fiscal
+     * homologado a imprimir
+     *
+     * @param shipment remito del cual se obtienen la lineas
+     * @param document documento no-fiscal a imprimir
+     */
+	private void loadDNFHLines(final MInOut shipment, final Document document)
+	{
+	    for (MInOutLine line : shipment.getLines())
+	    {
+	        final DocumentLine docLine = new DocumentLine();
+	        docLine.setLineNumber(line.getLine());
+	        docLine.setQuantity(line.getQtyEntered());
+
+	        final MProduct product = MProduct.get(ctx, line.getM_Product_ID());
+
+	        // Usar los campos Identificador para definir el contenido de la linea
+	        if (fiscalPrinter.isOnPrintUseProductReference())
+	        {
+	            docLine.setDescription(genDescriptionFromIdentifiers(product));
+	        }
+	        // Usar alguna de las combinaciones CLAVE NOMBRE - NOMBRE CLAVE - NOMBRE - CLAVE
+	        else
+	        {
+	            String description = " ";
+	            String name = " ";
+	            String value = " ";
+	            // recuperar clave y nombre del articulo
+	            if (product.getValue() != null &&  product.getValue().trim().isEmpty())
+	                value = product.getValue().trim();
+	            if (product.getName() != null && !product.getName().trim().isEmpty())
+	                name = product.getName().trim();
+
+	            // armar la descripción según la selección
+	            if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Name.equals(fiscalPrinter.getOnPrintProductFormat()))
+	                description = name;
+	            if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_Value.equals(fiscalPrinter.getOnPrintProductFormat()))
+	                description = value;
+	            if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_NameValue.equals(fiscalPrinter.getOnPrintProductFormat()))
+	                description = name + " " + value;
+	            if (MFiscalPrinter.ONPRINTPRODUCTFORMAT_ValueName.equals(fiscalPrinter.getOnPrintProductFormat()))
+	                description = value + " " + name;
+
+                docLine.setDescription(description);
+                // Se agrega la línea al documento.
+                document.addLine(docLine);
+
+	        }
+	    }
+	} // loadDNFHLines
+
 	/**
 	 * Carga las líneas que se encuentran en el documento de ADempiere hacia
 	 * el documento de impresoras fiscales.
@@ -874,12 +1059,17 @@ public class FiscalDocumentPrint {
             }
 		}
 		// TODO - Improve this behavior
-		BigDecimal amt = ((BigDecimal) mInvoice.get_Value("WithHoldingAmt")).negate(); // LAR perception are negative
+		BigDecimal amt = mInvoice.get_Value("WithHoldingAmt") == null ? Env.ZERO :
+		    ((BigDecimal) mInvoice.get_Value("WithHoldingAmt")).negate(); // LAR perception are negative
 		if (amt.compareTo(BigDecimal.ZERO) > 0)
 		{
 		    // TODO Corregir el calculo del porcentaje de percepción.
 		    // BigDecimal rate = amt.divide(totalLineAmt, 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
-		    String desc = "Percepci\u00f3n IIBB"; //String.format("Percepci\u00f3n", rate);
+            // @mzuniga - Se agrega la provincia correspondiente a la Percepción en la descripción de la línea
+            String sql = "SELECT l.RegionName FROM AD_OrgInfo oi JOIN C_Location l ON oi.C_Location_ID = l.C_Location_ID WHERE oi.AD_Org_ID=?";
+            String prov = DB.getSQLValueString(mInvoice.get_TrxName(), sql, (Integer) mInvoice.get_Value("AD_Org_ID"));
+            String desc = "Perc. IIBB " + prov; //String.format("Percepci\u00f3n", rate);
+            // @mzuniga
 		    PerceptionLine perceptionLine = new PerceptionLine(desc, amt, null);
 		    document.setPerceptionLine(perceptionLine);
 		}
@@ -1537,6 +1727,9 @@ public class FiscalDocumentPrint {
 		errorMsg = null;
 		printerDocType = null;
 		//fiscalPrinter = null;
+
+		if (getOxpDocument() instanceof MInOut)
+		    return printShipmentDocument(getOxpDocument());
 
 		return printDocument(getOxpDocument());
 	}

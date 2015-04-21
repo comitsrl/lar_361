@@ -49,6 +49,7 @@ import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
+import org.compiere.pos.PosOrderModel;
 import org.compiere.process.DocAction;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -102,6 +103,7 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addModelChange(MPayment.Table_Name, this);
          engine.addModelChange(MInvoice.Table_Name, this);
          engine.addModelChange(MLARPaymentHeader.Table_Name, this);
+         engine.addModelChange(MInOut.Table_Name, this);
 
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
@@ -109,6 +111,7 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addDocValidate(MInOut.Table_Name, this);
          engine.addDocValidate(MAllocationHdr.Table_Name, this);
          engine.addDocValidate(MLARPaymentHeader.Table_Name, this);
+         engine.addDocValidate(PosOrderModel.Table_Name, this);
      }   //  initialize
 
     /**
@@ -168,6 +171,15 @@ import ar.com.ergio.util.LAR_Utils;
             if (msg != null) {
                 return msg;
             }
+        }
+
+        // Sincroniza el nro de documento de los remitos "manuales"
+        // con el asignado en su orden de remito origen
+        if (po.get_TableName().equals(MInOut.Table_Name) && type == TYPE_BEFORE_NEW)
+        {
+            msg = changeShipmentDocumentNo((MInOut) po);
+            if (msg != null)
+                return msg;
         }
 
         // Elimina la retención sobre los pagos cuando se modifica el header
@@ -286,7 +298,8 @@ import ar.com.ergio.util.LAR_Utils;
              */
             MOrder order = new MOrder(invoice.getCtx(), invoice.getC_Order_ID(), invoice.get_TrxName());
             MDocType dt = new MDocType(invoice.getCtx(), order.getC_DocTypeTarget_ID(), invoice.get_TrxName());
-            if (dt.getDocSubTypeSO() != null && dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder))
+            // Marcos Zúñiga : Se consideran también las Warehouse Orders (WP)
+            if (dt.getDocSubTypeSO() != null && (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder) || dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder)))
                 invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
 
             invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", findDocType.getLAR_DocumentLetter_ID());
@@ -314,7 +327,9 @@ import ar.com.ergio.util.LAR_Utils;
         // Antes de preparar la cabecera, se verifica si la retención fue generada
         if (po.get_TableName().equals(MLARPaymentHeader.Table_Name) && timing == TIMING_BEFORE_PREPARE)
         {
-            preparePaymentWithholding((MLARPaymentHeader) po);
+            msg = preparePaymentWithholding((MLARPaymentHeader) po);
+            if (msg != null)
+                return msg;
         }
 
         // Después de completar crear el certificado de retención y actualiza las fechas
@@ -354,18 +369,32 @@ import ar.com.ergio.util.LAR_Utils;
                  return msg;
              }
          }
-         // Determine documentNo for voided shipments
+         // Después de anular remitos, procesa numeración y ordenes relacionea
          if (po.get_TableName().equals(MInOut.Table_Name) &&
                  (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
          {
+             // Cambia el documentNo del remito
              msg = changeVoidDocumentNo(po);
-             if (msg != null) {
+             if (msg != null)
                  return msg;
-             }
+
+             msg = voidWarehouseOrder((MInOut) po);
+             if (msg != null)
+                 return msg;
+
          }
          // before posting the allocation - post the payment withholdings vs writeoff amount
          if (po.get_TableName().equals(MAllocationHdr.Table_Name) && timing == TIMING_BEFORE_POST) {
              msg = accountingForWithholdingOnPayment((MAllocationHdr) po);
+             if (msg != null)
+                 return msg;
+         }
+
+         // Antes de completar una Orde de Venta (POS), cambia el tipo de documento de la
+         // misma, dependiendo el medio de pago
+         if (po.get_TableName().equals(MOrder.Table_Name) && timing == TIMING_BEFORE_PREPARE)
+         {
+             msg = changeShipmentDocType((MOrder) po);
              if (msg != null)
                  return msg;
          }
@@ -401,15 +430,9 @@ import ar.com.ergio.util.LAR_Utils;
      {
          String msg = null;
          String nroIIBB = (bp.get_ValueAsString("DUNS")).replace("-", "").trim();
-         String sqlTipoIIBB = "SELECT value FROM lco_isic WHERE lco_isic_id = ?";
-         String tipoIIBB = DB.getSQLValueString(bp.get_TrxName(), sqlTipoIIBB, bp.get_ValueAsInt("LCO_ISIC_ID"));
-
-         if ((tipoIIBB == null)
-                 || (tipoIIBB.equals("D") && nroIIBB.length() != 8)
-                 || (tipoIIBB.equals("CM") && nroIIBB.length() != 10)) {
-
+         if (!LAR_Utils.validateIIBBNumber(nroIIBB, bp.get_ValueAsInt("LCO_ISIC_ID")))
              msg = "ERROR: número de IIBB invalido";
-         }
+
          return msg;
      }
 
@@ -901,11 +924,8 @@ import ar.com.ergio.util.LAR_Utils;
             if (AD_Sequence_ID != 0)
                 seq = new MSequence(ctx, AD_Sequence_ID, shipment.get_TrxName());
 
-            // Redefine los nros de documento y las descripciones de los remitos
-            int sufix = shipment.getM_InOut_ID() * shipment.getDocumentNo().hashCode();
-
-            String revDocumentNo = "R-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
-            String voidDocumentNo = "A-" + shipment.getDocumentNo() + "-" + Math.abs(sufix);
+            String revDocumentNo = "Rev-" + shipment.getDocumentNo() + "-" + shipment.getM_InOut_ID();
+            String voidDocumentNo = "Anu-" + shipment.getDocumentNo() + "-" + shipment.getM_InOut_ID();
             revShipment.setDocumentNo(revDocumentNo);
             revShipment.setDescription("(" + voidDocumentNo + "<-)");
             shipment.setDocumentNo(voidDocumentNo);
@@ -929,6 +949,32 @@ import ar.com.ergio.util.LAR_Utils;
 
         return null;
     }
+
+    /**
+     * Anula la orden de remito relacionada con el remito dado
+     * (siempre y cuando el mismo tenga una orden de este tipo como origen)
+     *
+     * @param shipment remito a procesar
+     * @return mensaje de error o null
+     */
+    private String voidWarehouseOrder(final MInOut shipment)
+    {
+        final String trx = shipment.get_TrxName();
+        final MOrder order = new MOrder(Env.getCtx(), shipment.getC_Order_ID(), trx);
+        final MDocType dt = new MDocType(Env.getCtx(), order.getC_DocType_ID(), trx);
+
+        // Controla si el tipo de la orden es "Orden de Remito"
+        // ("Orden de Remito" <=> "Warehouse Order")
+        if (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
+        {
+            if (order.processIt(MOrder.ACTION_Void))
+                order.saveEx(trx);
+            else
+                return "Falló la anulaci\u00f3n de la Orden de Remito";
+        }
+
+        return null;
+    } // voidWarehouseOrder
 
     /**
      * Process acounting for withholding on sales payment
@@ -1022,6 +1068,56 @@ import ar.com.ergio.util.LAR_Utils;
         }
         return null;
     }
+
+    /**
+     * Si la orden POS fue pagada en CtaCte, se realiza el cambio del tipo de
+     * documento de la misma:
+     * <ul>
+     *   <li>Contado -> PosOrderModel.C_DocTypeTarget_ID sin cambios
+     *   <li>CtaCte -> PosOrderModel.C_DocTypeTarget_ID = MPOS.C_DocTypeOnCredit_ID
+     * </ul>
+     *
+     * @param order Orden a procesar
+     * @return null si el proceso fue correcto; caso contrario el mensaje de error
+     */
+    private String changeShipmentDocType(final MOrder order)
+    {
+        // Solo se procesan las ordenes POS
+        if (order instanceof PosOrderModel)
+        {
+            final MPOS pos = new MPOS(order.getCtx(), order.getC_POS_ID(), order.get_TrxName());
+
+            if (!pos.get_ValueAsBoolean("IsShipment") &&
+                order.get_ValueAsBoolean("PrintShipment") &&
+                order.getC_PaymentTerm_ID() == PosOrderModel.PAYMENTTERMS_Account)
+            {
+                // Se cambia el tipo de orden para la operación en ctacte
+                order.setC_DocTypeTarget_ID(pos.get_ValueAsInt("C_DocTypeOnCredit_ID"));
+                if (!order.save())
+                    return "No se pudo realizar el cambio de tipo de documento de la orden pdv";
+            }
+        }
+        return null;
+    } // changeShipmentDocType
+
+    /**
+     * Cambia la numeración <i>solo</i> a los remitos que no estan
+     * configurados para ser impresos en el controlador fiscal
+     *
+     * @param shipment remito
+     * @return null si el cambio de nro fue correcto; caso contrario,
+     *         mensaje de error
+     */
+    private String changeShipmentDocumentNo(final MInOut shipment)
+    {
+        if (!LAR_Utils.isFiscalDocType(shipment.getC_DocType_ID()))
+        {
+            final MOrder order = new MOrder(shipment.getCtx(), shipment.getC_Order_ID(), shipment.get_TrxName());
+            shipment.setDocumentNo(order.getDocumentNo());
+        }
+
+        return null;
+    } // changeShipmentDocumentNo
 
 	 	/**
 	 	 * german wagner

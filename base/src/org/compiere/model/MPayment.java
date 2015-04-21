@@ -671,9 +671,10 @@ public final class MPayment extends X_C_Payment
 		if (getC_Charge_ID() != 0 && !get_ValueAsBoolean("EsRetencionIIBB"))
 		// end @emmie
 			return getPayAmt();
-		//
-		String sql = "SELECT SUM(currencyConvert(al.Amount,"
-				+ "ah.C_Currency_ID, p.C_Currency_ID,ah.DateTrx,p.C_ConversionType_ID, al.AD_Client_ID,al.AD_Org_ID)) "
+		// @mzuniga Se agrega COALESCE (Evita Null Pointer Exception cuando
+		// no se trabaja en una Cabecera)
+		String sql = "SELECT COALESCE(SUM(currencyConvert(al.Amount,"
+				+ "ah.C_Currency_ID, p.C_Currency_ID,ah.DateTrx,p.C_ConversionType_ID, al.AD_Client_ID,al.AD_Org_ID)), 0) "
 			+ "FROM C_AllocationLine al"
 			+ " INNER JOIN C_AllocationHdr ah ON (al.C_AllocationHdr_ID=ah.C_AllocationHdr_ID) "
 			+ " INNER JOIN C_Payment p ON (al.C_Payment_ID=p.C_Payment_ID) "
@@ -730,6 +731,16 @@ public final class MPayment extends X_C_Payment
 		BigDecimal total = getPayAmt();
 		if (!isReceipt())
 			total = total.negate();
+        // @mzuniga - Si es retención, marca el pago como asignado
+        if (get_ValueAsBoolean("EsRetencionSufrida"))
+        {
+            setIsAllocated(true);
+            log.fine("Allocated=" + true
+                    + " (" + alloc + "= Es Retención Sufrida )");
+                return true;
+        }
+        else
+        {
 		boolean test = total.compareTo(alloc) == 0;
 		boolean change = test != isAllocated();
 		if (change)
@@ -737,6 +748,7 @@ public final class MPayment extends X_C_Payment
 		log.fine("Allocated=" + test 
 			+ " (" + alloc + "=" + total + ")");
 		return change;
+        }
 	}	//	testAllocation
 	
 	/**

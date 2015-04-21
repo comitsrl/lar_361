@@ -147,9 +147,12 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
         // @m_zuniga custom
 		if (MSysConfig.getBooleanValue("ERGIO_InvoiceGen_Login_ORG_and_PDV", true, Env.getAD_Client_ID(Env.getCtx())))
 		{
-			MLookup orgL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 2163 /*C_Order.AD_Org_ID */, DisplayType.Table, Env.getLanguage(Env.getCtx()), "AD_Org_ID", 3000023 /* AD_Org Login*/,
-			false,""); // @marcos - Muestra unicamente la Organización con que se logueó
-			fOrg = new VLookup ("AD_Org_ID", true, false, true, orgL); //@m_zuniga Campo obligatorio para evitar selección vacía y que se muestren órdenes de otras organizaciones
+            // Muestra unicamente la Organización con que se logueó
+            MLookup orgL = MLookupFactory.get(Env.getCtx(), m_WindowNo, 2163 /* C_Order.AD_Org_ID */, DisplayType.TableDir,
+                    Env.getLanguage(Env.getCtx()), "AD_Org_ID", 3000023 /* AD_Org Login */, false, "");
+
+            // Campo obligatorio para evitar selección vacía y que se muestren órdenes de otras organizaciones
+            fOrg = new VLookup("AD_Org_ID", true, false, true, orgL);
 		}
         // @m_zuniga custom
 		else
@@ -162,7 +165,7 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		
 		MLookup docActionL = MLookupFactory.get(Env.getCtx(), m_WindowNo, 3494 /* C_Invoice.DocStatus */, 
 				DisplayType.List, Env.getLanguage(Env.getCtx()), "DocAction", 135 /* _Document Action */,
-				false, "AD_Ref_List.Value IN ('PR')"); // @emmie - remove 'CO' for fiscal printing
+				false, "AD_Ref_List.Value IN ('CO','PR')");
 		docAction = new VLookup("DocAction", true, false, true,docActionL);
 		//  lDcoACtion.setText((Msg.translate(Env.getCtx(), "DocAction")););
 		docAction.addVetoableChangeListener(this);
@@ -182,8 +185,10 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
         // @m_zuniga custom
         if (MSysConfig.getBooleanValue("ERGIO_InvoiceGen_Login_ORG_and_PDV", true, Env.getAD_Client_ID(Env.getCtx())))
         {
-            MLookup posL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 3000068 /* C_Invoice.C_POS_ID */, DisplayType.Table, Env.getLanguage(Env.getCtx()), "C_POS_ID", 3000022 /* LAR_POS_ID Login Org*/,
-			false,""); // @m_zuniga - Muestra PDVS disponibles para la Organización con que se logueó
+            // Muestra PDVS disponibles para la Organización con que se logueó
+            MLookup posL = MLookupFactory.get (Env.getCtx(), m_WindowNo, 3000068 /* C_Invoice.C_POS_ID */, DisplayType.Table,
+                    Env.getLanguage(Env.getCtx()), "C_POS_ID", 3000022 /* LAR_POS_ID Login Org*/, false,"");
+
             fPOS = new VLookup ("C_POS_ID", true, false, true, posL);
         }
         // @m_zuniga custom

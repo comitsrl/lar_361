@@ -16,43 +16,54 @@
  *****************************************************************************/
 package ar.com.ergio.process;
 
-import org.compiere.model.MInvoice;
+import org.compiere.model.MDocType;
+import org.compiere.model.MInOut;
+import org.compiere.model.MOrder;
 import org.compiere.process.SvrProcess;
 
-import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
+import ar.com.ergio.print.fiscal.view.ShipmentFiscalDocumentPrintManager;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
- * Print fiscal ticket for an invoice
+ * Impresión fiscal de un remito (documento no fiscal)
  *
  * @author Emiliano Pereyra - http://www.ergio.com.ar
  *
  */
-public class InvoiceFiscalPrinting extends SvrProcess
+public class ShipmentFiscalPrinting extends SvrProcess
 {
-    /** Current invoice id */
-    private int p_C_Invoice_ID;
+    /** Current shipment id */
+    private int p_C_Order_ID;
     /** Process result message */
     private String m_ResultMsg = "";
-    /** Current invoice model object */
-    private MInvoice invoice;
+    /** Current shipment model object */
+    private MOrder order;
 
     @Override
     protected void prepare()
     {
-        p_C_Invoice_ID = getRecord_ID();
-        invoice = new MInvoice(getCtx(), p_C_Invoice_ID, get_TrxName());
+        p_C_Order_ID = getRecord_ID();
+        order = new MOrder(getCtx(), p_C_Order_ID, get_TrxName());
     }
 
     @Override
     protected String doIt() throws Exception
     {
-        log.info(String.format("Processing invoice %s", invoice));
-        // Check if invoice exists and has proper doctype
-        if (invoice != null && LAR_Utils.isFiscalDocType(invoice.getC_DocType_ID()))
+        log.info(String.format("Procesando orden %s", order));
+
+        // Determina si la orden es de remito para continuar con el proceso
+        final MDocType dtTarget = new MDocType(getCtx(), order.getC_DocTypeTarget_ID(), get_TrxName());
+        if (dtTarget.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
         {
-            final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(invoice);
-            manager.print();
+            final MInOut shipment = order.getShipments()[0];
+
+            // Verifica si el remito existe y si el mismo el de tipo fiscal
+            // para imprimir o no el mismo en el controlador fiscal
+            if (shipment != null && LAR_Utils.isFiscalDocType(shipment.getC_DocType_ID()))
+            {
+                final ShipmentFiscalDocumentPrintManager process = new ShipmentFiscalDocumentPrintManager(shipment);
+                process.print();
+            }
         }
         return m_ResultMsg;
     }

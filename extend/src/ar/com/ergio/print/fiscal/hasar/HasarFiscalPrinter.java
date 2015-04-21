@@ -32,6 +32,7 @@ import ar.com.ergio.print.fiscal.document.DiscountLine;
 import ar.com.ergio.print.fiscal.document.Document;
 import ar.com.ergio.print.fiscal.document.DocumentLine;
 import ar.com.ergio.print.fiscal.document.Invoice;
+import ar.com.ergio.print.fiscal.document.DNFH;
 import ar.com.ergio.print.fiscal.document.NonFiscalDocument;
 import ar.com.ergio.print.fiscal.document.Payment;
 import ar.com.ergio.print.fiscal.document.PerceptionLine;
@@ -895,6 +896,61 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		}
 	}
 
+    public void printDocument(final DNFH dnfh) throws FiscalPrinterStatusError,
+            FiscalPrinterIOException, DocumentException
+    {
+        final Customer customer = dnfh.getCustomer();
+        FiscalPacket response;
+        // Se valida la nota de crédito.
+        dnfh.validate();
+        try {
+            setCancelAllowed(false);
+
+            //////////////////////////////////////////////////////////////
+            // Se setean los datos del comprador.
+            // Comando: @SetCustomerData
+            loadCustomerData(customer);
+
+            //////////////////////////////////////////////////////////////
+            // Se abre un documento no fiscal homologado.
+            // Comando: @OpenDNFH
+            execute(cmdOpenDNFH(
+                    traduceDocumentType(Document.DT_SHIPMENT, dnfh.getLetter()), // no tiene letra
+                    "x"
+            ));
+            setLastDocumentNo("");
+            setCancelAllowed(true);
+            setDocumentOpened(true);
+
+            //////////////////////////////////////////////////////////////
+            // Se cargan los ítems del remito emitido.
+            // Comando: @PrintEmbarkItem
+            loadDocumentEmbarkLineItems(dnfh);
+
+
+            //////////////////////////////////////////////////////////////
+            // Se cierra el comprobante no fiscal homologado.
+            // Comando: @CloseDNFH
+            response = execute(cmdCloseDNFH(dnfh.getNumberOfCopies()));
+            setDocumentOpened(false);
+            setCancelAllowed(false);
+            // Se obtiene el número del remito emitido.
+            setLastDocumentNo(response.getString(3));
+            dnfh.setDocumentNo(getLastDocumentNo());
+
+            // El documento no-fiscal indica al manejador de eventos
+            // si tiene que finalizar la impresión o no
+            if (dnfh.isPrintEnded())
+                firePrintEnded();
+
+        } catch (FiscalPrinterIOException e) {
+            // Si ocurrió algún error se intenta cancelar el documento
+            // actual y se relanza la excepción.
+            cancelCurrentDocument();
+            throw e;
+        }
+    }
+
 	public void printDocument(DebitNote debitNote) throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException {
 		Customer customer = debitNote.getCustomer();
 		FiscalPacket response;
@@ -1098,6 +1154,7 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 			documentTypes.put(Document.DT_DEBIT_NOTE + Document.DOC_LETTER_A, "D");
 			documentTypes.put(Document.DT_DEBIT_NOTE + Document.DOC_LETTER_B, "E");
 			documentTypes.put(Document.DT_DEBIT_NOTE + Document.DOC_LETTER_C, "E");
+			documentTypes.put(Document.DT_SHIPMENT, "r");
 		}
 		return documentTypes;
 	}
@@ -1179,6 +1236,25 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 	}
 
 	/**
+	 * Ejecuta los comandos para cargar las líneas de item del remito
+	 * (documento no-fiscal homologado) en la impresora fiscal.
+	 */
+    private void loadDocumentEmbarkLineItems(Document document) throws FiscalPrinterStatusError,
+            FiscalPrinterIOException
+    {
+	    // Se cargan los ítems del documento.
+	    // Comando: @cmdPrintEmbarkItem
+	    for (DocumentLine item : document.getLines())
+	    {
+	        execute(cmdPrintEmbarkItem(
+	                item.getDescription(),
+	                item.getQuantity(),
+	                null)
+	        );
+	    }
+	}
+
+    /**
 	 * Ejecuta los comandos necesarios para cargar las líneas de item
 	 * del documento en la impresora fiscal.
 	 */
