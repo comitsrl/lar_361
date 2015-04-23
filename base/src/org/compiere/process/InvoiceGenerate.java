@@ -47,7 +47,7 @@ import ar.com.ergio.util.LAR_Utils;
 
 /**
  *	Generate Invoices
- *
+ *	
  *  @author Jorg Janke
  *  @version $Id: InvoiceGenerate.java,v 1.2 2006/07/30 00:51:01 jjanke Exp $
  */
@@ -82,7 +82,7 @@ public class InvoiceGenerate extends SvrProcess
 	private int			m_line = 0;
 	/**	Business Partner		*/
 	private MBPartner	m_bp = null;
-
+	
 	/**
 	 *  Prepare - e.g., get Parameters.
 	 */
@@ -169,13 +169,13 @@ public class InvoiceGenerate extends SvrProcess
 				+ "ORDER BY M_Warehouse_ID, PriorityRule, C_BPartner_ID, Bill_Location_ID, C_Order_ID";
 		}
 	//	sql += " FOR UPDATE";
-
+		
 		PreparedStatement pstmt = null;
 		try
 		{
 			pstmt = DB.prepareStatement (sql, get_TrxName());
 			int index = 1;
-			if (p_Selection)
+			if (p_Selection) 
 			{
 				pstmt.setInt(index, getAD_PInstance_ID());
 			}
@@ -195,11 +195,11 @@ public class InvoiceGenerate extends SvrProcess
 		}
 		return generate(pstmt);
 	}	//	doIt
-
-
+	
+	
 	/**
 	 * 	Generate Shipments
-	 * 	@param pstmt order query
+	 * 	@param pstmt order query 
 	 *	@return info
 	 */
 	private String generate (PreparedStatement pstmt)
@@ -210,14 +210,14 @@ public class InvoiceGenerate extends SvrProcess
 			while (rs.next ())
 			{
 				MOrder order = new MOrder (getCtx(), rs, get_TrxName());
-
+				
 				//	New Invoice Location
-				if (!p_ConsolidateDocument
-					|| (m_invoice != null
+				if (!p_ConsolidateDocument 
+					|| (m_invoice != null 
 					&& m_invoice.getC_BPartner_Location_ID() != order.getBill_Location_ID()) )
 					completeInvoice();
 				boolean completeOrder = MOrder.INVOICERULE_AfterOrderDelivered.equals(order.getInvoiceRule());
-
+				
 				//	Schedule After Delivery
 				boolean doInvoice = false;
 				if (MOrder.INVOICERULE_CustomerScheduleAfterDelivery.equals(order.getInvoiceRule()))
@@ -238,7 +238,7 @@ public class InvoiceGenerate extends SvrProcess
 							continue;
 					}
 				}	//	Schedule
-
+				
 				//	After Delivery
 				if (doInvoice || MOrder.INVOICERULE_AfterDelivery.equals(order.getInvoiceRule()))
 				{
@@ -246,7 +246,7 @@ public class InvoiceGenerate extends SvrProcess
 					for (int i = 0; i < shipments.length; i++)
 					{
 						MInOut ship = shipments[i];
-						if (!ship.isComplete()		//	ignore incomplete or reversals
+						if (!ship.isComplete()		//	ignore incomplete or reversals 
 							|| ship.getDocStatus().equals(MInOut.DOCSTATUS_Reversed))
 							continue;
 						MInOutLine[] shipLines = ship.getLines(false);
@@ -274,7 +274,7 @@ public class InvoiceGenerate extends SvrProcess
 						//BigDecimal notInvoicedShipment = oLine.getQtyDelivered().subtract(oLine.getQtyInvoiced()); @emmie
 						//
 						boolean fullyDelivered = oLine.getQtyOrdered().compareTo(oLine.getQtyDelivered()) == 0;
-
+					
 						//	Complete Order
 						if (completeOrder && !fullyDelivered)
 						{
@@ -297,16 +297,16 @@ public class InvoiceGenerate extends SvrProcess
 						}
 						else
 						{
-							log.fine("Failed: " + order.getInvoiceRule()
+							log.fine("Failed: " + order.getInvoiceRule() 
 								+ " - ToInvoice=" + toInvoice + " - " + oLine);
-							addLog("Failed: " + order.getInvoiceRule()
+							addLog("Failed: " + order.getInvoiceRule() 
 								+ " - ToInvoice=" + toInvoice + " - " + oLine);
 						}
 					}	//	for all order lines
 					if (MOrder.INVOICERULE_Immediate.equals(order.getInvoiceRule()))
 						m_line += 1000;
 				}
-
+				
 				//	Complete Order successful
 				if (completeOrder && MOrder.INVOICERULE_AfterOrderDelivered.equals(order.getInvoiceRule()))
 				{
@@ -314,7 +314,7 @@ public class InvoiceGenerate extends SvrProcess
 					for (int i = 0; i < shipments.length; i++)
 					{
 						MInOut ship = shipments[i];
-						if (!ship.isComplete()		//	ignore incomplete or reversals
+						if (!ship.isComplete()		//	ignore incomplete or reversals 
 							|| ship.getDocStatus().equals(MInOut.DOCSTATUS_Reversed))
 							continue;
 						MInOutLine[] shipLines = ship.getLines(false);
@@ -351,9 +351,9 @@ public class InvoiceGenerate extends SvrProcess
 		completeInvoice();
 		return "@Created@ = " + m_created;
 	}	//	generate
-
-
-
+	
+	
+	
 	/**************************************************************************
 	 * 	Create Invoice Line from Order Line
 	 *	@param order order
@@ -361,7 +361,7 @@ public class InvoiceGenerate extends SvrProcess
 	 *	@param qtyInvoiced qty
 	 *	@param qtyEntered qty
 	 */
-	private void createLine (MOrder order, MOrderLine orderLine,
+	private void createLine (MOrder order, MOrderLine orderLine, 
 		BigDecimal qtyInvoiced, BigDecimal qtyEntered)
 	{
 		if (m_invoice == null)
@@ -373,7 +373,7 @@ public class InvoiceGenerate extends SvrProcess
 			if (!m_invoice.save())
 				throw new IllegalStateException("Could not create Invoice (o)");
 		}
-		//
+		//	
 		MInvoiceLine line = new MInvoiceLine (m_invoice);
 		line.setOrderLine(orderLine);
 		line.setQtyInvoiced(qtyInvoiced);
@@ -402,13 +402,13 @@ public class InvoiceGenerate extends SvrProcess
 				throw new IllegalStateException("Could not create Invoice (s)");
 		}
 		//	Create Shipment Comment Line
-		if (m_ship == null
+		if (m_ship == null 
 			|| m_ship.getM_InOut_ID() != ship.getM_InOut_ID())
 		{
 			MDocType dt = MDocType.get(getCtx(), ship.getC_DocType_ID());
 			if (m_bp == null || m_bp.getC_BPartner_ID() != ship.getC_BPartner_ID())
 				m_bp = new MBPartner (getCtx(), ship.getC_BPartner_ID(), get_TrxName());
-
+			
 			//	Reference: Delivery: 12345 - 12.12.12
 			MClient client = MClient.get(getCtx(), order.getAD_Client_ID ());
 			String AD_Language = client.getAD_Language();
@@ -416,10 +416,10 @@ public class InvoiceGenerate extends SvrProcess
 				AD_Language = m_bp.getAD_Language();
 			if (AD_Language == null)
 				AD_Language = Language.getBaseAD_Language();
-			java.text.SimpleDateFormat format = DisplayType.getDateFormat
+			java.text.SimpleDateFormat format = DisplayType.getDateFormat 
 				(DisplayType.Date, Language.getLanguage(AD_Language));
 			String reference = dt.getPrintName(m_bp.getAD_Language())
-				+ ": " + ship.getDocumentNo()
+				+ ": " + ship.getDocumentNo() 
 				+ " - " + format.format(ship.getMovementDate());
 			m_ship = ship;
 			//
@@ -441,7 +441,7 @@ public class InvoiceGenerate extends SvrProcess
 					throw new IllegalStateException("Could not create Invoice Comment Line 2 (sh)");
 			}
 		}
-		//
+		//	
 		MInvoiceLine line = new MInvoiceLine (m_invoice);
 		line.setShipLine(sLine);
 		if (sLine.sameOrderLineUOM())
@@ -456,11 +456,11 @@ public class InvoiceGenerate extends SvrProcess
 		sLine.setIsInvoiced(true);
 		if (!sLine.save())
 			throw new IllegalStateException("Could not update Shipment Line");
-
+		
 		log.fine(line.toString());
 	}	//	createLine
 
-
+	
 	/**
 	 * 	Complete Invoice
 	 */
@@ -488,7 +488,7 @@ public class InvoiceGenerate extends SvrProcess
 						percent = igt.divide(ogt, 10, BigDecimal.ROUND_HALF_UP);
 					MCurrency cur = MCurrency.get(order.getCtx(), order.getC_Currency_ID());
 					int scale = cur.getStdPrecision();
-
+				
 					for (MOrderPaySchedule ops : opss) {
 						MInvoicePaySchedule ips = new MInvoicePaySchedule(getCtx(), 0, get_TrxName());
 						PO.copyValues(ops, ips);
@@ -508,11 +508,13 @@ public class InvoiceGenerate extends SvrProcess
 					m_invoice.saveEx();
 				}
 			}
-
+			
 			if (!m_invoice.processIt(p_docAction))
 			{
 				log.warning("completeInvoice - failed: " + m_invoice);
 				addLog("completeInvoice - failed: " + m_invoice); // Elaine 2008/11/25
+				throw new IllegalStateException("Invoice Process Failed: " + m_invoice + " - " + m_invoice.getProcessMsg());
+				
 			}
 			// @emmie custom - impresion fiscal en caso de que la operación sea CO (completar)
 			//                 y la factura sea fiscal
@@ -536,5 +538,5 @@ public class InvoiceGenerate extends SvrProcess
 		m_ship = null;
 		m_line = 0;
 	}	//	completeInvoice
-
+	
 }	//	InvoiceGenerate

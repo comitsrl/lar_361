@@ -63,7 +63,7 @@ import org.compiere.util.Util;
  *  </code>
  *  @author     Jorg Janke
  *  @version    $Id: MiniTable.java,v 1.3 2006/07/30 00:51:28 jjanke Exp $
- *
+ * 
  * @author Teo Sarca, SC ARHIPAC SERVICE SRL
  * 				<li>BF [ 1891082 ] NPE on MiniTable when you hide some columns
  * 				<li>FR [ 1974299 ] Add MiniTable.getSelectedKeys method
@@ -76,9 +76,9 @@ import org.compiere.util.Util;
 public class MiniTable extends CTable implements IMiniTable
 {
 	/**
-	 *
+	 * 
 	 */
-	private static final long serialVersionUID = 2853772547464132497L;
+	private static final long serialVersionUID = 281959800766140642L;
 
 	/**
 	 *  Default Constructor
@@ -123,9 +123,9 @@ public class MiniTable extends CTable implements IMiniTable
 	}
 
 	/**
-	 * Gets the swing column of given index. No index checking
+	 * Gets the swing column of given index. No index checking 
 	 * is done.
-	 *
+	 * 
 	 * @param col
 	 * @return
 	 */
@@ -139,7 +139,7 @@ public class MiniTable extends CTable implements IMiniTable
 	public int getColumnCount() {
 		return(getColumnModel().getColumnCount());
 	}
-
+	
 	/**
 	 *	Size Columns.
 	 *  Uses Mimimum Column Size
@@ -148,7 +148,7 @@ public class MiniTable extends CTable implements IMiniTable
 	{
 		if ( !autoResize  )
 			return;
-
+		
 		long start = System.currentTimeMillis();
 		//
 		final int SLACK = 8;		//	making sure it fits in a column
@@ -245,7 +245,7 @@ public class MiniTable extends CTable implements IMiniTable
 			m_readWriteColumn.add(new Integer(column));
 	}   //  setColumnReadOnly
 
-
+	
 	/**************************************************************************
 	 *  Prepare Table and return SQL
 	 *
@@ -256,7 +256,7 @@ public class MiniTable extends CTable implements IMiniTable
 	 *  @param tableName table name
 	 *  @return SQL
 	 */
-	public String prepareTable(ColumnInfo[] layout,
+	public String prepareTable(ColumnInfo[] layout, 
 		String from, String where, boolean multiSelection, String tableName)
 	{
 		m_layout = layout;
@@ -290,12 +290,12 @@ public class MiniTable extends CTable implements IMiniTable
 
 		//  Table Selection
 		setRowSelectionAllowed(true);
-
+		
 		//	org.compiere.apps.form.VMatch.dynInit calls routine for initial init only
 		if (from.length() == 0)
 			return sql.toString();
 		//
-		String finalSQL = MRole.getDefault().addAccessSQL(sql.toString(),
+		String finalSQL = MRole.getDefault().addAccessSQL(sql.toString(), 
 			tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
 		log.finest(finalSQL);
 		return finalSQL;
@@ -371,7 +371,7 @@ public class MiniTable extends CTable implements IMiniTable
 			tc.setMaxWidth(20);
 			tc.setPreferredWidth(20);
 			tc.setResizable(false);
-
+			
 			tc.setHeaderRenderer(new VHeaderRenderer(DisplayType.Number));
 		}
 		//  Boolean
@@ -388,7 +388,7 @@ public class MiniTable extends CTable implements IMiniTable
 				tc.setCellEditor(new DefaultCellEditor(check));
 			}
 			m_minWidth.add(new Integer(30));
-
+			
 			tc.setHeaderRenderer(new VHeaderRenderer(DisplayType.YesNo));
 		}
 		//  Date
@@ -400,7 +400,7 @@ public class MiniTable extends CTable implements IMiniTable
 			else
 				tc.setCellEditor(new MiniCellEditor(c));
 			m_minWidth.add(new Integer(30));
-
+			
 			tc.setHeaderRenderer(new VHeaderRenderer(DisplayType.DateTime));
 		}
 		//  Amount
@@ -417,7 +417,7 @@ public class MiniTable extends CTable implements IMiniTable
 				tc.setCellEditor(new MiniCellEditor(c));
 				m_minWidth.add(new Integer(80));
 			}
-
+			
 			tc.setHeaderRenderer(new VHeaderRenderer(DisplayType.Number));
 		}
 		//  Number
@@ -434,7 +434,7 @@ public class MiniTable extends CTable implements IMiniTable
 				tc.setCellEditor(new MiniCellEditor(c));
 				m_minWidth.add(new Integer(80));
 			}
-
+			
 			tc.setHeaderRenderer(new VHeaderRenderer(DisplayType.Number));
 		}
 		//  Integer
@@ -446,7 +446,7 @@ public class MiniTable extends CTable implements IMiniTable
 			else
 				tc.setCellEditor(new MiniCellEditor(c));
 			m_minWidth.add(new Integer(30));
-
+			
 			tc.setHeaderRenderer(new VHeaderRenderer(DisplayType.Number));
 		}
 		//  String
@@ -458,7 +458,7 @@ public class MiniTable extends CTable implements IMiniTable
 			else
 				tc.setCellEditor(new MiniCellEditor(String.class));
 			m_minWidth.add(new Integer(30));
-
+			
 			tc.setHeaderRenderer(new VHeaderRenderer(DisplayType.String));
 		}
 	//	log.fine( "Renderer=" + tc.getCellRenderer().toString() + ", Editor=" + tc.getCellEditor().toString());
@@ -480,7 +480,7 @@ public class MiniTable extends CTable implements IMiniTable
 			throw new IllegalArgumentException("Model must be instance of DefaultTableModel");
 	}   //  setRowCount
 
-
+	
 	/**************************************************************************
 	 *	Load Table from ResultSet - The ResultSet is not closed
 	 *
@@ -536,7 +536,7 @@ public class MiniTable extends CTable implements IMiniTable
 			//		log.fine( "r=" + row + ", c=" + col + " " + m_layout[col].getColHeader(),
 			//			"data=" + data.toString() + " " + data.getClass().getName() + " * " + m_table.getCellRenderer(row, col));
 				}
-
+				
 
 			}
 		}
@@ -548,13 +548,13 @@ public class MiniTable extends CTable implements IMiniTable
 			addTotals(m_layout);
 		autoSize();
 		log.config("Row(rs)=" + getRowCount());
-
-
+		
+		
 	}	//	loadTable
 
 	/**
 	 *	Load Table from Object Array
-	 *  @param pos array of POs
+	 *  @param pos array of POs 
 	 */
 	public void loadTable(PO[] pos)
 	{
@@ -569,7 +569,7 @@ public class MiniTable extends CTable implements IMiniTable
 			PO myPO = pos[i];
 			int row = getRowCount();
 			setRowCount(row+1);
-
+			
 			for (int col = 0; col < m_layout.length; col++)
 			{
 				String columnName = m_layout[col].getColSQL();
@@ -591,8 +591,8 @@ public class MiniTable extends CTable implements IMiniTable
 		autoSize();
 		log.config("Row(array)=" + getRowCount());
 	}	//	loadTable
-
-
+	
+	
 	/**
 	 *  Get the key of currently selected row based on layout defined in prepareTable
 	 *  @return ID if key
@@ -739,7 +739,7 @@ public class MiniTable extends CTable implements IMiniTable
 			return 1;
 		return 0;
 	}   //  getColorCode
-
+	
 
 	/**
 	 *  Set if Totals is Show
@@ -757,7 +757,7 @@ public class MiniTable extends CTable implements IMiniTable
 	{
 		return showTotals;
 	}
-
+	
 	/**
 	 *  Adding a new row with the totals
 	 */
@@ -765,9 +765,9 @@ public class MiniTable extends CTable implements IMiniTable
 	{
 		if (getRowCount() == 0 || layout.length == 0)
 			return;
-
+		
 		Object[] total = new Object[layout.length];
-
+		
 		for (int row = 0 ; row < getRowCount(); row ++)
 		{
 
@@ -776,11 +776,11 @@ public class MiniTable extends CTable implements IMiniTable
 					Object data = getModel().getValueAt(row, col);
 					Class<?> c = layout[col].getColClass();
 					if (c == BigDecimal.class)
-					{
+					{	
 						BigDecimal subtotal = Env.ZERO;
 						if(total[col]!= null)
 							subtotal = (BigDecimal)(total[col]);
-
+							
 						BigDecimal amt =  (BigDecimal) data;
 						if(subtotal == null)
 							subtotal = Env.ZERO;
@@ -793,18 +793,18 @@ public class MiniTable extends CTable implements IMiniTable
 						Double subtotal = new Double(0);
 						if(total[col] != null)
 							subtotal = (Double)(total[col]);
-
+						
 						Double amt =  (Double) data;
 						if(subtotal == null)
 							subtotal = new Double(0);
 						if(amt == null )
 							subtotal = new Double(0);
 						total[col] = subtotal + amt;
-
-					}
-				}
+						
+					}		
+				}	
 		}
-
+		
 		//adding total row
 
 		int row = getRowCount() + 1;
@@ -813,7 +813,7 @@ public class MiniTable extends CTable implements IMiniTable
 		{
 			Class<?> c = layout[col].getColClass();
 			if (c == BigDecimal.class)
-			{
+			{	
 				setValueAt(total[col] , row - 1, col);
 			}
 			else if (c == Double.class)
@@ -821,15 +821,15 @@ public class MiniTable extends CTable implements IMiniTable
 				setValueAt(total[col] , row -1 , col);
 			}
 			else
-			{
+			{	
 				if(col == 0 )
-				{
+				{	
 					setValueAt(" Σ  " , row -1 , col);
-				}
+				}	
 				else
-					setValueAt(null , row - 1, col );
-			}
-
+					setValueAt(null , row - 1, col );	
+			}	
+			
 		}
 	}
 
@@ -840,9 +840,9 @@ public class MiniTable extends CTable implements IMiniTable
 	{
 		if (getRowCount() == 0 || layout.length == 0)
 			return;
-
+		
 		Object[] total = new Object[layout.length];
-
+		
 		for (int row = 0 ; row < getRowCount(); row ++)
 		{
 
@@ -851,11 +851,11 @@ public class MiniTable extends CTable implements IMiniTable
 					Object data = getModel().getValueAt(row, col);
 					Class<?> c = layout[col].getColClass();
 					if (c == BigDecimal.class)
-					{
+					{	
 						BigDecimal subtotal = Env.ZERO;
 						if(total[col]!= null)
 							subtotal = (BigDecimal)(total[col]);
-
+							
 						BigDecimal amt =  (BigDecimal) data;
 						if(subtotal == null)
 							subtotal = Env.ZERO;
@@ -868,18 +868,18 @@ public class MiniTable extends CTable implements IMiniTable
 						Double subtotal = new Double(0);
 						if(total[col] != null)
 							subtotal = (Double)(total[col]);
-
+						
 						Double amt =  (Double) data;
 						if(subtotal == null)
 							subtotal = new Double(0);
 						if(amt == null )
 							subtotal = new Double(0);
 						total[col] = subtotal + amt;
-
-					}
-				}
+						
+					}		
+				}	
 		}
-
+		
 		//adding total row
 
 		int row = getRowCount() + 1;
@@ -888,7 +888,7 @@ public class MiniTable extends CTable implements IMiniTable
 		{
 			Class<?> c = layout[col].getColClass();
 			if (c == BigDecimal.class)
-			{
+			{	
 				setValueAt(total[col] , row - 1, col);
 			}
 			else if (c == Double.class)
@@ -896,15 +896,15 @@ public class MiniTable extends CTable implements IMiniTable
 				setValueAt(total[col] , row -1 , col);
 			}
 			else
-			{
+			{	
 				if(col == 1 )
-				{
+				{	
 					setValueAt(" Σ  " , row -1 , col );
-				}
+				}	
 				else
-					setValueAt(null , row - 1, col );
-			}
-
+					setValueAt(null , row - 1, col );	
+			}	
+			
 		}
 	}
 }   //  MiniTable

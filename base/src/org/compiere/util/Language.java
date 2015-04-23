@@ -261,7 +261,7 @@ public class Language implements Serializable
 
 	/**************************************************************************
 	 *  Get Language.
-	 * 	If language does not exist, create it on the fly assuming that it is valid 
+	 * 	If language does not exist, create it on the fly assuming that it is valid
 	 *  @param langInfo either language (en) or locale (en-US) or display name
 	 *  @return Name (e.g. Deutsch)
 	 */
