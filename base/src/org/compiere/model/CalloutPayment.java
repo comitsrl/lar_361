@@ -500,12 +500,12 @@ public class CalloutPayment extends CalloutEngine
 		// No Invoice - Set Discount, Witeoff, Under/Over to 0
 		else if (C_Invoice_ID == 0 && LAR_PaymentHeader_ID == 0)
 		{
-                if (Env.ZERO.compareTo (DiscountAmt) != 0)
-                    mTab.setValue ("DiscountAmt", Env.ZERO);
-                if (Env.ZERO.compareTo (WriteOffAmt) != 0)
-                    mTab.setValue ("WriteOffAmt", Env.ZERO);
-                if (Env.ZERO.compareTo (OverUnderAmt) != 0)
-                    mTab.setValue ("OverUnderAmt", Env.ZERO);
+			if (Env.ZERO.compareTo (DiscountAmt) != 0)
+				mTab.setValue ("DiscountAmt", Env.ZERO);
+			if (Env.ZERO.compareTo (WriteOffAmt) != 0)
+				mTab.setValue ("WriteOffAmt", Env.ZERO);
+			if (Env.ZERO.compareTo (OverUnderAmt) != 0)
+				mTab.setValue ("OverUnderAmt", Env.ZERO);
 		} else
 		  {
           // Check if there are Invoices under the Header
