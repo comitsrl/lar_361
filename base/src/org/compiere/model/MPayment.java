@@ -597,11 +597,21 @@ public final class MPayment extends X_C_Payment
 		if (newRecord 
 			|| is_ValueChanged("C_Charge_ID") || is_ValueChanged("C_Invoice_ID")
 			|| is_ValueChanged("C_Order_ID") || is_ValueChanged("C_Project_ID"))
+		{
+			 // Si el cobro fue generado desde una POS Order, se asume que provino
+             //  del POS por lo tanto no es un pago anticipado (Prepayment)
+		    MOrder order = new MOrder(this.getCtx(), this.getC_Order_ID(), this.get_TrxName());
+            MDocType dt = new MDocType(this.getCtx(), order.getC_DocTypeTarget_ID(), this.get_TrxName());
+            if (dt.getDocSubTypeSO() != null
+                    && (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder)))
+                this.setIsPrepayment(false);
+            else
 			setIsPrepayment (getC_Charge_ID() == 0 
 				&& getC_BPartner_ID() != 0
 				&& (getC_Order_ID() != 0 
 					|| (getC_Project_ID() != 0 && getC_Invoice_ID() == 0)));
-		if (isPrepayment())
+		}
+			if (isPrepayment())
 		{
 			if (newRecord 
 				|| is_ValueChanged("C_Order_ID") || is_ValueChanged("C_Project_ID"))
