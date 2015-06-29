@@ -195,8 +195,8 @@ public final class ALogin extends CDialog
 		titleLabel.setText(Adempiere.getSubtitle());
 		titleLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
 		versionLabel.setRequestFocusEnabled(false);
-		versionLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		versionLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
+		versionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		versionLabel.setHorizontalTextPosition(SwingConstants.CENTER);
 		hostLabel.setRequestFocusEnabled(false);
 		hostLabel.setLabelFor(hostField);
 		hostField.addActionListener(this);
@@ -216,8 +216,8 @@ public final class ALogin extends CDialog
 		dateLabel.setRequestFocusEnabled(false);
 		warehouseLabel.setRequestFocusEnabled(false);
 		printerLabel.setRequestFocusEnabled(false);
-		compileDate.setHorizontalAlignment(SwingConstants.RIGHT);
-		compileDate.setHorizontalTextPosition(SwingConstants.RIGHT);
+		compileDate.setHorizontalAlignment(SwingConstants.CENTER);
+		compileDate.setHorizontalTextPosition(SwingConstants.CENTER);
 		compileDate.setText(Adempiere.DATE_VERSION);
 		compileDate.setToolTipText(Adempiere.getImplementationVendor());
 		southPanel.setLayout(southLayout);
@@ -270,11 +270,11 @@ public final class ALogin extends CDialog
 		connectionPanel.add(copy1Label,         new GridBagConstraints(1, 6, 2, 1, 0.0, 0.0
 			,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 12, 12), 0, 0));
 		connectionPanel.add(compileDate,        new GridBagConstraints(2, 1, 2, 1, 0.0, 0.0
-			,GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(2, 0, 0, 12), 0, 0));
+			,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(2, 0, 0, 12), 0, 0));
 		connectionPanel.add(titleLabel,         new GridBagConstraints(0, 0, 2, 2, 0.0, 0.0
-			,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(12, 12, 5, 5), 0, 0));
+			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(12, 12, 5, 5), 0, 0));
 		connectionPanel.add(versionLabel,        new GridBagConstraints(2, 0, 2, 1, 0.0, 0.0
-			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(12, 5, 0, 12), 0, 0));
+			,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(12, 5, 0, 12), 0, 0));
 
 		loginTabPane.add(connectionPanel, res.getString("Connection"));
 
