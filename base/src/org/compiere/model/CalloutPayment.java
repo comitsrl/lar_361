@@ -558,8 +558,8 @@ public class CalloutPayment extends CalloutEngine
                 {
                     if (!ofpi) // german custom
                     { // german custom
-                        PayAmt = InvoiceOpenAmt.subtract(DiscountAmt).subtract(WriteOffAmt)
-                                .subtract(OverUnderAmt);
+                        // @mzuniga No se resta el sub/sobre Pago
+                        PayAmt = InvoiceOpenAmt.subtract(DiscountAmt).subtract(WriteOffAmt);
                         mTab.setValue("PayAmt", PayAmt);
                     } // german custom
                     // german custom
