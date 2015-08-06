@@ -208,4 +208,4 @@ UPDATE AD_Column SET IsKey='Y', IsUpdateable='N', IsAllowCopy='N',Updated=TO_DAT
 UPDATE AD_Column SET IsKey='Y', IsUpdateable='N', IsAllowCopy='N',Updated=TO_DATE('2014-02-02 12:07:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=1654
 ;
 
-SELECT register_migration_script_lar('0055_Agrega_Campo_VCDescription_Pestaña_Linea_Ventana_DiarioCG.sql','LAR','') FROM dual;
+SELECT register_migration_script_lar('0055_VCDescription_Pestaña_Linea_Ventana_DiarioCG.sql','LAR','') FROM dual;
