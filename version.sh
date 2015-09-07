@@ -5,8 +5,8 @@
 BASEDIR=`dirname $0`
 FILE=$BASEDIR/base/src/org/adempiere/version.properties
 BRANCH=$(git branch |grep \*|awk '{print $2}')
-TODAY=`date +%Y-%m-%d` 
-if [ $BRANCH = "develop" ]; then
+TODAY=`date +%Y-%m-%d`
+#if [ $BRANCH = "develop" ]; then
     LAR_VER=$(grep MAIN $FILE |awk '{print $4}')
     LAR_VER_NEW=$(echo $LAR_VER |awk -F "-" '{print $1}')
     REV=$(git rev-list HEAD -n 1|cut -c 1-7)
@@ -20,4 +20,4 @@ if [ $BRANCH = "develop" ]; then
     IMPL_VER=$(grep IMPLEMENTATION_VERSION $FILE)
     IMPL_VER_NEW=$(echo $IMPL_VER|awk -F "=" '{print $1}')=$TODAY
     sed -i -e "s/$IMPL_VER/$IMPL_VER_NEW/" $FILE
-fi
+#fi

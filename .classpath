@@ -6,7 +6,7 @@
 	<classpathentry kind="src" path="zkwebui/WEB-INF/src"/>
 	<classpathentry kind="src" path="test/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/adempiere361"/>
 	<classpathentry kind="lib" path="test/lib/easymock-3.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/adempiere361"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

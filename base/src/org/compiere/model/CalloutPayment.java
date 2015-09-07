@@ -141,11 +141,14 @@ public class CalloutPayment extends CalloutEngine
 				if(!ofpi)//German custom
 				    mTab.setValue ("PayAmt", InvoiceOpen.subtract (DiscountAmt));
 
-                if(InvoiceOpen.subtract(DiscountAmt).compareTo(payAmt)!=0)          //German custom
+                /* @mzuniga - Se evita que se genere un "falso" OverUnderPayment
+                 *            cuando se trabaja con PaymentTerm
+				if(InvoiceOpen.subtract(DiscountAmt).compareTo(payAmt)!=0)          //German custom
                 {                                                                   //German custom
                     mTab.setValue ("IsOverUnderPayment" , Boolean.TRUE);            //German custom
                     amounts(ctx, WindowNo, mTab, oup, Boolean.TRUE, oup.getValue());//German custom
                 }                                                                   //German custom
+                 */
 
 				mTab.setValue ("DiscountAmt", DiscountAmt);
 				// reset as dependent fields get reset
@@ -500,12 +503,12 @@ public class CalloutPayment extends CalloutEngine
 		// No Invoice - Set Discount, Witeoff, Under/Over to 0
 		else if (C_Invoice_ID == 0 && LAR_PaymentHeader_ID == 0)
 		{
-                if (Env.ZERO.compareTo (DiscountAmt) != 0)
-                    mTab.setValue ("DiscountAmt", Env.ZERO);
-                if (Env.ZERO.compareTo (WriteOffAmt) != 0)
-                    mTab.setValue ("WriteOffAmt", Env.ZERO);
-                if (Env.ZERO.compareTo (OverUnderAmt) != 0)
-                    mTab.setValue ("OverUnderAmt", Env.ZERO);
+			if (Env.ZERO.compareTo (DiscountAmt) != 0)
+				mTab.setValue ("DiscountAmt", Env.ZERO);
+			if (Env.ZERO.compareTo (WriteOffAmt) != 0)
+				mTab.setValue ("WriteOffAmt", Env.ZERO);
+			if (Env.ZERO.compareTo (OverUnderAmt) != 0)
+				mTab.setValue ("OverUnderAmt", Env.ZERO);
 		} else
 		  {
           // Check if there are Invoices under the Header
@@ -558,8 +561,8 @@ public class CalloutPayment extends CalloutEngine
                 {
                     if (!ofpi) // german custom
                     { // german custom
-                        PayAmt = InvoiceOpenAmt.subtract(DiscountAmt).subtract(WriteOffAmt)
-                                .subtract(OverUnderAmt);
+                        // @mzuniga No se resta el sub/sobre Pago
+                        PayAmt = InvoiceOpenAmt.subtract(DiscountAmt).subtract(WriteOffAmt);
                         mTab.setValue("PayAmt", PayAmt);
                     } // german custom
                     // german custom

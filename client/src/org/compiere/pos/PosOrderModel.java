@@ -57,6 +57,7 @@ public class PosOrderModel extends MOrder {
 	private List<MPayment> payments = new ArrayList<MPayment>();
 	private MLARPaymentHeader paymentHeader;
 	private boolean isPaidFromAccount = false;
+	private BigDecimal discount = Env.ZERO;
 
 	public PosOrderModel(Properties ctx, int C_Order_ID, String trxName, MPOS pos) {
 		super(ctx, C_Order_ID, trxName);
@@ -416,6 +417,17 @@ public class PosOrderModel extends MOrder {
 	    return perception == null ? BigDecimal.ZERO : perception.getTaxAmt();
 	}
 
+    /**
+     * Permite asignar el importe de descuento que cada cobro puede tener según
+     * su medio de pago
+     *
+     * @param discount importe de descuento
+     */
+    void setDiscount(final BigDecimal discount)
+    {
+        this.discount = discount == null ? Env.ZERO : discount;
+    }
+
 	public boolean payCash(BigDecimal amt)
 	{
 		MPayment payment = createPayment(MPayment.TENDERTYPE_Cash);
@@ -483,6 +495,9 @@ public class PosOrderModel extends MOrder {
 		payment.setIsReceipt(true);
 		payment.setC_BPartner_ID(getC_BPartner_ID());
 		payment.set_ValueOfColumn("LAR_PaymentHeader_ID", paymentHeader.getLAR_PaymentHeader_ID());
+        // Si tiene descuento asignado, lo registra como un writeOffAmt
+        if (discount.compareTo(Env.ZERO) > 0)
+            payment.setWriteOffAmt(discount);
 		return payment;
 	}
 
