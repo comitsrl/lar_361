@@ -54,6 +54,7 @@ import org.compiere.model.MLotCtl;
 import org.compiere.model.MQuery;
 import org.compiere.model.MRole;
 import org.compiere.model.MSerNoCtl;
+import org.compiere.model.SystemIDs;
 import org.compiere.model.X_M_MovementLine;
 import org.compiere.swing.CButton;
 import org.compiere.swing.CCheckBox;
@@ -79,10 +80,10 @@ import org.compiere.util.Msg;
  *  @version $Id: VPAttributeDialog.java,v 1.4 2006/07/30 00:51:27 jjanke Exp $
  */
 public class VPAttributeDialog extends CDialog
-	implements ActionListener
+	implements ActionListener, SystemIDs
 {
 	/**
-	 *
+	 * 
 	 */
 	private static final long serialVersionUID = -1062346984681892620L;
 
@@ -114,8 +115,8 @@ public class VPAttributeDialog extends CDialog
 				m_adaptee.popupMenu.show((Component)e.getSource(), e.getX(), e.getY());
 		}	//	mouse Clicked
 
-	}	//	VPAttributeDialog_mouseAdapter
-
+	}	//	VPAttributeDialog_mouseAdapter	
+	
 	/**
 	 *	Product Attribute Instance Dialog
 	 *	@param frame parent frame
@@ -126,12 +127,12 @@ public class VPAttributeDialog extends CDialog
 	 * 	@param AD_Column_ID column
 	 * 	@param WindowNo window
 	 */
-	public VPAttributeDialog (Frame frame, int M_AttributeSetInstance_ID,
-		int M_Product_ID, int C_BPartner_ID,
+	public VPAttributeDialog (Frame frame, int M_AttributeSetInstance_ID, 
+		int M_Product_ID, int C_BPartner_ID, 
 		boolean productWindow, int AD_Column_ID, int WindowNo)
 	{
 		super (frame, Msg.translate(Env.getCtx(), "M_AttributeSetInstance_ID") , true);
-		log.config("M_AttributeSetInstance_ID=" + M_AttributeSetInstance_ID
+		log.config("M_AttributeSetInstance_ID=" + M_AttributeSetInstance_ID 
 			+ ", M_Product_ID=" + M_Product_ID
 			+ ", C_BPartner_ID=" + C_BPartner_ID
 			+ ", ProductW=" + productWindow + ", Column=" + AD_Column_ID);
@@ -150,7 +151,7 @@ public class VPAttributeDialog extends CDialog
  	 		//fallback
  	 		m_columnName = "M_AttributeSetInstance_ID";
  	 	}
-
+ 	 	
 		try
 		{
 			jbInit();
@@ -181,7 +182,7 @@ public class VPAttributeDialog extends CDialog
 	private boolean					m_productWindow = false;
 	/**	Change							*/
 	private boolean					m_changed = false;
-
+	
 	private CLogger					log = CLogger.getCLogger(getClass());
 	/** Row Counter					*/
 	private int						m_row = 0;
@@ -191,7 +192,7 @@ public class VPAttributeDialog extends CDialog
 	private static final int		INSTANCE_VALUE_LENGTH = 40;
 
 	private CCheckBox	cbNewEdit = new CCheckBox();
-	private CButton		bSelect = new CButton(Env.getImageIcon("PAttribute16.gif"));
+	private CButton		bSelect = new CButton(Env.getImageIcon("PAttribute16.gif")); 
 	//	Lot
 	private VString fieldLotString = new VString ("Lot", false, false, true, 20, 20, null, null);
 	private CComboBox fieldLot = null;
@@ -211,7 +212,7 @@ public class VPAttributeDialog extends CDialog
 	private CPanel centerPanel = new CPanel();
 	private ALayout centerLayout = new ALayout(5,5, true);
 	private ConfirmPanel confirmPanel = new ConfirmPanel (true);
-
+	
 	private String m_columnName = null;
 
 	/**
@@ -236,9 +237,9 @@ public class VPAttributeDialog extends CDialog
 	{
 		if (m_M_Product_ID == 0 && !m_productWindow)
 			return false;
-
+		
 		MAttributeSet as = null;
-
+		
 		if (m_M_Product_ID != 0)
 		{
 			//	Get Model
@@ -249,19 +250,19 @@ public class VPAttributeDialog extends CDialog
 				return false;
 			}
 			Env.setContext(Env.getCtx(), m_WindowNo, "M_AttributeSet_ID", m_masi.getM_AttributeSet_ID());
-
+	
 			//	Get Attribute Set
 			as = m_masi.getMAttributeSet();
 		}
-		else
+		else 
 		{
 			int M_AttributeSet_ID = Env.getContextAsInt(Env.getCtx(), m_WindowNoParent, "M_AttributeSet_ID");
 			m_masi = new MAttributeSetInstance (Env.getCtx(), 0, M_AttributeSet_ID, null);
 			as = m_masi.getMAttributeSet();
 		}
-
+		
 		//	Product has no Attribute Set
-		if (as == null)
+		if (as == null)		
 		{
 			ADialog.error(m_WindowNo, this, "PAttributeNoAttributeSet");
 			return false;
@@ -310,7 +311,7 @@ public class VPAttributeDialog extends CDialog
 			fieldLotString.setText (m_masi.getLot());
 			//	M_Lot_ID
 		//	int AD_Column_ID = 9771;	//	M_AttributeSetInstance.M_Lot_ID
-		//	fieldLot = new VLookup ("M_Lot_ID", false,false, true,
+		//	fieldLot = new VLookup ("M_Lot_ID", false,false, true, 
 		//		MLookupFactory.get(Env.getCtx(), m_WindowNo, 0, AD_Column_ID, DisplayType.TableDir));
 			String sql = "SELECT M_Lot_ID, Name "
 				+ "FROM M_Lot l "
@@ -332,7 +333,7 @@ public class VPAttributeDialog extends CDialog
 						fieldLot.setSelectedIndex(i);
 						fieldLotString.setEditable(false);
 						break;
-					}
+					} 
 				}
 			}
 			fieldLot.addActionListener(this);
@@ -347,7 +348,7 @@ public class VPAttributeDialog extends CDialog
 					bLot.addActionListener(this);
 				}
 			}
-			//	Popup
+			//	Popup 
 			fieldLot.addMouseListener(new VPAttributeDialog_mouseAdapter(this));    //  popup
 			mZoom = new CMenuItem(Msg.getMsg(Env.getCtx(), "Zoom"), Env.getImageIcon("Zoom16.gif"));
 			mZoom.addActionListener(this);
@@ -464,7 +465,7 @@ public class VPAttributeDialog extends CDialog
 		}
 		else if (MAttribute.ATTRIBUTEVALUETYPE_Number.equals(attribute.getAttributeValueType()))
 		{
-			VNumber editor = new VNumber(attribute.getName(), attribute.isMandatory(),
+			VNumber editor = new VNumber(attribute.getName(), attribute.isMandatory(), 
 				false, true, DisplayType.Number, attribute.getName());
 			if (instance != null)
 				editor.setValue(instance.getValueNumber());
@@ -479,7 +480,7 @@ public class VPAttributeDialog extends CDialog
 		}
 		else	//	Text Field
 		{
-			VString editor = new VString (attribute.getName(), attribute.isMandatory(),
+			VString editor = new VString (attribute.getName(), attribute.isMandatory(), 
 				false, true, 20, INSTANCE_VALUE_LENGTH, null, null);
 			if (instance != null)
 				editor.setText(instance.getValue());
@@ -500,9 +501,9 @@ public class VPAttributeDialog extends CDialog
 		removeAll();
 		Env.clearWinContext(m_WindowNo);
 		//
-		Env.setContext(Env.getCtx(), m_WindowNo, Env.TAB_INFO, m_columnName,
+		Env.setContext(Env.getCtx(), m_WindowNo, Env.TAB_INFO, m_columnName, 
 			String.valueOf(m_M_AttributeSetInstance_ID));
-		Env.setContext(Env.getCtx(), m_WindowNo, Env.TAB_INFO, "M_Locator_ID",
+		Env.setContext(Env.getCtx(), m_WindowNo, Env.TAB_INFO, "M_Locator_ID", 
 			String.valueOf(m_M_Locator_ID));
 		//
 		super.dispose();
@@ -549,7 +550,7 @@ public class VPAttributeDialog extends CDialog
 			if (pp != null)
 			{
 				fieldLot.addItem(pp);
-				fieldLot.setSelectedItem(pp);
+				fieldLot.setSelectedItem(pp);				
 			}
 		}
 		//	Create New SerNo
@@ -557,7 +558,7 @@ public class VPAttributeDialog extends CDialog
 		{
 			fieldSerNo.setText(m_masi.getSerNo(true));
 		}
-
+		
 		//	OK
 		else if (e.getActionCommand().equals(ConfirmPanel.A_OK))
 		{
@@ -611,9 +612,9 @@ public class VPAttributeDialog extends CDialog
 	private boolean cmd_select()
 	{
 		log.config("");
-
+		
 		int M_Warehouse_ID = Env.getContextAsInt(Env.getCtx(), m_WindowNoParent, "M_Warehouse_ID");
-
+		
 		int C_DocType_ID = Env.getContextAsInt(Env.getCtx(), m_WindowNoParent, "C_DocType_ID");
 		if (C_DocType_ID > 0) {
 			MDocType doctype = new MDocType (Env.getCtx(), C_DocType_ID, null);
@@ -621,13 +622,13 @@ public class VPAttributeDialog extends CDialog
 			if (docbase.equals(MDocType.DOCBASETYPE_MaterialReceipt))
 				M_Warehouse_ID = 0;
 		}
-
+		
 		// teo_sarca [ 1564520 ] Inventory Move: can't select existing attributes
 		int M_Locator_ID = 0;
-		if (m_AD_Column_ID == 8551) { // TODO: hardcoded: M_MovementLine[324].M_AttributeSetInstance_ID[8551]
+		if (m_AD_Column_ID == COLUMN_M_MOVEMENTLINE_M_ATTRIBUTESETINSTANCE_ID) { // TODO: hardcoded: M_MovementLine[324].M_AttributeSetInstance_ID[8551]
 			M_Locator_ID = Env.getContextAsInt(Env.getCtx(), m_WindowNoParent, X_M_MovementLine.COLUMNNAME_M_Locator_ID, true); // only window
 		}
-
+		
 		String title = "";
 		//	Get Text
 		String sql = "SELECT p.Name, w.Name, w.M_Warehouse_ID FROM M_Product p, M_Warehouse w "
@@ -655,8 +656,8 @@ public class VPAttributeDialog extends CDialog
 			DB.close(rs, pstmt);
 			rs = null; pstmt = null;
 		}
-		//
-		PAttributeInstance pai = new PAttributeInstance(this, title,
+		//		
+		PAttributeInstance pai = new PAttributeInstance(this, title, 
 			M_Warehouse_ID, M_Locator_ID, m_M_Product_ID, m_C_BPartner_ID);
 		if (pai.getM_AttributeSetInstance_ID() != -1)
 		{
@@ -689,7 +690,7 @@ public class VPAttributeDialog extends CDialog
 		{
 			CEditor editor = (CEditor)m_editors.get(i);
 			editor.setReadWrite(rw);
-		}
+		}	
 	}	//	cmd_newEdit
 
 	/**
@@ -707,7 +708,7 @@ public class VPAttributeDialog extends CDialog
 		//
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		//
-		int AD_Window_ID = 257;		//	Lot
+		int AD_Window_ID = WINDOW_LOT;		//	Lot
 		AWindow frame = new AWindow();
 		if (frame.initWindow(AD_Window_ID, zoomQuery))
 		{
@@ -806,7 +807,7 @@ public class VPAttributeDialog extends CDialog
 			}
 			m_changed = true;
 		}	//	for all attributes
-
+		
 		//	Save Model
 		if (m_changed)
 		{
@@ -824,7 +825,7 @@ public class VPAttributeDialog extends CDialog
 		return true;
 	}	//	saveSelection
 
-
+	
 	/**************************************************************************
 	 * 	Get Instance ID
 	 * 	@return Instance ID
@@ -842,14 +843,14 @@ public class VPAttributeDialog extends CDialog
 	{
 		return m_M_AttributeSetInstanceName;
 	}	//	getM_AttributeSetInstanceName
-
+	
 	/**
 	 * Get Locator ID
 	 * @return M_Locator_ID
 	 */
 	public int getM_Locator_ID()
 	{
-		return m_M_Locator_ID;
+		return m_M_Locator_ID; 
 	}
 
 	/**

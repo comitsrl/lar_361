@@ -63,6 +63,7 @@ import org.compiere.util.KeyNamePair;
 import org.compiere.util.Language;
 import org.compiere.util.Login;
 import org.compiere.util.Msg;
+
 /**
  *	Application Login Window
  *
@@ -73,7 +74,7 @@ public final class ALogin extends CDialog
 	implements ActionListener, ChangeListener
 {
 	/**
-	 *
+	 * 
 	 */
 	private static final long serialVersionUID = -3057525535969948097L;
 
@@ -157,7 +158,7 @@ public final class ALogin extends CDialog
 	private String 			m_user;
 	/** Application Password    */
 	private String 			m_pwd;
-
+	
 	/**	Combo Active			*/
 	private boolean			m_comboActive = false;
 	/**	Combo Active			*/
@@ -168,10 +169,10 @@ public final class ALogin extends CDialog
 	private int			    m_WindowNo;
 	/** Context					*/
 	private Properties      m_ctx = Env.getCtx();
-
+	
 	private Login			m_login = null;
 
-
+	
 	/**************************************************************************
 	 *	Component initialization
 	 *  @throws Exception
@@ -194,8 +195,8 @@ public final class ALogin extends CDialog
 		titleLabel.setText(Adempiere.getSubtitle());
 		titleLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
 		versionLabel.setRequestFocusEnabled(false);
-		versionLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		versionLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
+		versionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		versionLabel.setHorizontalTextPosition(SwingConstants.CENTER);
 		hostLabel.setRequestFocusEnabled(false);
 		hostLabel.setLabelFor(hostField);
 		hostField.addActionListener(this);
@@ -215,8 +216,8 @@ public final class ALogin extends CDialog
 		dateLabel.setRequestFocusEnabled(false);
 		warehouseLabel.setRequestFocusEnabled(false);
 		printerLabel.setRequestFocusEnabled(false);
-		compileDate.setHorizontalAlignment(SwingConstants.RIGHT);
-		compileDate.setHorizontalTextPosition(SwingConstants.RIGHT);
+		compileDate.setHorizontalAlignment(SwingConstants.CENTER);
+		compileDate.setHorizontalTextPosition(SwingConstants.CENTER);
 		compileDate.setText(Adempiere.DATE_VERSION);
 		compileDate.setToolTipText(Adempiere.getImplementationVendor());
 		southPanel.setLayout(southLayout);
@@ -269,11 +270,11 @@ public final class ALogin extends CDialog
 		connectionPanel.add(copy1Label,         new GridBagConstraints(1, 6, 2, 1, 0.0, 0.0
 			,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 12, 12), 0, 0));
 		connectionPanel.add(compileDate,        new GridBagConstraints(2, 1, 2, 1, 0.0, 0.0
-			,GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(2, 0, 0, 12), 0, 0));
+			,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(2, 0, 0, 12), 0, 0));
 		connectionPanel.add(titleLabel,         new GridBagConstraints(0, 0, 2, 2, 0.0, 0.0
-			,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(12, 12, 5, 5), 0, 0));
+			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(12, 12, 5, 5), 0, 0));
 		connectionPanel.add(versionLabel,        new GridBagConstraints(2, 0, 2, 1, 0.0, 0.0
-			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(12, 5, 0, 12), 0, 0));
+			,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(12, 5, 0, 12), 0, 0));
 
 		loginTabPane.add(connectionPanel, res.getString("Connection"));
 
@@ -318,19 +319,19 @@ public final class ALogin extends CDialog
 		printerLabel.setText("Printer");
 		printerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		printerLabel.setLabelFor(printerField);
-
+		
 		defaultPanel.add(printerLabel,        new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0
 			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 12, 12, 5), 0, 0));
 		defaultPanel.add(printerField,        new GridBagConstraints(1, 5, 1, 1, 1.0, 0.0
 			,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 12, 12), 0, 0));
-
+		
 		defaultPanel.add(warehouseLabel,  new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0
 			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 12, 5, 5), 0, 0));
 		defaultPanel.add(warehouseCombo,   new GridBagConstraints(1, 3, 1, 1, 1.0, 0.0
 			,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 12), 0, 0));
-
+		
 		// @Trifon - begin
-/*
+/*		
 		defaultPanel.add(languageLabel, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0
 				, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 12, 5, 5), 0, 0));
 		defaultPanel.add(languageCombo,    new GridBagConstraints(1, 6, 3, 1, 1.0, 0.0
@@ -356,13 +357,13 @@ public final class ALogin extends CDialog
 		southPanel.add(statusBar, BorderLayout.SOUTH);
 		//helpScollPane.getViewport().add(onlineHelp, null);
 		confirmPanel.addActionListener(this);
-
+		
 		CButton helpBtn = new CButton(Env.getImageIcon2("Help24"));
 		helpBtn.setActionCommand("onlineLoginHelp");
 		helpBtn.addActionListener(this);
 		helpBtn.setToolTipText(res.getString("Help"));
 		confirmPanel.addComponent(helpBtn);
-
+		
 		statusBar.setStatusDB(null);
 	} 	//	jbInit
 
@@ -375,10 +376,10 @@ public final class ALogin extends CDialog
 	{
 		m_cc = CConnection.get(Adempiere.getCodeBaseHost());
 		hostField.setValue(m_cc);
-
+		
 		if ( Ini.isPropertyBool(Ini.P_VALIDATE_CONNECTION_ON_STARTUP)) {
 			validateConnection();
-		}
+		} 
 
 		//  Application/PWD
 		userTextField.setText(Ini.getProperty(Ini.P_UID));
@@ -419,15 +420,15 @@ public final class ALogin extends CDialog
 		if (!CConnection.isServerEmbedded())
 			m_cc.testAppsServer();
 	}
-
+	
 	private void connectToDatabase() {
 		//Check connection
 		DB.setDBTarget(m_cc);
-
+		
 		//direct
 		DB.connect();
 	}
-
+	
 	/**
 	 *  Validate Connection
 	 */
@@ -435,15 +436,15 @@ public final class ALogin extends CDialog
 	{
 		m_connectionOK = false;
 		validateAppServer();
-
+		
 		//make sure connecting to new database
 		DB.closeTarget();
 		connectToDatabase();
 		//
 		hostField.setDisplay();
 	}   //  validateConnection
-
-
+	
+	
 	/*************************************************************************
 	 *	Exit action performed
 	 */
@@ -471,7 +472,7 @@ public final class ALogin extends CDialog
 	{
 		return m_okPressed;
 	}	//	isOKpressed
-
+	
 	/**************************************************************************
 	 *	Action Event handler
 	 *  @param e event
@@ -487,7 +488,7 @@ public final class ALogin extends CDialog
 			else
 			{
 				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				m_okPressed = true;
+				m_okPressed = true; 
 				// Dispose if OK - teo_sarca [ 1674663 ]
 				if(!defaultsOK())
 					m_okPressed = false;
@@ -497,7 +498,7 @@ public final class ALogin extends CDialog
 		else if (e.getActionCommand().equals(ConfirmPanel.A_CANCEL))
 			appExit();
 		//
-		else if (e.getSource() == hostField)
+		else if (e.getSource() == hostField) 
 			validateConnection();
 		else if (e.getSource() == languageCombo)
 			languageComboChanged();
@@ -525,14 +526,14 @@ public final class ALogin extends CDialog
 
 		m_connectionOK = tryConnection();
 
-		if (m_connectionOK)
+		if (m_connectionOK)			
 		{
 			//  Verify Language & Load Msg
 			Language l = Language.getLoginLanguage();
 			Env.verifyLanguage (m_ctx, l);
 			Env.setContext(m_ctx, Env.LANGUAGE, l.getAD_Language());
 			Msg.getMsg(m_ctx, "0");
-
+			
 			//	Migration
 			MSystem system = MSystem.get(m_ctx);
 			if (system.isJustMigrated())
@@ -600,7 +601,7 @@ public final class ALogin extends CDialog
 			appExit();
 			return false;
 		}
-
+		
 		//  Load Properties and save Ini values
 		statusBar.setStatusLine("Loading Preferences");
 		String msg = m_login.loadPreferences (org,
@@ -633,14 +634,14 @@ public final class ALogin extends CDialog
 		//	Establish connection
 		if (!DB.isConnected(false))
 			validateConnection();
-
+		
 		if (!DB.isConnected(false))
 		{
 			statusBar.setStatusLine(txt_NoDatabase, true);
 			hostField.setBackground(AdempierePLAF.getFieldBackground_Error());
 			return false;
 		}
-
+		
 		//	Reference check
 		Ini.setProperty(Ini.P_ADEMPIERESYS, "Reference".equalsIgnoreCase(CConnection.get().getDbUid()));
 
@@ -650,7 +651,7 @@ public final class ALogin extends CDialog
 		//  Get Roles
 		m_login = new Login(m_ctx);
 		KeyNamePair[] roles = null;
-		try
+		try 
 		{
 			roles = m_login.getRoles(m_user, m_pwd);
 			if (roles == null || roles.length == 0)
@@ -677,8 +678,8 @@ public final class ALogin extends CDialog
 				return false;
 			}
 		}
-
-
+		
+		
 		//	Delete existing role items
 		m_comboActive = true;
 		if (roleCombo.getItemCount() > 0)
@@ -697,7 +698,7 @@ public final class ALogin extends CDialog
 		}
 		if (iniValue != null)
 			roleCombo.setSelectedItem(iniValue);
-
+		
 		// If we have only one role, we can hide the combobox - metas-2009_0021_AP1_G94
 		if (roleCombo.getItemCount() == 1 && ! MSysConfig.getBooleanValue("ALogin_ShowOneRole", true))
 		{
@@ -776,7 +777,7 @@ public final class ALogin extends CDialog
 			return;
 		log.config(": " + client);
 		m_comboActive = true;
-		// @Trifon - Set Proper "#AD_Client_ID", #AD_User_ID and "#SalesRep_ID"
+		// @Trifon - Set Proper "#AD_Client_ID", #AD_User_ID and "#SalesRep_ID"  
 		// https://sourceforge.net/tracker/?func=detail&aid=2957215&group_id=176962&atid=879332
 		Env.setContext(m_ctx, "#AD_Client_ID", client.getKey());
 		MUser user = MUser.get (m_ctx, userTextField.getText(), new String (passwordField.getPassword()) );
@@ -840,7 +841,7 @@ public final class ALogin extends CDialog
 		//	Delete existing warehouse items
 		if (warehouseCombo.getItemCount() > 0)
 			warehouseCombo.removeAllItems();
-
+		
 		//  fill warehouses
 		if (whs != null)
 		{
@@ -858,8 +859,8 @@ public final class ALogin extends CDialog
 		}
 		m_comboActive = false;
 	}	//	orgComboChanged
-
-
+	
+	
 	/**
 	 *  Check Version
 	 *  @return true if version is OK and
@@ -903,7 +904,7 @@ public final class ALogin extends CDialog
 	/**************************************************************************
 	 *	Language issues
 	 */
-	private String	//	txt_Connected,
+	private String	//	txt_Connected, 
 					txt_NotConnected, txt_NoDatabase,
 					txt_UserPwdError, txt_RoleError, txt_LoggedIn;
 
