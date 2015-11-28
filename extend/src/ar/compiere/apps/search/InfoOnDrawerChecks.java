@@ -18,6 +18,7 @@
 package ar.compiere.apps.search;
 
 import java.awt.Frame;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -151,6 +152,9 @@ public class InfoOnDrawerChecks extends Info
 		new Info_Column(Msg.translate(Env.getCtx(), "IsAllocated"),
 			"p.IsAllocated",  Boolean.class),
 	};
+    private static final int CONVERTED_AMT = 10;
+    private static final int SELECTION = 0;
+    private BigDecimal sumaSeleccionados = Env.ZERO;
 
 	/**
 	 *	Static Setup - add fields to parameterPanel
@@ -380,4 +384,34 @@ public class InfoOnDrawerChecks extends Info
 	{
 		return new InfoOnDrawerChecks(frame, modal, WindowNo, value, multiSelection, whereClause);
 	}
+
+    /**************************************************************************
+   *  Mouse Clicked
+   *  @param e event
+   */
+  @Override
+  public void mouseClicked(MouseEvent e)
+  {
+      super.mouseClicked(e);
+      // @mzuniga Suma el importe de los cheques
+      // seleccionados y los muestra en la línea de status
+      if (e.getClickCount() < 2 && p_table.getSelectedRow() != -1 && p_multiSelection)
+      {
+          int row = p_table.getSelectedRow();
+          String sel = p_table.getValueAt(row, SELECTION).toString();
+          int col = p_table.getSelectedColumn();
+          if (sel.contains("Selected=true") && col == SELECTION )
+          {
+              Object valor = p_table.getValueAt(row, CONVERTED_AMT);
+              sumaSeleccionados = sumaSeleccionados.add((BigDecimal) valor);
+              setStatusLine("Suma cheques seleccionados = " + sumaSeleccionados.setScale(2), false);
+          }
+          else if (col == SELECTION)
+          {
+              Object valor = p_table.getValueAt(row, CONVERTED_AMT);
+              sumaSeleccionados = sumaSeleccionados.subtract((BigDecimal) valor);
+              setStatusLine("Suma cheques seleccionados = " + sumaSeleccionados.setScale(2), false);
+          }
+      }
+  } // mouseClicked
 }   //  InfoPayment
