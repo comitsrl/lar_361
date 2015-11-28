@@ -21,6 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -392,6 +394,110 @@ public class CalloutPayment extends CalloutEngine
         if (Env.getContextAsInt(ctx, WindowNo, "C_Payment_ID") == 0
                 && Env.getContextAsInt(ctx, WindowNo, "C_BPartner_ID") == 0 && C_Invoice_ID == 0)
             return "";
+
+        // Varias Facturas -> Varios Pagos/Cobros
+        // Sugerir el monto del pago/cobro teniendo en cuenta las facturas
+        // y los pagos/cobros cargados bajo la cabecera
+        if ((Env.getContextAsInt(ctx, WindowNo, "C_Payment_ID") == 0)
+                && (mTab.getValue("PayAmt").equals(Env.ZERO)))
+        {
+            // Recuperar información de las facturas
+            List<MPaymentAllocate> invoices = new ArrayList<MPaymentAllocate>();
+
+            String sql = "SELECT * FROM C_PaymentAllocate WHERE LAR_PaymentHeader_ID = ?";
+
+            PreparedStatement pstmt;
+            pstmt = DB.prepareStatement(sql, null);
+            ResultSet rs = null;
+
+            try
+            {
+                pstmt.setInt(1, LAR_PaymentHeader_ID);
+                rs = pstmt.executeQuery();
+                while (rs.next())
+                    invoices.add(new MPaymentAllocate(ctx, rs, null));
+
+            } catch (SQLException e)
+            {
+                log.log(Level.SEVERE, sql, e);
+            } finally
+            {
+                DB.close(rs, pstmt);
+                rs = null;
+                pstmt = null;
+            }
+            if (!invoices.isEmpty())
+            {
+                MPaymentAllocate[] facturas = invoices
+                        .toArray(new MPaymentAllocate[invoices.size()]);
+                BigDecimal sumaFacturas = Env.ZERO;
+                // Recorrer facturas
+                for (int i = 0; i < facturas.length; i++)
+                {
+                    sql = "SELECT" + " invoiceOpen(C_Invoice_ID,?)" // 1
+                            + " FROM C_Invoice WHERE C_Invoice_ID=?"; // 2
+                    pstmt = null;
+                    rs = null;
+                    try
+                    {
+                        pstmt = DB.prepareStatement(sql, null);
+                        pstmt.setInt(1, 0);
+                        pstmt.setInt(2, facturas[i].getC_Invoice_ID());
+                        rs = pstmt.executeQuery();
+                        if (rs.next())
+                        {
+                            BigDecimal InvoiceOpenAmt = rs.getBigDecimal(1); // Importe Impago
+                            if (InvoiceOpenAmt == null)
+                                InvoiceOpenAmt = Env.ZERO;
+                            sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
+                        }
+                    } catch (SQLException e)
+                    {
+                        log.log(Level.SEVERE, sql, e);
+                        return e.getLocalizedMessage();
+                    } finally
+                    {
+                        DB.close(rs, pstmt);
+                        rs = null;
+                        pstmt = null;
+                    }
+                } // Recorrer facturas
+
+                // Recorrer Pagos/Cobros
+                List<MPayment> payments = new ArrayList<MPayment>();
+
+                sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ?";
+
+                pstmt = DB.prepareStatement(sql, null);
+                rs = null;
+
+                try
+                {
+                    pstmt.setInt(1, LAR_PaymentHeader_ID);
+                    rs = pstmt.executeQuery();
+                    while (rs.next())
+                        payments.add(new MPayment(ctx, rs, null));
+
+                } catch (SQLException e)
+                {
+                    log.log(Level.SEVERE, sql, e);
+                } finally
+                {
+                    DB.close(rs, pstmt);
+                    rs = null;
+                    pstmt = null;
+                }
+                MPayment[] pagos = payments.toArray(new MPayment[payments.size()]);
+                BigDecimal sumaPagos = Env.ZERO;
+                // Recorrer Pagos
+                for (int p = 0; p < pagos.length; p++)
+                    sumaPagos = sumaPagos.add(pagos[p].getPayAmt());
+                mTab.setValue("PayAmt", sumaFacturas.subtract(sumaPagos));
+                mTab.setValue("OverUnderAmt", Env.ZERO);
+                return "";
+            }
+        } // Varias Facturas -> Varios Pagos/Cobros
+
         // Changed Column
         String colName = mField.getColumnName();
         if (colName.equals("IsOverUnderPayment") // Set Over/Under Amt to
@@ -532,18 +638,18 @@ public class CalloutPayment extends CalloutEngine
             else
             {
                 boolean processed = mTab.getValueAsBoolean(MPayment.COLUMNNAME_Processed);
-                if (colName.equals("PayAmt") && (!processed)
+                if (colName.equals("PayAmt") && (!processed) && (C_Invoice_ID != 0)
                         && "Y".equals(Env.getContext(ctx, WindowNo, "IsOverUnderPayment")))
                 {
                     OverUnderAmt = InvoiceOpenAmt.subtract(PayAmt).subtract(DiscountAmt)
                             .subtract(WriteOffAmt);
                     mTab.setValue("OverUnderAmt", OverUnderAmt);
-                } else if (colName.equals("PayAmt") && (!processed))
+                } else if (colName.equals("PayAmt") && (!processed) && (C_Invoice_ID != 0))
                 {
                     WriteOffAmt = InvoiceOpenAmt.subtract(PayAmt).subtract(DiscountAmt)
                             .subtract(OverUnderAmt);
                     mTab.setValue("WriteOffAmt", WriteOffAmt);
-                } else if (colName.equals("IsOverUnderPayment") && (!processed))
+                } else if (colName.equals("IsOverUnderPayment") && (!processed) && (C_Invoice_ID != 0))
                 {
                     boolean overUnderPaymentActive = "Y".equals(Env.getContext(ctx, WindowNo,
                             "IsOverUnderPayment"));
@@ -568,7 +674,7 @@ public class CalloutPayment extends CalloutEngine
                 // PayAmt
                 // End By Goodwill
                 {
-                    if (!ofpi) // german custom
+                    if ((!ofpi) && (C_Invoice_ID != 0))// german custom
                     { // german custom
                       // @mzuniga No se resta el sub/sobre Pago
                         PayAmt = InvoiceOpenAmt.subtract(DiscountAmt).subtract(WriteOffAmt);
@@ -576,7 +682,7 @@ public class CalloutPayment extends CalloutEngine
                     } // german custom
                       // german custom
                       // {
-                    else
+                    else if (C_Invoice_ID != 0)
                     {
                         boolean overUnderPaymentActive = "Y".equals(Env.getContext(ctx, WindowNo,
                                 "IsOverUnderPayment"));
