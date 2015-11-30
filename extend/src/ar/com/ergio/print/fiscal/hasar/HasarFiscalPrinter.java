@@ -187,6 +187,13 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		return cmd;
 	}
 
+	public FiscalPacket cmdChangeIBNumber(String ibNumber) {
+		FiscalPacket cmd = createFiscalPacket(CMD_CHANGE_IB_NUMBER);
+		int i = 1;
+		cmd.setText(i++, ibNumber, false);
+		return cmd;
+	}
+
 	public FiscalPacket cmdCloseDNFH(Integer copies) {
 		FiscalPacket cmd = createFiscalPacket(CMD_CLOSE_DNFH);
 		int i = 1;
