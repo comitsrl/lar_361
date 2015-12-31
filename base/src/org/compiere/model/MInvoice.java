@@ -344,6 +344,10 @@ public class MInvoice extends X_C_Invoice implements DocAction
          * globales en el validador LAR.
          */
         set_ValueOfColumn("C_POS_ID", order.get_ValueAsInt("C_POS_ID"));
+
+        // @mzuniga: Setea la factura Origen
+        if (order.get_ValueAsInt("Source_Invoice_ID") != 0)
+            set_ValueOfColumn("Source_Invoice_ID", order.get_ValueAsInt("Source_Invoice_ID"));
 	}	//	MInvoice
 
 	/**

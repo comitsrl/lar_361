@@ -27,7 +27,7 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 /**
- * Encuentra el tipo de Factura para un determinado
+ * Encuentra el tipo de Factura/Nota de Crédito para un determinado
  * Socio del Negocio, a partir del C_POS_ID y el AD_Org_ID
  * 
  * @author      Marcos Zúñiga    - http://www.ergio.com.ar
@@ -40,12 +40,14 @@ public final class FindInvoiceDocType
     private int ad_Org_ID;
     private MDocType docType;
     private int lar_DocumentLetter_ID;
+    private String docBaseType;
 
-    public FindInvoiceDocType(final MBPartner bpartner, final int c_POS_ID, final int ad_Org_ID)
+    public FindInvoiceDocType(final MBPartner bpartner, final int c_POS_ID, final int ad_Org_ID, final String docBaseType)
     {
         this.bpartner = bpartner;
         this.c_POS_ID = c_POS_ID;
         this.ad_Org_ID = ad_Org_ID;
+        this.docBaseType = docBaseType;
         retrieveDocType();
     }
 
@@ -104,8 +106,17 @@ public final class FindInvoiceDocType
                                               .append(" AND FiscalDocument=?") // 'F' > Invoice
                                               .append(" AND LAR_DocumentLetter_ID=?")
                                               .append(" AND C_POS_ID=?");
-        Object[] params = new Object[]{ad_Client_ID, ad_Org_ID, "Y", MDocType.DOCBASETYPE_ARInvoice,
-                                       LAR_MDocType.FISCALDOCUMENT_Invoice, lar_DocumentLetter_ID, c_POS_ID};
+        // @mzuniga Determina si es Factura o Nota de Crédito
+        // utilizando el tipo de documentobase
+        Object[] params = new Object[] {
+                ad_Client_ID,
+                ad_Org_ID,
+                "Y",
+                docBaseType,
+                (docBaseType.equals(MDocType.DOCBASETYPE_ARInvoice) ? LAR_MDocType.FISCALDOCUMENT_Invoice
+                        : LAR_MDocType.FISCALDOCUMENT_CreditNote),
+                lar_DocumentLetter_ID,
+                c_POS_ID };
         docType = new Query(Env.getCtx(), MDocType.Table_Name, whereClause.toString(), bpartner.get_TrxName())
                 .setParameters(params)
                 .firstOnly();

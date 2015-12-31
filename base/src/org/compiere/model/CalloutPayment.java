@@ -491,7 +491,7 @@ public class CalloutPayment extends CalloutEngine
                 BigDecimal sumaPagos = Env.ZERO;
                 // Recorrer Pagos
                 for (int p = 0; p < pagos.length; p++)
-                    sumaPagos = sumaPagos.add(pagos[p].getPayAmt());
+                    sumaPagos = sumaPagos.add(pagos[p].getPayAmt().add(pagos[p].getWriteOffAmt()));
                 mTab.setValue("PayAmt", sumaFacturas.subtract(sumaPagos));
                 mTab.setValue("OverUnderAmt", Env.ZERO);
                 return "";

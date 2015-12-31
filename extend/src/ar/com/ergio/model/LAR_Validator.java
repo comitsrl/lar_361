@@ -281,12 +281,14 @@ import ar.com.ergio.util.LAR_Utils;
             int c_POS_ID = invoice.get_ValueAsInt("C_POS_ID");
 
             // @emmie @mzuniga Se abstrae la forma de recuperar el tipo de documento
-            final FindInvoiceDocType findDocType = new FindInvoiceDocType(bp, c_POS_ID, ad_Org_ID); 
+            // @mzuniga Se considera el tipo de documento base (NC o Factura)
+            MDocType dt_orig = new MDocType(invoice.getCtx(), invoice.getC_DocTypeTarget_ID(), invoice.get_TrxName());
+            final FindInvoiceDocType findDocType = new FindInvoiceDocType(bp, c_POS_ID, ad_Org_ID, dt_orig.getDocBaseType());
             final MDocType docType = findDocType.getDocType();
 
             // Check retrieved doctype
             if (docType == null) {
-                return "DocTypeNotFound";
+                return "No se encontró el tipo de documento";
             }
 
             /*
@@ -298,13 +300,16 @@ import ar.com.ergio.util.LAR_Utils;
              */
             MOrder order = new MOrder(invoice.getCtx(), invoice.getC_Order_ID(), invoice.get_TrxName());
             MDocType dt = new MDocType(invoice.getCtx(), order.getC_DocTypeTarget_ID(), invoice.get_TrxName());
-            // Marcos Zúñiga : Se consideran también las Warehouse Orders (WP)
-            if (dt.getDocSubTypeSO() != null && (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder) || dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder)))
+            // Marcos Zúñiga : Se consideran también las Warehouse Orders (WP) y las On Credit Orders (WI)
+            if (dt.getDocSubTypeSO() != null
+                    && (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder)
+                            || dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder) || (dt
+                                .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_OnCreditOrder))))
                 invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
 
             invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", findDocType.getLAR_DocumentLetter_ID());
             if (!invoice.save()) {
-                return "CannotChangeInvoiceDocType";
+                return "No se pudo cambiar el tipo de documento";
             }
         }
         return null;
