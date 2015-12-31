@@ -1,3 +1,13 @@
+v2.0.2 - 2015-12-30
+===================
+
+Scripts de migración incorporados desde el último release oficial:
+
+  - 0061_ISSUE-67.sql
+  - 0062_ISSUE-74.sql
+  - 0063_ISSUE-68.sql
+  - 0064_ISSUE-75.sql
+
 v2.0.0 - 2015-05-13
 ===================
 
