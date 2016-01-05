@@ -146,7 +146,7 @@ public final class FindInvoiceDocType
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                     .append(bpartner.getTaxID())
                     .append(bpartner.getName())
-                    .append(docType.getName())
+                    .append((docType.getName() == null) ? "null" : (docType.getName()))
                     .toString();
     } // toString
 } // FindInvoiceDocType

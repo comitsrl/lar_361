@@ -40,7 +40,6 @@ import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
-import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MSequence;
@@ -48,7 +47,6 @@ import org.compiere.model.MTax;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
-import org.compiere.model.Query;
 import org.compiere.pos.PosOrderModel;
 import org.compiere.process.DocAction;
 import org.compiere.util.CLogger;
@@ -272,7 +270,9 @@ import ar.com.ergio.util.LAR_Utils;
         {
             log.info("Changing doctype for " + invoice);
             final MBPartner bp = new MBPartner(invoice.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
-            int ad_Org_ID = invoice.getAD_Org_ID(); //Utiliza la Organización de la factura
+            // Utiliza la Organización del entorno, esto posibilita determinar correctamente el
+            // tipo de documento cuando se factura una orden creada en otra organización
+            int ad_Org_ID = Env.getAD_Org_ID(bp.getCtx());
             /*
              * @emmie - Siempre se recupera el ID del POS desde la factura, ya que el mismo o se
              *          asigna en las ventanas correspondientes, o se asigna en el contructor de
