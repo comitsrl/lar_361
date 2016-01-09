@@ -33,11 +33,11 @@ import ar.com.ergio.util.LAR_Utils;
  */
 public class OrderFiscalPrinting extends SvrProcess
 {
-    /** Current invoice id */
+    /** Current order id */
     private int p_C_Order_ID;
     /** Process result message */
     private String m_ResultMsg = "";
-    /** Current invoice order model object */
+    /** Current order model object */
     private MOrder order;
 
     @Override
