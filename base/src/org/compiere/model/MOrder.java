@@ -26,8 +26,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import javax.mail.internet.AddressException;
-
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoBillToAddressException;
 import org.adempiere.exceptions.BPartnerNoShipToAddressException;
@@ -1009,6 +1007,12 @@ public class MOrder extends X_C_Order implements DocAction
 		if (getC_DocTypeTarget_ID() == 0)
 			setC_DocTypeTarget_ID(DocSubTypeSO_Standard);
 
+		// Setear C_POS_ID
+		String sql = "SELECT C_POS_ID FROM C_DocType WHERE C_DocType_ID = ?";
+        int dt_ID = DB.getSQLValue(null, sql, getC_DocTypeTarget_ID());
+        if (dt_ID != 0)
+            setC_POS_ID(dt_ID);
+
 		//	Default Payment Term
 		if (getC_PaymentTerm_ID() == 0)
 		{
@@ -1017,7 +1021,7 @@ public class MOrder extends X_C_Order implements DocAction
 				setC_PaymentTerm_ID(ii);
 			else
 			{
-				String sql = "SELECT C_PaymentTerm_ID FROM C_PaymentTerm WHERE AD_Client_ID=? AND IsDefault='Y'";
+				sql = "SELECT C_PaymentTerm_ID FROM C_PaymentTerm WHERE AD_Client_ID=? AND IsDefault='Y'";
 				ii = DB.getSQLValue(null, sql, getAD_Client_ID());
 				if (ii != 0)
 					setC_PaymentTerm_ID (ii);
@@ -1768,7 +1772,9 @@ public class MOrder extends X_C_Order implements DocAction
 		if (MDocType.DOCSUBTYPESO_OnCreditOrder.equals(DocSubTypeSO)		//	(W)illCall(I)nvoice
 			|| MDocType.DOCSUBTYPESO_WarehouseOrder.equals(DocSubTypeSO)	//	(W)illCall(P)ickup	
 			|| MDocType.DOCSUBTYPESO_POSOrder.equals(DocSubTypeSO)			//	(W)alkIn(R)eceipt
-			|| MDocType.DOCSUBTYPESO_PrepayOrder.equals(DocSubTypeSO)) 
+			|| MDocType.DOCSUBTYPESO_PrepayOrder.equals(DocSubTypeSO)
+			//@mzuniga También se crea Shipment si la orden es Devolución de Material
+			|| MDocType.DOCSUBTYPESO_ReturnMaterial.equals(DocSubTypeSO))
 		{
 			if (!DELIVERYRULE_Force.equals(getDeliveryRule()))
 			{
@@ -1796,6 +1802,10 @@ public class MOrder extends X_C_Order implements DocAction
 			if (invoice == null)
 				return DocAction.STATUS_Invalid;
 			info.append(" - @C_Invoice_ID@: ").append(invoice.getDocumentNo());
+
+            // @mzuniga - Marcar la Orden como facturada
+            setIsInvoiced(true);
+
 			String msg = invoice.getProcessMsg();
 			if (msg != null && msg.length() > 0)
 				info.append(" (").append(msg).append(")");
