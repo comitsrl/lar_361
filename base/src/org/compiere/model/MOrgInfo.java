@@ -99,5 +99,35 @@ public class MOrgInfo extends X_AD_OrgInfo
 		setDUNS ("?");
 		setTaxID ("?");
 	}	//	MOrgInfo
-	
+
+	// @fchiappano Codigo copiado desde Libertya.
+    public static final int EXPORTTYPEFE_AD_Reference_ID = MReference.getReferenceID("Tipo de Exportación Electrónica");
+    /** Exportación definitiva de Bienes = 1 */
+    public static final String EXPORTTYPEFE_ExportaciónDefinitivaDeBienes = "1";
+    /** Servicios = 2 */
+    public static final String EXPORTTYPEFE_Servicios = "2";
+    /** Otros = 4 */
+    public static final String EXPORTTYPEFE_Otros = "4";
+
+    /** Set Export Type FE */
+    public void setExportTypeFE(String ExportTypeFE)
+    {
+        if (ExportTypeFE == null || ExportTypeFE.equals("1") || ExportTypeFE.equals("2") || ExportTypeFE.equals("4"))
+            ;
+        else
+            throw new IllegalArgumentException(
+                    "ExportTypeFE Invalid value - Reference = EXPORTTYPEFE_AD_Reference_ID - 1 - 2 - 4");
+        if (ExportTypeFE != null && ExportTypeFE.length() > 1)
+        {
+            log.warning("Length > 1 - truncated");
+            ExportTypeFE = ExportTypeFE.substring(0, 1);
+        }
+        set_Value("ExportTypeFE", ExportTypeFE);
+    }
+
+    /** Get Export Type FE */
+    public String getExportTypeFE()
+    {
+        return (String) get_Value("ExportTypeFE");
+    }
 }

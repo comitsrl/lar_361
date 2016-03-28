@@ -64,14 +64,14 @@ public class WsfexV1 extends Wsfe{
 				this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoNumeroComprobante"));
 				return;
 			}
-			line.append(this.getInvoice().getNumeroComprobante()+"\n");
+			line.append(this.getInvoice().getNumeroComprobante() + "\n");
 			
 			//*****PUNTO DE VENTA
-			if(this.getInvoice().getPuntoDeVenta() == 0){
+			if(this.getInvoice().get_ValueAsInt("PuntoDeVenta") == 0){
 				this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoPuntoDeVenta"));
 				return;
 			}
-			line.append(this.getInvoice().getPuntoDeVenta()+"\n");
+			line.append(this.getInvoice().get_ValueAsInt("PuntoDeVenta") + "\n");
 			
 			//*****TIPO DE COMPROBANTE
 			MDocType docType = new MDocType(Env.getCtx(),this.getInvoice().getC_DocTypeTarget_ID(), this.getTrxName());
@@ -92,7 +92,7 @@ public class WsfexV1 extends Wsfe{
 			
 			//*****MONEDA
 			MCurrency currency = new MCurrency(this.getM_ctx(), this.getInvoice().getC_Currency_ID(), this.getTrxName());
-			line.append(currency.getWSFECode()+"\n");
+			line.append(currency.get_ValueAsString("WSFECode") + "\n");
 			
 			//*****COTIZACION
 			// Se debe convertir a la moneda del comprobante desde la moneda de la compañía
@@ -108,8 +108,8 @@ public class WsfexV1 extends Wsfe{
 				exportTypeFE = orgInfo.getExportTypeFE();
 			}
 			else{
-				if(!Util.isEmpty(clientInfo.getExportTypeFE())){
-					exportTypeFE = clientInfo.getExportTypeFE();
+				if(!Util.isEmpty(clientInfo.get_ValueAsString("ExportTypeFE"))){
+					exportTypeFE = clientInfo.get_ValueAsString("ExportTypeFE");
 				}
 				else{
 					this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoTipoExportacion"));
@@ -125,19 +125,19 @@ public class WsfexV1 extends Wsfe{
 			if ((exportTypeFE.compareTo(MClientInfo.EXPORTTYPEFE_ExportaciónDefinitivaDeBienes) == 0) && (docType.getdocsubtypecae().compareTo(MDocType.DOCSUBTYPECAE_FacturaDeExportaciónE) == 0)){
 				/* Veo si la configuración es a nivel de organización. */
 				if(!Util.isEmpty(orgInfo.getExportTypeFE())){
-					shipmentPermitFE = (orgInfo.isShipmentPermitFE() ? "S" : "N");
+					shipmentPermitFE = (orgInfo.get_ValueAsBoolean("isShipmentPermitFE") ? "S" : "N");
 				}
 				else{
-					shipmentPermitFE = (clientInfo.isShipmentPermitFE() ? "S" : "N");
+					shipmentPermitFE = (clientInfo.get_ValueAsBoolean("isShipmentPermitFE") ? "S" : "N");
 				}	
 			}
 			line.append(shipmentPermitFE+"\n");			
 			
 			//*****PAIS DESTINO
 			String paisDestino;
-			if(this.getInvoice().getBPartnerLocation() != null){
-				MLocation location = new MLocation(this.getM_ctx(), this.getInvoice().getBPartnerLocation().getC_Location_ID(), this.getInvoice().get_TableName());
-				paisDestino = location.getCountry().getCountryCodeFE();
+			if(this.getInvoice().getC_BPartner_Location() != null){
+				MLocation location = new MLocation(this.getM_ctx(), this.getInvoice().getC_BPartner_Location_ID(), this.getInvoice().get_TableName());
+				paisDestino = location.getCountry().get_ValueAsString("CountryCodeFE");
 			}
 			else{
 				this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoPaisDestino"));
@@ -149,16 +149,17 @@ public class WsfexV1 extends Wsfe{
 			MBPartner partner = new MBPartner(this.getM_ctx(), this.getInvoice().getC_BPartner_ID(), this.getTrxName());
 			line.append(partner.getName()+"\n");
 			
-			//*****DOMICILIO CLIENTE
-			String domicilioCliente;
-			if(this.getInvoice().getInvoice_Adress() != null){
-				domicilioCliente = this.getInvoice().getInvoice_Adress();
-			}
-			else{
-				this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoDomicilioCliente"));
-				return;
-			}
-			line.append(domicilioCliente+"\n");
+//			//*****DOMICILIO CLIENTE
+//			String domicilioCliente;
+//			
+//			if(this.getInvoice().getInvoice_Adress() != null){
+//				domicilioCliente = this.getInvoice().getInvoice_Adress();
+//			}
+//			else{
+//				this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoDomicilioCliente"));
+//				return;
+//			}
+//			line.append(domicilioCliente+"\n");
 			
 			//*****ID IMPOSITIVO
 			line.append(partner.getTaxID()+"\n");
@@ -179,12 +180,12 @@ public class WsfexV1 extends Wsfe{
 			line.append("ITEMS"+"\n");
 			line.append(this.getInvoice().getLines().length+"\n");
 			for (MInvoiceLine invoiceLine : this.getInvoice().getLines()){
-				line.append(invoiceLine.getProductName());
+				line.append(invoiceLine.getM_Product().getName());
 				line.append(":");
 				line.append(invoiceLine.getQtyEntered());
 				line.append(":");
 				MUOM uom = MUOM.get(this.getM_ctx(), invoiceLine.getC_UOM_ID()); 
-				line.append(uom.getUOMCodeFE());
+				line.append(uom.get_ValueAsString("UOMCodeFE"));
 				line.append(":");
 				line.append(invoiceLine.getPriceEntered());
 				line.append(":");

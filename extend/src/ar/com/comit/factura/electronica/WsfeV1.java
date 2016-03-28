@@ -10,10 +10,12 @@ import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceTax;
+import org.compiere.model.MPOS;
 import org.compiere.model.MTax;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.globalqss.model.X_LCO_TaxPayerType;
 
 /**
  * @author Castro, Juan Manul
@@ -40,14 +42,15 @@ public class WsfeV1 extends Wsfe{
 				this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoNumeroComprobante"));
 				return;
 			}
-			line.append(this.getInvoice().getNumeroComprobante()+"\n");
+			line.append(this.getInvoice().getNumeroComprobante() + "\n");
 			
 			//*****PUNTO DE VENTA
-			if(this.getInvoice().getPuntoDeVenta() == 0){
+			final MPOS pos = new MPOS(getM_ctx(), this.getInvoice().get_ValueAsInt("C_Pos_ID"), getTrxName());
+			if(pos.get_ValueAsInt("PosNumber") == 0){
 				this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoPuntoDeVenta"));
 				return;
 			}
-			line.append(this.getInvoice().getPuntoDeVenta()+"\n");
+			line.append(pos.get_ValueAsInt("PosNumber") + "\n");
 			
 			//*****TIPO DE COMPROBANTE
 			MDocType docType = new MDocType(Env.getCtx(),this.getInvoice().getC_DocTypeTarget_ID(),getTrxName());
@@ -55,18 +58,20 @@ public class WsfeV1 extends Wsfe{
 			
 			//*****TIPO DOC: 80 CUIT / 96 DNI
 			MBPartner partner = new MBPartner(this.getM_ctx(),this.getInvoice().getC_BPartner_ID(),getTrxName());
-			if(partner.isConsumidorFinal()){
+			final X_LCO_TaxPayerType taxPayerType = new X_LCO_TaxPayerType(getM_ctx(), partner.get_ValueAsInt("LCO_TaxPayerType_ID"), getTrxName());
+			if(taxPayerType.getName().equals("ConsumidorFinal"))
+			{
 				line.append("96"+"\n");
 				line.append("1"+"\n");
 			}
 			else{
 				line.append("80"+"\n");
-				if(this.getInvoice().getCUIT() == null || this.getInvoice().getCUIT().equals("")){
+				if(partner.getTaxID() == null || partner.getTaxID().equals("")){
 					this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoCUIT"));
 					return;
 				}
 				
-				line.append(this.getInvoice().getCUIT().replaceAll("-", "")+"\n");
+				line.append(partner.getTaxID().replaceAll("-", "")+"\n");
 			}
 			
 			//*****IMPORTE TOTAL
@@ -75,7 +80,7 @@ public class WsfeV1 extends Wsfe{
 			
 			//*****IMPORTE NETO
 			//line.append(this.getInvoice().getTotalLines().toString().replace(".", "")+"\n");
-			line.append(this.getInvoice().getNetAmount()+"\n");
+			line.append(this.getInvoice().getTotalLines()+"\n");
 			
 			//*****FECHA
 			if(this.getInvoice().getDateAcct() == null){
@@ -89,7 +94,7 @@ public class WsfeV1 extends Wsfe{
 			
 			//*****MONEDA
 			MCurrency currency = new MCurrency(this.getM_ctx(), this.getInvoice().getC_Currency_ID(),getTrxName());
-			line.append(currency.getWSFECode()+"\n");
+			line.append(currency.get_ValueAsString("WSFECode") + "\n");
 			
 			//*****CONVERSION
 			// Se debe convertir a la moneda del comprobante desde la moneda de la compañía
@@ -105,21 +110,21 @@ public class WsfeV1 extends Wsfe{
 			int size = taxes.length;
 			boolean firstLineAppended = false;
 			for (int i = 0; i < size; i++){
-				tax = MTax.get(this.getM_ctx(), taxes[i].getC_Tax_ID(), getTrxName());
-				if (!tax.isPercepcion()){
+				tax = MTax.get(this.getM_ctx(), taxes[i].getC_Tax_ID());
+				if (!tax.get_ValueAsBoolean("IsPerception")){
 					taxes[i].getTaxAmt();
 					taxes[i].getTaxBaseAmt();
-					tax.getWSFECode();
+					tax.get_ValueAsString("WSFECode");
 					
 					if(firstLineAppended){
 						line.append(";");
 					}
-					line.append(tax.getWSFECode()+":"+getTaxBaseAmt(taxes[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), this.getInvoice().getTaxesAmt())+":"+taxes[i].getTaxAmt());
+					line.append(tax.get_ValueAsString("WSFECode") + ":" + getTaxBaseAmt(taxes[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), getTaxesAmt(this.getInvoice())) + ":" + taxes[i].getTaxAmt());
 					firstLineAppended = true;	
 				}
 			}
 			
-			line.append("\n");
+//			line.append("\n");
 			
 			//*****IMPUESTOS PERCEPCIONES
 			BigDecimal total_Perception = BigDecimal.ZERO;
@@ -128,24 +133,24 @@ public class WsfeV1 extends Wsfe{
 			int sizePerc = taxesPerc.length;
 			boolean firstLineAppended2 = false;
 			for (int i = 0; i < sizePerc; i++){
-				taxPerc = MTax.get(this.getM_ctx(), taxesPerc[i].getC_Tax_ID(), getTrxName());
-				if (taxPerc.isPercepcion()){
+				taxPerc = MTax.get(this.getM_ctx(), taxesPerc[i].getC_Tax_ID());
+				if (taxPerc.get_ValueAsBoolean("IsPerception")){
 					total_Perception = total_Perception.add(taxesPerc[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP)); 
 					
 					taxesPerc[i].getTaxAmt();
 					taxesPerc[i].getTaxBaseAmt();
-					taxPerc.getWSFECode();
+					taxPerc.get_ValueAsInt("WSFECode");
 					
 					if(firstLineAppended2){
 						line.append(";");
 					}
 					BigDecimal alic = taxPerc.getRate().setScale(2, BigDecimal.ROUND_HALF_UP);
-					line.append(taxPerc.getWSFECode()+":"+getTaxBaseAmt(taxesPerc[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), this.getInvoice().getTaxesAmt())+":"+taxesPerc[i].getTaxAmt()+":"+alic);
+					line.append(taxPerc.get_ValueAsInt("WSFECode") + ":" + getTaxBaseAmt(taxesPerc[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), getTaxesAmt(this.getInvoice())) + ":" + taxesPerc[i].getTaxAmt() + ":" + alic);
 					firstLineAppended2 = true;	
 				}
 			}
 			
-			line.append("\n");
+			line.append("\n"); 
 			
 			//*****MONTO TOTAL DE PERCEPCIONES
 			line.append(total_Perception+"\n");

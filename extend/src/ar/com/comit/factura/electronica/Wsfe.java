@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -14,6 +15,8 @@ import java.util.logging.Level;
 
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MInvoiceTax;
+import org.compiere.model.MPOS;
 import org.compiere.model.MPreference;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
@@ -94,18 +97,25 @@ public abstract class Wsfe {
 	 * @return: Devuelve el path donde se encuentra alojado el proceso wsfe.py en el
 	 * sistema de archvos local. Este path se guarda en la tabla AD_Preference (Valores Predeterminados)
 	 */
-	protected String getPath(){
-		MDocType docType = new MDocType(Env.getCtx(),invoice.getC_DocTypeTarget_ID(),getTrxName());
-		/**
-		 * El nombre de AD_Preference a consultar se forma concatenando el valor WSFE_PV y el Nro de Punto de Venta
-		 */
-		MPreference preference = MPreference.getUserPreference(Env.getCtx(), "WSFE_PV"+docType.getPosNumber(), getTrxName());
-		if(preference == null){
-			// En el caso que no se haya encontrado ninguna preferencia a partir del Nro de Punto de Venta se busca utilizando el valor por defecto que es: WSFE
-			preference = MPreference.getUserPreference(Env.getCtx(), "WSFE", getTrxName());
-		}
-		return preference.getValue();
-	}
+    protected String getPath()
+    {
+        MDocType docType = new MDocType(Env.getCtx(), invoice.getC_DocTypeTarget_ID(), getTrxName());
+        /**
+         * El nombre de AD_Preference a consultar se forma concatenando el valor
+         * WSFE_PV y el Nro de Punto de Venta
+         */
+        MPOS pos = new MPOS(m_ctx, invoice.get_ValueAsInt("C_Pos_ID"), trxName);
+        MPreference preference = MPreference.getUserPreference(Env.getCtx(),
+                "WSFE_PV" + pos.get_ValueAsInt("PosNumber"), getTrxName());
+        if (preference == null)
+        {
+            // En el caso que no se haya encontrado ninguna preferencia a partir
+            // del Nro de Punto de Venta se busca utilizando el valor por
+            // defecto que es: WSFE
+            preference = MPreference.getUserPreference(Env.getCtx(), "WSFE", getTrxName());
+        }
+        return preference.getValue();
+    }
 	
 	protected void deleteExistingFiles(){
 		try{
@@ -362,4 +372,20 @@ public abstract class Wsfe {
 		}
 		return time;
 	}
+
+	/**
+	 * Obtener el monto total de todos los impuesto aplicados a la factura.
+	 * @param invoice
+	 * @return 
+	 */
+    public BigDecimal getTaxesAmt(MInvoice invoice)
+    {
+        MInvoiceTax[] taxes = invoice.getTaxes(false);
+        BigDecimal total = Env.ZERO;
+        for (int i = 0; i < taxes.length; i++)
+        {
+            total = total.add(taxes[i].getTaxAmt());
+        }
+        return total;
+    } // getTaxesAmt
 }

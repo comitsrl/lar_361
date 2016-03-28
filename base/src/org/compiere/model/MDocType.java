@@ -42,6 +42,97 @@ public class MDocType extends X_C_DocType
 	 */
 	private static final long serialVersionUID = -4404263001194756568L;
 
+    // @fchiappano lista DocSubTypeCAE para facturacion electronica.
+    public static final int DOCSUBTYPECAE_AD_Reference_ID = MReference.getReferenceID("DocSubTypeCae");
+    /** Facturas A = 01 */
+    public static final String DOCSUBTYPECAE_FacturasA = "01";
+    /** Notas de Debito A = 02 */
+    public static final String DOCSUBTYPECAE_NotasDeDebitoA = "02";
+    /** Notas de Credito A = 03 */
+    public static final String DOCSUBTYPECAE_NotasDeCreditoA = "03";
+    /** Recibos A = 04 */
+    public static final String DOCSUBTYPECAE_RecibosA = "04";
+    /** Notas de Venta al Contado A = 05 */
+    public static final String DOCSUBTYPECAE_NotasDeVentaAlContadoA = "05";
+    /** Facturas B = 06 */
+    public static final String DOCSUBTYPECAE_FacturasB = "06";
+    /** Notas de Debito B = 07 */
+    public static final String DOCSUBTYPECAE_NotasDeDebitoB = "07";
+    /** Notas de Credito B = 08 */
+    public static final String DOCSUBTYPECAE_NotasDeCreditoB = "08";
+    /** Recibos B = 09 */
+    public static final String DOCSUBTYPECAE_RecibosB = "09";
+    /** Notas de Venta al contado B = 10 */
+    public static final String DOCSUBTYPECAE_NotasDeVentaAlContadoB = "10";
+    /** Nota de Débito por Operaciones en el Exterior = 20 */
+    public static final String DOCSUBTYPECAE_NotaDeDébitoPorOperacionesEnElExterior = "20";
+    /** Factura de Exportación E = 19 */
+    public static final String DOCSUBTYPECAE_FacturaDeExportaciónE = "19";
+    /** Nota de Crédito por Operaciones en el Exterior = 21 */
+    public static final String DOCSUBTYPECAE_NotaDeCréditoPorOperacionesEnElExterior = "21";
+
+    /** Set docsubtypecae */
+    public void setDocSubTypeCae(String docsubtypecae)
+    {
+        if (docsubtypecae == null || docsubtypecae.equals("01") || docsubtypecae.equals("02")
+                || docsubtypecae.equals("03") || docsubtypecae.equals("04") || docsubtypecae.equals("05")
+                || docsubtypecae.equals("06") || docsubtypecae.equals("07") || docsubtypecae.equals("08")
+                || docsubtypecae.equals("09") || docsubtypecae.equals("10") || docsubtypecae.equals("20")
+                || docsubtypecae.equals("19") || docsubtypecae.equals("21"))
+            ;
+        else
+            throw new IllegalArgumentException(
+                    "docsubtypecae Invalid value - Reference = DOCSUBTYPECAE_AD_Reference_ID - 01 - 02 - 03 - 04 - 05 - 06 - 07 - 08 - 09 - 10 - 20 - 19 - 21");
+        if (docsubtypecae != null && docsubtypecae.length() > 2)
+        {
+            log.warning("Length > 2 - truncated");
+            docsubtypecae = docsubtypecae.substring(0, 2);
+        }
+        set_Value("docsubtypecae", docsubtypecae);
+    } // setdocsubtypecae
+
+    /** Get docsubtypecae */
+    public String getdocsubtypecae()
+    {
+        return (String)get_Value("docsubtypecae");
+    } // getdocsubtypecae
+
+    /**
+     * @autor: Horacio Alvarez - Servicios Digitales S.A.
+     * @fecha: 2009-06-16
+     * @descripcion: Devuelve true en caso que el tipo de documento sea del tipo electronico,
+     * osea que obtiene el CAE mediante los WebServices de la AFIP.
+     */
+    public static boolean isElectronicDocType(int docType_ID)
+    {
+        boolean result = false;
+        if (docType_ID != 0)
+        {
+            MDocType docType = new MDocType(Env.getCtx(), docType_ID, null);
+            result = docType.isElectronic();
+        }
+        return result;
+    } // isElectronicDocType
+
+    /** Set iselectronic */
+    public void setIsElectronic(boolean iselectronic)
+    {
+        set_Value("iselectronic", new Boolean(iselectronic));
+    }
+
+    /** Get iselectronic */
+    public boolean isElectronic()
+    {
+        Object oo = get_Value("iselectronic");
+        if (oo != null)
+        {
+            if (oo instanceof Boolean)
+                return ((Boolean) oo).booleanValue();
+            return "Y".equals(oo);
+        }
+        return false;
+    }
+
 	/**
 	 * Return the first Doc Type for this BaseType
 	 * @param DocBaseType

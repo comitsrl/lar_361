@@ -17,7 +17,12 @@
 package org.compiere.model;
 
 import java.sql.ResultSet;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
+
+import org.compiere.util.Env;
+
 
 /**
  *	Preference Model
@@ -103,5 +108,34 @@ public class MPreference extends X_AD_Preference
 			.append ("]");
 		return sb.toString ();
 	}	//	toString
+
+    public static MPreference getUserPreference(Properties ctx, String attribute, String trxName)
+    {
+        RecordFinder finder = new RecordFinder();
+        Map filter = new TreeMap();
+        filter.put("AD_User_ID", Env.getContextAsInt(ctx, "#AD_User_ID"));
+        filter.put("Attribute", attribute);
+        ResultSet rs = finder.find(ctx, filter, Table_Name);
+        if (rs != null)
+        {
+            return new MPreference(ctx, rs, trxName);
+        }
+        return null;
+    }
+
+    public static MPreference getUserPreference(Properties ctx, String attribute, String trxName, Integer AD_Org_ID)
+    {
+        RecordFinder finder = new RecordFinder();
+        Map filter = new TreeMap();
+        filter.put("AD_User_ID", Env.getContextAsInt(ctx, "#AD_User_ID"));
+        filter.put("Attribute", attribute);
+        filter.put("AD_Org_ID", AD_Org_ID);
+        ResultSet rs = finder.find(ctx, filter, Table_Name);
+        if (rs != null)
+        {
+            return new MPreference(ctx, rs, trxName);
+        }
+        return null;
+    }
 	
 }	//	MPreference
