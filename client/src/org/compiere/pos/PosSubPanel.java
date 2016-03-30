@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import javax.swing.KeyStroke;
 
 import org.compiere.apps.AppsAction;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
@@ -142,8 +143,10 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 
 		final MOrder order = p_posPanel.m_order;
 		boolean isFiscal = false;
+		boolean isElectronic = false;
 		int reportType = 0;
 		int documentId = 0;
+		String impresoraFactura = "";
 
 		if (order != null)
 		{
@@ -175,8 +178,9 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
                 int C_DocType_ID = invoice.getC_DocType_ID();
                 isFiscal = LAR_Utils.isFiscalDocType(C_DocType_ID);
+                isElectronic = MDocType.isElectronicDocType(C_DocType_ID);
 
-                if (isFiscal)
+                if (isFiscal && !isElectronic)
                 {
                     // Impresión fiscal de factura
                     if (!p_posPanel.printFiscalTicket(invoice))
@@ -189,6 +193,11 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 {
                     reportType = ReportEngine.INVOICE;
                     documentId = invoice.getC_Invoice_ID();
+
+                    if (isElectronic)
+                    {
+                        ReportCtl.startDocumentPrint(reportType, null, documentId, null, Env.getWindowNo(this), true, impresoraFactura);
+                    }
                 }
 		    } // if (isShipment)
 
