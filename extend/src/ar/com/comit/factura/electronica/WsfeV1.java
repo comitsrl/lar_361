@@ -11,6 +11,7 @@ import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MPOS;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
@@ -89,9 +90,9 @@ public class WsfeV1 extends Wsfe{
 			}			
 			line.append(formatTime(this.getInvoice().getDateAcct(), "yyyyMMdd")+"\n");
 			
-			//*****PRESTA SERVICIOS 0-->NO  1-->SI  
-			line.append("0\n");
-			
+			//*****PRESTA SERVICIOS 0-->NO  1-->SI
+			line.append(MSysConfig.getValue("LAR_PrestaServicios_FE", Env.getAD_Client_ID(Env.getCtx())) + "\n");
+
 			//*****MONEDA
 			MCurrency currency = new MCurrency(this.getM_ctx(), this.getInvoice().getC_Currency_ID(),getTrxName());
 			line.append(currency.get_ValueAsString("WSFECode") + "\n");
