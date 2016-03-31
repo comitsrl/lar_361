@@ -793,16 +793,6 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 
 -- 28/03/2016 18:08:54 ART
 -- ISSUE #77: Facturación Electronica.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,AD_Org_ID,UpdatedBy,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002139,1,'Y','N','N',3000873,'N','Y',263,'N','LAR','Detail',0,100,'Y',TO_TIMESTAMP('2016-03-28 18:08:53','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2016-03-28 18:08:53','YYYY-MM-DD HH24:MI:SS'))
-;
-
--- 28/03/2016 18:08:54 ART
--- ISSUE #77: Facturación Electronica.
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002139 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 28/03/2016 18:08:54 ART
--- ISSUE #77: Facturación Electronica.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,AD_Org_ID,UpdatedBy,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002140,15,'Y','N','N',3001382,'N','Y',263,'N','LAR','IdCAE',0,100,'Y',TO_TIMESTAMP('2016-03-28 18:08:54','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2016-03-28 18:08:54','YYYY-MM-DD HH24:MI:SS'))
 ;
 
@@ -834,11 +824,6 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 -- 28/03/2016 18:10:36 ART
 -- ISSUE #77: Facturación Electronica.
 UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002137
-;
-
--- 28/03/2016 18:10:36 ART
--- ISSUE #77: Facturación Electronica.
-UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002139
 ;
 
 -- 28/03/2016 18:10:36 ART
@@ -879,6 +864,26 @@ UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3002138
 -- 28/03/2016 18:17:24 ART
 -- ISSUE #77: Facturación Electronica.
 UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2016-03-28 18:17:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002142
+;
+
+-- 29/03/2016 19:49:49 ART
+-- ISSUE #77: Facturación electronica.
+INSERT INTO AD_SysConfig (AD_SysConfig_ID,EntityType,ConfigurationLevel,Value,Description,Name,AD_Client_ID,AD_Org_ID,Created,Updated,CreatedBy,UpdatedBy,IsActive) VALUES (3000011,'LAR','C','0','Si se prestan servicios, ingresar 1. Caso contrario, ingresar 0. ','LAR_PrestaServicios_FE',0,0,TO_TIMESTAMP('2016-03-29 19:49:48','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-03-29 19:49:48','YYYY-MM-DD HH24:MI:SS'),100,100,'Y')
+;
+
+-- 29/03/2016 20:15:52 ART
+-- ISSUE #77: Facturación Electronica.
+UPDATE AD_Column SET AD_Reference_ID=10,Updated=TO_TIMESTAMP('2016-03-29 20:15:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001377
+;
+
+-- 31/03/2016 18:56:53 ART
+-- ISSUE #77: Facturación Electronica.
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3002133
+;
+
+-- 31/03/2016 18:56:53 ART
+-- ISSUE #77: Facturación Electronica.
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3002132
 ;
 
 -- Registración de Script
