@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MPOS;
@@ -99,7 +98,6 @@ public abstract class Wsfe {
 	 */
     protected String getPath()
     {
-        MDocType docType = new MDocType(Env.getCtx(), invoice.getC_DocTypeTarget_ID(), getTrxName());
         /**
          * El nombre de AD_Preference a consultar se forma concatenando el valor
          * WSFE_PV y el Nro de Punto de Venta

@@ -106,6 +106,7 @@ public class WsfeV1 extends Wsfe{
 			line.append(cotizacion+"\n");
 			
 			//*****IMPUESTO
+			BigDecimal total_Impuesto = BigDecimal.ZERO;
 			MInvoiceTax[] taxes = this.getInvoice().getTaxes(false);
 			MTax tax = null;
 			int size = taxes.length;
@@ -113,6 +114,7 @@ public class WsfeV1 extends Wsfe{
 			for (int i = 0; i < size; i++){
 				tax = MTax.get(this.getM_ctx(), taxes[i].getC_Tax_ID());
 				if (!tax.get_ValueAsBoolean("IsPerception")){
+				    total_Impuesto = total_Impuesto.add(taxes[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
 					taxes[i].getTaxAmt();
 					taxes[i].getTaxBaseAmt();
 					tax.get_ValueAsString("WSFECode");
@@ -124,12 +126,15 @@ public class WsfeV1 extends Wsfe{
 					firstLineAppended = true;	
 				}
 			}
-			
-//			line.append("\n");
-			
+
+            line.append("\n");
+
+            // *****MONTO TOTAL DE IMPUESTOS
+            line.append(total_Impuesto + "\n");
+
 			//*****IMPUESTOS PERCEPCIONES
 			BigDecimal total_Perception = BigDecimal.ZERO;
-			MInvoiceTax[] taxesPerc = this.getInvoice().getTaxes(false);
+			MInvoiceTax[] taxesPerc = this.getInvoice().getTaxes(true);
 			MTax taxPerc = null;
 			int sizePerc = taxesPerc.length;
 			boolean firstLineAppended2 = false;
@@ -145,12 +150,15 @@ public class WsfeV1 extends Wsfe{
 					if(firstLineAppended2){
 						line.append(";");
 					}
-					BigDecimal alic = taxPerc.getRate().setScale(2, BigDecimal.ROUND_HALF_UP);
+					BigDecimal alic = (taxPerc.getRate().setScale(2, BigDecimal.ROUND_HALF_UP)).negate();
 					line.append(taxPerc.get_ValueAsInt("WSFECode") + ":" + getTaxBaseAmt(taxesPerc[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), getTaxesAmt(this.getInvoice())) + ":" + taxesPerc[i].getTaxAmt() + ":" + alic);
 					firstLineAppended2 = true;	
 				}
 			}
-			
+
+			if (total_Perception.equals(Env.ZERO))
+			    line.append("0");
+
 			line.append("\n"); 
 			
 			//*****MONTO TOTAL DE PERCEPCIONES
