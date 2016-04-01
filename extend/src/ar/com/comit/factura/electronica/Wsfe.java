@@ -39,6 +39,8 @@ public abstract class Wsfe {
 	private String result = null;
 	private WsfeResult wsfeResult;
 
+	private String path = "";
+
 	public Wsfe(MInvoice inv) {
 		this.invoice = inv;
 		setTrxName(invoice.get_TrxName());
@@ -102,17 +104,28 @@ public abstract class Wsfe {
          * El nombre de AD_Preference a consultar se forma concatenando el valor
          * WSFE_PV y el Nro de Punto de Venta
          */
-        MPOS pos = new MPOS(m_ctx, invoice.get_ValueAsInt("C_Pos_ID"), trxName);
-        MPreference preference = MPreference.getUserPreference(Env.getCtx(),
-                "WSFE_PV" + pos.get_ValueAsInt("PosNumber"), getTrxName());
-        if (preference == null)
+        if (path != "")
+            return path;
+        else
         {
-            // En el caso que no se haya encontrado ninguna preferencia a partir
-            // del Nro de Punto de Venta se busca utilizando el valor por
-            // defecto que es: WSFE
-            preference = MPreference.getUserPreference(Env.getCtx(), "WSFE", getTrxName());
+            MPOS pos = new MPOS(m_ctx, invoice.get_ValueAsInt("C_Pos_ID"), trxName);
+            String atributo = "WSFE_PV" + pos.get_ValueAsInt("PosNumber");
+            MPreference preference = MPreference.getOrgPreference(Env.getAD_Client_ID(getM_ctx()),
+                    Env.getAD_Org_ID(getM_ctx()), atributo, getM_ctx(), getTrxName());
+
+            // En el caso que no se haya encontrado ninguna preferencia
+            // a partir del Nro de Punto de Venta se busca utilizando el valor
+            // por defecto que es: WSFE
+            if (preference == null)
+            {
+                atributo = "WSFE";
+                preference = MPreference.getOrgPreference(Env.getAD_Client_ID(getM_ctx()),
+                        Env.getAD_Org_ID(getM_ctx()), atributo, getM_ctx(), getTrxName());
+            }
+
+            path = preference.getValue();
+            return path;
         }
-        return preference.getValue();
     }
 	
 	protected void deleteExistingFiles(){
