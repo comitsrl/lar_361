@@ -1981,8 +1981,8 @@ public class MInvoice extends X_C_Invoice implements DocAction
                     MDocType dt = MDocType.get(getCtx(), getC_DocType_ID());
                     MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), nroCbte + 1, get_TrxName());
 
-                    log.log(Level.SEVERE, "CAE: " + processor.getCAE());
-                    log.log(Level.SEVERE, "DATE CAE: " + processor.getDateCae());
+                    log.log(Level.WARNING, "CAE: " + processor.getCAE());
+                    log.log(Level.WARNING, "DATE CAE: " + processor.getDateCae());
                 }
             }
         }

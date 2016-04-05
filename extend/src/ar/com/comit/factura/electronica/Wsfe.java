@@ -222,7 +222,7 @@ public abstract class Wsfe {
 				log.log(Level.SEVERE, linea);
 			}
 			else{
-				log.log(Level.SEVERE, "Everything is OK");
+				log.log(Level.WARNING, "Everything is OK");
 			}
 		}
 		catch(Exception ex){
@@ -242,7 +242,7 @@ public abstract class Wsfe {
 		try { 
 				BufferedReader reader = new BufferedReader(new FileReader(getPath()+"salida.txt"));
 				linea = reader.readLine();
-				log.log(Level.SEVERE, linea);
+				log.log(Level.INFO, linea);
 	    } catch (IOException ex) { 
 	    	  messageError = Msg.translate(m_ctx, "CaeErrorReadOutput");
 	    	  log.log(Level.SEVERE, messageError+ex);
