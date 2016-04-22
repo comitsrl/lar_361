@@ -77,11 +77,11 @@ public class WsfeV1 extends Wsfe{
 			
 			//*****IMPORTE TOTAL
 			//line.append(this.getInvoice().getGrandTotal().toString().replace(".", "")+"\n");
-			line.append(this.getInvoice().getGrandTotal()+"\n");
+			line.append(this.getInvoice().getGrandTotal().setScale(2, BigDecimal.ROUND_HALF_UP) + "\n");
 			
 			//*****IMPORTE NETO
 			//line.append(this.getInvoice().getTotalLines().toString().replace(".", "")+"\n");
-			line.append(this.getInvoice().getTotalLines()+"\n");
+			line.append(this.getInvoice().getTotalLines().setScale(2, BigDecimal.ROUND_HALF_UP) + "\n");
 			
 			//*****FECHA
 			if(this.getInvoice().getDateAcct() == null){
@@ -122,7 +122,7 @@ public class WsfeV1 extends Wsfe{
 					if(firstLineAppended){
 						line.append(";");
 					}
-					line.append(tax.get_ValueAsString("WSFECode") + ":" + getTaxBaseAmt(taxes[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), getTaxesAmt(this.getInvoice())) + ":" + taxes[i].getTaxAmt());
+					line.append(tax.get_ValueAsString("WSFECode") + ":" + (getTaxBaseAmt(taxes[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), getTaxesAmt(this.getInvoice()))).setScale(2, BigDecimal.ROUND_HALF_UP) + ":" + taxes[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
 					firstLineAppended = true;	
 				}
 			}
@@ -151,7 +151,7 @@ public class WsfeV1 extends Wsfe{
 						line.append(";");
 					}
 					BigDecimal alic = (taxPerc.getRate().setScale(2, BigDecimal.ROUND_HALF_UP)).negate();
-					line.append(taxPerc.get_ValueAsInt("WSFECode") + ":" + getTaxBaseAmt(taxesPerc[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), getTaxesAmt(this.getInvoice())) + ":" + taxesPerc[i].getTaxAmt() + ":" + alic);
+					line.append(taxPerc.get_ValueAsInt("WSFECode") + ":" + (getTaxBaseAmt(taxesPerc[i].getTaxBaseAmt(), this.getInvoice().getGrandTotal(), getTaxesAmt(this.getInvoice()))).setScale(2, BigDecimal.ROUND_HALF_UP) + ":" + taxesPerc[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP) + ":" + alic);
 					firstLineAppended2 = true;	
 				}
 			}
