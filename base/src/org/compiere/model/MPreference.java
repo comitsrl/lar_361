@@ -16,12 +16,14 @@
  *****************************************************************************/
 package org.compiere.model;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Map;
+import java.sql.SQLException;
 import java.util.Properties;
-import java.util.TreeMap;
+import java.util.logging.Level;
 
-import org.compiere.util.Env;
+import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 
 
 /**
@@ -38,7 +40,8 @@ public class MPreference extends X_AD_Preference
 	private static final long serialVersionUID = -5098559160325123593L;
 	/**	Null Indicator				*/
 	public static String		NULL = "null";
-	
+    private static CLogger log = CLogger.getCLogger(MPreference.class);
+
 	/**
 	 * 	Standatrd Constructor
 	 *	@param ctx ctx
@@ -109,33 +112,49 @@ public class MPreference extends X_AD_Preference
 		return sb.toString ();
 	}	//	toString
 
-    public static MPreference getUserPreference(Properties ctx, String attribute, String trxName)
+	/**
+	 * Obtener Preferencia a nivel Organización, mediante el campo Attribute.
+	 *
+	 * @param AD_Client_ID
+	 * @param AD_Org_ID
+	 * @param atributo
+	 * @param ctx
+	 * @param trx
+	 * @return MPreference
+	 */
+    public static MPreference getOrgPreference(final int AD_Client_ID, final int AD_Org_ID, final String atributo,
+                                                final Properties ctx, final String trx)
     {
-        RecordFinder finder = new RecordFinder();
-        Map filter = new TreeMap();
-        filter.put("AD_User_ID", Env.getContextAsInt(ctx, "#AD_User_ID"));
-        filter.put("Attribute", attribute);
-        ResultSet rs = finder.find(ctx, filter, Table_Name);
-        if (rs != null)
-        {
-            return new MPreference(ctx, rs, trxName);
-        }
-        return null;
-    }
+        String sql = "SELECT AD_Preference_ID"
+                   + "  FROM AD_Preference "
+                   + " WHERE AD_Client_ID=? AND AD_Org_ID=? AND Attribute=?";
 
-    public static MPreference getUserPreference(Properties ctx, String attribute, String trxName, Integer AD_Org_ID)
-    {
-        RecordFinder finder = new RecordFinder();
-        Map filter = new TreeMap();
-        filter.put("AD_User_ID", Env.getContextAsInt(ctx, "#AD_User_ID"));
-        filter.put("Attribute", attribute);
-        filter.put("AD_Org_ID", AD_Org_ID);
-        ResultSet rs = finder.find(ctx, filter, Table_Name);
-        if (rs != null)
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        MPreference preference = null;
+        try
         {
-            return new MPreference(ctx, rs, trxName);
+            pstmt = DB.prepareStatement(sql, null);
+            pstmt.setInt(1, AD_Client_ID);
+            pstmt.setInt(2, AD_Org_ID);
+            pstmt.setString(3, atributo);
+            rs = pstmt.executeQuery();
+            if (rs.next())
+            {
+                preference = new MPreference(ctx, rs.getInt("AD_Preference_ID"), trx);
+            }
         }
-        return null;
-    }
+        catch (SQLException eSql)
+        {
+            log.log(Level.SEVERE, sql, eSql);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+        return preference;
+    } // getOrgPreference
 	
 }	//	MPreference

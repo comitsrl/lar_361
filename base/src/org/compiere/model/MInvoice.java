@@ -1938,14 +1938,6 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			return DocAction.STATUS_Invalid;
 		}
 
-		// Set the definite document number after completed (if needed)
-		setDefiniteDocumentNo();
-
-		//	Counter Documents
-		MInvoice counter = createCounterDoc();
-		if (counter != null)
-			info.append(" - @CounterDoc@: @C_Invoice_ID@=").append(counter.getDocumentNo());
-
         /**
          * @agregado: Horacio Alvarez - Servicios Digitales S.A.
          * @fecha: 2009-06-16
@@ -1954,7 +1946,6 @@ public class MInvoice extends X_C_Invoice implements DocAction
          */
         if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()))
         {
-
             // === Lógica adicional para evitar doble notificación a AFIP. ===
             // Si tiene CAE asignado, no debe generarlo nuevamente
             if ((getcae() == null || getcae().length() == 0) && getcaecbte() != getNumeroComprobante())
@@ -1976,16 +1967,19 @@ public class MInvoice extends X_C_Invoice implements DocAction
                     int nroCbte = Integer.parseInt(processor.getNroCbte());
                     this.setNumeroComprobante(nroCbte);
 
-                    // Actualizar la secuencia del tipo de documento de la
-                    // factura en función del valor recibido en el WS de AFIP
-                    MDocType dt = MDocType.get(getCtx(), getC_DocType_ID());
-                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), nroCbte + 1, get_TrxName());
-
-                    log.log(Level.SEVERE, "CAE: " + processor.getCAE());
-                    log.log(Level.SEVERE, "DATE CAE: " + processor.getDateCae());
+                    log.log(Level.WARNING, "CAE: " + processor.getCAE());
+                    log.log(Level.WARNING, "DATE CAE: " + processor.getDateCae());
                 }
             }
         }
+
+        // Set the definite document number after completed (if needed)
+        setDefiniteDocumentNo();
+
+        // Counter Documents
+        MInvoice counter = createCounterDoc();
+        if (counter != null)
+            info.append(" - @CounterDoc@: @C_Invoice_ID@=").append(counter.getDocumentNo());
 
 		m_processMsg = info.toString().trim();
 		setProcessed(true);
@@ -2013,9 +2007,33 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			setDateInvoiced(new Timestamp (System.currentTimeMillis()));
 		}
 		if (dt.isOverwriteSeqOnComplete()) {
-			String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
-			if (value != null)
-				setDocumentNo(value);
+		    // @fchiappano
+            if (dt.isElectronic())
+            {
+                final MSequence seq = new MSequence(getCtx(), dt.getDefiniteSequence_ID(), get_TrxName());
+                final int currentNext = seq.getCurrentNext();
+
+                // @fchiappano Comprobar que el siguiente número de la secuencia coincida
+                // con el devuelto por afip.
+                if (currentNext != getNumeroComprobante())
+                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), getNumeroComprobante(),
+                            get_TrxName());
+
+                String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
+                if (value != null)
+                    setDocumentNo(value);
+
+                // @fchiappano Controlar que el currentNext este correcto para la siguiente
+                // transacción.
+                MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), getNumeroComprobante() + 1,
+                        get_TrxName());
+            }
+            else
+            {
+                String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
+                if (value != null)
+                    setDocumentNo(value);
+            }
 		}
 	}
 

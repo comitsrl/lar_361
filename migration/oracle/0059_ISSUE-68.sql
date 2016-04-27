@@ -77,7 +77,7 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 
 -- 05/01/2015 8:29:35 ART
 -- BUG #23: Retenciones en Cobros
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3001625,1,'Y','N','N',3000825,'N','Y',3000013,'N','LAR','IsBounced',100,0,TO_DATE('2015-01-05 08:29:35','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2015-01-05 08:29:35','YYYY-MM-DD HH24:MI:SS'))
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3001625,1,'Y','N','N',3000274,'N','Y',3000013,'N','LAR','IsBounced',100,0,TO_DATE('2015-01-05 08:29:35','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2015-01-05 08:29:35','YYYY-MM-DD HH24:MI:SS'))
 ;
 
 -- 05/01/2015 8:29:35 ART
@@ -87,7 +87,7 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 
 -- 05/01/2015 8:29:36 ART
 -- BUG #23: Retenciones en Cobros
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3001626,1,'Y','N','N',3000826,'N','Y',3000013,'N','LAR','IsDeposited',100,0,TO_DATE('2015-01-05 08:29:35','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2015-01-05 08:29:35','YYYY-MM-DD HH24:MI:SS'))
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3001626,1,'Y','N','N',3000275,'N','Y',3000013,'N','LAR','IsDeposited',100,0,TO_DATE('2015-01-05 08:29:35','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2015-01-05 08:29:35','YYYY-MM-DD HH24:MI:SS'))
 ;
 
 -- 05/01/2015 8:29:36 ART
@@ -97,7 +97,7 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 
 -- 05/01/2015 8:29:36 ART
 -- BUG #23: Retenciones en Cobros
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3001627,60,'Y','N','N',3000824,'N','Y',3000013,'N','LAR','TargetAccount',100,0,TO_DATE('2015-01-05 08:29:36','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2015-01-05 08:29:36','YYYY-MM-DD HH24:MI:SS'))
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3001627,60,'Y','N','N',3000273,'N','Y',3000013,'N','LAR','TargetAccount',100,0,TO_DATE('2015-01-05 08:29:36','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2015-01-05 08:29:36','YYYY-MM-DD HH24:MI:SS'))
 ;
 
 -- 05/01/2015 8:29:36 ART
