@@ -2008,8 +2008,12 @@ public class MOrder extends X_C_Order implements DocAction
 		}
 		
 		// added AdempiereException by zuhri
-		if (!invoice.processIt(DocAction.ACTION_Complete))
-			throw new AdempiereException("Failed when processing document - " + invoice.getProcessMsg());
+        if (!invoice.processIt(DocAction.ACTION_Complete))
+        {
+            // @fchiappano capturar el error desde la MInvoice.
+            m_processMsg = invoice.getProcessMsg();
+            throw new AdempiereException("Failed when processing document - " + m_processMsg);
+        }
 		// end added
 		invoice.saveEx(get_TrxName());
 		setC_CashLine_ID(invoice.getC_CashLine_ID());

@@ -38,8 +38,11 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.Util;
 import org.eevolution.model.MPPProductBOM;
 import org.eevolution.model.MPPProductBOMLine;
+
+import ar.com.comit.factura.electronica.ProcessorWSFE;
 
 
 /**
@@ -1367,6 +1370,11 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		//	Convert/Check DocType
 		if (getC_DocType_ID() != getC_DocTypeTarget_ID() )
 			setC_DocType_ID(getC_DocTypeTarget_ID());
+
+        // @fchiappano: Setea el Numero de comprobante obtenido desde la
+        // secuencia definitiva.
+        setNumeroComprobante(getNextNroComprobante(getC_DocType_ID()));
+
 		if (getC_DocType_ID() == 0)
 		{
 			m_processMsg = "No Document Type";
@@ -1930,13 +1938,48 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			return DocAction.STATUS_Invalid;
 		}
 
-		// Set the definite document number after completed (if needed)
-		setDefiniteDocumentNo();
+        /**
+         * @agregado: Horacio Alvarez - Servicios Digitales S.A.
+         * @fecha: 2009-06-16
+         * @fecha: 2011-06-25 modificado para soportar WSFEv1.0
+         *
+         */
+        if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()))
+        {
+            // === Lógica adicional para evitar doble notificación a AFIP. ===
+            // Si tiene CAE asignado, no debe generarlo nuevamente
+            if ((getcae() == null || getcae().length() == 0) && getcaecbte() != getNumeroComprobante())
+            {
+                ProcessorWSFE processor = new ProcessorWSFE(this);
+                String errorMsg = processor.generateCAE();
+                if (Util.isEmpty(processor.getCAE()))
+                {
+                    setcaeerror(errorMsg);
+                    m_processMsg = errorMsg;
+                    log.log(Level.SEVERE, "CAE Error: " + errorMsg);
+                    return DocAction.STATUS_Invalid;
+                }
+                else
+                {
+                    setcae(processor.getCAE());
+                    setvtocae(processor.getDateCae());
+                    setcaeerror(errorMsg);
+                    int nroCbte = Integer.parseInt(processor.getNroCbte());
+                    this.setNumeroComprobante(nroCbte);
 
-		//	Counter Documents
-		MInvoice counter = createCounterDoc();
-		if (counter != null)
-			info.append(" - @CounterDoc@: @C_Invoice_ID@=").append(counter.getDocumentNo());
+                    log.log(Level.WARNING, "CAE: " + processor.getCAE());
+                    log.log(Level.WARNING, "DATE CAE: " + processor.getDateCae());
+                }
+            }
+        }
+
+        // Set the definite document number after completed (if needed)
+        setDefiniteDocumentNo();
+
+        // Counter Documents
+        MInvoice counter = createCounterDoc();
+        if (counter != null)
+            info.append(" - @CounterDoc@: @C_Invoice_ID@=").append(counter.getDocumentNo());
 
 		m_processMsg = info.toString().trim();
 		setProcessed(true);
@@ -1964,9 +2007,33 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			setDateInvoiced(new Timestamp (System.currentTimeMillis()));
 		}
 		if (dt.isOverwriteSeqOnComplete()) {
-			String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
-			if (value != null)
-				setDocumentNo(value);
+		    // @fchiappano
+            if (dt.isElectronic())
+            {
+                final MSequence seq = new MSequence(getCtx(), dt.getDefiniteSequence_ID(), get_TrxName());
+                final int currentNext = seq.getCurrentNext();
+
+                // @fchiappano Comprobar que el siguiente número de la secuencia coincida
+                // con el devuelto por afip.
+                if (currentNext != getNumeroComprobante())
+                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), getNumeroComprobante(),
+                            get_TrxName());
+
+                String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
+                if (value != null)
+                    setDocumentNo(value);
+
+                // @fchiappano Controlar que el currentNext este correcto para la siguiente
+                // transacción.
+                MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), getNumeroComprobante() + 1,
+                        get_TrxName());
+            }
+            else
+            {
+                String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
+                if (value != null)
+                    setDocumentNo(value);
+            }
 		}
 	}
 
@@ -2438,5 +2505,103 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			|| DOCSTATUS_Closed.equals(ds)
 			|| DOCSTATUS_Reversed.equals(ds);
 	}	//	isComplete
+
+	// @fchiappano Codigo copiado desde Libertya para Facturación Electronica.
+    /** Set cae */
+    public void setcae(String cae)
+    {
+        if (cae != null && cae.length() > 14)
+        {
+            log.warning("Length > 14 - truncated");
+            cae = cae.substring(0, 14);
+        }
+        set_Value("cae", cae);
+    }
+
+    /** Get cae */
+    public String getcae()
+    {
+        return (String) get_Value("cae");
+    }
+
+    /** Set caecbte */
+    public void setcaecbte(int caecbte)
+    {
+        set_Value("caecbte", new Integer(caecbte));
+    }
+
+    /** Get caecbte */
+    public int getcaecbte()
+    {
+        Integer ii = (Integer) get_Value("caecbte");
+        if (ii == null)
+            return 0;
+        return ii.intValue();
+    }
+
+    /** Set caeerror */
+    public void setcaeerror(String caeerror)
+    {
+        if (caeerror != null && caeerror.length() > 255)
+        {
+            log.warning("Length > 255 - truncated");
+            caeerror = caeerror.substring(0, 255);
+        }
+        set_Value("caeerror", caeerror);
+    }
+
+    /** Get caeerror */
+    public String getcaeerror()
+    {
+        return (String) get_Value("caeerror");
+    }
+
+    /** Set vtocae */
+    public void setvtocae(Timestamp vtocae)
+    {
+        set_Value("vtocae", vtocae);
+    }
+
+    /** Get vtocae */
+    public Timestamp getvtocae()
+    {
+        return (Timestamp) get_Value("vtocae");
+    }
+
+    /** Set Numero Comprobante */
+    public void setNumeroComprobante(int NumeroComprobante)
+    {
+        set_Value("NumeroComprobante", new Integer(NumeroComprobante));
+    }
+
+    /** Get Numero Comprobante */
+    public int getNumeroComprobante()
+    {
+        Integer ii = (Integer) get_Value("NumeroComprobante");
+        if (ii == null)
+            return 0;
+        return ii.intValue();
+    }
+
+    /**
+     * Obtiene el siguiente número de comprobante de la secuancia definitiva de la MInvoice.
+     * @param docTypeID
+     * @return
+     */
+    public static Integer getNextNroComprobante(final int docTypeID)
+    {
+        Integer nro = null;
+        Properties ctx = Env.getCtx();
+        MDocType mDocType = new MDocType(ctx, docTypeID, null);
+        if (mDocType != null)
+        {
+            MSequence seq = new MSequence(ctx, mDocType.getDefiniteSequence_ID(), null);
+            if (seq != null)
+            {
+                nro = seq.getCurrentNext();
+            }
+        }
+        return nro;
+    }
 
 }	//	MInvoice
