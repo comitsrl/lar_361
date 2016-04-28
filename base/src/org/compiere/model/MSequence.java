@@ -1336,35 +1336,14 @@ public class MSequence extends X_AD_Sequence
      * @param trxName
      * @return
      */
-    public static boolean setFiscalDocTypeNextNroComprobante(int sequenceID, int nextNroComprobante, String trxName)
+    public static boolean setFiscalDocTypeNextNroComprobante(final int sequenceID, final int nextNroComprobante, final String trxName)
     {
         MSequence seq = new MSequence(Env.getCtx(), sequenceID, trxName);
-        String currentNext = String.valueOf(seq.getCurrentNext());
-        String prefix = seq.getPrefix();
+        int currentNext = seq.getCurrentNext();
 
-        NumberFormat format = NumberFormat.getNumberInstance();
-        format.setMinimumIntegerDigits(8);
-        format.setMaximumIntegerDigits(8);
-        format.setGroupingUsed(false);
-        // Se debe determinar que parte del punto de venta está contenido en el
-        // CurrentNext (debido al conocido problema de los puntos de venta
-        // terminados en Cero)
-        //
-        // Long del Prefijo = 4 -> PV en CurrentNext = 1
-        // Long del Prefijo = 3 -> PV en CurrentNext = 2
-        // Long del Prefijo = 2 -> PV en CurrentNext = 3
-        // Long del Prefijo = 1 -> PV en CurrentNext = 4
-        //
-        // Se obtiene el número siguiente de documento según el ultimo
-        // comprobante
-        // emitido por la impresora fiscal.
-        String newCurrentNext = currentNext.substring(0, (4 - prefix.length()) + 1) + format.format(nextNroComprobante);
-        // Se actualiza la secuencia solo si el número de comprobante siguiente
-        // es distinto al
-        // que ya tenía la secuencia.
-        if (!currentNext.equals(newCurrentNext))
+        if (currentNext != nextNroComprobante)
         {
-            seq.setCurrentNext(Integer.parseInt(newCurrentNext));
+            seq.setCurrentNext(nextNroComprobante);
             return seq.save();
         }
 
