@@ -242,7 +242,11 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 			ba.load(get_TrxName());
 			setBeginningBalance(ba.getCurrentBalance());
 		}
-		setEndingBalance(getBeginningBalance().add(getStatementDifference()));
+        // @fchiappano Si es un cierre de caja, EndingBalance = SaldoInicial + StatementDifference.
+        if (get_ValueAsBoolean("EsCierreCaja"))
+            setEndingBalance(((BigDecimal) get_Value("SaldoInicial")).add(getStatementDifference()));
+        else
+            setEndingBalance(getBeginningBalance().add(getStatementDifference()));
 		return true;
 	}	//	beforeSave
 	
@@ -318,7 +322,11 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				maxDate = line.getDateAcct(); 
 		}
 		setStatementDifference(total);
-		setEndingBalance(getBeginningBalance().add(total));
+        // @fchiappano Si es un cierre de caja, EndingBalance = SaldoInicial + total.
+        if (get_ValueAsBoolean("EsCierreCaja"))
+            setEndingBalance(((BigDecimal) get_Value("SaldoInicial")).add(total));
+        else
+            setEndingBalance(getBeginningBalance().add(total));
 		MPeriod.testPeriodOpen(getCtx(), minDate, MDocType.DOCBASETYPE_BankStatement, 0);
 		MPeriod.testPeriodOpen(getCtx(), maxDate, MDocType.DOCBASETYPE_BankStatement, 0);
 
