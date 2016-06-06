@@ -54,6 +54,7 @@ public class DrawerTransfer extends SvrProcess
     private int p_To_C_BankAccount_ID = 0; // Bank Account To
     private Timestamp p_StatementDate = null; // Date Statement
     private Timestamp p_DateAcct = null; // Date Account
+    private int p_BankStatement_ID = 0;
     private int m_transferred = 0;
 
     /**
@@ -78,6 +79,8 @@ public class DrawerTransfer extends SvrProcess
                 p_StatementDate = (Timestamp) para[i].getParameter();
             else if (name.equals("DateAcct"))
                 p_DateAcct = (Timestamp) para[i].getParameter();
+            else if (name.equals("C_BankStatement_ID"))
+                p_BankStatement_ID = para[i].getParameterAsInt();
             else
                 log.log(Level.SEVERE, "prepare - Unknown Parameter: " + name);
         }
@@ -131,14 +134,19 @@ public class DrawerTransfer extends SvrProcess
      */
     private void generateDrawerTransfer()
     {
+        final MBankStatement statement = new MBankStatement(getCtx(), p_BankStatement_ID, get_TrxName());
         final MBankAccount mBankFrom = new MBankAccount(getCtx(), p_From_C_BankAccount_ID, get_TrxName());
         final MBankAccount mBankTo = new MBankAccount(getCtx(), p_To_C_BankAccount_ID, get_TrxName());
 
         BigDecimal cashAmt = BigDecimal.ZERO;
         BigDecimal totalAmt = BigDecimal.ZERO;
         // Iterates over conciliated payments
-        for (final MBankStatementLine line : getLines(mBankFrom))
+        for (final MBankStatementLine line : statement.getLines(true))
         {
+            // @fchiappano Si la linea ya fue tranferida, se pasa a la siguiente.
+            if (line.get_ValueAsBoolean("IsTransferred"))
+                continue;
+
             final MPayment paymentFrom = new MPayment(getCtx(), line.getC_Payment_ID(), get_TrxName());
             totalAmt = totalAmt.add(paymentFrom.getPayAmt());
             // Accumulates cash amounts
@@ -226,7 +234,18 @@ public class DrawerTransfer extends SvrProcess
         newLine.saveEx();
         // process statement
         newStmt.processIt(MBankStatement.DOCACTION_Complete);
+        // @fchiappano Marco el nuevo Statement como transferido.
+        newStmt.set_ValueOfColumn("Tranferido", true);
+        // @fchiappano si el Statement original, Es un cierre de caja,
+        // marco el nuevo Statement como cierre de caja tambien.
+        if (statement.get_ValueAsBoolean("EsCierreCaja"))
+            newStmt.set_ValueOfColumn("EsCierreCaja", true);
         newStmt.saveEx();
+
+        // @fchiappano Marco el Statement original como transferido.
+        statement.set_ValueOfColumn("Tranferido", true);
+        statement.saveEx();
+
         return;
     } // generateDrawerTransfer
 
