@@ -28,6 +28,8 @@ import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+
+import ar.com.ergio.model.TransaccionCuentaBancaria;
  
 /**
 *	Bank Statement Model
@@ -411,6 +413,31 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 		{
 			m_processMsg = valid;
 			return DocAction.STATUS_Invalid;
+		}
+
+		// @fchiappano tranferir todos los moviemientos de caja, a las cuentas según corresponda.
+		if (get_ValueAsBoolean("EsCierreCaja"))
+		{
+		    if (getBankAccount().get_ValueAsBoolean("EsCajaPrincipal") && !get_ValueAsBoolean("Transferido"))
+		    {
+		        final Timestamp fecha = new Timestamp(System.currentTimeMillis());
+		        final int C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();
+                final String descripcion = "Pago en concepto de transferencia de valores de caja pricipal, a cuenta bancaria según forma de pago.";
+                TransaccionCuentaBancaria.transferirValoresPorFormaPago(getC_BankStatement_ID(),
+                        descripcion, C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
+		    }
+		    else
+            {
+		        if (!get_ValueAsBoolean("Transferido"))
+		        {
+                    final Timestamp fecha = new Timestamp(System.currentTimeMillis());
+                    final int C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();
+                    final String descripcion = "Pago en concepto de transferencia de valores, entre cajas.";
+                    TransaccionCuentaBancaria.transferirMovimientosEntreCuentas(getC_BankStatement_ID(),
+                            getC_BankAccount_ID(), getBankAccount().get_ValueAsInt("CajaPrincipal_ID"), descripcion,
+                            C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
+		        }
+		    }
 		}
 		//
 		setProcessed(true);

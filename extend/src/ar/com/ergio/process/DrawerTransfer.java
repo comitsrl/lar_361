@@ -123,9 +123,16 @@ public class DrawerTransfer extends SvrProcess
         if (p_DateAcct == null)
             p_DateAcct = p_StatementDate;
 
-        m_transferred = TransaccionCuentaBancaria.transferirMovimientosEntreCuentas(p_BankStatement_ID,
-                p_From_C_BankAccount_ID, p_To_C_BankAccount_ID, p_Description, p_C_BPartner_ID, p_C_Currency_ID,
-                p_StatementDate, p_DateAcct, getCtx(), get_TrxName());
+        // Si la cuenta, es una caja principal, se transfieren los valores segun 
+        // la forma de pago.
+        final MBankAccount cuenta = new MBankAccount(getCtx(), p_From_C_BankAccount_ID, get_TrxName());
+        if(cuenta.get_ValueAsBoolean("EsCajaPrincipal"))
+            m_transferred = TransaccionCuentaBancaria.transferirValoresPorFormaPago(p_BankStatement_ID, p_Description,
+                    p_C_BPartner_ID, p_StatementDate, p_DateAcct, getCtx(), get_TrxName());
+        else
+            m_transferred = TransaccionCuentaBancaria.transferirMovimientosEntreCuentas(p_BankStatement_ID,
+                    p_From_C_BankAccount_ID, p_To_C_BankAccount_ID, p_Description, p_C_BPartner_ID, p_StatementDate,
+                    p_DateAcct, getCtx(), get_TrxName());
 
         return "@Se transfirieron@ " + m_transferred + " líneas.";
     } // doIt
