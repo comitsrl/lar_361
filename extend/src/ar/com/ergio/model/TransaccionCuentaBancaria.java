@@ -178,7 +178,8 @@ public class TransaccionCuentaBancaria
                 {
                     if (pago.getTenderType().equals("C") || pago.getTenderType().equals("D"))
                     {
-                        if (pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID") == cuenta.get_ValueAsInt("LAR_Tarjeta_Credito_ID"))
+                        if (pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID") == cuenta.get_ValueAsInt("LAR_Tarjeta_Credito_ID") ||
+                                pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID") == cuenta.get_ValueAsInt("LAR_Tarjeta_Debito_ID"))
                         {
                             totalAmt = totalAmt.add(pago.getPayAmt());
 
