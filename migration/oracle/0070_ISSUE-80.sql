@@ -3661,6 +3661,16 @@ UPDATE AD_Column SET AD_Reference_Value_ID=NULL, AD_Val_Rule_ID=NULL,Updated=TO_
 UPDATE AD_Column SET AD_Reference_ID=19,Updated=TO_DATE('2016-06-16 19:59:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001057
 ;
 
+-- 21/06/2016 19:42:00 ART
+-- BUG #192: ABM - Maestro de planes de tarjeta.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000031,Updated=TO_DATE('2016-06-21 19:42:00','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001188
+;
+
+-- 21/06/2016 19:42:19 ART
+-- BUG #192: ABM - Maestro de planes de tarjeta.
+UPDATE AD_Column SET AD_Reference_Value_ID=3000046, AD_Reference_ID=18,Updated=TO_DATE('2016-06-21 19:42:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001772
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0070_ISSUE-80.sql', 'LAR', '') FROM DUAL
 ;
