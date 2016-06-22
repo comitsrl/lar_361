@@ -970,6 +970,10 @@ ALTER TABLE LAR_TenderType_BankAccount ADD COLUMN LAR_Tarjeta_Debito_ID numeric(
 ALTER TABLE LAR_TenderType_BankAccount ADD CONSTRAINT lar_tendertype_bankaccount_lar_tarjeta_debito_id_fkey FOREIGN KEY (lar_tarjeta_debito_id)
       REFERENCES lar_tarjeta_credito (lar_tarjeta_credito_id) MATCH SIMPLE;
 
+CREATE UNIQUE INDEX LAR_TenderType_BankAccount_Credito ON LAR_TenderType_BankAccount (TenderType, LAR_Tarjeta_Credito_ID);
+
+CREATE UNIQUE INDEX LAR_TenderType_BankAccount_Debito ON LAR_TenderType_BankAccount (TenderType, LAR_Tarjeta_Debito_ID);
+
 -- 16/06/2016 20:17:24 ART
 -- BUG #251: Contabilidad por Forma de Pago
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001774,3000034,'LAR',0,'N','N','N','N',10,'N',19,'N',3000338,'N','Y','N','Tarjeta de Debito','LAR_Tarjeta_Debito_ID',100,TO_TIMESTAMP('2016-06-16 20:17:23','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2016-06-16 20:17:23','YYYY-MM-DD HH24:MI:SS'),100)
@@ -1013,6 +1017,51 @@ UPDATE AD_Field SET DisplayLogic='@TenderType@=D',Updated=TO_TIMESTAMP('2016-06-
 -- 16/06/2016 20:21:07 ART
 -- BUG #251: Contabilidad por Forma de Pago
 UPDATE AD_Column SET AD_Val_Rule_ID=3000031,Updated=TO_TIMESTAMP('2016-06-16 20:21:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001770
+;
+
+-- 22/06/2016 16:23:35 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001776,3000034,'LAR',0,'N','N','N','N',10,'N',19,'N',3000209,'N','Y','N','Tarjeta de Crédito','LAR_Tarjeta_Credito_ID',100,TO_TIMESTAMP('2016-06-22 16:23:34','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2016-06-22 16:23:34','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 22/06/2016 16:23:35 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001776 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 22/06/2016 16:23:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000031,Updated=TO_TIMESTAMP('2016-06-22 16:23:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001776
+;
+
+-- 22/06/2016 16:24:39 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002682,10,'Y','N','N',3001776,'N','Y',3000055,'N','LAR','Tarjeta de Crédito',100,0,'Y',TO_TIMESTAMP('2016-06-22 16:24:39','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2016-06-22 16:24:39','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 22/06/2016 16:24:39 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002682 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 22/06/2016 16:24:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3001887
+;
+
+-- 22/06/2016 16:24:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=3002681
+;
+
+-- 22/06/2016 16:24:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=70,IsDisplayed='Y' WHERE AD_Field_ID=3002682
+;
+
+-- 22/06/2016 16:25:21 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=C',Updated=TO_TIMESTAMP('2016-06-22 16:25:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002682
 ;
 
 -- Registración de script
