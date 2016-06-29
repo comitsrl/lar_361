@@ -655,6 +655,768 @@ UPDATE AD_Field SET DisplayLogic='@IsDrawer@=''Y''',Updated=TO_TIMESTAMP('2016-0
 UPDATE AD_Column SET AD_Reference_Value_ID=53283, AD_Reference_ID=18,Updated=TO_TIMESTAMP('2016-06-09 21:22:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001766
 ;
 
+ALTER TABLE C_BankStatement ADD COLUMN MensajeImportante character varying(255);
+
+-- 23/06/2016 15:57:55 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET DefaultValue='@SysDate@',Updated=TO_TIMESTAMP('2016-06-23 15:57:55','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=5214
+;
+
+-- 23/06/2016 16:13:22 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('C_BankAccount.IsDrawer=''N''','S',3000033,'LAR','Cuentas Bancarias',100,100,TO_TIMESTAMP('2016-06-23 16:13:22','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_TIMESTAMP('2016-06-23 16:13:22','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 23/06/2016 16:13:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET AD_Reference_ID=18, AD_Val_Rule_ID=3000033,Updated=TO_TIMESTAMP('2016-06-23 16:13:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3994
+;
+
+-- 23/06/2016 16:33:03 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000033,Updated=TO_TIMESTAMP('2016-06-23 16:33:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001087
+;
+
+-- 23/06/2016 16:42:18 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('C_BankAccount.IsDrawer=''Y''','S',3000034,'LAR','Cajas',100,100,TO_TIMESTAMP('2016-06-23 16:42:17','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_TIMESTAMP('2016-06-23 16:42:17','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 23/06/2016 16:42:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET AD_Reference_ID=18, AD_Val_Rule_ID=3000034,Updated=TO_TIMESTAMP('2016-06-23 16:42:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000154
+;
+
+-- 23/06/2016 17:00:19 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Window_Trl SET IsTranslated='Y',Name='Cierre de Cajas',Description='Cierre de Cajas',Help='La ventana Cierre de Cajas permite realizar una conciliación del dinero, cupones, cheques etc con lo registrado en el Sistema.',Updated=TO_TIMESTAMP('2016-06-23 17:00:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Window_ID=3000005 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:01:20 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Menu_Trl SET IsTranslated='Y',Name='Cierre de Cajas',Updated=TO_TIMESTAMP('2016-06-23 17:01:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Menu_ID=3000009 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:08:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Tab_Trl SET IsTranslated='Y',Name='Cierre de Cajas',Description='Cierre de Cajas',Help=NULL,Updated=TO_TIMESTAMP('2016-06-23 17:08:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000007 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:09:51 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Tab_Trl SET IsTranslated='Y',Name='Línea Cierre de Cajas',Description='Línea Cierre de Cajas',Help=NULL,Updated=TO_TIMESTAMP('2016-06-23 17:09:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000008 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:46:19 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 17:46:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000154 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:47:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET IsCentrallyMaintained='Y',Updated=TO_TIMESTAMP('2016-06-23 17:47:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000155
+;
+
+-- 23/06/2016 17:50:40 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Fecha',Description='Fecha',Updated=TO_TIMESTAMP('2016-06-23 17:50:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000156 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:51:28 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET IsCentrallyMaintained='Y',Updated=TO_TIMESTAMP('2016-06-23 17:51:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000157
+;
+
+-- 23/06/2016 17:53:23 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 17:53:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000162 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:54:20 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Total Diferencias',Updated=TO_TIMESTAMP('2016-06-23 17:54:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000222 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:55:52 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET Name='Saldo Final',Description='Saldo Final',Updated=TO_TIMESTAMP('2016-06-23 17:55:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000164 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:56:37 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Total Cheques',Updated=TO_TIMESTAMP('2016-06-23 17:56:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000212 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:57:05 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Cheques Contabilizados',Updated=TO_TIMESTAMP('2016-06-23 17:57:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000219 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:57:36 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Diferencia Cheques',Updated=TO_TIMESTAMP('2016-06-23 17:57:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000211 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:58:04 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Total Efectivo',Updated=TO_TIMESTAMP('2016-06-23 17:58:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000210 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:58:46 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Efectivo Contabilizado',Updated=TO_TIMESTAMP('2016-06-23 17:58:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000218 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 17:59:07 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Diferencia Efectivo',Updated=TO_TIMESTAMP('2016-06-23 17:59:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000209 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:01:07 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Cupones T.C. Contabilizados',Updated=TO_TIMESTAMP('2016-06-23 18:01:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000220 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:02:24 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 18:02:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000221 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:04:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Aprovado',Updated=TO_TIMESTAMP('2016-06-23 18:04:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000169 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:07:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 18:07:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000177 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:10:23 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 18:10:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000181 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:10:49 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 18:10:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000182 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:12:25 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Forma de Pago',Updated=TO_TIMESTAMP('2016-06-23 18:12:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000208 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:12:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 18:12:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000187 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:13:25 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 18:13:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000189 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:14:07 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 18:14:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000195 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:14:14 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 18:14:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000196 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 18:52:36 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Trl SET IsTranslated='Y',Name='Transferencia de Caja',Updated=TO_TIMESTAMP('2016-06-23 18:52:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000001 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:01:08 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Name='Cuenta Origen',Updated=TO_TIMESTAMP('2016-06-23 19:01:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000000 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:03:05 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 19:03:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000003 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:03:16 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 19:03:16','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000004 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:03:25 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 19:03:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000005 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:03:38 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 19:03:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000007 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:06:05 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 19:06:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000255 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:06:34 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET Name='Cierre de Caja',Updated=TO_TIMESTAMP('2016-06-23 19:06:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000255 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:06:49 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET Name='Caja Origen',Updated=TO_TIMESTAMP('2016-06-23 19:06:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000000 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:25:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para SET AD_Val_Rule_ID=3000034,Updated=TO_TIMESTAMP('2016-06-23 19:25:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000000
+;
+
+-- 23/06/2016 19:29:29 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('C_BankAccount.EsCajaPrincipal=''Y''','S',3000035,'LAR','Cajas Principales',100,100,TO_TIMESTAMP('2016-06-23 19:29:29','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_TIMESTAMP('2016-06-23 19:29:29','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 23/06/2016 19:30:57 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000035,Updated=TO_TIMESTAMP('2016-06-23 19:30:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001766
+;
+
+-- 23/06/2016 19:33:44 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Element SET Name='Es Caja', PrintName='Es Caja',Updated=TO_TIMESTAMP('2016-06-23 19:33:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000037
+;
+
+-- 23/06/2016 19:33:44 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3000037
+;
+
+-- 23/06/2016 19:33:44 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET ColumnName='IsDrawer', Name='Es Caja', Description=NULL, Help=NULL WHERE AD_Element_ID=3000037
+;
+
+-- 23/06/2016 19:33:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para SET ColumnName='IsDrawer', Name='Es Caja', Description=NULL, Help=NULL, AD_Element_ID=3000037 WHERE UPPER(ColumnName)='ISDRAWER' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 23/06/2016 19:33:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para SET ColumnName='IsDrawer', Name='Es Caja', Description=NULL, Help=NULL WHERE AD_Element_ID=3000037 AND IsCentrallyMaintained='Y'
+;
+
+-- 23/06/2016 19:33:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET Name='Es Caja', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3000037) AND IsCentrallyMaintained='Y'
+;
+
+-- 23/06/2016 19:33:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_PrintFormatItem SET PrintName='Es Caja', Name='Es Caja' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3000037)
+;
+
+-- 23/06/2016 19:33:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Element_Trl SET Name='Es Caja',PrintName='Es Caja',Updated=TO_TIMESTAMP('2016-06-23 19:33:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000037 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:34:05 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column_Trl SET Name='Es Caja',Updated=TO_TIMESTAMP('2016-06-23 19:34:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000147 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 19:35:04 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET Name='Es Caja',Updated=TO_TIMESTAMP('2016-06-23 19:35:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000089 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 21:39:24 ART
+-- ISSUE #80: Cierre de Caja.
+DELETE FROM AD_Process_Para_Trl WHERE AD_Process_Para_ID=3000001
+;
+
+-- 23/06/2016 21:39:24 ART
+-- ISSUE #80: Cierre de Caja.
+DELETE FROM AD_Process_Para WHERE AD_Process_Para_ID=3000001
+;
+
+-- 23/06/2016 21:42:53 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Table SET AD_Window_ID=3000026,Updated=TO_TIMESTAMP('2016-06-23 21:42:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Table_ID=3000031
+;
+
+-- 23/06/2016 21:48:19 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Table SET AD_Window_ID=3000009,Updated=TO_TIMESTAMP('2016-06-23 21:48:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Table_ID=3000010
+;
+
+-- 23/06/2016 21:56:29 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Column (ColumnSQL,AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,SeqNo,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsSyncDatabase,IsKey,AD_Element_ID,IsAutocomplete,IsAllowLogging,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,IsAllowCopy,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES ('(SELECT UpdatedBy FROM C_Payment WHERE C_Payment_ID=C_BankStatementLine.C_Payment_ID)',3001779,393,'U',0,'N','N','N',0,'The User identifies a unique user in the system. This could be an internal user or a business partner contact','N',10,'N',19,'N','N',138,'N','Y','N','N','N','User within the system - Internal or Business Partner Contact','User/Contact','AD_User_ID','N',100,TO_TIMESTAMP('2016-06-23 21:56:28','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2016-06-23 21:56:28','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 23/06/2016 21:56:29 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001779 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 23/06/2016 21:56:38 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column_Trl SET Name='Cajero',IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 21:56:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001779 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 21:57:05 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column_Trl SET IsTranslated='N',Updated=TO_TIMESTAMP('2016-06-23 21:57:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001779 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 21:57:35 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002683,1,'Y','N','N',3000145,'N','Y',3000008,'N','The transferred checkbox indicates if the transactions associated with this document should be transferred to the General Ledger.','LAR','Transferred to General Ledger (i.e. accounted)','Transferred',100,0,'Y',TO_TIMESTAMP('2016-06-23 21:57:35','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2016-06-23 21:57:35','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 23/06/2016 21:57:35 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002683 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 23/06/2016 21:57:35 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002684,10,'Y','N','N',3001779,'N','Y',3000008,'N','The User identifies a unique user in the system. This could be an internal user or a business partner contact','U','User within the system - Internal or Business Partner Contact','User/Contact',100,0,'Y',TO_TIMESTAMP('2016-06-23 21:57:35','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2016-06-23 21:57:35','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 23/06/2016 21:57:35 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002684 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3002684
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=150,IsDisplayed='Y' WHERE AD_Field_ID=3000208
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=160,IsDisplayed='Y' WHERE AD_Field_ID=3000187
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=170,IsDisplayed='Y' WHERE AD_Field_ID=3000188
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=3000189
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=3000190
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=3000191
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=3000192
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=220,IsDisplayed='Y' WHERE AD_Field_ID=3000193
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3000194
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3000195
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3000196
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3000197
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3000198
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3000199
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3000200
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3000201
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3000202
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3000203
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3000204
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000205
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000206
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000207
+;
+
+-- 23/06/2016 22:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3002683
+;
+
+-- 23/06/2016 22:00:53 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Name='Transferido',Updated=TO_TIMESTAMP('2016-06-23 22:00:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002683 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 22:01:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET IsCentrallyMaintained='N',Updated=TO_TIMESTAMP('2016-06-23 22:01:11','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002684
+;
+
+-- 23/06/2016 22:01:23 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET Name='Cajero',Updated=TO_TIMESTAMP('2016-06-23 22:01:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002684 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 22:01:25 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2016-06-23 22:01:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002684 AND AD_Language='es_AR'
+;
+
+-- 23/06/2016 22:02:12 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2016-06-23 22:02:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002684
+;
+
+-- 23/06/2016 22:02:24 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET EntityType='LAR',Updated=TO_TIMESTAMP('2016-06-23 22:02:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002684
+;
+
+-- 23/06/2016 22:03:16 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET EntityType='LAR',Updated=TO_TIMESTAMP('2016-06-23 22:03:16','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001779
+;
+
+-- 24/06/2016 15:21:52 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('AD_Ref_List.Value <> ''X''  AND AD_Ref_List.Value <> ''T'' AND AD_Ref_List.Value <> ''Y'' AND AD_Ref_List.Value <> ''Z''','S',3000037,'LAR','TenderType - Cuenta Bancaria',100,100,TO_TIMESTAMP('2016-06-24 15:21:51','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_TIMESTAMP('2016-06-24 15:21:51','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 24/06/2016 15:22:48 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000037,Updated=TO_TIMESTAMP('2016-06-24 15:22:48','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001086
+;
+
+-- 27/06/2016 20:50:32 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET IsCentrallyMaintained='Y',Updated=TO_TIMESTAMP('2016-06-27 20:50:32','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000152
+;
+
+-- 27/06/2016 20:50:37 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET IsCentrallyMaintained='Y',Updated=TO_TIMESTAMP('2016-06-27 20:50:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000153
+;
+
+-- 27/06/2016 20:54:54 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET Description='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal, los movimientos de caja serán transferidos a las cuentas bancarias correspondientes, según la forma de pago.',Updated=TO_TIMESTAMP('2016-06-27 20:54:54','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000168 AND AD_Language='es_AR'
+;
+
+-- 27/06/2016 20:59:03 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Trl SET IsTranslated='Y',Name='Cierre de Controlador Fiscal',Updated=TO_TIMESTAMP('2016-06-27 20:59:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000013 AND AD_Language='es_AR'
+;
+
+-- 27/06/2016 21:00:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Menu_Trl SET IsTranslated='Y',Name='Cierre de Controlador Fiscal',Updated=TO_TIMESTAMP('2016-06-27 21:00:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Menu_ID=3000016 AND AD_Language='es_AR'
+;
+
+-- 27/06/2016 21:01:45 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Name='Tipo de Cierre',Updated=TO_TIMESTAMP('2016-06-27 21:01:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3000012 AND AD_Language='es_AR'
+;
+
+-- 27/06/2016 21:13:41 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Ref_List_Trl SET Name='Depósito Directo',Updated=TO_TIMESTAMP('2016-06-27 21:13:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=402 AND AD_Language='es_AR'
+;
+
+-- 29/06/2016 17:55:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field_Trl SET Help='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal, los movimientos de caja serán transferidos a las cuentas bancarias correspondientes, según la forma de pago.',Updated=TO_TIMESTAMP('2016-06-29 17:55:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000168 AND AD_Language='es_AR'
+;
+
+-- 29/06/2016 17:56:23 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process SET Help='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal, los movimientos de caja serán transferidos a las cuentas bancarias correspondientes, según la forma de pago.', Description='Transferencia de Valores.',Updated=TO_TIMESTAMP('2016-06-29 17:56:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000001
+;
+
+-- 29/06/2016 17:56:23 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Trl SET IsTranslated='N' WHERE AD_Process_ID=3000001
+;
+
+-- 29/06/2016 17:56:23 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Menu SET Name='LAR_DrawerTransfer', Description='Transferencia de Valores.', IsActive='Y',Updated=TO_TIMESTAMP('2016-06-29 17:56:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Menu_ID=3000007
+;
+
+-- 29/06/2016 17:56:23 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Menu_Trl SET IsTranslated='N' WHERE AD_Menu_ID=3000007
+;
+
+-- 29/06/2016 17:56:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Trl SET Description='Transferencia de Valores.',Help='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal, los movimientos de caja serán transferidos a las cuentas bancarias correspondientes, según la forma de pago.',Updated=TO_TIMESTAMP('2016-06-29 17:56:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000001 AND AD_Language='es_AR'
+;
+
+-- 29/06/2016 17:57:38 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process SET Help=NULL, Description='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal, los movimientos de caja serán transferidos a las cuentas bancarias correspondientes, según la forma de pago.',Updated=TO_TIMESTAMP('2016-06-29 17:57:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000001
+;
+
+-- 29/06/2016 17:57:38 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Trl SET IsTranslated='N' WHERE AD_Process_ID=3000001
+;
+
+-- 29/06/2016 17:57:38 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Menu SET Name='LAR_DrawerTransfer', Description='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal, los movimientos de caja serán transferidos a las cuentas bancarias correspondientes, según la forma de pago.', IsActive='Y',Updated=TO_TIMESTAMP('2016-06-29 17:57:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Menu_ID=3000007
+;
+
+-- 29/06/2016 17:57:38 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Menu_Trl SET IsTranslated='N' WHERE AD_Menu_ID=3000007
+;
+
+-- 29/06/2016 17:57:52 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Trl SET Description='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal, los movimientos de caja serán transferidos a las cuentas bancarias correspondientes, según la forma de pago.',Help=NULL,Updated=TO_TIMESTAMP('2016-06-29 17:57:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000001 AND AD_Language='es_AR'
+;
+
+-- 29/06/2016 18:34:12 ART
+-- ISSUE #80: Cierre de Caja.
+DELETE FROM AD_Process_Para_Trl WHERE AD_Process_Para_ID=3000003
+;
+
+-- 29/06/2016 18:34:12 ART
+-- ISSUE #80: Cierre de Caja.
+DELETE FROM AD_Process_Para WHERE AD_Process_Para_ID=3000003
+;
+
+-- 29/06/2016 18:34:16 ART
+-- ISSUE #80: Cierre de Caja.
+DELETE FROM AD_Process_Para_Trl WHERE AD_Process_Para_ID=3000004
+;
+
+-- 29/06/2016 18:34:16 ART
+-- ISSUE #80: Cierre de Caja.
+DELETE FROM AD_Process_Para WHERE AD_Process_Para_ID=3000004
+;
+
+-- 29/06/2016 18:34:20 ART
+-- ISSUE #80: Cierre de Caja.
+DELETE FROM AD_Process_Para_Trl WHERE AD_Process_Para_ID=3000005
+;
+
+-- 29/06/2016 18:34:20 ART
+-- ISSUE #80: Cierre de Caja.
+DELETE FROM AD_Process_Para WHERE AD_Process_Para_ID=3000005
+;
+
+-- 29/06/2016 18:49:08 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_SysConfig SET Value='http://soporte.comit.com.ar/cgi-bin/get_ID',Updated=TO_TIMESTAMP('2016-06-29 18:49:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_SysConfig_ID=50004
+;
+
+-- 29/06/2016 18:49:16 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000344,'mensajeimportante','LAR','mensajeimportante','mensajeimportante',0,TO_TIMESTAMP('2016-06-29 18:49:15','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-06-29 18:49:15','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 29/06/2016 18:49:16 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000344 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 29/06/2016 18:49:16 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001783,392,'LAR',0,'N','N','N','N',255,'N',10,'N',3000344,'N','Y','N','mensajeimportante','mensajeimportante',100,TO_TIMESTAMP('2016-06-29 18:49:15','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2016-06-29 18:49:15','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 29/06/2016 18:49:16 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001783 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 29/06/2016 18:50:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Element SET ColumnName='MensajeImportante', Name='Mensaje Importante', PrintName='Mensaje Importante',Updated=TO_TIMESTAMP('2016-06-29 18:50:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000344
+;
+
+-- 29/06/2016 18:50:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3000344
+;
+
+-- 29/06/2016 18:50:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET ColumnName='MensajeImportante', Name='Mensaje Importante', Description=NULL, Help=NULL WHERE AD_Element_ID=3000344
+;
+
+-- 29/06/2016 18:50:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para SET ColumnName='MensajeImportante', Name='Mensaje Importante', Description=NULL, Help=NULL, AD_Element_ID=3000344 WHERE UPPER(ColumnName)='MENSAJEIMPORTANTE' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 29/06/2016 18:50:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Process_Para SET ColumnName='MensajeImportante', Name='Mensaje Importante', Description=NULL, Help=NULL WHERE AD_Element_ID=3000344 AND IsCentrallyMaintained='Y'
+;
+
+-- 29/06/2016 18:50:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET Name='Mensaje Importante', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3000344) AND IsCentrallyMaintained='Y'
+;
+
+-- 29/06/2016 18:50:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_PrintFormatItem SET PrintName='Mensaje Importante', Name='Mensaje Importante' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3000344)
+;
+
+-- 29/06/2016 18:50:41 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Element_Trl SET Name='Mensaje Importante',PrintName='Mensaje Importante',Updated=TO_TIMESTAMP('2016-06-29 18:50:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000344 AND AD_Language='es_AR'
+;
+
+-- 29/06/2016 18:50:57 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET FieldLength=0, AD_Reference_ID=36, Name='Mensaje Importante', ColumnName='MensajeImportante',Updated=TO_TIMESTAMP('2016-06-29 18:50:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001783
+;
+
+-- 29/06/2016 18:51:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column_Trl SET Name='Mensaje Importante',Updated=TO_TIMESTAMP('2016-06-29 18:51:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001783 AND AD_Language='es_AR'
+;
+
+-- 29/06/2016 18:51:46 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET IsUpdateable='N',Updated=TO_TIMESTAMP('2016-06-29 18:51:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001783
+;
+
+-- 29/06/2016 18:54:09 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002686,0,'Y','N','N',3001783,'N','Y',3000007,'N','LAR','Mensaje Importante',100,0,'Y',TO_TIMESTAMP('2016-06-29 18:54:09','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2016-06-29 18:54:09','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 29/06/2016 18:54:09 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002686 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 29/06/2016 18:54:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002653
+;
+
+-- 29/06/2016 18:54:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3002686
+;
+
+-- 29/06/2016 18:54:30 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3000170
+;
+
+-- 29/06/2016 18:55:24 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET IsSameLine='Y', IsReadOnly='Y', DisplayLogic='@DocStatus@=DR', DefaultValue='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal, los movimientos de caja serán transferidos a las cuentas bancarias correspondientes, según la forma de pago.',Updated=TO_TIMESTAMP('2016-06-29 18:55:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002686
+;
+
+-- 29/06/2016 18:56:38 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET DefaultValue=NULL,Updated=TO_TIMESTAMP('2016-06-29 18:56:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002686
+;
+
+-- 29/06/2016 18:57:56 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET DefaultValue='Los movimientos de caja serán transferidos a la caja Principal. Si se tratase de una Caja Principal los movimientos de caja serán transferidos a las cuentas bancarias correspondientes según la forma de pago.',Updated=TO_TIMESTAMP('2016-06-29 18:57:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001783
+;
+
+-- 29/06/2016 18:59:25 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET FieldLength=255, AD_Reference_ID=14,Updated=TO_TIMESTAMP('2016-06-29 18:59:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001783
+;
+
+-- 29/06/2016 19:00:11 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET FieldLength=0, AD_Reference_ID=36,Updated=TO_TIMESTAMP('2016-06-29 19:00:11','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001783
+;
+
+-- 29/06/2016 19:01:23 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Column SET FieldLength=255, AD_Reference_ID=14,Updated=TO_TIMESTAMP('2016-06-29 19:01:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001783
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0072_ISSUE-80', 'LAR', '')
 ;
