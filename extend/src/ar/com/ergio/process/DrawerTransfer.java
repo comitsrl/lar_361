@@ -47,7 +47,7 @@ public class DrawerTransfer extends SvrProcess
     private String p_DocumentNo = ""; // Document No
     private String p_Description = ""; // Description
     private int p_C_BPartner_ID = 0; // Business Partner to be used as bridge
-    private int p_C_Currency_ID = 0; // Payment Currency
+    // private int p_C_Currency_ID = 0; // Payment Currency
 
     private int p_From_C_BankAccount_ID = 0; // Bank Account From
     private int p_To_C_BankAccount_ID = 0; // Bank Account To
@@ -68,8 +68,8 @@ public class DrawerTransfer extends SvrProcess
                 p_From_C_BankAccount_ID = para[i].getParameterAsInt();
             else if (name.equals("To_C_BankAccount_ID"))
                 p_To_C_BankAccount_ID = para[i].getParameterAsInt();
-            else if (name.equals("C_Currency_ID"))
-                p_C_Currency_ID = para[i].getParameterAsInt();
+            // else if (name.equals("C_Currency_ID"))
+            // p_C_Currency_ID = para[i].getParameterAsInt();
             else if (name.equals("Description"))
                 p_Description = (String) para[i].getParameter();
             else if (name.equals("DocumentNo"))
@@ -98,21 +98,21 @@ public class DrawerTransfer extends SvrProcess
                 p_From_C_BankAccount_ID, p_To_C_BankAccount_ID, p_DocumentNo, p_Description, p_StatementDate, p_DateAcct);
         log.info(msg);
 
-        if (p_To_C_BankAccount_ID == 0 || p_From_C_BankAccount_ID == 0)
-            throw new IllegalArgumentException("Banks required");
+        if (p_From_C_BankAccount_ID == 0)
+            throw new IllegalArgumentException("Número de Caja Requerido");
 
         // if (p_DocumentNo == null || p_DocumentNo.length() == 0)
         // throw new IllegalArgumentException("Document No required");
 
-        if (p_To_C_BankAccount_ID == p_From_C_BankAccount_ID)
-            throw new AdempiereUserError("Accounts From and To must be different");
+        // if (p_To_C_BankAccount_ID == p_From_C_BankAccount_ID)
+        // throw new AdempiereUserError("Accounts From and To must be different");
 
         p_C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();        
         if (p_C_BPartner_ID == 0)
-            throw new AdempiereUserError ("Business Partner required");
+            throw new AdempiereUserError ("Socio de Negocio requerido");
 
-        if (p_C_Currency_ID == 0)
-            throw new AdempiereUserError("Currency required");
+        // if (p_C_Currency_ID == 0)
+        // throw new AdempiereUserError("Currency required");
 
         // Login Date
         if (p_StatementDate == null)
@@ -123,6 +123,9 @@ public class DrawerTransfer extends SvrProcess
         if (p_DateAcct == null)
             p_DateAcct = p_StatementDate;
 
+        if (p_BankStatement_ID == 0)
+            throw new AdempiereUserError ("Por favor, seleccione un cierre de caja a transferir.");
+
         // Si la cuenta, es una caja principal, se transfieren los valores segun 
         // la forma de pago.
         final MBankAccount cuenta = new MBankAccount(getCtx(), p_From_C_BankAccount_ID, get_TrxName());
@@ -131,7 +134,7 @@ public class DrawerTransfer extends SvrProcess
                     p_C_BPartner_ID, p_StatementDate, p_DateAcct, getCtx(), get_TrxName());
         else
             m_transferred = TransaccionCuentaBancaria.transferirMovimientosEntreCuentas(p_BankStatement_ID,
-                    p_From_C_BankAccount_ID, p_To_C_BankAccount_ID, p_Description, p_C_BPartner_ID, p_StatementDate,
+                    p_From_C_BankAccount_ID, p_Description, p_C_BPartner_ID, p_StatementDate,
                     p_DateAcct, getCtx(), get_TrxName());
 
         return "@Se transfirieron@ " + m_transferred + " líneas.";

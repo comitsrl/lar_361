@@ -23,6 +23,10 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 
+import javax.swing.JFrame;
+
+import org.compiere.Adempiere;
+import org.compiere.apps.ADialog;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
@@ -416,6 +420,8 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 		}
 
 		// @fchiappano tranferir todos los moviemientos de caja, a las cuentas según corresponda.
+		int m_transferred = 0;
+
 		if (get_ValueAsBoolean("EsCierreCaja"))
 		{
 		    if (getBankAccount().get_ValueAsBoolean("EsCajaPrincipal") && !get_ValueAsBoolean("Transferido"))
@@ -423,7 +429,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 		        final Timestamp fecha = new Timestamp(System.currentTimeMillis());
 		        final int C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();
                 final String descripcion = "Pago en concepto de transferencia de valores de caja pricipal, a cuenta bancaria según forma de pago.";
-                TransaccionCuentaBancaria.transferirValoresPorFormaPago(getC_BankStatement_ID(),
+                m_transferred = TransaccionCuentaBancaria.transferirValoresPorFormaPago(getC_BankStatement_ID(),
                         descripcion, C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
 		    }
 		    else
@@ -433,11 +439,23 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
                     final Timestamp fecha = new Timestamp(System.currentTimeMillis());
                     final int C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();
                     final String descripcion = "Pago en concepto de transferencia de valores, entre cajas.";
-                    TransaccionCuentaBancaria.transferirMovimientosEntreCuentas(getC_BankStatement_ID(),
-                            getC_BankAccount_ID(), getBankAccount().get_ValueAsInt("CajaPrincipal_ID"), descripcion,
+                    m_transferred = TransaccionCuentaBancaria.transferirMovimientosEntreCuentas(getC_BankStatement_ID(),
+                            getC_BankAccount_ID(), descripcion,
                             C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
 		        }
 		    }
+
+            final int m_NoTransferred = getLines(true).length - m_transferred;
+            m_processMsg = "Se han transferido " + m_transferred + " líneas. Por el contrario, " + m_NoTransferred
+                    + " líneas quedaron sin transferir.";
+
+            if (m_transferred > 0)
+            {
+                final JFrame frame = new JFrame();
+                frame.setIconImage(Adempiere.getImage16());
+                ADialog.info(1, frame, "Transferencia de Valores. \n" + m_transferred + " Líneas Transferidas. \n"
+                        + m_NoTransferred + " Líneas sin Transferir.");
+            }
 		}
 		//
 		setProcessed(true);

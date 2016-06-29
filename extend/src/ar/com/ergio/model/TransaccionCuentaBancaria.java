@@ -59,7 +59,7 @@ public class TransaccionCuentaBancaria
      * @return Cantidad de lineas transferidas.
      */
     public static int transferirMovimientosEntreCuentas(final int p_BankStatement_ID,
-            final int p_From_C_BankAccount_ID, final int p_To_C_BankAccount_ID, final String p_Description,
+            final int p_From_C_BankAccount_ID, final String p_Description,
             final int p_C_BPartner_ID, final Timestamp p_StatementDate, final Timestamp p_DateAcct,
             final Properties ctx, final String trxName)
     {
@@ -67,11 +67,12 @@ public class TransaccionCuentaBancaria
         int m_transferred = 0;
 
         final MBankStatement statement = new MBankStatement(ctx, p_BankStatement_ID, trxName);
-        final MBankAccount mBankTo = new MBankAccount(ctx, p_To_C_BankAccount_ID, trxName);
+        final MBankAccount mBankTo = new MBankAccount(ctx, statement.getBankAccount().get_ValueAsInt("CajaPrincipal_ID"), trxName);
 
         BigDecimal cashAmt = BigDecimal.ZERO;
         BigDecimal totalAmt = BigDecimal.ZERO;
         int p_C_Currency_ID = 0;
+        int cash_transferred = 0;
 
         // Iterates over conciliated payments
         for (final MBankStatementLine line : statement.getLines(true))
@@ -92,10 +93,11 @@ public class TransaccionCuentaBancaria
                 cashAmt = cashAmt.add(paymentFrom.getPayAmt());
                 line.set_ValueOfColumn("IsTransferred", true);
                 line.saveEx();
+                cash_transferred ++;
                 continue;
             }
             // Transfer other payments
-            crearPago(p_DateAcct, p_StatementDate, p_To_C_BankAccount_ID, paymentFrom, p_C_BPartner_ID, p_Description,
+            crearPago(p_DateAcct, p_StatementDate, mBankTo.getC_BankAccount_ID(), paymentFrom, p_C_BPartner_ID, p_Description,
                     ctx, trxName);
 
             // Mark bank statement line as transferred
@@ -121,7 +123,6 @@ public class TransaccionCuentaBancaria
             cashBankTo.saveEx();
             cashBankTo.processIt(MPayment.DOCACTION_Complete);
             cashBankTo.saveEx();
-            m_transferred++;
         }
 
         debitarValores(statement, p_C_Currency_ID, totalAmt, ctx, trxName);
@@ -130,7 +131,7 @@ public class TransaccionCuentaBancaria
         statement.set_ValueOfColumn("Transferido", true);
         statement.saveEx();
 
-        return m_transferred;
+        return m_transferred + cash_transferred;
     } // transferirMovimientosEntreCuentas
 
     /**
@@ -218,7 +219,15 @@ public class TransaccionCuentaBancaria
             boolean transferido = true;
             for (MBankStatementLine linea : statement.getLines(true))
                 if (!linea.get_ValueAsBoolean("IsTransferred"))
-                    transferido = false;
+                {
+                    final MPayment pago = (MPayment) linea.getC_Payment();
+                    if (!pago.getTenderType().equals("X") && !pago.getTenderType().equals("T")
+                            && !pago.getTenderType().equals("Y") && !pago.getTenderType().equals("Z"))
+                    {
+                        transferido = false;
+                        break;
+                    }
+                }
 
             statement.set_ValueOfColumn("Transferido", transferido);
             statement.saveEx();
@@ -290,11 +299,11 @@ public class TransaccionCuentaBancaria
         payment.setC_Currency_ID(paymentFrom.getC_Currency_ID());
         payment.setPayAmt(paymentFrom.getPayAmt());
         payment.setOverUnderAmt(Env.ZERO);
+        payment.set_ValueOfColumn("IsOnDrawer", paymentFrom.get_Value("IsOnDrawer"));
         payment.setC_DocType_ID(true);
         payment.saveEx();
         payment.processIt(MPayment.DOCACTION_Complete);
         payment.saveEx();
-        payment.load(trxName);
     } // crearPago
 
     /**
