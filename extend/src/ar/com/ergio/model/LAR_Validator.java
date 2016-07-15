@@ -855,7 +855,7 @@ import ar.com.ergio.util.LAR_Utils;
             pwhnew.setDateTrx(pwh.getDateTrx());
             pwhnew.setPercent(pwh.getPercent());
             pwhnew.setProcessed(true);
-            pwhnew.setTaxAmt(pwh.getTaxAmt());
+            pwhnew.setTaxAmt(pwh.getTaxAmt().negate());
             pwhnew.setTaxBaseAmt(pwh.getTaxBaseAmt().negate());
             if (!pwhnew.save())
                 return "No se pudo guardar el la retenci\u00f3n inversa";
