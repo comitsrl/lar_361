@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import javax.swing.JDialog;
+
+import org.compiere.Adempiere;
 import org.compiere.apps.ADialog;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
@@ -156,6 +159,25 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             // Crea la retención
             BigDecimal taxAmt = getPayHeaderTotalAmt().multiply(wc.getAliquot())
                     .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+
+            // @fchiappano verifico que existan pagos en los que se pueda generar la retención.
+            boolean retener = false;
+            for (MPayment payment : getPayments(get_TrxName()))
+            {
+                if (!payment.getTenderType().equals("Z") && payment.getPayAmt().compareTo(taxAmt) >= 0)
+                {
+                    retener = true;
+                    break;
+                }
+            }
+
+            if (!retener)
+            {
+                JDialog dialog = new JDialog();
+                dialog.setIconImage(Adempiere.getImage16());
+                ADialog.warn(1, dialog, "No existen pagos, con el monto suficiente para realizar la retención."
+                        + " Recuerde que no es posible realizar una retención desde un Cheque de Terceros.");
+            }
 
             final MLARPaymentWithholding pwh = MLARPaymentWithholding.get(this);
             pwh.setLAR_PaymentHeader_ID(getLAR_PaymentHeader_ID());

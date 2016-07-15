@@ -37,6 +37,7 @@ import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
@@ -748,6 +749,26 @@ import ar.com.ergio.util.LAR_Utils;
             whc.setLAR_PaymentHeader_ID(header.get_ID());
             whc.setC_DocTypeTarget_ID(header.getC_DocType_ID());
             whc.setDocumentNo(header.getDocumentNo());
+
+            // @fchiappano
+            whc.set_ValueOfColumn("C_BPartner_ID", header.getC_BPartner_ID());
+            whc.set_ValueOfColumn("Base", header.getPayHeaderTotalAmt());
+            whc.set_ValueOfColumn("TotalImpuesto", header.getWithholdingAmt());
+
+            // Obtengo el BP para obtener los datos correspondientes.
+            final MBPartner bp = (MBPartner) header.getC_BPartner();
+            whc.set_ValueOfColumn("TaxID", bp.getTaxID());
+            whc.set_ValueOfColumn("DUNS", bp.getDUNS());
+            MLocation location = obtenerLocacion(bp.getC_BPartner_ID(), bp.getCtx(), bp.get_TrxName());
+            whc.set_ValueOfColumn("City", location.getCity());
+            whc.set_ValueOfColumn("Postal", location.getPostal());
+            whc.set_ValueOfColumn("RegionName", location.getRegionName());
+            whc.set_ValueOfColumn("C_Location_ID", location.getC_Location_ID());
+
+            // Obtengo la Config. para obtener la alicuota de la retencion.
+            final WithholdingConfig wc = new WithholdingConfig(bp, false);
+            whc.set_ValueOfColumn("Porcentaje", wc.getRate());
+
             if (!whc.save())
                 return "No se pudo crear el certificado de retenci\u00f3n";
 
@@ -798,6 +819,17 @@ import ar.com.ergio.util.LAR_Utils;
         payment.setTenderType(MPayment.TENDERTYPE_Cash);
         payment.setPayAmt(header.getWithholdingAmt());
         payment.setC_Charge_ID(c_Charge_ID);
+
+        // @fchiappano Actualizo el payAmt de alguno de los pagos, descontando el valor de la retencion aplicada.
+        for (MPayment p : header.getPayments(header.get_TrxName()))
+        {
+            if(!p.getTenderType().equals("Z") && p.getPayAmt().compareTo(header.getWithholdingAmt()) >= 0)
+            {
+                p.setPayAmt(p.getPayAmt().subtract(header.getWithholdingAmt()));
+                p.saveEx();
+            }
+        }
+
         return payment;
     }
 
@@ -1161,4 +1193,48 @@ import ar.com.ergio.util.LAR_Utils;
 	 		return null;
 	 	}
 	 	//Marcos Zúñiga -end
+
+    // @fchiappano
+    /**
+     * Obtener Location del BPartner.
+     * 
+     * @param bp
+     * @return MLocation
+     */
+    private MLocation obtenerLocacion(final int c_BPartner_ID, final Properties ctx, final String trxName)
+    {
+        final String sql = "SELECT bl.C_Location_ID"
+                         + "  FROM C_BPartner_Location bl "
+                         + " WHERE bl.C_BPartner_Location_ID = (SELECT MAX(bpl.C_BPartner_Location_ID) "
+                         + "                                      FROM C_BPartner_Location bpl"
+                         + "                                     WHERE bpl.C_BPartner_ID = ?"
+                         + "                                       AND bpl.IsActive='Y' AND bpl.IsActive='Y')";
+
+        MLocation location = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, null);
+            pstmt.setInt(1, c_BPartner_ID);
+            rs = pstmt.executeQuery();
+            while (rs.next())
+            {
+                location = new MLocation(ctx, rs.getInt("C_Location_ID"), trxName);
+            }
+        }
+        catch (SQLException eSql)
+        {
+            log.log(Level.SEVERE, sql, eSql);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return location;
+    } // obtenerLocacion
+
  }   //  LAR_Validator
