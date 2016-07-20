@@ -152,15 +152,18 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         final MBPartner bp = new MBPartner(getCtx(), getC_BPartner_ID(), get_TrxName());
         final WithholdingConfig wc = new WithholdingConfig(bp, false);
         log.config("Withholding conf >> " + wc);
+        BigDecimal taxAmt = Env.ZERO;
 
-        if (wc.isCalcFromPayment() &&
-                getPayHeaderTotalAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+        if (wc.isCalcFromPayment())
         {
-            // Crea la retención
-            BigDecimal taxAmt = getPayHeaderTotalAmt().multiply(wc.getAliquot())
-                    .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+            if (getInvoices(get_TrxName()).length > 0 && getRemainingAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+                taxAmt = getRemainingAmt().multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_EVEN);
 
-            // @fchiappano verifico que existan pagos en los que se pueda generar la retención.
+            else if (getPayHeaderTotalAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
+                taxAmt = getPayHeaderTotalAmt().multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+
+            // @fchiappano verifico que existan pagos en los que se pueda
+            // generar la retención.
             boolean retener = false;
             for (MPayment payment : getPayments(get_TrxName()))
             {

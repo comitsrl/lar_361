@@ -827,6 +827,7 @@ import ar.com.ergio.util.LAR_Utils;
             {
                 p.setPayAmt(p.getPayAmt().subtract(header.getWithholdingAmt()));
                 p.saveEx();
+                break;
             }
         }
 
