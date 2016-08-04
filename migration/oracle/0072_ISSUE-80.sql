@@ -1417,6 +1417,2546 @@ UPDATE AD_Column SET FieldLength=0, AD_Reference_ID=36,Updated=TO_DATE('2016-06-
 UPDATE AD_Column SET FieldLength=255, AD_Reference_ID=14,Updated=TO_DATE('2016-06-29 19:01:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001783
 ;
 
+-- 18/07/2016 17:07:27 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002718,10,'Y','N','N',3001205,'N','Y',3000013,'N','LAR','Plan de Pago',100,0,TO_DATE('2016-07-18 17:07:27','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:07:27','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:07:27 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002718 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:07:27 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002719,10,'Y','N','N',3001188,'N','Y',3000013,'N','LAR','Tarjeta de Crédito',100,0,TO_DATE('2016-07-18 17:07:27','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:07:27','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:07:27 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002719 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:07:28 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002720,10,'Y','N','N',3001772,'N','Y',3000013,'N','LAR','Tarjeta de Debito',100,0,TO_DATE('2016-07-18 17:07:27','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:07:27','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:07:28 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002720 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002718
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3002719
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3001954
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3002720
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000334
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000335
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000336
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000337
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000338
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000339
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000340
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000341
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000342
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000343
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000344
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000345
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000346
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000347
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000348
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000349
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000350
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000351
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000352
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000353
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000354
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000355
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000356
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000357
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000358
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000359
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000360
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000363
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3000302
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3000364
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=3000362
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=660,IsDisplayed='Y' WHERE AD_Field_ID=3000289
+;
+
+-- 18/07/2016 17:08:50 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=670,IsDisplayed='Y' WHERE AD_Field_ID=3000366
+;
+
+-- 18/07/2016 17:09:13 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=C',Updated=TO_DATE('2016-07-18 17:09:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002719
+;
+
+-- 18/07/2016 17:09:22 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=D',Updated=TO_DATE('2016-07-18 17:09:22','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002720
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000333
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3001954
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002719
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3002720
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3000334
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000335
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000336
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000337
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000338
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000339
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000340
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000341
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000342
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000343
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000344
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000345
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000346
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000347
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000348
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000349
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000350
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000351
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000352
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000353
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000354
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000355
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000356
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000357
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000358
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000359
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000360
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000363
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000302
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000364
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3000362
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3000289
+;
+
+-- 18/07/2016 17:10:06 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=3000366
+;
+
+-- 18/07/2016 17:19:53 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002721,10,'Y','N','N',3000816,'N','Y',3000024,'N','LAR','C_TaxWithholding_ID',100,0,TO_DATE('2016-07-18 17:19:53','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:53','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:53 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002721 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:53 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002722,1,'Y','N','N',3001179,'N','Y',3000024,'N','LAR','DebitCardType',100,0,TO_DATE('2016-07-18 17:19:53','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:53','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:53 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002722 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002723,1,'Y','N','N',3000832,'N','Y',3000024,'N','LAR','EsRetencionIIBB',100,0,TO_DATE('2016-07-18 17:19:53','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:53','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002723 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002724,1,'Y','N','N',3000965,'N','Y',3000024,'N','LAR','EsRetencionSufrida',100,0,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002724 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002725,1,'Y','N','N',3000825,'N','Y',3000024,'N','LAR','IsBounced',100,0,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002725 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002726,1,'Y','N','N',3000826,'N','Y',3000024,'N','LAR','IsDeposited',100,0,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002726 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002727,10,'Y','N','N',3001205,'N','Y',3000024,'N','LAR','Plan de Pago',100,0,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002727 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002728,60,'Y','N','N',3000824,'N','Y',3000024,'N','LAR','TargetAccount',100,0,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002728 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002729,10,'Y','N','N',3001188,'N','Y',3000024,'N','LAR','Tarjeta de Crédito',100,0,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:54','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:54 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002729 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:55 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002730,10,'Y','N','N',3001772,'N','Y',3000024,'N','LAR','Tarjeta de Debito',100,0,TO_DATE('2016-07-18 17:19:55','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:55','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:55 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002730 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:19:55 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002731,20,'Y','N','N',3000820,'N','Y',3000024,'N','LAR','WithholdingCertNo',100,0,TO_DATE('2016-07-18 17:19:55','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-07-18 17:19:55','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 18/07/2016 17:19:55 ART
+-- ISSUE #80: Cierre de Caja.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002731 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002721
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002722
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002723
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002724
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002725
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002726
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000853
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002727
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002728
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002731
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000854
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002729
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3002730
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3000824
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000825
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000826
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000827
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000828
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000829
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000830
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000831
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000832
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000833
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000834
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000835
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000836
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000837
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000838
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000839
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000840
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000841
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000842
+;
+
+-- 18/07/2016 17:26:42 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000843
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000844
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000845
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000846
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000847
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000848
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000849
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000850
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000851
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000852
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000857
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3000855
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3000856
+;
+
+-- 18/07/2016 17:26:43 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=3000858
+;
+
+-- 18/07/2016 17:27:00 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=C',Updated=TO_DATE('2016-07-18 17:27:00','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002729
+;
+
+-- 18/07/2016 17:27:14 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=D',Updated=TO_DATE('2016-07-18 17:27:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002730
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000823
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3002729
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002730
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3000824
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3000825
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000826
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000827
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000828
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000829
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000830
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000831
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000832
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000833
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000834
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000835
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000836
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000837
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000838
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000839
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000840
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000841
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000842
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000843
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000844
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000845
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000846
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000847
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000848
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000849
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000850
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000851
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000852
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000857
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000855
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3000856
+;
+
+-- 18/07/2016 17:27:21 ART
+-- ISSUE #80: Cierre de Caja.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3000858
+;
+
+-- 04/08/2016 16:38:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Table SET AD_Window_ID=1000005,Updated=TO_DATE('2016-08-04 16:38:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Table_ID=335
+;
+
+-- 04/08/2016 16:39:05 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Table SET PO_Window_ID=195,Updated=TO_DATE('2016-08-04 16:39:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Table_ID=335
+;
+
+-- 04/08/2016 16:44:09 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000215
+;
+
+-- 04/08/2016 16:44:09 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000221
+;
+
+-- 04/08/2016 16:44:09 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3000167
+;
+
+-- 04/08/2016 16:44:09 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3000168
+;
+
+-- 04/08/2016 16:44:09 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3000169
+;
+
+-- 04/08/2016 16:44:09 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3002686
+;
+
+-- 04/08/2016 16:44:09 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3000170
+;
+
+-- 04/08/2016 16:51:01 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Val_Rule (Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('S',3000038,'LAR','Forma de Pago',100,100,TO_DATE('2016-08-04 16:51:00','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_DATE('2016-08-04 16:51:00','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 16:56:04 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Val_Rule SET Code='AD_Ref_List.Value <> ''N'' AND AD_Ref_List.Value <> ''O'' AD_Ref_List.Value <> ''Y''',Updated=TO_DATE('2016-08-04 16:56:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000038
+;
+
+-- 04/08/2016 16:57:04 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Val_Rule SET Code='AD_Ref_List.Value <> ''N'' AND AD_Ref_List.Value <> ''O'' AND AD_Ref_List.Value <> ''Y''',Updated=TO_DATE('2016-08-04 16:57:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000038
+;
+
+-- 04/08/2016 16:57:09 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET AD_Reference_ID=17, AD_Reference_Value_ID=214, AD_Val_Rule_ID=3000038,Updated=TO_DATE('2016-08-04 16:57:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000450
+;
+
+-- 04/08/2016 16:58:37 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET AD_Reference_ID=17, AD_Reference_Value_ID=214, AD_Val_Rule_ID=3000038,Updated=TO_DATE('2016-08-04 16:58:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=4056
+;
+
+-- 04/08/2016 19:28:46 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002758,10,'Y','N','N',3001205,'N','Y',1000012,'N','LAR','Plan de Pago',100,0,TO_DATE('2016-08-04 19:28:45','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:28:45','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:28:46 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002758 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:28:46 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002759,10,'Y','N','N',3001188,'N','Y',1000012,'N','LAR','Tarjeta de Crédito',100,0,TO_DATE('2016-08-04 19:28:46','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:28:46','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:28:46 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002759 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:28:46 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002760,10,'Y','N','N',3001772,'N','Y',1000012,'N','LAR','Tarjeta de Debito',100,0,TO_DATE('2016-08-04 19:28:46','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:28:46','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:28:46 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002760 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002758
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3002759
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3002760
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=1000233
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=1000234
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=1000235
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=1000236
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=1000237
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=1000238
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=1000239
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=1000240
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=1000241
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=1000242
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=1000243
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=1000244
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=1000245
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=1000246
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=1000247
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=1000248
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=1000249
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=1000250
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=1000251
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=1000252
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=1000253
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=1000254
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=1000255
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=1000256
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=1000257
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=1000258
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=1000259
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=660,IsDisplayed='Y' WHERE AD_Field_ID=1000260
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=670,IsDisplayed='Y' WHERE AD_Field_ID=1000261
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=680,IsDisplayed='Y' WHERE AD_Field_ID=1000262
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=690,IsDisplayed='Y' WHERE AD_Field_ID=1000263
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=700,IsDisplayed='Y' WHERE AD_Field_ID=1000264
+;
+
+-- 04/08/2016 19:29:53 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=710,IsDisplayed='Y' WHERE AD_Field_ID=3001944
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=720,IsDisplayed='Y' WHERE AD_Field_ID=3001953
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=730,IsDisplayed='Y' WHERE AD_Field_ID=3001945
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=740,IsDisplayed='Y' WHERE AD_Field_ID=3001949
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=750,IsDisplayed='Y' WHERE AD_Field_ID=3001950
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=760,IsDisplayed='Y' WHERE AD_Field_ID=3001946
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=770,IsDisplayed='Y' WHERE AD_Field_ID=3001947
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=780,IsDisplayed='Y' WHERE AD_Field_ID=3001951
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=790,IsDisplayed='Y' WHERE AD_Field_ID=3001952
+;
+
+-- 04/08/2016 19:29:54 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=800,IsDisplayed='Y' WHERE AD_Field_ID=3001948
+;
+
+-- 04/08/2016 19:30:22 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=C',Updated=TO_DATE('2016-08-04 19:30:22','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002759
+;
+
+-- 04/08/2016 19:30:32 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=D',Updated=TO_DATE('2016-08-04 19:30:32','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002760
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=1000232
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3002759
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3002760
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=1000233
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=1000234
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=1000235
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=1000236
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=1000237
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=1000238
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=1000239
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=1000240
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=1000241
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=1000242
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=1000243
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=1000244
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=1000245
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=1000246
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=1000247
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=1000248
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=1000249
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=1000250
+;
+
+-- 04/08/2016 19:30:49 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=1000251
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=1000252
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=1000253
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=1000254
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=1000255
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=1000256
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=1000257
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=1000258
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=1000259
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=1000260
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=660,IsDisplayed='Y' WHERE AD_Field_ID=1000261
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=670,IsDisplayed='Y' WHERE AD_Field_ID=1000262
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=680,IsDisplayed='Y' WHERE AD_Field_ID=1000263
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=690,IsDisplayed='Y' WHERE AD_Field_ID=1000264
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=700,IsDisplayed='Y' WHERE AD_Field_ID=3001944
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=710,IsDisplayed='Y' WHERE AD_Field_ID=3001953
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=720,IsDisplayed='Y' WHERE AD_Field_ID=3001945
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=730,IsDisplayed='Y' WHERE AD_Field_ID=3001949
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=740,IsDisplayed='Y' WHERE AD_Field_ID=3001950
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=750,IsDisplayed='Y' WHERE AD_Field_ID=3001946
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=760,IsDisplayed='Y' WHERE AD_Field_ID=3001947
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=770,IsDisplayed='Y' WHERE AD_Field_ID=3001951
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=780,IsDisplayed='Y' WHERE AD_Field_ID=3001952
+;
+
+-- 04/08/2016 19:30:50 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=790,IsDisplayed='Y' WHERE AD_Field_ID=3001948
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002761,10,'Y','N','N',3000816,'N','Y',3000016,'N','LAR','C_TaxWithholding_ID',100,0,TO_DATE('2016-08-04 19:31:14','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:14','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002761 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002762,1,'Y','N','N',3001179,'N','Y',3000016,'N','LAR','DebitCardType',100,0,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002762 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002763,1,'Y','N','N',3000832,'N','Y',3000016,'N','LAR','EsRetencionIIBB',100,0,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002763 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002764,1,'Y','N','N',3000965,'N','Y',3000016,'N','LAR','EsRetencionSufrida',100,0,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002764 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002765,1,'Y','N','N',3000825,'N','Y',3000016,'N','LAR','IsBounced',100,0,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002765 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002766,1,'Y','N','N',3000826,'N','Y',3000016,'N','LAR','IsDeposited',100,0,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:15 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002766 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002767,10,'Y','N','N',3001205,'N','Y',3000016,'N','LAR','Plan de Pago',100,0,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:15','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002767 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002768,60,'Y','N','N',3000824,'N','Y',3000016,'N','LAR','TargetAccount',100,0,TO_DATE('2016-08-04 19:31:16','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:16','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002768 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002769,10,'Y','N','N',3001188,'N','Y',3000016,'N','LAR','Tarjeta de Crédito',100,0,TO_DATE('2016-08-04 19:31:16','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:16','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002769 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002770,10,'Y','N','N',3001772,'N','Y',3000016,'N','LAR','Tarjeta de Debito',100,0,TO_DATE('2016-08-04 19:31:16','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:16','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002770 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002771,20,'Y','N','N',3000820,'N','Y',3000016,'N','LAR','WithholdingCertNo',100,0,TO_DATE('2016-08-04 19:31:16','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:31:16','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:31:16 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002771 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002761
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002762
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002763
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002764
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002765
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002766
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002767
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002768
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002771
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002769
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3002770
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3000457
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000458
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000459
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000460
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000461
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000462
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000463
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000464
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000465
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000466
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000467
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000468
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000469
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000470
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000471
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000472
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000473
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000474
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000475
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000476
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000477
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000478
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000479
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000480
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000481
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000482
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000483
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000484
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000485
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000491
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3000492
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3000490
+;
+
+-- 04/08/2016 19:33:19 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=3000488
+;
+
+-- 04/08/2016 19:33:36 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=C',Updated=TO_DATE('2016-08-04 19:33:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002769
+;
+
+-- 04/08/2016 19:33:48 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=D',Updated=TO_DATE('2016-08-04 19:33:48','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002770
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000456
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3002769
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002770
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3000457
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3000458
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000459
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000460
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000461
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000462
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000463
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000464
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000465
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000466
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000467
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000468
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000469
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000470
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000471
+;
+
+-- 04/08/2016 19:33:56 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000472
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000473
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000474
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000475
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000476
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000477
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000478
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000479
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000480
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000481
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000482
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000483
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000484
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000485
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000491
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000492
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3000490
+;
+
+-- 04/08/2016 19:33:57 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3000488
+;
+
+-- 04/08/2016 19:34:31 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002772,10,'Y','N','N',3000816,'N','Y',3000031,'N','LAR','C_TaxWithholding_ID',100,0,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:31 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002772 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:31 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002773,1,'Y','N','N',3001179,'N','Y',3000031,'N','LAR','DebitCardType',100,0,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:31 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002773 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:31 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002774,1,'Y','N','N',3000832,'N','Y',3000031,'N','LAR','EsRetencionIIBB',100,0,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:31 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002774 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:31 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002775,1,'Y','N','N',3000965,'N','Y',3000031,'N','LAR','EsRetencionSufrida',100,0,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:31 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002775 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002776,1,'Y','N','N',3000825,'N','Y',3000031,'N','LAR','IsBounced',100,0,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:31','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002776 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002777,1,'Y','N','N',3000826,'N','Y',3000031,'N','LAR','IsDeposited',100,0,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002777 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002778,10,'Y','N','N',3001205,'N','Y',3000031,'N','LAR','Plan de Pago',100,0,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002778 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002779,60,'Y','N','N',3000824,'N','Y',3000031,'N','LAR','TargetAccount',100,0,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002779 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002780,10,'Y','N','N',3001188,'N','Y',3000031,'N','LAR','Tarjeta de Crédito',100,0,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002780 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002781,10,'Y','N','N',3001772,'N','Y',3000031,'N','LAR','Tarjeta de Debito',100,0,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002781 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002782,20,'Y','N','N',3000820,'N','Y',3000031,'N','LAR','WithholdingCertNo',100,0,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2016-08-04 19:34:32','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/08/2016 19:34:32 ART
+-- ISSUE #80: Cierre de Cajas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002782 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002772
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002773
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002774
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002775
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002776
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002777
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002778
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002779
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002782
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002780
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3002781
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3001225
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3001226
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3001227
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3001228
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3001229
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3001230
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3001231
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3001232
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3001233
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3001234
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3001235
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3001236
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3001237
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3001238
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3001239
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3001240
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3001241
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3001242
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3001243
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3001244
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3001245
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3001246
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3001247
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3001248
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3001249
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3001250
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3001251
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3001252
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3001253
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3001254
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3001255
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3001256
+;
+
+-- 04/08/2016 19:35:23 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=3001257
+;
+
+-- 04/08/2016 19:36:11 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=C',Updated=TO_DATE('2016-08-04 19:36:11','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002780
+;
+
+-- 04/08/2016 19:36:24 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET DisplayLogic='@TenderType@=D',Updated=TO_DATE('2016-08-04 19:36:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002781
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3001224
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3002780
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002781
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3001225
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3001226
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3001227
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3001228
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3001229
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3001230
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3001231
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3001232
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3001233
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3001234
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3001235
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3001236
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3001237
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3001238
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3001239
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3001240
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3001241
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3001242
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3001243
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3001244
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3001245
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3001246
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3001247
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3001248
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3001249
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3001250
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3001251
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3001252
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3001253
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3001254
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3001255
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3001256
+;
+
+-- 04/08/2016 19:36:58 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3001257
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0072_ISSUE-80.sql', 'LAR', '') FROM dual
 ;
