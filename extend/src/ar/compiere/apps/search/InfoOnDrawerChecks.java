@@ -70,7 +70,7 @@ public class InfoOnDrawerChecks extends Info
 	protected InfoOnDrawerChecks(Frame frame, boolean modal, int WindowNo, String value,
 		boolean multiSelection, String whereClause)
 	{
-		super (frame, modal, WindowNo, "p", "C_Payment_ID", true, whereClause);
+		super (frame, modal, WindowNo, "p", "C_Payment_ID", multiSelection, whereClause);
 		log.info( "Documentos en Cartera");
 		setTitle("Documentos en Cartera");
 		//
