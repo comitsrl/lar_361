@@ -3957,6 +3957,11 @@ UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3001256
 UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3001257
 ;
 
+-- 17/08/2016 18:47:17 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Column SET IsUpdateable='N',Updated=TO_TIMESTAMP('2016-08-17 18:47:17','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=4917
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0072_ISSUE-80', 'LAR', '')
 ;
