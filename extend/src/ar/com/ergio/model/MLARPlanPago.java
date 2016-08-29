@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 
 
 public class MLARPlanPago extends X_LAR_Plan_Pago
@@ -131,9 +132,18 @@ public class MLARPlanPago extends X_LAR_Plan_Pago
 		}
 
         // Concatenar correctamente el name del plan de pago
-        final String name = getCuota_Inicial() + " a " + getCuota_Final()
-                + " Cuotas - Descuento " + getDescuento().doubleValue() + '%';
-        set_Value("Name", name);
+        if (getDescuento().compareTo(Env.ZERO) < 0)
+        {
+            final String name = getCuota_Inicial() + " a " + getCuota_Final() + " Cuotas - Recargo "
+                    + getDescuento().negate().doubleValue() + '%';
+            set_Value("Name", name);
+        }
+        else
+        {
+            final String name = getCuota_Inicial() + " a " + getCuota_Final() + " Cuotas - Descuento "
+                    + getDescuento().doubleValue() + '%';
+            set_Value("Name", name);
+        }
 
         return true;
 	}// beforeSave
