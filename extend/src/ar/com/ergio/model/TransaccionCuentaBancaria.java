@@ -18,16 +18,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import javax.swing.JFrame;
+
+import org.compiere.Adempiere;
+import org.compiere.apps.ADialog;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MBankStatement;
 import org.compiere.model.MBankStatementLine;
 import org.compiere.model.MPayment;
-import org.compiere.model.MUser;
+import org.compiere.model.MSysConfig;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -125,7 +127,7 @@ public class TransaccionCuentaBancaria
             cashBankTo.saveEx();
         }
 
-        debitarValores(statement, p_C_Currency_ID, totalAmt, ctx, trxName);
+        debitarValores(statement, p_C_Currency_ID, p_C_BPartner_ID, totalAmt, ctx, trxName);
 
         // @fchiappano Marco el Statement original como transferido.
         statement.set_ValueOfColumn("Transferido", true);
@@ -145,18 +147,47 @@ public class TransaccionCuentaBancaria
             final int p_C_BPartner_ID, final Timestamp p_StatementDate, final Timestamp p_DateAcct,
             final Properties ctx, final String trxName)
     {
-        int m_tansferred = 0;
+        int m_transferred = 0;
+        int cash_transferred = 0;
+        int tipoPago = 0;
+
+        // Chequeo si hay tarjetas de Debito y si las mismas tienen una cuenta bancaria configurada.
+        tipoPago = comprobarCuentasPorFormaPago(p_BankStatement_ID, "LAR_Tarjeta_Debito_ID");
+        if (tipoPago > 0)
+        {
+            final MLARTarjetaCredito debito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
+            final JFrame frame = new JFrame();
+            frame.setIconImage(Adempiere.getImage16());
+            ADialog.error(1, frame, "La tarjeta de debito " + debito.getDescription() + ", no posee una cuenta bancaria configurada.");
+            return m_transferred;
+        }
+
+        // Chequeo si hay tarjetas de Credito y si las mismas tienen una cuenta bancaria configurada.
+        tipoPago = comprobarCuentasPorFormaPago(p_BankStatement_ID, "LAR_Tarjeta_Credito_ID");
+        if (tipoPago > 0)
+        {
+            final MLARTarjetaCredito credito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
+            final JFrame frame = new JFrame();
+            frame.setIconImage(Adempiere.getImage16());
+            ADialog.error(1, frame, "La tarjeta de credito " + credito.getDescription() + ", no posee una cuenta bancaria configurada.");
+            return m_transferred;
+        }
+
+        // Chequeo si hay Tipos de Deposito y si los mismos tienen una cuenta bancaria configurada.
+        tipoPago = comprobarCuentasPorFormaPago(p_BankStatement_ID, "LAR_Deposito_Directo_ID");
+        if (tipoPago > 0)
+        {
+            final MLARTarjetaCredito deposito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
+            final JFrame frame = new JFrame();
+            frame.setIconImage(Adempiere.getImage16());
+            ADialog.error(1, frame, "El tipo de deposito directo " + deposito.getName() + ", no posee una cuenta bancaria configurada.");
+            return m_transferred;
+        }
 
         final MBankStatement statement = new MBankStatement(ctx, p_BankStatement_ID, trxName);
 
-        // Obtengo la lista de cuentas bancarias.
-        final List<X_LAR_TenderType_BankAccount> cuentasBancarias = getCuentasPorFormaPago(ctx, trxName);
-
-        // Si la lista de cuentas esta vacia, quiere decir que no hay nada por transferir.
-        if (cuentasBancarias == null)
-            return 0;
-
         BigDecimal totalAmt = Env.ZERO;
+        BigDecimal cashAmt = BigDecimal.ZERO;
         int p_C_Currency_ID = 0;
 
         // Reccorro todas las lineas del statement para transferir a una nueva cuenta segun corresponda.
@@ -172,91 +203,113 @@ public class TransaccionCuentaBancaria
             // Tomo y guardo, la moneda utilizada en el pago para utilizarla posteriormente.
             p_C_Currency_ID = pago.getC_Currency_ID();
 
-            // Recorro las cuentas bancarias segun forma de pago, y comparo su tenderType con el del pago.
-            for (X_LAR_TenderType_BankAccount cuenta : cuentasBancarias)
+            if (pago.getTenderType().equals(MPayment.TENDERTYPE_Cash) &&
+                    MSysConfig.getValue("LAR_TransfiereEfectivo_En_CierreDeCajas", Env.getAD_Client_ID(ctx)).equals("Y"))
             {
-                if (pago.getTenderType().equals(cuenta.getTenderType()))
-                {
-                    if (pago.getTenderType().equals("C") || pago.getTenderType().equals("D"))
-                    {
-                        if (pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID") == cuenta.get_ValueAsInt("LAR_Tarjeta_Credito_ID") ||
-                                pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID") == cuenta.get_ValueAsInt("LAR_Tarjeta_Debito_ID"))
-                        {
-                            totalAmt = totalAmt.add(pago.getPayAmt());
-
-                            // Creo el pago en concepto de transferencia.
-                            crearPago(p_DateAcct, p_StatementDate, cuenta.getC_BankAccount_ID(), pago, p_C_BPartner_ID,
-                                    p_Description, ctx, trxName);
-
-                            // Cuento la linea como transferida.
-                            m_tansferred ++;
-                            linea.set_ValueOfColumn("IsTransferred", true);
-                            linea.saveEx();
-                        }
-                    }
-                    else
-                    {
-                        totalAmt = totalAmt.add(pago.getPayAmt());
-
-                        crearPago(p_DateAcct, p_StatementDate, cuenta.getC_BankAccount_ID(), pago, p_C_BPartner_ID,
-                                p_Description, ctx, trxName);
-
-                        // Cuento la linea como transferida.
-                        m_tansferred ++;
-                        linea.set_ValueOfColumn("IsTransferred", true);
-                        linea.saveEx();
-                    }
-                }
+                cashAmt = cashAmt.add(pago.getPayAmt());
+                linea.set_ValueOfColumn("IsTransferred", true);
+                linea.saveEx();
+                cash_transferred ++;
+                continue;
+            }
+            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) ||
+                    pago.getTenderType().equals("Z"))
+            {
+                final MBankAccount cuentaBancaria = new MBankAccount(ctx, statement.getC_BankAccount_ID(), trxName);
+                final String sql = "UPDATE C_Payment"
+                                 + "   SET C_BankAccount_ID='" + cuentaBancaria.get_ValueAsInt("CajaPrincipal_ID") + "'"
+                                 + " WHERE C_Payment_ID='" + pago.getC_Payment_ID() + "'";
+                DB.executeUpdate(sql, trxName);
+                m_transferred ++;
+                continue;
+            }
+            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
+            {
+                totalAmt = totalAmt.add(pago.getPayAmt());
+                crearPago(p_DateAcct, p_StatementDate,
+                        getCuentaPorFormaPago("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID")),
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+                m_transferred ++;
+                continue;
+            }
+            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDebit))
+            {
+                totalAmt = totalAmt.add(pago.getPayAmt());
+                crearPago(p_DateAcct, p_StatementDate,
+                        getCuentaPorFormaPago("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID")),
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+                m_transferred ++;
+                continue;
+            }
+            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDeposit))
+            {
+                totalAmt = totalAmt.add(pago.getPayAmt());
+                crearPago(p_DateAcct, p_StatementDate,
+                        getCuentaPorFormaPago("LAR_Desposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID")),
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+                m_transferred ++;
+                continue;
             }
         }
 
-        if (m_tansferred > 0)
+        if (cashAmt.compareTo(BigDecimal.ZERO) > 0)
         {
-            debitarValores(statement, p_C_Currency_ID, totalAmt, ctx, trxName);
+            final MPayment cashBankTo = new MPayment(ctx, 0, trxName);
+            final MBankAccount cuentaBancaria = new MBankAccount(ctx, statement.getC_BankAccount_ID(), trxName);
+            cashBankTo.setC_BankAccount_ID(cuentaBancaria.get_ValueAsInt("CajaPrincipal_ID"));
+            cashBankTo.setDateAcct(p_DateAcct);
+            cashBankTo.setDateTrx(p_StatementDate);
+            cashBankTo.setTenderType(MPayment.TENDERTYPE_Cash);
+            cashBankTo.setDescription(p_Description);
+            cashBankTo.setC_BPartner_ID(p_C_BPartner_ID);
+            cashBankTo.setC_Currency_ID(p_C_Currency_ID);
+            cashBankTo.setPayAmt(cashAmt);
+            cashBankTo.setOverUnderAmt(Env.ZERO);
+            cashBankTo.setC_DocType_ID(true);
+            cashBankTo.setIsReceipt(true);
+            cashBankTo.saveEx();
+            cashBankTo.processIt(MPayment.DOCACTION_Complete);
+            cashBankTo.saveEx();
 
-            // Recorro todas las lineas del Statement original, y lo marco como transferido,
-            // solo si todas sus lineas fueron transferidas.
-            boolean transferido = true;
-            for (MBankStatementLine linea : statement.getLines(true))
-                if (!linea.get_ValueAsBoolean("IsTransferred"))
-                {
-                    final MPayment pago = (MPayment) linea.getC_Payment();
-                    if (!pago.getTenderType().equals("X") && !pago.getTenderType().equals("T")
-                            && !pago.getTenderType().equals("Y") && !pago.getTenderType().equals("Z"))
-                    {
-                        transferido = false;
-                        break;
-                    }
-                }
+            // Sumo el cashAmt al totalAmt para debitar el total de los valores posteriormente.
+            totalAmt = totalAmt.add(cashAmt);
+        }
 
-            statement.set_ValueOfColumn("Transferido", transferido);
+        if (m_transferred > 0 || cash_transferred > 0)
+        {
+            debitarValores(statement, p_C_Currency_ID, p_C_BPartner_ID, totalAmt, ctx, trxName);
+
+            statement.set_ValueOfColumn("Transferido", true);
             statement.saveEx();
         }
-        return m_tansferred;
+
+        return m_transferred + cash_transferred;
     } // transferirValoresPorFormaPago
 
     /**
-     * Obtener todas las cuentas bancarias, establecidas por forma de pago.
+     * Obtener la cuenta bancaria configurada, según la forma de pago.
      * @param ctx
      * @param trxName
      * @return
      */
-    private static List<X_LAR_TenderType_BankAccount> getCuentasPorFormaPago(final Properties ctx, final String trxName)
+    private static int getCuentaPorFormaPago(final String nombreColumna, final int tipoPago_ID)
     {
-        final List<X_LAR_TenderType_BankAccount> cuentas = new ArrayList<X_LAR_TenderType_BankAccount>();
+        int cuenta = 0;
 
         // Busco las cuentas bancarias segun la forma de pago.
-        String sql = "SELECT LAR_TenderType_BankAccount_ID"
-                   + "  FROM LAR_TenderType_BankAccount";
+        String sql = "SELECT C_BankAccount_ID"
+                   + "  FROM LAR_TenderType_BankAccount"
+                   + " WHERE " + nombreColumna + "=?";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try
         {
             pstmt = DB.prepareStatement(sql, null);
+            pstmt.setInt(1, tipoPago_ID);
             rs = pstmt.executeQuery();
-            while (rs.next())
-                cuentas.add(new X_LAR_TenderType_BankAccount(ctx, rs.getInt(1), trxName));
+            if (rs.next())
+                cuenta = rs.getInt("C_BankAccount_ID");
         }
         catch (SQLException eSql)
         {
@@ -268,8 +321,8 @@ public class TransaccionCuentaBancaria
             rs = null;
             pstmt = null;
         }
-        return cuentas;
-    } // getCuentasPorFormaPago
+        return cuenta;
+    } // getCuentaPorFormaPago
 
     /**
      * Crear un pago.
@@ -293,14 +346,24 @@ public class TransaccionCuentaBancaria
         payment.setDateAcct(p_DateAcct);
         payment.setDateTrx(p_StatementDate);
         payment.setTenderType(paymentFrom.getTenderType());
-        payment.set_ValueOfColumn("LAR_Tarjeta_Credito_ID", paymentFrom.get_ValueAsInt("LAR_Tarjeta_Credito_ID"));
+
+        // Obtener la Tarjeta de Credito del pago original.
+        int tarjeta = paymentFrom.get_ValueAsInt("LAR_Tarjeta_Credito_ID");
+        payment.set_ValueOfColumn("LAR_Tarjeta_Credito_ID", tarjeta != 0 ? tarjeta : null);
+        // Obtener la Tarjeta de Debito del pago original.
+        tarjeta = paymentFrom.get_ValueAsInt("LAR_Tarjeta_Debito_ID");
+        payment.set_ValueOfColumn("LAR_Tarjeta_Debito_ID", tarjeta != 0 ? tarjeta : null);
+        // Obtener el Deposito Directo del pago original.
+        tarjeta = paymentFrom.get_ValueAsInt("LAR_Deposito_Directo_ID");
+        payment.set_ValueOfColumn("LAR_Deposito_Directo_ID", tarjeta != 0 ? tarjeta : null);
+
         payment.setDescription(p_Description);
         payment.setC_BPartner_ID(p_C_BPartner_ID);
         payment.setC_Currency_ID(paymentFrom.getC_Currency_ID());
         payment.setPayAmt(paymentFrom.getPayAmt());
         payment.setOverUnderAmt(Env.ZERO);
-        payment.set_ValueOfColumn("IsOnDrawer", paymentFrom.get_Value("IsOnDrawer"));
         payment.setC_DocType_ID(true);
+        payment.setIsReceipt(true);
         payment.saveEx();
         payment.processIt(MPayment.DOCACTION_Complete);
         payment.saveEx();
@@ -315,7 +378,7 @@ public class TransaccionCuentaBancaria
      * @param ctx
      * @param trxName
      */
-    private static void debitarValores(final MBankStatement statement, final int p_C_Currency_ID,
+    private static void debitarValores(final MBankStatement statement, final int p_C_Currency_ID, final int p_C_BPartner_ID,
             final BigDecimal totalAmt, final Properties ctx, final String trxName)
     {
         // Pago que debita los valores transferidos de la cuenta.
@@ -325,7 +388,7 @@ public class TransaccionCuentaBancaria
         paymentBankFrom.setDateTrx(new Timestamp(System.currentTimeMillis()));
         paymentBankFrom.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
         paymentBankFrom.setDescription("Pago en concepto de Transferencia de valores.");
-        paymentBankFrom.setC_BPartner_ID(new MUser(ctx, Env.getAD_User_ID(ctx), trxName).getC_BPartner_ID());
+        paymentBankFrom.setC_BPartner_ID(p_C_BPartner_ID);
         paymentBankFrom.setC_Currency_ID(p_C_Currency_ID);
         paymentBankFrom.setPayAmt(totalAmt);
         paymentBankFrom.setOverUnderAmt(Env.ZERO);
@@ -363,5 +426,62 @@ public class TransaccionCuentaBancaria
         newStmt.processIt(MBankStatement.DOCACTION_Complete);
         newStmt.saveEx();
     } // debitarValores
+
+    /**
+     * Comprobar, si alguna forma de pago no posee cuenta bancaria configurada.
+     * 
+     * @param c_BankStatement_ID
+     * @param nombreColumna
+     * @return 0 si la configuracion esta correcta; formaPago_ID si es que la
+     *         forma de pago no posee una cuenta bancaria configurada.
+     */
+    private static int comprobarCuentasPorFormaPago(final int c_BankStatement_ID, final String nombreColumna)
+    {
+        String sql = "SELECT DISTINCT(p." + nombreColumna + ")"
+                   + "  FROM C_BankStatementLine sl JOIN C_Payment p ON sl.C_Payment_ID = p.C_Payment_ID"
+                   + " WHERE sl.C_BankStatement_ID=?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, null);
+            pstmt.setInt(1, c_BankStatement_ID);
+            rs = pstmt.executeQuery();
+
+            while (rs.next())
+            {
+                if (rs.getInt(1) != 0)
+                {
+                    final int tipoPago_ID = rs.getInt(1);
+                    pstmt = null;
+                    rs = null;
+
+                    sql = "SELECT LAR_TenderType_BankAccount_ID"
+                        + "  FROM LAR_TenderType_BankAccount"
+                        + " WHERE " + nombreColumna + "=?";
+
+                    pstmt = DB.prepareStatement(sql, null);
+                    pstmt.setInt(1, tipoPago_ID);
+                    rs = pstmt.executeQuery();
+
+                    if (!rs.next())
+                        return tipoPago_ID;
+                }
+            }
+        }
+        catch (SQLException eSql)
+        {
+            log.log(Level.SEVERE, sql, eSql);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return 0;
+    } // comprobarCuentasPorFormaPago
 
 } // TransaccionCuentaBancaria

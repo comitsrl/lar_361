@@ -424,25 +424,18 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 
 		if (get_ValueAsBoolean("EsCierreCaja"))
 		{
-		    if (getBankAccount().get_ValueAsBoolean("EsCajaPrincipal") && !get_ValueAsBoolean("Transferido"))
+		    if (!getBankAccount().get_ValueAsBoolean("EsCajaPrincipal") && !get_ValueAsBoolean("Transferido"))
 		    {
 		        final Timestamp fecha = new Timestamp(System.currentTimeMillis());
-		        final int C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();
+		        final int C_BPartner_ID = MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", Env.getAD_Client_ID(getCtx()));
                 final String descripcion = "Pago en concepto de transferencia de valores de caja pricipal, a cuenta bancaria según forma de pago.";
                 m_transferred = TransaccionCuentaBancaria.transferirValoresPorFormaPago(getC_BankStatement_ID(),
                         descripcion, C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
-		    }
-		    else
-            {
-		        if (!get_ValueAsBoolean("Transferido"))
-		        {
-                    final Timestamp fecha = new Timestamp(System.currentTimeMillis());
-                    final int C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();
-                    final String descripcion = "Pago en concepto de transferencia de valores, entre cajas.";
-                    m_transferred = TransaccionCuentaBancaria.transferirMovimientosEntreCuentas(getC_BankStatement_ID(),
-                            getC_BankAccount_ID(), descripcion,
-                            C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
-		        }
+
+                if (m_transferred <= 0)
+                {
+                    return STATUS_Invalid;
+                }
 		    }
 
             final int m_NoTransferred = getLines(true).length - m_transferred;
