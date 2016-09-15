@@ -72,6 +72,11 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
         // Si es una tranferencia, verifico que las cajas sean distintas y fuerzo el retiro == false.
         if (isTransferencia())
         {
+            if (getC_BankAccountTo_ID() <= 0)
+            {
+                log.saveError("Error al Guardar", "Por favor, seleccione una Caja Destino.");
+                return false;
+            }
             if (getC_BankAccountTo_ID() == getC_BankAccountFrom_ID())
             {
                 log.saveError("Error al Guardar", "No se pueden transferir valores a la misma caja.");
@@ -80,10 +85,18 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             setRetiro(false);
         }
-
-        if (!isTransferencia() && !isRetiro())
+        else if (get_ValueAsBoolean("Deposito"))
         {
-            log.saveError("Error al Guardar","Por favor, marque si se trata de un Retiro o una Transferencia.");
+            if (get_ValueAsInt("CuentaDestino_ID") <= 0)
+            {
+                log.saveError("Error al Guardar", "Por favor, seleccione una Cuenta Bancaria Destino.");
+                return false;
+            }
+        }
+
+        if (!isTransferencia() && !isRetiro() && !get_ValueAsBoolean("Deposito"))
+        {
+            log.saveError("Error al Guardar","Por favor, marque si se trata de un Retiro, Transferencia o Depósito bancario.");
             return false;
         }
         return true;
@@ -139,97 +152,104 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 return STATUS_Drafted;
             }
 
-            if (isRetiro() || linea.getTenderType().equals(MPayment.TENDERTYPE_Cash))
-            {
-                // Pago que debita los valores transferidos de la cuenta.
-                final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
-                paymentBankFrom.setC_BankAccount_ID(getC_BankAccountFrom_ID());
-                paymentBankFrom.setDateAcct(new Timestamp(System.currentTimeMillis()));
-                paymentBankFrom.setDateTrx(new Timestamp(System.currentTimeMillis()));
-                // paymentBankFrom.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
-                paymentBankFrom.setDescription(getDescription());
-                paymentBankFrom.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", Env.getAD_Client_ID(getCtx())));
-                paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
-                paymentBankFrom.setPayAmt(linea.getMonto());
-                paymentBankFrom.setOverUnderAmt(Env.ZERO);
-                paymentBankFrom.setC_DocType_ID(false);
+            // Pago que debita los valores transferidos de la cuenta.
+            final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
+            paymentBankFrom.setC_BankAccount_ID(getC_BankAccountFrom_ID());
+            paymentBankFrom.setDateAcct(new Timestamp(System.currentTimeMillis()));
+            paymentBankFrom.setDateTrx(new Timestamp(System.currentTimeMillis()));
+            paymentBankFrom.setDescription(getDescription());
+            paymentBankFrom.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, Env.getAD_Client_ID(getCtx())));
+            paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
+            paymentBankFrom.setPayAmt(linea.getMonto());
+            paymentBankFrom.setOverUnderAmt(Env.ZERO);
+            paymentBankFrom.setC_DocType_ID(false);
 
-                // Si es un retiro, y el TenderType es cheque, marco la marca
-                // IsOnDrawer como false.
+            // Si el TenderType es cheque, cambio la marca IsOnDrawer a false.
+            if (linea.getTenderType().equals("Z"))
+            {
+                final MPayment cobro = new MPayment(getCtx(), linea.getCobro_ID(), get_TrxName());
+                paymentBankFrom.setTenderType(cobro.getTenderType());
+                paymentBankFrom.setRoutingNo(cobro.getRoutingNo());
+                paymentBankFrom.setCheckNo(cobro.getCheckNo());
+                paymentBankFrom.setAccountNo(cobro.getAccountNo());
+                paymentBankFrom.setA_Name(cobro.getA_Name());
+
+                final String sql = "UPDATE C_Payment"
+                                 + "   SET IsOnDrawer='N'"
+                                 + " WHERE C_Payment_ID='" + cobro.getC_Payment_ID() + "'";
+                DB.executeUpdate(sql, get_TrxName());
+            }
+            else
+            {
+                paymentBankFrom.setTenderType(MPayment.TENDERTYPE_Cash);
+                paymentBankFrom.set_ValueOfColumn("IsOnDrawer", false);
+            }
+
+            paymentBankFrom.saveEx();
+
+            if (paymentBankFrom.processIt(MPayment.DOCACTION_Complete))
+            {
+                paymentBankFrom.saveEx();
+                linea.setPago_ID(paymentBankFrom.getC_Payment_ID());
+                linea.saveEx();
+            }
+            else
+            {
+                m_processMsg = "No se ha podido procesar el pago correspondiente al retiro de efectivo.";
+                return STATUS_Drafted;
+            }
+
+            if (isTransferencia() || get_ValueAsBoolean("Deposito"))
+            {
+                final MPayment paymentBankTo = new MPayment(getCtx(), 0, get_TrxName());
+                // Si el tenderType es cheque, solo cambio la cuenta bancaria al Pago.
                 if (linea.getTenderType().equals("Z"))
                 {
                     final MPayment cobro = new MPayment(getCtx(), linea.getCobro_ID(), get_TrxName());
-                    paymentBankFrom.setTenderType(cobro.getTenderType());
-                    paymentBankFrom.setRoutingNo(cobro.getRoutingNo());
-                    paymentBankFrom.setCheckNo(cobro.getCheckNo());
-                    paymentBankFrom.setAccountNo(cobro.getAccountNo());
-                    paymentBankFrom.setA_Name(cobro.getA_Name());
+                    paymentBankTo.setTenderType(cobro.getTenderType());
+                    paymentBankTo.setRoutingNo(cobro.getRoutingNo());
+                    paymentBankTo.setCheckNo(cobro.getCheckNo());
+                    paymentBankTo.setAccountNo(cobro.getAccountNo());
+                    paymentBankTo.setA_Name(cobro.getA_Name());
+                    paymentBankTo.set_ValueOfColumn("LAR_PaymentSource_ID", cobro.getC_Payment_ID());
 
-                    final String sql = "UPDATE C_Payment" + "   SET IsOnDrawer='N'" + " WHERE C_Payment_ID='"
-                            + cobro.getC_Payment_ID() + "'";
-                    DB.executeUpdate(sql, get_TrxName());
+                    if (isTransferencia())
+                        paymentBankTo.set_ValueOfColumn("IsOnDrawer", true);
+                    else
+                    {
+                        paymentBankTo.set_ValueOfColumn("IsOnDrawer", false);
+                        cobro.set_ValueOfColumn("IsDeposited", true);
+                        cobro.saveEx();
+                    }
                 }
                 else
-                    paymentBankFrom.setTenderType(MPayment.TENDERTYPE_Cash);
-
-                paymentBankFrom.saveEx();
-
-                if (paymentBankFrom.processIt(MPayment.DOCACTION_Complete))
                 {
-                    paymentBankFrom.saveEx();
-                    linea.setPago_ID(paymentBankFrom.getC_Payment_ID());
+                    paymentBankTo.setTenderType(MPayment.TENDERTYPE_Cash);
+                    paymentBankTo.set_ValueOfColumn("IsOnDrawer", false);
+                }
+
+                // Si es una trasferencia, seteo la caja destino. Si no, seteo la cuenta bancaria destino.
+                paymentBankTo.setC_BankAccount_ID(isTransferencia() ? getC_BankAccountTo_ID() : get_ValueAsInt("CuentaDestino_ID"));
+                paymentBankTo.setDateAcct(new Timestamp(System.currentTimeMillis()));
+                paymentBankTo.setDateTrx(new Timestamp(System.currentTimeMillis()));
+                paymentBankTo.setDescription(getDescription());
+                paymentBankTo.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0,
+                        Env.getAD_Client_ID(getCtx())));
+                paymentBankTo.setC_Currency_ID(getC_Currency_ID());
+                paymentBankTo.setPayAmt(linea.getMonto());
+                paymentBankTo.setOverUnderAmt(Env.ZERO);
+                paymentBankTo.setC_DocType_ID(true);
+                paymentBankTo.setIsReceipt(true);
+                paymentBankTo.saveEx();
+                if (paymentBankTo.processIt(MPayment.DOCACTION_Complete))
+                {
+                    paymentBankTo.saveEx();
+                    linea.setCobro_ID(paymentBankTo.getC_Payment_ID());
                     linea.saveEx();
                 }
                 else
                 {
-                    m_processMsg = "No se ha podido procesar el pago correspondiente al retiro de efectivo.";
-                    return STATUS_Drafted;
-                }
-            }
-
-            if (isTransferencia())
-            {
-                if (getC_BankAccountTo_ID() != 0)
-                {
-                    // Si el tenderType es cheque, solo cambio la cuenta
-                    // bancaria al Pago.
-                    if (linea.getTenderType().equals("Z"))
-                    {
-                        final String sql = "UPDATE C_Payment" + "   SET C_BankAccount_ID='" + getC_BankAccountTo_ID()
-                                + "'" + " WHERE C_Payment_ID='" + linea.getCobro_ID() + "'";
-                        DB.executeUpdate(sql, get_TrxName());
-                    }
-                    else
-                    {
-                        final MPayment paymentBankTo = new MPayment(getCtx(), 0, get_TrxName());
-                        paymentBankTo.setC_BankAccount_ID(getC_BankAccountTo_ID());
-                        paymentBankTo.setDateAcct(new Timestamp(System.currentTimeMillis()));
-                        paymentBankTo.setDateTrx(new Timestamp(System.currentTimeMillis()));
-                        paymentBankTo.setTenderType(MPayment.TENDERTYPE_Cash);
-                        paymentBankTo.setDescription(getDescription());
-                        paymentBankTo.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", Env.getAD_Client_ID(getCtx())));
-                        paymentBankTo.setC_Currency_ID(getC_Currency_ID());
-                        paymentBankTo.setPayAmt(linea.getMonto());
-                        paymentBankTo.setOverUnderAmt(Env.ZERO);
-                        paymentBankTo.setC_DocType_ID(true);
-                        paymentBankTo.setIsReceipt(true);
-                        paymentBankTo.saveEx();
-                        if (paymentBankTo.processIt(MPayment.DOCACTION_Complete))
-                        {
-                            paymentBankTo.saveEx();
-                            linea.setCobro_ID(paymentBankTo.getC_Payment_ID());
-                            linea.saveEx();
-                        }
-                        else
-                        {
-                            m_processMsg = "No se ha podido efectuar la transferencia de efectivo. Error al crear el cobro en la cuenta Destino.";
-                            return STATUS_Drafted;
-                        }
-                    }
-                }
-                else
-                {
-                    m_processMsg = "Por favor, seleccione una Caja Destino.";
+                    m_processMsg = "No se ha podido efectuar la transferencia de efectivo. Error al crear el cobro en la cuenta Destino.";
                     return STATUS_Drafted;
                 }
             }
@@ -249,56 +269,50 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
     {
         for (X_LAR_RetiroCajaLine linea : obtenerLineas())
         {
-            // Si es un retiro y el TenderType es cheque, vuelvo a marcar el
-            // cheque como en cartera.
-            if (isRetiro() || linea.getTenderType().equals(MPayment.TENDERTYPE_Cash))
+            // Si el TenderType es cheque, vuelvo a marcar el cheque como en cartera.
+            if (linea.getTenderType().equals("Z"))
             {
-                if (linea.getTenderType().equals("Z"))
-                {
-                    final String sql = "UPDATE C_Payment" + "   SET IsOnDrawer='Y'" + " WHERE C_Payment_ID='"
-                            + linea.getCobro_ID() + "'";
-                    DB.executeUpdate(sql, get_TrxName());
-                }
+                final MPayment cobro = new MPayment(p_ctx, linea.getCobro_ID(), get_TrxName());
+                String sql = "UPDATE C_Payment"
+                           + "   SET IsOnDrawer='Y', IsDeposited='N'";
+
+                if (isTransferencia() || get_ValueAsBoolean("Deposito"))
+                    sql = sql + " WHERE C_Payment_ID='" + cobro.get_ValueAsInt("LAR_PaymentSource_ID") + "'";
                 else
-                {
-                    // Revierto el pago realizado desde la caja Origen.
-                    MPayment pago = new MPayment(p_ctx, linea.getPago_ID(), get_TrxName());
+                    sql = sql + " WHERE C_Payment_ID='" + cobro.getC_Payment_ID() + "'";
 
-                    if (!pago.voidIt())
-                    {
-                        m_processMsg = pago.getProcessMsg();
-                        return false;
-                    }
-
-                    pago.saveEx();
-                }
+                DB.executeUpdate(sql, get_TrxName());
             }
 
-            // Si se trata de una transferencia, revierto el cobro de la caja
-            // destino.
-            if (isTransferencia())
+            // Revierto el pago realizado desde la caja Origen.
+            MPayment pago = new MPayment(p_ctx, linea.getPago_ID(), get_TrxName());
+
+            if (!pago.voidIt())
             {
-                // Si el TenderType es Cheque, cambio el C_BankAccount_ID del
-                // pago, por el de la caja origen.
-                if (linea.getTenderType().equals("Z"))
-                {
-                    final String sql = "UPDATE C_Payment" + "   SET C_BankAccount_ID='" + getC_BankAccountFrom_ID()
-                            + "'" + " WHERE C_Payment_ID='" + linea.getCobro_ID() + "'";
-                    DB.executeUpdate(sql, get_TrxName());
-                }
-                // Sino, Revierto el cobro normalmente.
-                else
-                {
-                    MPayment cobro = new MPayment(p_ctx, linea.getCobro_ID(), get_TrxName());
+                m_processMsg = pago.getProcessMsg();
+                return false;
+            }
 
-                    if (!cobro.voidIt())
-                    {
-                        m_processMsg = cobro.getProcessMsg();
-                        return false;
-                    }
+            pago.saveEx();
 
-                    cobro.saveEx();
+            // Si se trata de una transferencia o un deposito, revierto el cobro
+            // de la caja/cuenta destino.
+            if (isTransferencia() || get_ValueAsBoolean("Deposito"))
+            {
+                MPayment cobro = new MPayment(p_ctx, linea.getCobro_ID(), get_TrxName());
+
+                if (!cobro.voidIt())
+                {
+                    m_processMsg = cobro.getProcessMsg();
+                    return false;
                 }
+
+                cobro.saveEx();
+
+                // Obligo que el Reversal este marcado como conciliado.
+                final MPayment reversal = new MPayment(getCtx(), cobro.getReversal_ID(), get_TrxName());
+                reversal.setIsReconciled(true);
+                reversal.saveEx();
             }
         }
 
