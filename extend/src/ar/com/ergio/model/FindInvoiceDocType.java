@@ -50,7 +50,59 @@ public final class FindInvoiceDocType
         this.docBaseType = docBaseType;
         retrieveDocType();
     }
-
+    public FindInvoiceDocType(final MBPartner bpartner, final int c_POS_ID, final String docBaseType, final int ad_Org_ID, final int  lar_DocumentLetter_ID)
+    {
+        this.ad_Org_ID = ad_Org_ID;
+        this.bpartner = bpartner;
+        this.c_POS_ID = c_POS_ID;
+        this.docBaseType = docBaseType;
+        this.lar_DocumentLetter_ID = lar_DocumentLetter_ID;
+        retrieveDocTypeImported();
+    }
+    /**
+     * Dependiendo de la Condición ante el IVA
+     * del SdN (TaxPAyerType), la Organización y el Punto de Venta
+     *encuentra el tipo de Factura a realizar
+     *
+     * @param bpartner Socio del Negocio
+     * @param c_POS_ID ID del Punto de Venta
+     * @param ad_Org_ID ID de la Organización
+     * @exception Exception
+     *                si la configuración del SdN o del POs no es válida.
+     */
+    private void retrieveDocTypeImported()
+    {
+        // Obtiene el tipo de documento Factura correspondiente
+        int ad_Client_ID = Env.getAD_Client_ID(Env.getCtx());
+       
+        // Chequea el Nº de POS
+        if (c_POS_ID == 0) 
+        {
+            throw new AdempiereException("PosConfigNotFound");
+        }
+        
+        StringBuilder whereClause = new StringBuilder("AD_Client_ID=?")
+                                              .append(" AND AD_Org_ID=?")
+                                              .append(" AND IsActive=?")
+                                              .append(" AND DocBaseType=?")
+                                            //  .append(" AND FiscalDocument=?") // 'F' > Invoice
+                                              .append(" AND LAR_DocumentLetter_ID=?")
+                                              .append(" AND C_POS_ID=?");
+        // @mzuniga Determina si es Factura o Nota de Crédito
+        // utilizando el tipo de documentobase
+        Object[] params = new Object[] {
+                ad_Client_ID,
+                ad_Org_ID,
+                "Y",
+                docBaseType,
+             //   (docBaseType.equals(MDocType.DOCBASETYPE_ARInvoice) ? LAR_MDocType.FISCALDOCUMENT_Invoice
+               //         : LAR_MDocType.FISCALDOCUMENT_CreditNote),
+                        lar_DocumentLetter_ID,
+                c_POS_ID };
+        docType = new Query(Env.getCtx(), MDocType.Table_Name, whereClause.toString(), bpartner.get_TrxName())
+                .setParameters(params)
+                .firstOnly();
+    } // retrieveDocTypeImported
     /**
      * Dependiendo de la Condición ante el IVA
      * del SdN (TaxPAyerType), la Organización y el Punto de Venta
@@ -100,7 +152,7 @@ public final class FindInvoiceDocType
                 lco_TaxPayerType_Vendor_ID, lco_TaxPayerType_Customer_ID);
         
         StringBuilder whereClause = new StringBuilder("AD_Client_ID=?")
-                                              .append(" AND AD_Org_ID=?")
+                                              //.append(" AND AD_Org_ID=?")
                                               .append(" AND IsActive=?")
                                               .append(" AND DocBaseType=?")
                                               .append(" AND FiscalDocument=?") // 'F' > Invoice
@@ -110,12 +162,12 @@ public final class FindInvoiceDocType
         // utilizando el tipo de documentobase
         Object[] params = new Object[] {
                 ad_Client_ID,
-                ad_Org_ID,
+                //ad_Org_ID,
                 "Y",
                 docBaseType,
                 (docBaseType.equals(MDocType.DOCBASETYPE_ARInvoice) ? LAR_MDocType.FISCALDOCUMENT_Invoice
                         : LAR_MDocType.FISCALDOCUMENT_CreditNote),
-                lar_DocumentLetter_ID,
+                        1000000,
                 c_POS_ID };
         docType = new Query(Env.getCtx(), MDocType.Table_Name, whereClause.toString(), bpartner.get_TrxName())
                 .setParameters(params)

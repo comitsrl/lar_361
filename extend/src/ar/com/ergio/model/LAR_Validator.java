@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.acct.Doc;
 import org.compiere.acct.DocTax;
 import org.compiere.acct.Fact;
@@ -280,11 +281,37 @@ import ar.com.ergio.util.LAR_Utils;
              *          la orden cuando se crea una factura desde una orden (venta desde POS)
              */
             int c_POS_ID = invoice.get_ValueAsInt("C_POS_ID");
-
+                
             // @emmie @mzuniga Se abstrae la forma de recuperar el tipo de documento
             // @mzuniga Se considera el tipo de documento base (NC o Factura)
             MDocType dt_orig = new MDocType(invoice.getCtx(), invoice.getC_DocTypeTarget_ID(), invoice.get_TrxName());
-            final FindInvoiceDocType findDocType = new FindInvoiceDocType(bp, c_POS_ID, ad_Org_ID, dt_orig.getDocBaseType());
+          int i = invoice.getC_DocType_ID();
+            final FindInvoiceDocType findDocType;
+            if(invoice.getDescription().indexOf("- importado")== -1)//==
+            {
+                findDocType = new FindInvoiceDocType(bp, c_POS_ID, ad_Org_ID, dt_orig.getDocBaseType());    
+            }
+            else
+            {
+                //Es Importado
+                String docno = invoice.getDocumentNo();
+                String[] arregloDatos = docno.split("-");
+                final String letra = String.valueOf(arregloDatos[2].charAt(0));
+                
+                String sql = "SELECT L.LAR_DocumentLetter_ID"
+                        + "  FROM LAR_DocumentLetter L"
+                        + " WHERE L.letter=?";
+                final Integer lar_DocumentLetter_ID = DB.getSQLValue(invoice.get_TrxName(), sql,letra);
+                // Chequea el Nº de POS
+                if (lar_DocumentLetter_ID == -1) 
+                {
+                    throw new AdempiereException("lar_DocumentLetter_ID Not Found");
+                }
+                final String docBaseType="SOO";//Hardcodeado
+                findDocType = new FindInvoiceDocType(bp, c_POS_ID, docBaseType,0,lar_DocumentLetter_ID);
+                
+            }
+            
             final MDocType docType = findDocType.getDocType();
 
             // Check retrieved doctype
