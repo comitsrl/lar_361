@@ -200,55 +200,95 @@ public class TransaccionCuentaBancaria
             // De la linea obtengo el pago
             final MPayment pago = (MPayment) linea.getC_Payment();
 
+            MPayment paymentBankTo = null;
+
             // Tomo y guardo, la moneda utilizada en el pago para utilizarla posteriormente.
             p_C_Currency_ID = pago.getC_Currency_ID();
 
-            if (pago.getTenderType().equals(MPayment.TENDERTYPE_Cash) &&
-                    MSysConfig.getValue("LAR_TransfiereEfectivo_En_CierreDeCajas", Env.getAD_Client_ID(ctx)).equals("Y"))
+            final MBankAccount cuentaBancaria = new MBankAccount(ctx, statement.getC_BankAccount_ID(), trxName);
+
+            if (cuentaBancaria.get_ValueAsInt("CajaPrincipal_ID") > 0)
             {
-                cashAmt = cashAmt.add(pago.getPayAmt());
-                linea.set_ValueOfColumn("IsTransferred", true);
-                linea.saveEx();
-                cash_transferred ++;
-                continue;
-            }
-            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) ||
-                    pago.getTenderType().equals("Z"))
-            {
-                final MBankAccount cuentaBancaria = new MBankAccount(ctx, statement.getC_BankAccount_ID(), trxName);
-                final String sql = "UPDATE C_Payment"
-                                 + "   SET C_BankAccount_ID='" + cuentaBancaria.get_ValueAsInt("CajaPrincipal_ID") + "'"
-                                 + " WHERE C_Payment_ID='" + pago.getC_Payment_ID() + "'";
-                DB.executeUpdate(sql, trxName);
-                m_transferred ++;
-                continue;
+                if (pago.getTenderType().equals(MPayment.TENDERTYPE_Cash)
+                        && MSysConfig.getValue("LAR_TransfiereEfectivo_En_CierreDeCajas", Env.getAD_Client_ID(ctx))
+                                .equals("Y"))
+                {
+                    cashAmt = pago.get_ValueAsBoolean("IsReceipt") ? cashAmt.add(pago.getPayAmt()) : cashAmt.add(
+                            pago.getPayAmt()).negate();
+                    linea.set_ValueOfColumn("IsTransferred", true);
+                    linea.saveEx();
+                    cash_transferred++;
+                    continue;
+                }
+                else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) || pago.getTenderType().equals("Z")
+                        && pago.get_ValueAsBoolean("IsReceipt") && pago.get_ValueAsBoolean("IsOnDrawer"))
+                {
+
+                    paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
+                            cuentaBancaria.get_ValueAsInt("CajaPrincipal_ID"), pago, p_C_BPartner_ID, p_Description,
+                            ctx, trxName);
+
+                    // Desmarco el pago como en cartera, y lo marco como
+                    // depositado.
+                    pago.set_ValueOfColumn("IsOnDrawer", false);
+                    pago.set_ValueOfColumn("IsDeposited", true);
+                    pago.saveEx();
+
+                    // Copio los datos propios del cheque en el cobro destino.
+                    paymentBankTo.setTenderType(pago.getTenderType());
+                    paymentBankTo.setRoutingNo(pago.getRoutingNo());
+                    paymentBankTo.setCheckNo(pago.getCheckNo());
+                    paymentBankTo.setAccountNo(pago.getAccountNo());
+                    paymentBankTo.setA_Name(pago.getA_Name());
+
+                    m_transferred++;
+                }
             }
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
             {
                 totalAmt = totalAmt.add(pago.getPayAmt());
-                crearPago(p_DateAcct, p_StatementDate,
+                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
                         getCuentaPorFormaPago("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+
+                paymentBankTo.set_ValueOfColumn("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID"));
+                paymentBankTo.setA_Name(pago.getA_Name());
+                paymentBankTo.setCreditCardNumber(pago.getCreditCardNumber());
+                paymentBankTo.setCreditCardExpMM(pago.getCreditCardExpMM());
+                paymentBankTo.setCreditCardExpYY(pago.getCreditCardExpYY());
+                paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", pago.get_ValueAsInt("LAR_Plan_Pago_ID"));
+
                 m_transferred ++;
-                continue;
             }
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDebit))
             {
                 totalAmt = totalAmt.add(pago.getPayAmt());
-                crearPago(p_DateAcct, p_StatementDate,
+                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
                         getCuentaPorFormaPago("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+
+                paymentBankTo.set_ValueOfColumn("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID"));
+
                 m_transferred ++;
-                continue;
             }
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDeposit))
             {
                 totalAmt = totalAmt.add(pago.getPayAmt());
-                crearPago(p_DateAcct, p_StatementDate,
-                        getCuentaPorFormaPago("LAR_Desposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID")),
+                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
+                        getCuentaPorFormaPago("LAR_Deposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+
+                paymentBankTo.set_ValueOfColumn("LAR_Deposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID"));
+
                 m_transferred ++;
-                continue;
+            }
+
+            // Guardo y completo el cobro en la caja destino.
+            if (paymentBankTo != null)
+            {
+                paymentBankTo.saveEx();
+                paymentBankTo.processIt(MPayment.DOCACTION_Complete);
+                paymentBankTo.saveEx();
             }
         }
 
@@ -337,7 +377,7 @@ public class TransaccionCuentaBancaria
      * @param ctx
      * @param trxName
      */
-    private static void crearPago(final Timestamp p_DateAcct, final Timestamp p_StatementDate,
+    private static MPayment crearPago(final Timestamp p_DateAcct, final Timestamp p_StatementDate,
             final int bankAccount_ID, final MPayment paymentFrom, final int p_C_BPartner_ID,
             final String p_Description, final Properties ctx, final String trxName)
     {
@@ -346,27 +386,18 @@ public class TransaccionCuentaBancaria
         payment.setDateAcct(p_DateAcct);
         payment.setDateTrx(p_StatementDate);
         payment.setTenderType(paymentFrom.getTenderType());
-
-        // Obtener la Tarjeta de Credito del pago original.
-        int tarjeta = paymentFrom.get_ValueAsInt("LAR_Tarjeta_Credito_ID");
-        payment.set_ValueOfColumn("LAR_Tarjeta_Credito_ID", tarjeta != 0 ? tarjeta : null);
-        // Obtener la Tarjeta de Debito del pago original.
-        tarjeta = paymentFrom.get_ValueAsInt("LAR_Tarjeta_Debito_ID");
-        payment.set_ValueOfColumn("LAR_Tarjeta_Debito_ID", tarjeta != 0 ? tarjeta : null);
-        // Obtener el Deposito Directo del pago original.
-        tarjeta = paymentFrom.get_ValueAsInt("LAR_Deposito_Directo_ID");
-        payment.set_ValueOfColumn("LAR_Deposito_Directo_ID", tarjeta != 0 ? tarjeta : null);
-
         payment.setDescription(p_Description);
         payment.setC_BPartner_ID(p_C_BPartner_ID);
         payment.setC_Currency_ID(paymentFrom.getC_Currency_ID());
         payment.setPayAmt(paymentFrom.getPayAmt());
         payment.setOverUnderAmt(Env.ZERO);
         payment.setC_DocType_ID(true);
-        payment.setIsReceipt(true);
+        payment.setIsReceipt(paymentFrom.isReceipt());
+        payment.set_ValueOfColumn("IsOnDrawer", paymentFrom.get_ValueAsBoolean("IsOnDrawer"));
+        payment.set_ValueOfColumn("LAR_PaymentSource_ID", paymentFrom.getC_Payment_ID());
         payment.saveEx();
-        payment.processIt(MPayment.DOCACTION_Complete);
-        payment.saveEx();
+
+        return payment;
     } // crearPago
 
     /**
