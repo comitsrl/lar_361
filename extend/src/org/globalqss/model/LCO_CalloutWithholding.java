@@ -57,7 +57,7 @@ public class LCO_CalloutWithholding extends CalloutEngine
 		log.info("");
 		int wht_id = ((Integer) mTab.getValue("LCO_WithholdingType_ID")).intValue();
 		
-		String sql = "SELECT IsUseBPISIC, IsUseBPTaxPayerType, IsUseBPCity, IsUseOrgISIC, IsUseOrgTaxPayerType, IsUseOrgCity, IsUseWithholdingCategory, IsUseProductTaxCategory "
+		String sql = "SELECT IsUseBPISIC, IsUseBPTaxPayerType, IsUseBPCity, IsUseOrgISIC, IsUseOrgTaxPayerType, IsUseOrgCity, IsUseWithholdingCategory, IsUseProductTaxCategory, LAR_UsaTipoGananciasBP "
 			           + "FROM LCO_WithholdingRuleConf WHERE LCO_WithholdingType_ID=?";		//	#1
 
 		try
@@ -75,6 +75,8 @@ public class LCO_CalloutWithholding extends CalloutEngine
 				mTab.setValue("IsUseOrgCity", rs.getString("IsUseOrgCity"));
 				mTab.setValue("IsUseWithholdingCategory", rs.getString("IsUseWithholdingCategory"));
 				mTab.setValue("IsUseProductTaxCategory", rs.getString("IsUseProductTaxCategory"));
+				// @mzuniga Se agrega la configuración para Retención de Ganancias 
+				mTab.setValue("LAR_UsaTipoGananciasBP", rs.getString("LAR_UsaTipoGananciasBP"));
 			} else {
 				mTab.setValue("IsUseBPISIC", "N");
 				mTab.setValue("IsUseBPTaxPayerType", "N");
@@ -84,6 +86,7 @@ public class LCO_CalloutWithholding extends CalloutEngine
 				mTab.setValue("IsUseOrgCity", "N");
 				mTab.setValue("IsUseWithholdingCategory", "N");
 				mTab.setValue("IsUseProductTaxCategory", "N");
+				mTab.setValue("LAR_UsaTipoGananciasBP", "N");
 				log.warning("Rule not configured for withholding type");
 			}
 			rs.close();
