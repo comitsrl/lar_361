@@ -51,7 +51,7 @@ import org.compiere.util.Env;
  *
  * @author Wagner Germán
  *
- * @contributor Marcos Zuñiga - http://www.ergio.com.ar
+ * @contributor Marcos Zuñiga - http://www.comit.com.ar
  */
 public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction, DocOptions
 {
@@ -88,8 +88,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     }
 
     /**
-     * Actualiza la retenci\u00f3n y el total de pago en la cabecera via sql.
-     * (Esta forma evita el disparo de la validaci\u00f3n)
+     * Actualiza la retención y el total de pago en la cabecera via sql.
+     * (Esta forma evita el disparo de la validación)
      *
      * @return verdadero si se actualiza la cabecera
      */
@@ -106,11 +106,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                    + "            FROM C_Payment p"
                    + "           WHERE p.IsActive='Y'"
                    + "             AND LAR_PaymentHeader.LAR_PaymentHeader_ID=p.LAR_PaymentHeader_ID)"
-                   + "          + "
-                   + "         (SELECT COALESCE(SUM(TaxAmt),0)"
-                   + "            FROM LAR_PaymentWithholding iw"
-                   + "           WHERE iw.IsActive='Y'"
-                   + "             AND LAR_PaymentHeader.LAR_PaymentHeader_ID=iw.LAR_PaymentHeader_ID)"
                    + " WHERE LAR_PaymentHeader_ID=?";
         int no = DB.executeUpdate(sql, LAR_PaymentHeader_ID, trxName);
 
@@ -134,69 +129,165 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     }
 
     /**
-     * Realiza el cálculo de la retención sobre la cabezera de pago dada.
-     * Esto lo lleva a cabo creando un registro de retención sobre pagos
-     * y un pago con el importe de la retención el campo WriteOff para su
-     * posterior contabilización.
+     * Establece un valor al campo PayAmt un Pago directamente (via sql)
      *
-     * @return cantidad de retenciones generadas o -1 en caso de error
+     * @param pago Pago
+     * @param imp Importe del Pago
+     * @return verdadero si se actualiza el Pagocabecera
+     */
+    public static boolean setPayAmtDirectly(final MPayment pago, final BigDecimal imp)
+    {
+        DB.executeUpdate("UPDATE C_Payment SET PayAmt=? WHERE C_Payment_ID=?",
+                new Object[] {imp, pago.getC_Payment_ID()},
+                true,
+                pago.get_TrxName());
+        return true;
+    } //setPayAmtDirectly
+
+    /**
+     * Realiza el cálculo de la retención sobre la cabecera de pago dada.
+     * Esto lo lleva a cabo creando por cada confiuración alicable
+     * un certificado de retención y un pago de tipo "retención".
+     *
+     * @return verdadero si se generó la retención correctamente
      */
     public boolean recalcPaymentWithholding()
     {
+        // TODO - Revisar este forma de fuerzar la relectura del header
+        this.load(get_TrxName());
+
         final MDocType dt = new MDocType(getCtx(), getC_DocType_ID(), get_TrxName());
         String genwh = dt.get_ValueAsString("GenerateWithholding");
         if (genwh == null || genwh.equals("N"))
             return true;
 
+        // Se Borran los certificados y Pagos Retención del Header
+        BorrarCertificadosdeRetenciondelHeader();
+        BorrarPagosRetenciondelHeader();
+        updateHeaderWithholding(getLAR_PaymentHeader_ID(), get_TrxName());
+        this.load(get_TrxName());
+        final BigDecimal impTotalHeader = getPayHeaderTotalAmt();
+
         // Recupera la configuración y calcula
         final MBPartner bp = new MBPartner(getCtx(), getC_BPartner_ID(), get_TrxName());
-        final WithholdingConfig wc = new WithholdingConfig(bp, false);
-        log.config("Withholding conf >> " + wc);
-        BigDecimal taxAmt = Env.ZERO;
+        final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, dt.isSOTrx(),
+                get_TrxName(), null, getDateTrx());
 
-        if (wc.isCalcFromPayment())
+        // Se recorren las configuraciones recuperadas
+        // Se crean los pagos retención y sus respectivos certificados
+        for (int i = 0; i < configs.length; i++)
         {
-            if (getInvoices(get_TrxName()).length > 0 && getRemainingAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
-                taxAmt = getRemainingAmt().multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_EVEN);
 
-            else if (getPayHeaderTotalAmt().compareTo(wc.getPaymentThresholdMin()) >= 0)
-                taxAmt = getPayHeaderTotalAmt().multiply(wc.getAliquot()).setScale(2, BigDecimal.ROUND_HALF_EVEN);
-
-            // @fchiappano verifico que existan pagos en los que se pueda
-            // generar la retención.
-            boolean retener = false;
-            for (MPayment payment : getPayments(get_TrxName()))
+            final WithholdingConfig wc = configs[i];
+            log.config("Withholding conf >> " + wc);
+            BigDecimal impRetencion = Env.ZERO;
+            // Se recupera el tipo de documento para el Pago Retención
+            // a partir del tipo de retencion
+            final int c_DocType_ID = wc.getC_DocType_ID();
+            int cargoRetencion;
+            if (c_DocType_ID > 0)
             {
-                if (!payment.getTenderType().equals("Z") && payment.getPayAmt().compareTo(taxAmt) >= 0)
+                final MDocType doc = new MDocType(getCtx(), c_DocType_ID, get_TrxName());
+                // Se recupera y valida el ID del cargo para retención desde el documento
+                cargoRetencion = (Integer) doc.get_Value("LAR_Withholding_Charge_ID");
+                if (cargoRetencion < 0)
                 {
-                    retener = true;
-                    break;
+                    JDialog dialog = new JDialog();
+                    dialog.setIconImage(Adempiere.getImage16());
+                    ADialog.warn(1, dialog,
+                            "Error al crear la retenci\u00f3n (No existe cargo retenci\u00f3n configurado en el documento)");
+                    return false;
                 }
-            }
-
-            if (!retener)
+            } else
             {
                 JDialog dialog = new JDialog();
                 dialog.setIconImage(Adempiere.getImage16());
-                ADialog.warn(1, dialog, "No existen pagos, con el monto suficiente para realizar la retención."
-                        + " Recuerde que no es posible realizar una retención desde un Cheque de Terceros.");
+                ADialog.warn(
+                        1,
+                        dialog,
+                        "Error al crear la retenci\u00f3n (No existe tipo de documento configurado para el Pago Retenci\u00f3n)");
+                return false;
             }
 
-            final MLARPaymentWithholding pwh = MLARPaymentWithholding.get(this);
-            pwh.setLAR_PaymentHeader_ID(getLAR_PaymentHeader_ID());
-            pwh.setC_Tax_ID(wc.getC_Tax_ID());
-            pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
-            pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
-            pwh.setDateAcct(Env.getContextAsDate(getCtx(), "#Date"));
-            pwh.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
-            pwh.setPercent(wc.getRate());
-            pwh.setProcessed(false);
-            pwh.setTaxAmt(taxAmt);
-            pwh.setTaxBaseAmt(getPayHeaderTotalAmt());
-            // Cuando se guarda la retención, se actualiza la cabecera
-            // de pago con mediante MLARPaymentWithholding.afterSave()
-            if (!pwh.save(get_TrxName()))
-                return false;
+            if (wc.isCalcFromPayment())
+            {
+                // Si el pago supera el mínimo se calcula el importe de la retención
+                // TODO: Contemplar que según el tipo de retención el importe se calcula
+                // de distintas formas.
+                if (impTotalHeader.compareTo(wc.getPaymentThresholdMin()) >= 0)
+                    impRetencion = impTotalHeader.multiply(wc.getAliquot())
+                            .divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                // Validar que si existen facturas, quede importe disponible a pagar
+                if (getInvoices(get_TrxName()).length > 0)
+                {
+                    if (getRemainingAmt().compareTo(impRetencion) != 1)
+                    {
+                        JDialog dialog = new JDialog();
+                        dialog.setIconImage(Adempiere.getImage16());
+                        ADialog.warn(
+                                1,
+                                dialog,
+                                "No existe suficiente importe pendiente de pago (Revisar las facturas cargadas en la Orden de Pago).");
+                        return false;
+                    }
+                }
+                // @fchiappano verifico que existan pagos en los que se pueda
+                // descontar el importe de la retención.
+                MPayment pago = null;
+                boolean compensar = false;
+                for (MPayment payment : getPayments(get_TrxName()))
+                {
+                    if (!payment.getTenderType().equals("Z")
+                            && payment.getPayAmt().compareTo(impRetencion) >= 0)
+                    {
+                        pago = payment;
+                        compensar = true;
+                        break;
+                    }
+                }
+                // Existe un pago que permite compensar el importe de la retención
+                if (compensar)
+                {
+                    // Se crea el Pago Retención
+                    final MPayment pagoRetencion = creaPagoRetencion(impRetencion, cargoRetencion,
+                            c_DocType_ID, pago, compensar);
+                    if (pagoRetencion == null)
+                    {
+                        JDialog dialog = new JDialog();
+                        dialog.setIconImage(Adempiere.getImage16());
+                        ADialog.warn(1, dialog, "Error al generar el Pago Retenci\u00f3n");
+                        return false;
+
+                    }
+                    log.config("Pago Retenci\u00f3n: " + pagoRetencion.getC_Payment_ID());
+                    // Se recarga el pago para evitar error en tab
+                    pagoRetencion.load(get_TrxName());
+                    // Se crea el Certificado de Retención
+                    final MLARPaymentWithholding certificado = creaCertificadodeRetencion(
+                            impRetencion, wc);
+                    if (certificado == null)
+                    {
+                        JDialog dialog = new JDialog();
+                        dialog.setIconImage(Adempiere.getImage16());
+                        ADialog.warn(1, dialog, "Error al generar el Certificado de Retenci\u00f3n");
+                        return false;
+
+                    }
+                    log.config("Certificado Retenci\u00f3n: "
+                            + certificado.getLAR_PaymentWithholding_ID());
+                } else
+                {
+                    // Se crea el Pago Retención sin compensar el importe
+                    final MPayment pagoRetencion = creaPagoRetencion(impRetencion, cargoRetencion,
+                            c_DocType_ID, pago, false);
+                    log.config("Pago Retenci\u00f3n: " + pagoRetencion.getC_Payment_ID());
+                    // Se crea el Certificado de Retención
+                    final MLARPaymentWithholding certificado = creaCertificadodeRetencion(
+                            impRetencion, wc);
+                    log.config("Certificado Retenci\u00f3n: "
+                            + certificado.getLAR_PaymentWithholding_ID());
+                }
+            }
         }
         return true;
     } // recalcPaymentWithholding
@@ -234,14 +325,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 	@Override
 	protected boolean beforeSave(boolean newRecord)
 	{
-	    // TODO - Think about implement a determination of DocType similar to in MPayment.beforeSave()
 		if(!newRecord)
 		{
 			MPayment[] pays = getPayments(get_TrxName());
 
             for (int i = 0; i < pays.length; i++)
 			{
-				pays[i].setC_DocType_ID(getC_DocType_ID());
+                if (!pays[i].get_ValueAsBoolean("EsRetencionIIBB"))
+                    pays[i].setC_DocType_ID(getC_DocType_ID());
 				pays[i].setDocumentNo(getDocumentNo());
 				pays[i].setDateTrx(getDateTrx());
 				pays[i].setDateAcct(getDateTrx());
@@ -367,7 +458,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         MPayment[] pays = getPayments(get_TrxName());
         if (pays.length == 0)
         {
-            ADialog.error(0, null, "El recibo no tiene cobros");
+            ADialog.error(0, null, "La cabecera no tiene cobros/pagos");
             return DocAction.STATUS_Invalid;
         }
         // Recibos: Validar que la suma de los Pagos Retención sea >=
@@ -379,7 +470,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             for (int p = 0; p < pays.length; p++)
                 if (pays[p].get_ValueAsBoolean("EsRetencionSufrida"))
                     sumPagosRet = sumPagosRet.add(pays[p].getWriteOffAmt());
-            // Si existen Pagos Retención
+            // Si existen Cobros Retención
             if (!(sumPagosRet.compareTo(Env.ZERO) == 0))
             {
                 MPaymentAllocate[] invoices = getInvoices(get_TrxName());
@@ -710,5 +801,152 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             pstmt = null;
         }
     } // getInvoices
+
+    /*
+     * Borra los registros de retención (Certificados) asociados a una cabecera.
+     */
+    public String BorrarCertificadosdeRetenciondelHeader()
+    {
+        // Chequear que es una operación de Compras
+        if (this.isReceipt())
+            return null;
+
+        int mLARaymentHeader_ID = getLAR_PaymentHeader_ID();
+        log.info("Borrar los certificados de retencion de la cabecera: " + mLARaymentHeader_ID);
+        String sql = "DELETE FROM LAR_PaymentWithholding WHERE LAR_PaymentHeader_ID=?";
+        PreparedStatement pstmt = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, mLARaymentHeader_ID);
+            pstmt.executeUpdate();
+        } catch (Exception e)
+        {
+            log.log(Level.SEVERE, sql, e);
+            return e.getMessage();
+        } finally
+        {
+            DB.close(pstmt);
+            pstmt = null;
+        }
+        return null;
+    } // BorrarCertificadosdeRetenciondelHeader
+
+    /*
+     * Borra los Pagos Retención asociados a una cabecera.
+     */
+    public String BorrarPagosRetenciondelHeader()
+    {
+        // Chequear que es una operación de Compras
+        if (this.isReceipt())
+            return null;
+
+        int mLARaymentHeader_ID = getLAR_PaymentHeader_ID();
+        log.info("Borrar los pagos retenci/u00f3n de la cabecera: " + mLARaymentHeader_ID);
+        String sql = "DELETE FROM C_Payment WHERE LAR_PaymentHeader_ID=? AND EsRetencionIIBB='Y'";
+        PreparedStatement pstmt = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, mLARaymentHeader_ID);
+            pstmt.executeUpdate();
+        } catch (Exception e)
+        {
+            log.log(Level.SEVERE, sql, e);
+            return e.getMessage();
+        } finally
+        {
+            DB.close(pstmt);
+            pstmt = null;
+        }
+        return null;
+    } // BorrarPagosRetenciondelHeader
+
+    /**
+     * Crea el pago "retención" necesario para procesar la cabecera de pago
+     * 
+     * @param impRetencion
+     *        Importe de la retención.
+     * @param c_Charge_ID
+     *        Cargo del tipo de retención para utilizar en el pago.
+     * @param c_DocType_ID
+     *        Tipo de documento (retención) para utilizar en el pago.
+     * @param pago
+     *        Pago sobre el cual se descontará el importe de la retención.
+     * @param compensa
+     *        Determina si se debe compensar el importe de la retención.
+     * @return pago retencion.
+     */
+    public MPayment creaPagoRetencion(BigDecimal impRetencion, int c_Charge_ID, int c_DocType,
+            MPayment pago, Boolean compensa)
+    {
+        // Se compensa el importe de la retención en el pago recibido
+        if (compensa)
+        {
+            if (pago == null)
+            {
+                JDialog dialog = new JDialog();
+                dialog.setIconImage(Adempiere.getImage16());
+                ADialog.warn(1, dialog,
+                        "No existe un pago que permita compensar el importe de la retenci\u00f3n");
+                return null;
+
+            }
+            // Se actualiza el total del pago compensado directamente vía SQL
+            // para evitar que se dispare el recálculo de retenciones
+            setPayAmtDirectly(pago, pago.getPayAmt().subtract(impRetencion));
+        }
+        final MPayment pagoRetencion = new MPayment(getCtx(), 0, get_TrxName());
+        pagoRetencion.setC_DocType_ID(getC_DocType_ID());
+        pagoRetencion.setC_Currency_ID(getC_Currency_ID());
+        pagoRetencion.setC_BankAccount_ID(getC_BankAccount_ID());
+        pagoRetencion.setC_BPartner_ID(getC_BPartner_ID());
+        pagoRetencion.setAD_Org_ID(getAD_Org_ID());
+        pagoRetencion.setIsReceipt(false);
+        pagoRetencion.setIsAllocated(false);
+        pagoRetencion.setIsReconciled(true);
+        // Este campo determina que es una retención generada (No sufrida)
+        pagoRetencion.set_ValueOfColumn("EsRetencionIIBB", true);
+        pagoRetencion.set_ValueOfColumn("LAR_PaymentHeader_ID", getLAR_PaymentHeader_ID());
+        pagoRetencion.setTenderType(MPayment.TENDERTYPE_Cash);
+        pagoRetencion.setPayAmt(impRetencion);
+        pagoRetencion.setC_Charge_ID(c_Charge_ID);
+        if (!pagoRetencion.save(get_TrxName()))
+            return null;
+
+        return pagoRetencion;
+    } // creaPagoRetencion
+
+    /**
+     * Crea el certificado de retención asociado a la retención aplicable
+     * 
+     * @param impRetencion
+     *        Importe de la retención.
+     * @param Configuración
+     *        de retención aplicable.
+     * @return Certificado de Retención.
+     */
+    public MLARPaymentWithholding creaCertificadodeRetencion(BigDecimal impRetencion,
+            WithholdingConfig wc)
+    {
+        final MLARPaymentWithholding pwh = new MLARPaymentWithholding(getCtx(), 0, get_TrxName());
+
+        pwh.setLAR_PaymentHeader_ID(getLAR_PaymentHeader_ID());
+        pwh.setC_Tax_ID(wc.getC_Tax_ID());
+        pwh.setDateAcct(getDateTrx());
+        pwh.setDateTrx(getDateTrx());
+        pwh.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
+        pwh.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
+        pwh.setPercent(wc.getAliquot());
+        pwh.setProcessed(false);
+        pwh.setTaxAmt(impRetencion);
+        pwh.setTaxBaseAmt(getPayHeaderTotalAmt());
+        // Cuando se guarda la retención, se actualiza la cabecera
+        // de pago con mediante MLARPaymentWithholding.afterSave()
+        if (!pwh.save(get_TrxName()))
+            return null;
+
+        return pwh;
+    } // creaCertificadodeRetencion
 
 }	//	MLARPaymentHeader
