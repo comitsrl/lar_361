@@ -18,6 +18,8 @@ package ar.com.ergio.model;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -49,17 +51,17 @@ public class MLARPaymentWithholding extends X_LAR_PaymentWithholding
     }
 
     /**
-    * Recupera o crea una retención a partir de una cabecera de pago
+    * Recupera los registros (certificados) de retención
     *
     * @param header
-    *        cabecera de pago a partir del cual se busca la retención
-    * @return Rentención existente relaciona a la cabecera de pago,
-    *         o nuevo objeto retención para la cabezara de pago dada.
+    *        cabecera de pago a partir de la cual se buscan los certificados
+    * @return Rentenciones existentee relacionadas a la cabecera de pago.
     */
-    public static MLARPaymentWithholding get(final MLARPaymentHeader header)
+    public static MLARPaymentWithholding[] get(final MLARPaymentHeader header)
     {
         //TODO Agregar cache
         MLARPaymentWithholding retValue = null;
+        final List<MLARPaymentWithholding> retenciones = new ArrayList<MLARPaymentWithholding>();
         if (header == null || header.getLAR_PaymentHeader_ID() == 0) {
             log.info("No existe cabecera de pago");
             return null;
@@ -72,28 +74,28 @@ public class MLARPaymentWithholding extends X_LAR_PaymentWithholding
             pstmt = DB.prepareStatement(sql, header.get_TrxName());
             pstmt.setInt(1, header.getLAR_PaymentHeader_ID());
             rs = pstmt.executeQuery();
-            if (rs.next())
+            while (rs.next())
+            {
                 retValue = new MLARPaymentWithholding(header.getCtx(), rs, header.get_TrxName());
+                if (!retenciones.add(retValue))
+                    log.severe("Error al recuperar retenci\u00f3n y agregar a la lista");
+            }
+
             rs.close();
             pstmt.close();
             pstmt = null;
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Sin retención para la cabecera de pago", e);
+            log.log(Level.SEVERE, "Error al recuperar los registros de retenci\u00f3n", e);
         } finally {
             DB.close(rs, pstmt);
             rs = null;
             pstmt = null;
         }
 
-        if (retValue != null) {
-            retValue.set_TrxName(header.get_TrxName());
-            return retValue;
-        }
+        if (!retenciones.isEmpty())
+            return retenciones.toArray(new MLARPaymentWithholding[retenciones.size()]);
 
-        // Create new one
-        retValue = new MLARPaymentWithholding(header.getCtx(), 0, header.get_TrxName());
-        log.info("(new)" + retValue);
-        return retValue;
+        return new MLARPaymentWithholding[]{};
     } // get
 
     /**
