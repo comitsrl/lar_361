@@ -68,6 +68,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     /**
      * Recupera la cabecera de pagos relacionada con el id de la factura dada
      *
+     * @deprecated Luego de la funcionalidad Varias Facturas vs varios Cobros/Pagos en las
+     *             cabeceras ya no se permite la carga de una factura en el Header, sino en la
+     *             pestaña facturas que se refleja en la tabla C_PaymentAllocate.
+     *
      * @param ctx
      *        contexto
      * @param C_Invoice_ID
@@ -364,12 +368,26 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 	{
 		if(success)
 		{
-            MPayment[] pays = getPayments(get_TrxName());
+            // Se eliminan los pagos asociados a la cabecera
+            final MPayment[] pays = getPayments(get_TrxName());
             for (int i = 0; i < pays.length; i++)
             {
                 if (!pays[i].delete(false, get_TrxName()))
                 {
-                    String msg = "No se pudo eliminar alguno de los pagos vinculados al documento que"
+                    String msg = "No se pudo eliminar alguno de los pagos cargados en el documento que"
+                            + "se está eliminando. Se cancelará la operación";
+                    log.severe(msg);
+                    ADialog.error(0, null, msg);
+                    return false;
+                }
+            }
+            // Se eliminan los registros de facturas asociados a la cabecera
+            final MPaymentAllocate[] facturas = getInvoices(get_TrxName());
+            for (int i = 0; i < facturas.length; i++)
+            {
+                if (!facturas[i].delete(false, get_TrxName()))
+                {
+                    String msg = "No se pudo eliminar alguno de las facturas cargadas en el documento que"
                             + "se está eliminando. Se cancelará la operación";
                     log.severe(msg);
                     ADialog.error(0, null, msg);
@@ -390,8 +408,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 	{
 	    //TODO - Analize genereate a cache for this payments
 		List<MPayment> pays = new ArrayList<MPayment>();
-		// @mzuniga -  Se Agrega la condición de ordenamiento, recupera primero las retenciones
-        String sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ? ORDER BY EsRetencionSufrida DESC";
+		// @mzuniga -  Se Agrega la condición de ordenamiento, recupera primero las retenciones (sufridas y efectuadas).
+        String sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ? ORDER BY EsRetencionSufrida, EsRetencionIIBB, C_Payment_ID DESC";
 
 		PreparedStatement pstmt;
 		pstmt = DB.prepareStatement(sql, trxName);
@@ -566,19 +584,20 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 }
                 MPaymentAllocate pa = invoices[i];
                 MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
-                int comp = (pays[p].getPayAmt().add(pays[p].getWriteOffAmt()).subtract(pays[p]
-                        .getAllocatedAmt())).compareTo(invoice.getOpenAmt());
+                final BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt()).subtract(pays[p].getAllocatedAmt());
+                int comp = impPago.compareTo(invoice.getOpenAmt());
                 MAllocationLine aLine = null;
-                BigDecimal alineOUAmt = pa.getOverUnderAmt();
+                BigDecimal alineOUAmt = Env.ZERO;
                 BigDecimal alineAmt;
                 // Evita Sobrepagos
-                if (!((comp != -1) && (comp != 0)))
+                if (comp <= 0)
                 {
-                    alineAmt = pays[p].getPayAmt().add(pays[p].getWriteOffAmt())
-                            .subtract(pays[p].getAllocatedAmt());
+                    alineAmt = impPago;
                     alineOUAmt = invoice.getOpenAmt().subtract(alineAmt);
-                } else
+                } else {
                     alineAmt = invoice.getOpenAmt();
+                    alineOUAmt = alineAmt.subtract(impPago);
+                }
                 if (isReceipt())
                     aLine = new MAllocationLine(alloc, alineAmt, pa.getDiscountAmt(),
                             pa.getWriteOffAmt(), alineOUAmt);
@@ -594,7 +613,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     pa.setC_AllocationLine_ID(aLine.getC_AllocationLine_ID());
                     pa.saveEx();
                 }
-                if (comp != -1)
+                if (comp >= 0)
                 {
                     i = i + 1;
                     if (comp == 0)
