@@ -4703,6 +4703,789 @@ UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Es Retención',PrintName='Es Re
 UPDATE AD_Tab_Trl SET Name='Certificados de Retención',Updated=TO_DATE('2016-10-28 07:15:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000029 AND AD_Language='es_AR'
 ;
 
+-- REVER TIPOS ORACLE
+-- ISSUE #81: Retenciones
+-- Se agregan las columnas relacionadas a las exenciones de Retenciones
+ALTER TABLE C_BPartner
+-- IIBB y  Ganancias
+ADD COLUMN LAR_Exento_Ret_IIBB character(1) DEFAULT 'N'::bpchar,
+ADD COLUMN LAR_Exento_Ret_Ganancias character(1) DEFAULT 'N'::bpchar,
+ADD CONSTRAINT C_BPartner_LAR_Exento_Ret_IIBB_check CHECK ((LAR_Exento_Ret_IIBB = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))),
+ADD CONSTRAINT C_BPartner_LAR_Exento_Ret_Ganancias_check CHECK ((LAR_Exento_Ret_Ganancias = ANY (ARRAY['Y'::bpchar, 'N'::bpchar])))
+;
+
+-- 29/10/2016 10:27:59 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000394,'lar_exento_ret_iibb','LAR','lar_exento_ret_iibb','lar_exento_ret_iibb',0,TO_DATE('2016-10-29 10:27:57','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2016-10-29 10:27:57','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 29/10/2016 10:27:59 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000394 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 29/10/2016 10:28:00 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001900,291,'LAR',0,'N','N','N','N',1,'N',20,'N',3000394,'N','Y','N','lar_exento_ret_iibb','lar_exento_ret_iibb',100,TO_DATE('2016-10-29 10:27:57','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_DATE('2016-10-29 10:27:57','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 29/10/2016 10:28:00 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001900 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 29/10/2016 10:28:02 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000395,'lar_exento_ret_ganancias','LAR','lar_exento_ret_ganancias','lar_exento_ret_ganancias',0,TO_DATE('2016-10-29 10:28:00','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2016-10-29 10:28:00','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 29/10/2016 10:28:02 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000395 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 29/10/2016 10:28:03 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001901,291,'LAR',0,'N','N','N','N',1,'N',20,'N',3000395,'N','Y','N','lar_exento_ret_ganancias','lar_exento_ret_ganancias',100,TO_DATE('2016-10-29 10:28:00','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_DATE('2016-10-29 10:28:00','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 29/10/2016 10:28:03 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001901 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 29/10/2016 10:28:54 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Element SET ColumnName='LAR_Exento_Ret_Ganancias', Name='LAR_Exento_Ret_Ganancias', PrintName='LAR_Exento_Ret_Ganancias',Updated=TO_DATE('2016-10-29 10:28:54','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000395
+;
+
+-- 29/10/2016 10:28:54 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3000395
+;
+
+-- 29/10/2016 10:28:54 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Column SET ColumnName='LAR_Exento_Ret_Ganancias', Name='LAR_Exento_Ret_Ganancias', Description=NULL, Help=NULL WHERE AD_Element_ID=3000395
+;
+
+-- 29/10/2016 10:28:54 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Process_Para SET ColumnName='LAR_Exento_Ret_Ganancias', Name='LAR_Exento_Ret_Ganancias', Description=NULL, Help=NULL, AD_Element_ID=3000395 WHERE UPPER(ColumnName)='LAR_EXENTO_RET_GANANCIAS' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 29/10/2016 10:28:54 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Process_Para SET ColumnName='LAR_Exento_Ret_Ganancias', Name='LAR_Exento_Ret_Ganancias', Description=NULL, Help=NULL WHERE AD_Element_ID=3000395 AND IsCentrallyMaintained='Y'
+;
+
+-- 29/10/2016 10:28:54 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET Name='LAR_Exento_Ret_Ganancias', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3000395) AND IsCentrallyMaintained='Y'
+;
+
+-- 29/10/2016 10:28:54 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_PrintFormatItem pi SET PrintName='LAR_Exento_Ret_Ganancias', Name='LAR_Exento_Ret_Ganancias' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3000395)
+;
+
+-- 29/10/2016 10:29:46 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Exento Retenciones Ganancias',PrintName='Exento Retenciones Ganancias',Updated=TO_DATE('2016-10-29 10:29:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000395 AND AD_Language='es_AR'
+;
+
+-- 29/10/2016 10:30:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Element SET ColumnName='LAR_Exento_Ret_IIBB', Name='LAR_Exento_Ret_IIBB', PrintName='LAR_Exento_Ret_IIBB',Updated=TO_DATE('2016-10-29 10:30:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000394
+;
+
+-- 29/10/2016 10:30:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3000394
+;
+
+-- 29/10/2016 10:30:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Column SET ColumnName='LAR_Exento_Ret_IIBB', Name='LAR_Exento_Ret_IIBB', Description=NULL, Help=NULL WHERE AD_Element_ID=3000394
+;
+
+-- 29/10/2016 10:30:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Process_Para SET ColumnName='LAR_Exento_Ret_IIBB', Name='LAR_Exento_Ret_IIBB', Description=NULL, Help=NULL, AD_Element_ID=3000394 WHERE UPPER(ColumnName)='LAR_EXENTO_RET_IIBB' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 29/10/2016 10:30:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Process_Para SET ColumnName='LAR_Exento_Ret_IIBB', Name='LAR_Exento_Ret_IIBB', Description=NULL, Help=NULL WHERE AD_Element_ID=3000394 AND IsCentrallyMaintained='Y'
+;
+
+-- 29/10/2016 10:30:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET Name='LAR_Exento_Ret_IIBB', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3000394) AND IsCentrallyMaintained='Y'
+;
+
+-- 29/10/2016 10:30:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_PrintFormatItem pi SET PrintName='LAR_Exento_Ret_IIBB', Name='LAR_Exento_Ret_IIBB' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3000394)
+;
+
+-- 29/10/2016 10:31:13 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Exento Retenciones IIBB',PrintName='Exento Retenciones IIBB',Updated=TO_DATE('2016-10-29 10:31:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000394 AND AD_Language='es_AR'
+;
+
+-- 29/10/2016 10:32:36 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002972,1,'Y','N','N',3001901,'N','Y',220,'N','LAR','LAR_Exento_Ret_Ganancias',100,0,'Y',TO_DATE('2016-10-29 10:32:31','YYYY-MM-DD HH24:MI:SS'),0,100,TO_DATE('2016-10-29 10:32:31','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 29/10/2016 10:32:36 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002972 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 29/10/2016 10:32:40 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002973,1,'Y','N','N',3001900,'N','Y',220,'N','LAR','LAR_Exento_Ret_IIBB',100,0,'Y',TO_DATE('2016-10-29 10:32:36','YYYY-MM-DD HH24:MI:SS'),0,100,TO_DATE('2016-10-29 10:32:36','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 29/10/2016 10:32:40 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002973 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3002973
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3002959
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3002963
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3002966
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002969
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3001776
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3002953
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3002958
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3002962
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3002965
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3002968
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3955
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=2124
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=2164
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=2139
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=2149
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3001605
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=2144
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=2162
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=2148
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=2128
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=2127
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=2146
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=2154
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=2153
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=54555
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=2135
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=9620
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=57533
+;
+
+-- 29/10/2016 10:46:56 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3002972
+;
+
+-- 29/10/2016 10:47:21 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3002972
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3002958
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3002962
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3002965
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3002968
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3955
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=2124
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=2164
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=2139
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=2149
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3001605
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=2144
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=2162
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=2148
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=2128
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=2127
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=2146
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=2154
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=2153
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=54555
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=2135
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=9620
+;
+
+-- 29/10/2016 10:47:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=57533
+;
+
+-- 29/10/2016 10:47:35 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_DATE('2016-10-29 10:47:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002972
+;
+
+-- 29/10/2016 10:48:48 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_DATE('2016-10-29 10:48:48','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002959
+;
+
+-- 29/10/2016 10:48:53 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_DATE('2016-10-29 10:48:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002963
+;
+
+-- 29/10/2016 10:48:57 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_DATE('2016-10-29 10:48:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002966
+;
+
+-- 29/10/2016 10:49:01 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_DATE('2016-10-29 10:49:01','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002969
+;
+
+-- 29/10/2016 10:49:22 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_Ganancias@=Y',Updated=TO_DATE('2016-10-29 10:49:22','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002958
+;
+
+-- 29/10/2016 10:49:36 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_Ganancias@=Y',Updated=TO_DATE('2016-10-29 10:49:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002962
+;
+
+-- 29/10/2016 10:49:38 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_Ganancias@=Y',Updated=TO_DATE('2016-10-29 10:49:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002965
+;
+
+-- 29/10/2016 10:49:41 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_Ganancias@=Y',Updated=TO_DATE('2016-10-29 10:49:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002968
+;
+
+-- 29/10/2016 12:14:40 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Column SET ReadOnlyLogic='@LAR_PaymentSource_ID@!0  | @EsRetencionIIBB@=Y',Updated=TO_DATE('2016-10-29 12:14:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=5299
+;
+
+-- 29/10/2016 12:15:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Column SET ReadOnlyLogic='@IsApproved@=Y | @LAR_PaymentSource_ID@!0  | @EsRetencionIIBB@=Y',Updated=TO_DATE('2016-10-29 12:15:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=5046
+;
+
+-- 29/10/2016 12:18:02 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET DisplayLogic='@EsRetencionIIBB@=Y',Updated=TO_DATE('2016-10-29 12:18:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002763
+;
+
+-- 29/10/2016 12:20:03 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Column SET ReadOnlyLogic='@LAR_PaymentSource_ID@!0  | @EsRetencionIIBB@=Y',Updated=TO_DATE('2016-10-29 12:20:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=5303
+;
+
+-- 29/10/2016 12:22:31 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET IsReadOnly='Y', DisplayLogic=NULL,Updated=TO_DATE('2016-10-29 12:22:31','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002763
+;
+
+-- 29/10/2016 12:22:55 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2016-10-29 12:22:55','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000412
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000446
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3000447
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3000452
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3000453
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3000454
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3000455
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3002769
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3002770
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3002806
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3000458
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3000459
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3000460
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000461
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000462
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000463
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000464
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000465
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000466
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000467
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000468
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000469
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000470
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000471
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000472
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000473
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000474
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000475
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000476
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000477
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000478
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000479
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000480
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000481
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000482
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000483
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000484
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000492
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000490
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000489
+;
+
+-- 29/10/2016 12:24:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000491
+;
+
+-- ISSUE #81: Retenciones
+-- Se agregala referencia del pago en el certificado de retención
+-- REVER TIPOS PARA ORACLE
+ALTER TABLE LAR_PaymentWithholding
+ADD COLUMN C_Payment_ID numeric(10,0),
+ADD CONSTRAINT fk_larpaymentwithholding_c_payment_id FOREIGN KEY (C_Payment_ID) REFERENCES C_Payment(C_Payment_ID)
+;
+
+-- 29/10/2016 18:32:12 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001902,3000004,'LAR',0,'N','N','N','The Payment is a unique identifier of this payment.','N',10,'N',19,'N',1384,'N','Y','N','Payment identifier','Payment','C_Payment_ID',100,TO_DATE('2016-10-29 18:32:11','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_DATE('2016-10-29 18:32:11','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 29/10/2016 18:32:12 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001902 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 29/10/2016 18:34:17 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002974,10,'Y','N','N',3001902,'N','Y',3000029,'N','The Payment is a unique identifier of this payment.','LAR','Payment identifier','Payment',100,0,'Y',TO_DATE('2016-10-29 18:34:16','YYYY-MM-DD HH24:MI:SS'),0,100,TO_DATE('2016-10-29 18:34:16','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 29/10/2016 18:34:17 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002974 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3001130
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002974
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=50,IsDisplayed='Y' WHERE AD_Field_ID=3001137
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=3001138
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=70,IsDisplayed='Y' WHERE AD_Field_ID=3001134
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=80,IsDisplayed='Y' WHERE AD_Field_ID=3001136
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=3001127
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3001139
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3001140
+;
+
+-- 29/10/2016 18:34:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3001141
+;
+
+-- 29/10/2016 18:34:52 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Tab SET IsReadOnly='Y', IsInsertRecord='N',Updated=TO_DATE('2016-10-29 18:34:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000029
+;
+
+-- 29/10/2016 19:01:57 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2016-10-29 19:01:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000444
+;
+
+-- 29/10/2016 19:01:59 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2016-10-29 19:01:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000445
+;
 
 -- Registración de script
 SELECT register_migration_script_lar('0078_ISSUE-81.sql', 'LAR', '') FROM dual
