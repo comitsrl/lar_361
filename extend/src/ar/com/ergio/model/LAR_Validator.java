@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import org.apache.poi.hssf.record.RecalcIdRecord;
 import org.compiere.acct.Doc;
 import org.compiere.acct.DocTax;
 import org.compiere.acct.Fact;
@@ -43,6 +42,7 @@ import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
 import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
+import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MSequence;
 import org.compiere.model.MTax;
 import org.compiere.model.ModelValidationEngine;
@@ -102,6 +102,8 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addModelChange(MInvoice.Table_Name, this);
          engine.addModelChange(MLARPaymentHeader.Table_Name, this);
          engine.addModelChange(MInOut.Table_Name, this);
+         // Se aregan las facturas dentro de una cabecera
+         engine.addModelChange(MPaymentAllocate.Table_Name, this);
 
          // Documents to be monitored
          engine.addDocValidate(MPayment.Table_Name, this);
@@ -209,6 +211,15 @@ import ar.com.ergio.util.LAR_Utils;
                 return msg;
 
             msg = updatePaymentHeaderTotalAmt((MPayment) po, type);
+            if (msg != null)
+                return msg;
+        }
+
+        // Despues de modificar/agregar una factura se actualiza la retención y el total de la cabecera
+        if (po.get_TableName().equals(MPaymentAllocate.Table_Name)
+                && (type == TYPE_AFTER_NEW || type == TYPE_AFTER_CHANGE || type == TYPE_AFTER_DELETE))
+        {
+            msg = clearPaymentWithholdingFromPaymentAllocate((MPaymentAllocate) po, type);
             if (msg != null)
                 return msg;
         }
@@ -559,17 +570,19 @@ import ar.com.ergio.util.LAR_Utils;
         {
             BigDecimal curWithholdingAmt = header.getWithholdingAmt();
             // Solo se borran las retenciones si existen retenciones previas
-            if (curWithholdingAmt != null && !curWithholdingAmt.equals(Env.ZERO))
+            if (!curWithholdingAmt.equals(Env.ZERO))
+            {
                 header.BorrarCertificadosdeRetenciondelHeader();
-            header.BorrarPagosRetenciondelHeader();
-            MLARPaymentHeader.updateHeaderWithholding(header.getLAR_PaymentHeader_ID(),
+                header.BorrarPagosRetenciondelHeader();
+                MLARPaymentHeader.updateHeaderWithholding(header.getLAR_PaymentHeader_ID(),
                     header.get_TrxName());
+            }
         }
         return null;
     } // clearPaymentWithholdingFromHeader
 
     /**
-     * Elimina la retención de la cabecera de pago cuando se modifican
+     * Elimina las retenciones de la cabecera de pago cuando se modifican
      * los pagos asociados a la misma.
      *
      * @param payment pago asociado a la cabecera
@@ -578,27 +591,47 @@ import ar.com.ergio.util.LAR_Utils;
      */
     private String clearPaymentWithholdingFromPayments(final MPayment payment, int type)
     {
-        // Solo se procesan pagos
-        if (payment.isReceipt())
+        // Solo se procesan pagos y con importe mayor a cero
+        // Si el importe es 0 no debería borrar las retenciones
+        // Si el importe es negativo es un pago reversión
+        if (payment.isReceipt() || payment.getPayAmt().compareTo(Env.ZERO) <= 0)
             return null;
         // No se procesan los pagos "retención"
         // (Puede ser cualquier tipo de retención), se mantuvo el nombre
         // de la columna por consistencia, debería llamarse "EsRetenciónEfectuada"
         if (payment.get_ValueAsBoolean("EsRetencionIIBB"))
         {
-            // TODO Borrar también el certificado de retención si se
-            // borrando el pago, aquí o en MPAyment
+            if (type == TYPE_AFTER_DELETE)
+            {
+                // Recupera y borra el Certificado de Retención asociado al Pago Retención que se está borrando
+                final int c_Payment_ID = payment.getC_Payment_ID();
+                log.info("Borra el certificado de retenci\u00f3n asociado al pago: " + c_Payment_ID);
+                String sql = "DELETE FROM C_PaymentWithholding WHERE C_Payment_ID=?";
+                PreparedStatement pstmt = null;
+                try
+                {
+                    pstmt = DB.prepareStatement(sql, payment.get_TrxName());
+                    pstmt.setInt(1, c_Payment_ID);
+                    pstmt.executeUpdate();
+                } catch (Exception e)
+                {
+                    log.log(Level.SEVERE, sql, e);
+                    return e.getMessage();
+                } finally
+                {
+                    DB.close(pstmt);
+                    pstmt = null;
+                }
+            }
             return null;
         }
 
-        if (type == TYPE_AFTER_NEW || type == TYPE_AFTER_DELETE
-                || (type == TYPE_AFTER_CHANGE
-                    && (    payment.is_ValueChanged(MPayment.COLUMNNAME_PayAmt)
-                        ||  payment.is_ValueChanged(MPayment.COLUMNNAME_C_Invoice_ID)
-                        ||  payment.is_ValueChanged(MPayment.COLUMNNAME_TenderType)
-                        )
-                    )
-            )
+        if (type == TYPE_AFTER_NEW
+                || (type == TYPE_AFTER_CHANGE && (payment
+                        .is_ValueChanged(MPayment.COLUMNNAME_PayAmt)
+                // Unicamente se considera el cambio si el nuevo TT es Cheque de Terceros
+                || (payment.is_ValueChanged(MPayment.COLUMNNAME_TenderType) && payment
+                        .getTenderType().equals("Z")))))
         {
             int lar_PaymentHeader_ID = payment.get_ValueAsInt("LAR_PaymentHeader_ID");
             if (lar_PaymentHeader_ID == 0)
@@ -608,23 +641,58 @@ import ar.com.ergio.util.LAR_Utils;
                     lar_PaymentHeader_ID, payment.get_TrxName());
             BigDecimal curWithholdingAmt = header.getWithholdingAmt();
 
-            // Si existe retención calculada se fuerza el recálculo
-            if (curWithholdingAmt != null)
+            // Si existe retención calculada se borran los Certificados y Pagos Retención
+            if (!curWithholdingAmt.equals(Env.ZERO))
             {
-                if (!curWithholdingAmt.equals(Env.ZERO))
-                {
-                    final boolean ok = header.recalcPaymentWithholding();
-                    if (!ok)
-                        return "No se pudo actualizar el total de la retención en la cabecera de pago.";
-                }
-            } else
-            {
-                if (!MLARPaymentHeader.setWithholdingAmtDirectly(header, Env.ZERO))
-                    return "No se pudo actualizar la cabecera de pago vía setWithholdingAmtDirectly";
+                header.BorrarCertificadosdeRetenciondelHeader();
+                header.BorrarPagosRetenciondelHeader();
+                MLARPaymentHeader.updateHeaderWithholding(header.getLAR_PaymentHeader_ID(), header.get_TrxName());
             }
         }
         return null;
     } // clearPaymentWithholdingFromPayments
+
+    /**
+     * Elimina las retenciones de la cabecera de pago cuando se modifican
+     * las facturas (registros en MPaymentAllocate) asociados a la misma.
+     *
+     * @param payAlloc Registro de PaymentAllocate asociado a la cabecera
+     * @param type Evento
+     * @return Mensaje de error o nulo
+     */
+    private String clearPaymentWithholdingFromPaymentAllocate(final MPaymentAllocate payAlloc, int type)
+    {
+        final int lar_PaymentHeader_ID = payAlloc.get_ValueAsInt("LAR_PaymentHeader_ID");
+        
+        // No se está trabajando en una cabecera
+        if (lar_PaymentHeader_ID < 0)
+            return null;
+
+        final MLARPaymentHeader header = new MLARPaymentHeader(payAlloc.getCtx(),
+                lar_PaymentHeader_ID, payAlloc.get_TrxName());
+        // Solo se procesan cabeceras de pago
+        if (header.isReceipt())
+            return null;
+
+        // Existe retención calculada
+        final BigDecimal curWithholdingAmt = header.getWithholdingAmt();
+        if ((!curWithholdingAmt.equals(Env.ZERO)
+                && type == TYPE_AFTER_NEW)
+                || type == TYPE_AFTER_DELETE
+                // seleccionó otra factura
+                || (type == TYPE_AFTER_CHANGE && (payAlloc
+                        .is_ValueChanged(MPayment.COLUMNNAME_C_Invoice_ID))))
+        {
+            // Si existe retención calculada se borran los Certificados y Pagos Retención
+            if (!curWithholdingAmt.equals(Env.ZERO))
+            {
+                header.BorrarCertificadosdeRetenciondelHeader();
+                header.BorrarPagosRetenciondelHeader();
+                MLARPaymentHeader.updateHeaderWithholding(header.getLAR_PaymentHeader_ID(), header.get_TrxName());
+            }
+        }
+        return null;
+    } // clearPaymentWithholdingFromPaymentAllocate
 
     /**
      * Actualiza el importe total de la cabecera de pago
@@ -680,17 +748,27 @@ import ar.com.ergio.util.LAR_Utils;
     private String preparePaymentWithholding(final MLARPaymentHeader header)
     {
         // Solo se procesan las cabeceras de pago
-        // Nota: recupera la retención con el método generico para poder comparar con null
-        //       y de esta forma, determinar de forma más apropiada si hay que generer o no retención
-        if (!header.isReceipt() && header.get_Value("WithholdingAmt") == null)
+        if (!header.isReceipt() && header.getWithholdingAmt().equals(Env.ZERO))
         {
             final MDocType dt = new MDocType(header.getCtx(), header.getC_DocType_ID(), header.get_TrxName());
             String genwh = dt.get_ValueAsString("GenerateWithholding");
             if (genwh != null) {
 
                 if (genwh.equals("Y")) {
+                    // Recupera la configuraciones
+                    final MBPartner bp = new MBPartner(header.getCtx(), header.getC_BPartner_ID(), header.get_TrxName());
+                    final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, dt.isSOTrx(),
+                            header.get_TrxName(), null, header.getDateTrx());
+                    boolean generar = false;
+                    for (final WithholdingConfig wc : configs)
+                        if (wc.isCalcFromPayment())
+                        {
+                            generar = true;
+                            break;
+                        }
                     // tipo de documento configurado para obligar a la generación de retención
-                    return "Retenci\u00f3n no generada";
+                    if (generar)
+                        return "Retenci\u00f3n no generada, por favor genere la retenci\u00f3n antes de completar el documento";
                 }
 
                 if (genwh.equals("A")) {
