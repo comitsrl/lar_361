@@ -402,46 +402,31 @@ public class CalloutPayment extends CalloutEngine
                 && (mTab.getValue("PayAmt").equals(Env.ZERO)))
         {
             // Recuperar información de las facturas
-            List<MPaymentAllocate> invoices = new ArrayList<MPaymentAllocate>();
+            List<MPaymentAllocate> invoices = getInvoices(ctx, LAR_PaymentHeader_ID);
 
-            String sql = "SELECT * FROM C_PaymentAllocate WHERE LAR_PaymentHeader_ID = ?";
-
-            PreparedStatement pstmt;
-            pstmt = DB.prepareStatement(sql, null);
+            String sql = "";
+            PreparedStatement pstmt = null;
             ResultSet rs = null;
 
-            try
-            {
-                pstmt.setInt(1, LAR_PaymentHeader_ID);
-                rs = pstmt.executeQuery();
-                while (rs.next())
-                    invoices.add(new MPaymentAllocate(ctx, rs, null));
-
-            } catch (SQLException e)
-            {
-                log.log(Level.SEVERE, sql, e);
-            } finally
-            {
-                DB.close(rs, pstmt);
-                rs = null;
-                pstmt = null;
-            }
             if (!invoices.isEmpty())
             {
                 MPaymentAllocate[] facturas = invoices
                         .toArray(new MPaymentAllocate[invoices.size()]);
                 BigDecimal sumaFacturas = Env.ZERO;
+                BigDecimal sumaDescuento = Env.ZERO;
                 // Recorrer facturas
                 for (int i = 0; i < facturas.length; i++)
                 {
+                    // @fchiappano. Obtengo el C_InvoicePaySchedule_ID para calcular el importe impago.
+                    int c_InvoicePaySchedule_ID = facturas[i].get_ValueAsInt("C_InvoicePaySchedule_ID");
+
                     sql = "SELECT" + " invoiceOpen(C_Invoice_ID,?)" // 1
                             + " FROM C_Invoice WHERE C_Invoice_ID=?"; // 2
-                    pstmt = null;
-                    rs = null;
+
                     try
                     {
                         pstmt = DB.prepareStatement(sql, null);
-                        pstmt.setInt(1, 0);
+                        pstmt.setInt(1, c_InvoicePaySchedule_ID);
                         pstmt.setInt(2, facturas[i].getC_Invoice_ID());
                         rs = pstmt.executeQuery();
                         if (rs.next())
@@ -449,7 +434,20 @@ public class CalloutPayment extends CalloutEngine
                             BigDecimal InvoiceOpenAmt = rs.getBigDecimal(1); // Importe Impago
                             if (InvoiceOpenAmt == null)
                                 InvoiceOpenAmt = Env.ZERO;
-                            sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
+                            if (c_InvoicePaySchedule_ID > 0)
+                            {
+                                MInvoicePaySchedule paySchedule = new MInvoicePaySchedule(ctx, c_InvoicePaySchedule_ID, null);
+                                sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
+                                // @fchippano Chequeo si hay que aplicar el descuento.
+                                // (Solo si el compromiso de pago no esta vencido).
+                                if (!paySchedule.getDueDate().before(new Timestamp(System.currentTimeMillis())))
+                                {
+                                    // @fchiappano Sumo los descuentos.
+                                    sumaDescuento = sumaDescuento.add(paySchedule.getDiscountAmt());
+                                }
+                            }
+                            else
+                                sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
                         }
                     } catch (SQLException e)
                     {
@@ -464,35 +462,14 @@ public class CalloutPayment extends CalloutEngine
                 } // Recorrer facturas
 
                 // Recorrer Pagos/Cobros
-                List<MPayment> payments = new ArrayList<MPayment>();
+                List<MPayment> payments = getPayments(ctx, LAR_PaymentHeader_ID);
 
-                sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ?";
-
-                pstmt = DB.prepareStatement(sql, null);
-                rs = null;
-
-                try
-                {
-                    pstmt.setInt(1, LAR_PaymentHeader_ID);
-                    rs = pstmt.executeQuery();
-                    while (rs.next())
-                        payments.add(new MPayment(ctx, rs, null));
-
-                } catch (SQLException e)
-                {
-                    log.log(Level.SEVERE, sql, e);
-                } finally
-                {
-                    DB.close(rs, pstmt);
-                    rs = null;
-                    pstmt = null;
-                }
                 MPayment[] pagos = payments.toArray(new MPayment[payments.size()]);
                 BigDecimal sumaPagos = Env.ZERO;
                 // Recorrer Pagos
                 for (int p = 0; p < pagos.length; p++)
                     sumaPagos = sumaPagos.add(pagos[p].getPayAmt().add(pagos[p].getWriteOffAmt()));
-                mTab.setValue("PayAmt", sumaFacturas.subtract(sumaPagos));
+                mTab.setValue("PayAmt", sumaFacturas.subtract(sumaPagos).subtract(sumaDescuento));
                 mTab.setValue("OverUnderAmt", Env.ZERO);
                 return "";
             }
@@ -638,7 +615,112 @@ public class CalloutPayment extends CalloutEngine
             else
             {
                 boolean processed = mTab.getValueAsBoolean(MPayment.COLUMNNAME_Processed);
-                if (colName.equals("PayAmt") && (!processed) && (C_Invoice_ID != 0)
+
+                // @fchiappano Obtengo todas las facturas asignadas a la cabecera
+                final List<MPaymentAllocate> facturas = getInvoices(ctx, LAR_PaymentHeader_ID);
+
+                if (colName.equals("PayAmt") && !processed && !facturas.isEmpty())
+                {
+                    int pagoNro = 0;
+                    BigDecimal resto = Env.ZERO;
+                    BigDecimal saldoImpago = Env.ZERO;
+                    BigDecimal descuento = Env.ZERO;
+                    List<MPayment> pagos = getPayments(ctx, LAR_PaymentHeader_ID);
+                    for (MPaymentAllocate factura : facturas)
+                    {
+                        final int c_InvoicePaySchedule_ID = factura.get_ValueAsInt("C_InvoicePaySchedule_ID");
+
+                        boolean compromisoValido = false;
+
+                        if (c_InvoicePaySchedule_ID > 0)
+                        {
+                            MInvoicePaySchedule invoiceSchedule = new MInvoicePaySchedule(ctx,
+                                    c_InvoicePaySchedule_ID, null);
+
+                            // Verifico si el compromiso de pago es valido y no esta vencido.
+                            compromisoValido = !invoiceSchedule.getDueDate().before(
+                                    new Timestamp(System.currentTimeMillis()))
+                                    && invoiceSchedule.isValid();
+                        }
+
+                        saldoImpago = compromisoValido ? factura.getAmount().subtract(factura.getDiscountAmt()) : factura.getAmount();
+                        for (int x = pagoNro; x < pagos.size(); x++)
+                        {
+                            MPayment pago = pagos.get(x);
+
+                            // Si el pago, es el que se modifico actualmente y
+                            // no hay resto, tomo el valor de la grilla.
+                            if (Env.getContextAsInt(ctx, WindowNo, "C_Payment_ID") == pago.getC_Payment_ID()
+                                    && resto.compareTo(Env.ZERO) == 0)
+                            {
+                                resto = PayAmt;
+                                descuento = Env.ZERO;
+                            }
+                            // Si no hay resto sobrante del pago, tomo el payAmt.
+                            else if (resto.compareTo(Env.ZERO) == 0)
+                            {
+                                resto = pago.getPayAmt();
+                                descuento = Env.ZERO;
+                            }
+
+
+                            if (resto.compareTo(saldoImpago) >= 0)
+                            {
+                                resto = resto.subtract(saldoImpago);
+                                saldoImpago = Env.ZERO;
+                                pagoNro = x;
+                                descuento = compromisoValido ? descuento.add(
+                                        factura.getDiscountAmt()) : Env.ZERO;
+                            }
+                            else
+                            {
+                                saldoImpago = saldoImpago.subtract(resto);
+                                pagoNro = x + 1;
+                                resto = Env.ZERO;
+                            }
+
+                            if (Env.getContextAsInt(ctx, WindowNo, "C_Payment_ID") == pago.getC_Payment_ID())
+                                mTab.setValue("DiscountAmt", descuento);
+                            else
+                            {
+                                pago.setDiscountAmt(descuento);
+                                pago.saveEx();
+                            }
+
+                            // Si la factura fue pagada en su totalidad, paso a la siguiente.
+                            if (saldoImpago.compareTo(Env.ZERO) == 0)
+                                break;
+                        }
+                        // Si es un nuevo pago, calculo el descuento obteniendo el payAmt
+                        // y seteo el descuento directamente en la MTab de la ventana.
+                        if (Env.getContextAsInt(ctx, WindowNo, "C_Payment_ID") == 0)
+                        {
+                            if (resto.compareTo(Env.ZERO) == 0)
+                            {
+                                resto = PayAmt;
+                                mTab.setValue("DiscountAmt", Env.ZERO);
+                            }
+
+                            if (resto.compareTo(saldoImpago) >= 0)
+                            {
+                                resto = resto.subtract(saldoImpago);
+                                saldoImpago = Env.ZERO;
+                                mTab.setValue("DiscountAmt", compromisoValido ? ((BigDecimal) mTab.getValue("DiscountAmt")).add(
+                                        factura.getDiscountAmt()) : Env.ZERO);
+                            }
+                            else
+                            {
+                                saldoImpago = saldoImpago.subtract(resto);
+                                resto = Env.ZERO;
+                            }
+
+                            // Si la factura quedo saldada, termino el proceso.
+                            if (resto.compareTo(Env.ZERO) == 0)
+                                break;
+                        }
+                    }
+                }
+                else if (colName.equals("PayAmt") && (!processed) && (C_Invoice_ID != 0)
                         && "Y".equals(Env.getContext(ctx, WindowNo, "IsOverUnderPayment")))
                 {
                     OverUnderAmt = InvoiceOpenAmt.subtract(PayAmt).subtract(DiscountAmt)
@@ -746,4 +828,83 @@ public class CalloutPayment extends CalloutEngine
         }
         return "";
     } // esretencionsufrida
+
+    /**
+     * Obtener las facturas asignadas a la cabecera de pago.
+     * @return
+     */
+    private List<MPaymentAllocate> getInvoices(final Properties ctx, final int LAR_PaymentHeader_ID)
+    {
+        // Recuperar información de las facturas
+        List<MPaymentAllocate> invoices = new ArrayList<MPaymentAllocate>();
+
+        String sql = "SELECT *"
+                   + "  FROM C_PaymentAllocate"
+                   + " WHERE LAR_PaymentHeader_ID = ?"
+                   + " ORDER BY C_PaymentAllocate_ID";
+
+        PreparedStatement pstmt;
+        pstmt = DB.prepareStatement(sql, null);
+        ResultSet rs = null;
+
+        try
+        {
+            pstmt.setInt(1, LAR_PaymentHeader_ID);
+            rs = pstmt.executeQuery();
+            while (rs.next())
+                invoices.add(new MPaymentAllocate(ctx, rs, null));
+
+        }
+        catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return invoices;
+    } // getInvoices
+
+    /**
+     * Obtener todos los pagos de la cabecera.
+     * @param ctx
+     * @param LAR_PaymentHeader_ID
+     * @return
+     */
+    private List<MPayment> getPayments(final Properties ctx, final int LAR_PaymentHeader_ID)
+    {
+        List<MPayment> payments = new ArrayList<MPayment>();
+
+        String sql = "SELECT *"
+                   + "  FROM C_Payment"
+                   + " WHERE LAR_PaymentHeader_ID = ?"
+                   + " ORDER BY C_Payment_ID";
+
+        PreparedStatement pstmt;
+        pstmt = DB.prepareStatement(sql, null);
+        ResultSet rs = null;
+        try
+        {
+            pstmt.setInt(1, LAR_PaymentHeader_ID);
+            rs = pstmt.executeQuery();
+            while (rs.next())
+                payments.add(new MPayment(ctx, rs, null));
+
+        } catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+        } finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return payments;
+    } // getPayments
+
 } // CalloutPayment
