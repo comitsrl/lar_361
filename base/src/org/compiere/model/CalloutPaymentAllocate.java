@@ -74,6 +74,9 @@ public class CalloutPaymentAllocate extends CalloutEngine
 			&& Env.getContextAsInt(ctx, WindowNo, Env.TAB_INFO, "C_InvoicePaySchedule_ID") != 0)
 		{
 			C_InvoicePaySchedule_ID = Env.getContextAsInt(ctx, WindowNo, Env.TAB_INFO, "C_InvoicePaySchedule_ID");
+            // @fchiappano Seteo el C_InvoicePaySchedule_ID para controlar
+            // posteriormente, el remanente a pagar y el descuento sin aplicar.
+			mTab.setValue("C_InvoicePaySchedule_ID", C_InvoicePaySchedule_ID);
 		}
 
 		//  Payment Date
@@ -106,7 +109,7 @@ public class CalloutPaymentAllocate extends CalloutEngine
 				if (DiscountAmt == null)
 					DiscountAmt = Env.ZERO;
 				mTab.setValue("InvoiceAmt", InvoiceOpen);
-				mTab.setValue("Amount", InvoiceOpen.subtract(DiscountAmt));
+				mTab.setValue("Amount", InvoiceOpen);
 				mTab.setValue("DiscountAmt", DiscountAmt);
 				//  reset as dependent fields get reset
 				Env.setContext(ctx, WindowNo, "C_Invoice_ID", C_Invoice_ID.toString());
@@ -165,12 +168,12 @@ public class CalloutPaymentAllocate extends CalloutEngine
 		//  PayAmt - calculate write off
 		if (colName.equals("Amount"))
 		{
-			WriteOffAmt = InvoiceAmt.subtract(Amount).subtract(DiscountAmt).subtract(OverUnderAmt);
+			WriteOffAmt = InvoiceAmt.subtract(Amount).subtract(OverUnderAmt);
 			mTab.setValue("WriteOffAmt", WriteOffAmt);
 		}
 		else    //  calculate Amount
 		{
-			Amount = InvoiceAmt.subtract(DiscountAmt).subtract(WriteOffAmt).subtract(OverUnderAmt);
+			Amount = InvoiceAmt.subtract(WriteOffAmt).subtract(OverUnderAmt);
 			mTab.setValue("Amount", Amount);
 		}
 
