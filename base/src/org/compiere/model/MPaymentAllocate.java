@@ -143,8 +143,7 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
 		}
 		
 		BigDecimal check = getAmount()
-			//.add(getDiscountAmt()) @fchiappano Se omite el descuento, para que no se aplique el mismo
-		                                        // si se realiza un pago en forma parcial.
+			.add(getDiscountAmt())
 			.add(getWriteOffAmt())
 			.add(getOverUnderAmt());
 		if (check.compareTo(getInvoiceAmt()) != 0)
