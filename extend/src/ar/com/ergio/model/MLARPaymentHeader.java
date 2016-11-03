@@ -604,7 +604,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 MPaymentAllocate pa = invoices[i];
                 MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
                 final BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt()).subtract(pays[p].getAllocatedAmt());
-                int comp = impPago.compareTo(invoice.getOpenAmt());
+                final BigDecimal importeFactura = pa.getAmount();
+                int comp = impPago.compareTo(importeFactura);
                 MAllocationLine aLine = null;
                 BigDecimal alineOUAmt = Env.ZERO;
                 BigDecimal alineAmt;
@@ -612,17 +613,17 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 if (comp <= 0)
                 {
                     alineAmt = impPago;
-                    alineOUAmt = invoice.getOpenAmt().subtract(alineAmt);
+                    alineOUAmt = importeFactura.subtract(alineAmt);
                 } else {
-                    alineAmt = invoice.getOpenAmt();
+                    alineAmt = importeFactura;
                     alineOUAmt = alineAmt.subtract(impPago);
                 }
                 if (isReceipt())
-                    aLine = new MAllocationLine(alloc, alineAmt, pa.getDiscountAmt(),
+                    aLine = new MAllocationLine(alloc, alineAmt, Env.ZERO,
                             pa.getWriteOffAmt(), alineOUAmt);
                 else
-                    aLine = new MAllocationLine(alloc, alineAmt.negate(), pa.getDiscountAmt()
-                            .negate(), pa.getWriteOffAmt().negate(), alineOUAmt.negate());
+                    aLine = new MAllocationLine(alloc, alineAmt.negate(), Env.ZERO
+                            , pa.getWriteOffAmt().negate(), alineOUAmt.negate());
                 aLine.setDocInfo(pa.getC_BPartner_ID(), 0, pa.getC_Invoice_ID());
                 aLine.setPaymentInfo(pays[p].getC_Payment_ID(), 0);
                 if (!aLine.save(get_TrxName()))
