@@ -434,20 +434,9 @@ public class CalloutPayment extends CalloutEngine
                             BigDecimal InvoiceOpenAmt = rs.getBigDecimal(1); // Importe Impago
                             if (InvoiceOpenAmt == null)
                                 InvoiceOpenAmt = Env.ZERO;
-                            if (c_InvoicePaySchedule_ID > 0)
-                            {
-                                MInvoicePaySchedule paySchedule = new MInvoicePaySchedule(ctx, c_InvoicePaySchedule_ID, null);
-                                sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
-                                // @fchippano Chequeo si hay que aplicar el descuento.
-                                // (Solo si el compromiso de pago no esta vencido).
-                                if (!paySchedule.getDueDate().before(new Timestamp(System.currentTimeMillis())))
-                                {
-                                    // @fchiappano Sumo los descuentos.
-                                    sumaDescuento = sumaDescuento.add(paySchedule.getDiscountAmt());
-                                }
-                            }
-                            else
-                                sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
+
+                            sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
+                            sumaDescuento = facturas[i].getDiscountAmt();
                         }
                     } catch (SQLException e)
                     {
@@ -628,22 +617,7 @@ public class CalloutPayment extends CalloutEngine
                     List<MPayment> pagos = getPayments(ctx, LAR_PaymentHeader_ID);
                     for (MPaymentAllocate factura : facturas)
                     {
-                        final int c_InvoicePaySchedule_ID = factura.get_ValueAsInt("C_InvoicePaySchedule_ID");
-
-                        boolean compromisoValido = false;
-
-                        if (c_InvoicePaySchedule_ID > 0)
-                        {
-                            MInvoicePaySchedule invoiceSchedule = new MInvoicePaySchedule(ctx,
-                                    c_InvoicePaySchedule_ID, null);
-
-                            // Verifico si el compromiso de pago es valido y no esta vencido.
-                            compromisoValido = !invoiceSchedule.getDueDate().before(
-                                    new Timestamp(System.currentTimeMillis()))
-                                    && invoiceSchedule.isValid();
-                        }
-
-                        saldoImpago = compromisoValido ? factura.getAmount().subtract(factura.getDiscountAmt()) : factura.getAmount();
+                        saldoImpago = factura.getAmount();
                         for (int x = pagoNro; x < pagos.size(); x++)
                         {
                             MPayment pago = pagos.get(x);
@@ -669,8 +643,7 @@ public class CalloutPayment extends CalloutEngine
                                 resto = resto.subtract(saldoImpago);
                                 saldoImpago = Env.ZERO;
                                 pagoNro = x;
-                                descuento = compromisoValido ? descuento.add(
-                                        factura.getDiscountAmt()) : Env.ZERO;
+                                descuento = descuento.add(factura.getDiscountAmt());
                             }
                             else
                             {
@@ -705,8 +678,8 @@ public class CalloutPayment extends CalloutEngine
                             {
                                 resto = resto.subtract(saldoImpago);
                                 saldoImpago = Env.ZERO;
-                                mTab.setValue("DiscountAmt", compromisoValido ? ((BigDecimal) mTab.getValue("DiscountAmt")).add(
-                                        factura.getDiscountAmt()) : Env.ZERO);
+                                mTab.setValue("DiscountAmt", ((BigDecimal) mTab.getValue("DiscountAmt")).add(
+                                        factura.getDiscountAmt()));
                             }
                             else
                             {
