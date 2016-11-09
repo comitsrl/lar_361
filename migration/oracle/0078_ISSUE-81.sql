@@ -5487,6 +5487,26 @@ UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2016-10-29 19:01:57','YYYY-M
 UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2016-10-29 19:01:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000445
 ;
 
+-- 03/11/2016 9:51:25 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET IsDisplayed='N', DisplayLogic=NULL,Updated=TO_DATE('2016-11-03 09:51:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000325
+;
+
+-- 03/11/2016 9:51:43 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET IsDisplayed='N', IsSameLine='N', DisplayLogic=NULL,Updated=TO_DATE('2016-11-03 09:51:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000326
+;
+
+-- 03/11/2016 9:52:05 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field SET IsDisplayed='N', DisplayLogic='@C_Invoice_ID@^''''',Updated=TO_DATE('2016-11-03 09:52:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000323
+;
+
+-- 03/11/2016 9:54:28 ART
+-- ISSUE #81: Retenciones, configuración en C_BPartner
+UPDATE AD_Field_Trl SET Name='Importe Retención',Description='Importe Retención',Help='Importe de la Retención Sufrida.',Updated=TO_DATE('2016-11-03 09:54:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000322 AND AD_Language='es_AR'
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0078_ISSUE-81.sql', 'LAR', '') FROM dual
 ;
