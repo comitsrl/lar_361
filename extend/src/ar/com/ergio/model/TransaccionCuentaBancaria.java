@@ -214,13 +214,13 @@ public class TransaccionCuentaBancaria
                                 .equals("Y"))
                 {
                     cashAmt = pago.get_ValueAsBoolean("IsReceipt") ? cashAmt.add(pago.getPayAmt()) : cashAmt.add(
-                            pago.getPayAmt()).negate();
+                            pago.getPayAmt().negate());
                     linea.set_ValueOfColumn("IsTransferred", true);
                     linea.saveEx();
                     cash_transferred++;
                     continue;
                 }
-                else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) || pago.getTenderType().equals("Z")
+                else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) | pago.getTenderType().equals("Z")
                         && pago.get_ValueAsBoolean("IsReceipt") && pago.get_ValueAsBoolean("IsOnDrawer"))
                 {
 
