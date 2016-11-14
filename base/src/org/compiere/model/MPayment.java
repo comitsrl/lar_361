@@ -532,6 +532,64 @@ public final class MPayment extends X_C_Payment
 		return retValue;    //  Payment processed
 	}   //  startProcess
 
+    protected boolean afterDelete(boolean success)
+	{
+        int LAR_PaymentHeader_ID = get_ValueAsInt("LAR_PaymentHeader_ID");
+
+        // Si el pago/cobro tiene un header, recalculo los descuentos.
+        if (LAR_PaymentHeader_ID > 0)
+        {
+            // @fchiappano Obtengo todas las facturas asignadas a la cabecera
+            final List<MPaymentAllocate> facturas = SearchPaymentHeaderAttribute.getInvoices(getCtx(),
+                    LAR_PaymentHeader_ID);
+
+            if (!facturas.isEmpty())
+            {
+                int pagoNro = 0;
+                BigDecimal resto = Env.ZERO;
+                BigDecimal saldoImpago = Env.ZERO;
+                BigDecimal descuento = Env.ZERO;
+                List<MPayment> pagos = SearchPaymentHeaderAttribute.getPayments(getCtx(), LAR_PaymentHeader_ID);
+                for (MPaymentAllocate factura : facturas)
+                {
+                    saldoImpago = factura.getAmount();
+                    for (int x = pagoNro; x < pagos.size(); x++)
+                    {
+                        MPayment pago = pagos.get(x);
+
+                        // Si no hay resto sobrante del pago, tomo el payAmt.
+                        if (resto.compareTo(Env.ZERO) == 0)
+                        {
+                            resto = pago.getPayAmt();
+                            descuento = Env.ZERO;
+                        }
+
+                        if (resto.compareTo(saldoImpago) >= 0)
+                        {
+                            resto = resto.subtract(saldoImpago);
+                            saldoImpago = Env.ZERO;
+                            pagoNro = x;
+                            descuento = descuento.add(factura.getDiscountAmt());
+                        }
+                        else
+                        {
+                            saldoImpago = saldoImpago.subtract(resto);
+                            pagoNro = x + 1;
+                            resto = Env.ZERO;
+                        }
+
+                        pago.setDiscountAmt(descuento);
+                        pago.saveEx();
+
+                        // Si la factura fue pagada en su totalidad, paso a la siguiente.
+                        if (saldoImpago.compareTo(Env.ZERO) == 0)
+                            break;
+                    }
+                }
+            }
+        }
+        return true;
+	} // afterDelete
 	
 	/**
 	 * 	Before Save
