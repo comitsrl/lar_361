@@ -1531,17 +1531,17 @@ UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002753
 
 -- 01/08/2016 17:50:29 ART
 -- BUG #334: Cierre de Cajas.
-INSERT INTO C_DocType (GL_Category_ID,GenerateWithholding,IsElectronic,IsFiscal,IsFiscaldocument,C_DocType_ID,IsDefault,IsDocNoControlled,DocBaseType,IsSOTrx,DocumentCopies,HasCharges,HasProforma,IsCreateCounter,IsSplitWhenDifference,IsDefaultCounterDoc,IsInTransit,IsPickQAConfirm,IsIndexed,IsShipConfirm,IsOverwriteSeqOnComplete,IsOverwriteDateOnComplete,IsPrepareSplitDocument,PrintName,Name,Updated,IsChargeOrProductMandatory,CreatedBy,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID) VALUES (1000007,'N','N','N','N',1000159,'N','Y','APP','N',1,'N','N','Y','N','N','N','N','N','N','N','N','Y','Retiro de Caja','Retiro de Caja',TO_TIMESTAMP('2016-08-01 17:50:29','YYYY-MM-DD HH24:MI:SS'),'N',100,100,0,TO_TIMESTAMP('2016-08-01 17:50:29','YYYY-MM-DD HH24:MI:SS'),'Y',1000000)
+INSERT INTO C_DocType (GL_Category_ID,GenerateWithholding,IsElectronic,IsFiscal,IsFiscaldocument,C_DocType_ID,IsDefault,IsDocNoControlled,DocBaseType,IsSOTrx,DocumentCopies,HasCharges,HasProforma,IsCreateCounter,IsSplitWhenDifference,IsDefaultCounterDoc,IsInTransit,IsPickQAConfirm,IsIndexed,IsShipConfirm,IsOverwriteSeqOnComplete,IsOverwriteDateOnComplete,IsPrepareSplitDocument,PrintName,Name,Updated,IsChargeOrProductMandatory,CreatedBy,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID) VALUES (1000007,'N','N','N','N',3000159,'N','Y','APP','N',1,'N','N','Y','N','N','N','N','N','N','N','N','Y','Retiro de Caja','Retiro de Caja',TO_TIMESTAMP('2016-08-01 17:50:29','YYYY-MM-DD HH24:MI:SS'),'N',100,100,0,TO_TIMESTAMP('2016-08-01 17:50:29','YYYY-MM-DD HH24:MI:SS'),'Y',1000000)
 ;
 
 -- 01/08/2016 17:50:29 ART
 -- BUG #334: Cierre de Cajas.
-INSERT INTO C_DocType_Trl (AD_Language,C_DocType_ID, DocumentNote,PrintName,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.C_DocType_ID, t.DocumentNote,t.PrintName,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, C_DocType t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.C_DocType_ID=1000159 AND NOT EXISTS (SELECT * FROM C_DocType_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.C_DocType_ID=t.C_DocType_ID)
+INSERT INTO C_DocType_Trl (AD_Language,C_DocType_ID, DocumentNote,PrintName,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.C_DocType_ID, t.DocumentNote,t.PrintName,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, C_DocType t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.C_DocType_ID=3000159 AND NOT EXISTS (SELECT * FROM C_DocType_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.C_DocType_ID=t.C_DocType_ID)
 ;
 
 -- 01/08/2016 17:50:29 ART
 -- BUG #334: Cierre de Cajas.
-INSERT INTO AD_Document_Action_Access (AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,C_DocType_ID , AD_Ref_List_ID, AD_Role_ID) (SELECT 1000000,0,'Y', CURRENT_TIMESTAMP,100, CURRENT_TIMESTAMP,100, doctype.C_DocType_ID, "action".AD_Ref_List_ID, rol.AD_Role_ID FROM AD_Client client INNER JOIN C_DocType doctype ON (doctype.AD_Client_ID=client.AD_Client_ID) INNER JOIN AD_Ref_List "action" ON ("action".AD_Reference_ID=135) INNER JOIN AD_Role rol ON (rol.AD_Client_ID=client.AD_Client_ID) WHERE client.AD_Client_ID=1000000 AND doctype.C_DocType_ID=1000159 AND rol.IsManual='N')
+INSERT INTO AD_Document_Action_Access (AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,C_DocType_ID , AD_Ref_List_ID, AD_Role_ID) (SELECT 1000000,0,'Y', CURRENT_TIMESTAMP,100, CURRENT_TIMESTAMP,100, doctype.C_DocType_ID, "action".AD_Ref_List_ID, rol.AD_Role_ID FROM AD_Client client INNER JOIN C_DocType doctype ON (doctype.AD_Client_ID=client.AD_Client_ID) INNER JOIN AD_Ref_List "action" ON ("action".AD_Reference_ID=135) INNER JOIN AD_Role rol ON (rol.AD_Client_ID=client.AD_Client_ID) WHERE client.AD_Client_ID=1000000 AND doctype.C_DocType_ID=3000159 AND rol.IsManual='N')
 ;
 
 -- 01/08/2016 18:42:30 ART
@@ -1556,7 +1556,7 @@ INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Clien
 
 -- 01/08/2016 18:44:20 ART
 -- BUG #334: Cierre de Cajas.
-UPDATE AD_Column SET DefaultValue='1000159', IsUpdateable='N',Updated=TO_TIMESTAMP('2016-08-01 18:44:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001829
+UPDATE AD_Column SET DefaultValue='3000159', IsUpdateable='N',Updated=TO_TIMESTAMP('2016-08-01 18:44:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001829
 ;
 
 -- 01/08/2016 18:44:42 ART
