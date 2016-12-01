@@ -445,6 +445,11 @@ UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000489
 UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000491
 ;
 
+-- 01/12/2016 20:48:16 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Column SET ColumnSQL='((SELECT COALESCE(Sum(TrxAmt),0) FROM C_BankStatementLine sl JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID) WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType = ''X'')) + C_BankStatement.SaldoInicial)',Updated=TO_TIMESTAMP('2016-12-01 20:48:16','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000150
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0080_ISSUE-80', 'LAR', '')
 ;
