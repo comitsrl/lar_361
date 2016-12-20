@@ -428,7 +428,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 		    {
 		        final Timestamp fecha = new Timestamp(System.currentTimeMillis());
 		        final int C_BPartner_ID = MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, Env.getAD_Client_ID(getCtx()));
-                final String descripcion = "Pago en concepto de transferencia de valores de caja pricipal, a cuenta bancaria según forma de pago.";
+                final String descripcion = "Pago en concepto de transferencia de valores.";
                 m_transferred = TransaccionCuentaBancaria.transferirValoresPorFormaPago(getC_BankStatement_ID(),
                         descripcion, C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
 
