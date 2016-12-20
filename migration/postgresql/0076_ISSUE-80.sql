@@ -418,11 +418,6 @@ UPDATE AD_Field SET DisplayLogic='@TenderType@=A',Updated=TO_TIMESTAMP('2016-09-
 
 -- 07/09/2016 19:07:58 ART
 -- ISSUE #80: Cierre de Cajas.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002805,10,'Y','N','N',3001865,'N','Y',1000012,'N','LAR','Tipos de Depósito Directo',100,0,TO_TIMESTAMP('2016-09-07 19:07:58','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2016-09-07 19:07:58','YYYY-MM-DD HH24:MI:SS'))
-;
-
--- 07/09/2016 19:07:58 ART
--- ISSUE #80: Cierre de Cajas.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002805,10,'Y','N','N',3001865,'N','Y',3000026,'N','LAR','Tipos de Depósito Directo',100,0,TO_TIMESTAMP('2016-09-07 19:07:58','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2016-09-07 19:07:58','YYYY-MM-DD HH24:MI:SS'))
 ;
 
