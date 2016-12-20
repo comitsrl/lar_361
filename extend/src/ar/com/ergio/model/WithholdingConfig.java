@@ -330,7 +330,7 @@ class WithholdingConfig
                             wc.getThresholdmin(), wc.isCalcOnPayment(),
                             wr.getLCO_WithholdingRule_ID(), wr.getLCO_WithholdingType_ID(),
                             wc.getC_Tax_ID(), wrc.get_ValueAsInt("C_DocType_ID"),
-                            tax.getC_TaxCategory_ID());
+                            wr.getC_TaxCategory_ID());
 
                     if (!list.add(config))
                     {

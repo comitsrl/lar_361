@@ -466,9 +466,8 @@ import ar.com.ergio.util.LAR_Utils;
             // Check if is a sales transaction
             if (!order.isSOTrx())
                 return null;
-            
-            final MDocType dt = new MDocType(order.getCtx(), order.getC_DocType_ID(), order.get_TrxName());
-            final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, dt.isSOTrx(), order.get_TrxName(), order, order.getDateOrdered());
+
+            final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, true, order.get_TrxName(), order, order.getDateOrdered());
 
             // Se recorren las configuraciones recuperadas
             // Se crean las líneas de percepción
@@ -492,11 +491,11 @@ import ar.com.ergio.util.LAR_Utils;
     			}
     			if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType
     					.getTaxPayerType(bp))) {
-    				perceptionAmt = gravado.multiply(wc.getAliquot()).setScale(2,
-    						BigDecimal.ROUND_HALF_UP);
+    				perceptionAmt = (((gravado.add(taxAmt).multiply(wc.getAliquot())).divide(new BigDecimal (100))).setScale(2,
+                            BigDecimal.ROUND_HALF_UP)).abs(); 
     			} else {
-    				perceptionAmt = gravado.add(taxAmt).multiply(wc.getAliquot())
-    						.setScale(2, BigDecimal.ROUND_HALF_UP);
+    				perceptionAmt = (((gravado.multiply(wc.getAliquot())).divide(new BigDecimal (100))).setScale(2,
+                            BigDecimal.ROUND_HALF_UP)).abs(); 
     			}
     
     			// Crea la percepción de la orden
