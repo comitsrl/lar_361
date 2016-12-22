@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.model.MPayment;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
@@ -132,7 +133,20 @@ public class MLARPlanPago extends X_LAR_Plan_Pago
 		}
 
         // Concatenar correctamente el name del plan de pago
-        if (getDescuento().compareTo(Env.ZERO) < 0)
+		if (!getLAR_Medio_Pago().getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
+		{
+		    if (getDescuento().compareTo(Env.ZERO) < 0)
+		    {
+		        final String name = "Recargo " + getDescuento().negate().doubleValue() + '%';
+                set_Value("Name", name);
+            }
+		    else
+		    {
+		        final String name = "Descuento " + getDescuento().doubleValue() + '%';
+                set_Value("Name", name);
+		    }
+		}
+		else if (getDescuento().compareTo(Env.ZERO) < 0)
         {
             final String name = getCuota_Inicial() + " a " + getCuota_Final() + " Cuotas - Recargo "
                     + getDescuento().negate().doubleValue() + '%';
