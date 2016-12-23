@@ -63,7 +63,7 @@ public class CreateFromStatement extends CreateFrom
 	public boolean dynInit() throws Exception
 	{
 		log.config("");
-		setTitle(Msg.translate(Env.getCtx(), "C_BankStatement_ID") + " .. " + Msg.translate(Env.getCtx(), "CreateFrom"));
+		setTitle(Msg.translate(Env.getCtx(), "C_BankStatement_ID") + " / Cierre de Cajas" + " ... " + Msg.translate(Env.getCtx(), "CreateFrom"));
 		
 		return true;
 	}   //  dynInit
