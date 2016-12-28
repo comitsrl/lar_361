@@ -428,7 +428,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 	    //TODO - Analize genereate a cache for this payments
 		List<MPayment> pays = new ArrayList<MPayment>();
 		// @mzuniga -  Se Agrega la condición de ordenamiento, recupera primero las retenciones (sufridas y efectuadas).
-        String sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ? ORDER BY EsRetencionSufrida, EsRetencionIIBB, C_Payment_ID DESC";
+        String sql = "SELECT * FROM C_Payment WHERE LAR_PaymentHeader_ID = ? ORDER BY EsRetencionSufrida DESC, EsRetencionIIBB DESC, C_Payment_ID ASC";
 
 		PreparedStatement pstmt;
 		pstmt = DB.prepareStatement(sql, trxName);
@@ -604,7 +604,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 MPaymentAllocate pa = invoices[i];
                 MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
                 final BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt()).subtract(pays[p].getAllocatedAmt());
-                final BigDecimal importeFactura = pa.getAmount();
+                final BigDecimal importeFactura = invoice.getOpenAmt().subtract(pa.getDiscountAmt());
                 int comp = impPago.compareTo(importeFactura);
                 MAllocationLine aLine = null;
                 BigDecimal alineOUAmt = Env.ZERO;
@@ -824,7 +824,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         // TODO - Analize genereate a cache for this invoices
         List<MPaymentAllocate> invoices = new ArrayList<MPaymentAllocate>();
 
-        String sql = "SELECT * FROM C_PaymentAllocate WHERE LAR_PaymentHeader_ID = ?";
+        String sql = "SELECT * FROM C_PaymentAllocate WHERE LAR_PaymentHeader_ID = ? ORDER BY C_PaymentAllocate_ID";
 
         PreparedStatement pstmt;
         pstmt = DB.prepareStatement(sql, trxName);
