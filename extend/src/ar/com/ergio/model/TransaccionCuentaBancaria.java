@@ -241,48 +241,64 @@ public class TransaccionCuentaBancaria
                     paymentBankTo.setAccountNo(pago.getAccountNo());
                     paymentBankTo.setA_Name(pago.getA_Name());
 
+                    final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
+                    paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
+
+                    m_transferred++;
+                }
+                else if (pago.getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
+                {
+                    totalAmt = totalAmt.add(pago.getPayAmt());
+                    paymentBankTo = crearPago(
+                            p_DateAcct,
+                            p_StatementDate,
+                            getCuentaPorFormaPago("LAR_Tarjeta_Credito_ID",
+                                    pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID")), pago, p_C_BPartner_ID,
+                            p_Description, ctx, trxName);
+
+                    paymentBankTo.set_ValueOfColumn("LAR_Tarjeta_Credito_ID",
+                            pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID"));
+                    paymentBankTo.setA_Name(pago.getA_Name());
+                    paymentBankTo.setCreditCardNumber(pago.getCreditCardNumber());
+                    paymentBankTo.setCreditCardExpMM(pago.getCreditCardExpMM());
+                    paymentBankTo.setCreditCardExpYY(pago.getCreditCardExpYY());
+                    final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
+                    paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
+
+                    m_transferred++;
+                }
+                else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDebit))
+                {
+                    totalAmt = totalAmt.add(pago.getPayAmt());
+                    paymentBankTo = crearPago(
+                            p_DateAcct,
+                            p_StatementDate,
+                            getCuentaPorFormaPago("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID")),
+                            pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+
+                    paymentBankTo.set_ValueOfColumn("LAR_Tarjeta_Debito_ID",
+                            pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID"));
+                    final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
+                    paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
+
+                    m_transferred++;
+                }
+                else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDeposit))
+                {
+                    totalAmt = totalAmt.add(pago.getPayAmt());
+                    paymentBankTo = crearPago(
+                            p_DateAcct,
+                            p_StatementDate,
+                            getCuentaPorFormaPago("LAR_Deposito_Directo_ID",
+                                    pago.get_ValueAsInt("LAR_Deposito_Directo_ID")), pago, p_C_BPartner_ID,
+                            p_Description, ctx, trxName);
+
+                    paymentBankTo.set_ValueOfColumn("LAR_Deposito_Directo_ID",
+                            pago.get_ValueAsInt("LAR_Deposito_Directo_ID"));
+
                     m_transferred++;
                 }
             }
-            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
-            {
-                totalAmt = totalAmt.add(pago.getPayAmt());
-                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
-                        getCuentaPorFormaPago("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID")),
-                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
-
-                paymentBankTo.set_ValueOfColumn("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID"));
-                paymentBankTo.setA_Name(pago.getA_Name());
-                paymentBankTo.setCreditCardNumber(pago.getCreditCardNumber());
-                paymentBankTo.setCreditCardExpMM(pago.getCreditCardExpMM());
-                paymentBankTo.setCreditCardExpYY(pago.getCreditCardExpYY());
-                paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", pago.get_ValueAsInt("LAR_Plan_Pago_ID"));
-
-                m_transferred ++;
-            }
-            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDebit))
-            {
-                totalAmt = totalAmt.add(pago.getPayAmt());
-                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
-                        getCuentaPorFormaPago("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID")),
-                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
-
-                paymentBankTo.set_ValueOfColumn("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID"));
-
-                m_transferred ++;
-            }
-            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDeposit))
-            {
-                totalAmt = totalAmt.add(pago.getPayAmt());
-                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
-                        getCuentaPorFormaPago("LAR_Deposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID")),
-                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
-
-                paymentBankTo.set_ValueOfColumn("LAR_Deposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID"));
-
-                m_transferred ++;
-            }
-
             // Guardo y completo el cobro en la caja destino.
             if (paymentBankTo != null)
             {
