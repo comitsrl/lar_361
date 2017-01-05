@@ -485,6 +485,11 @@ UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2016-12-29 18:05:31','Y
 UPDATE AD_Field SET DisplayLogic='@TenderType@=Z | @TenderType@=K',Updated=TO_TIMESTAMP('2016-12-29 18:06:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003010
 ;
 
+-- 05/01/2017 12:58:02 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Column SET AD_Reference_Value_ID=149,Updated=TO_TIMESTAMP('2017-01-05 12:58:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001179
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0083_ISSUE-80', 'LAR', '')
 ;
