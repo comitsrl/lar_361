@@ -16,7 +16,6 @@
  *****************************************************************************/
 package ar.com.ergio.process;
 
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -25,15 +24,15 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.compiere.model.MBankAccount;
-import org.compiere.model.MBankStatement;
 import org.compiere.model.MBankStatementLine;
-import org.compiere.model.MPayment;
 import org.compiere.model.MUser;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+
+import ar.com.ergio.model.TransaccionCuentaBancaria;
 
 /**
  * Drawer transfer
@@ -48,12 +47,13 @@ public class DrawerTransfer extends SvrProcess
     private String p_DocumentNo = ""; // Document No
     private String p_Description = ""; // Description
     private int p_C_BPartner_ID = 0; // Business Partner to be used as bridge
-    private int p_C_Currency_ID = 0; // Payment Currency
+    // private int p_C_Currency_ID = 0; // Payment Currency
 
     private int p_From_C_BankAccount_ID = 0; // Bank Account From
     private int p_To_C_BankAccount_ID = 0; // Bank Account To
     private Timestamp p_StatementDate = null; // Date Statement
     private Timestamp p_DateAcct = null; // Date Account
+    private int p_BankStatement_ID = 0;
     private int m_transferred = 0;
 
     /**
@@ -68,8 +68,8 @@ public class DrawerTransfer extends SvrProcess
                 p_From_C_BankAccount_ID = para[i].getParameterAsInt();
             else if (name.equals("To_C_BankAccount_ID"))
                 p_To_C_BankAccount_ID = para[i].getParameterAsInt();
-            else if (name.equals("C_Currency_ID"))
-                p_C_Currency_ID = para[i].getParameterAsInt();
+            // else if (name.equals("C_Currency_ID"))
+            // p_C_Currency_ID = para[i].getParameterAsInt();
             else if (name.equals("Description"))
                 p_Description = (String) para[i].getParameter();
             else if (name.equals("DocumentNo"))
@@ -78,6 +78,8 @@ public class DrawerTransfer extends SvrProcess
                 p_StatementDate = (Timestamp) para[i].getParameter();
             else if (name.equals("DateAcct"))
                 p_DateAcct = (Timestamp) para[i].getParameter();
+            else if (name.equals("C_BankStatement_ID"))
+                p_BankStatement_ID = para[i].getParameterAsInt();
             else
                 log.log(Level.SEVERE, "prepare - Unknown Parameter: " + name);
         }
@@ -96,21 +98,21 @@ public class DrawerTransfer extends SvrProcess
                 p_From_C_BankAccount_ID, p_To_C_BankAccount_ID, p_DocumentNo, p_Description, p_StatementDate, p_DateAcct);
         log.info(msg);
 
-        if (p_To_C_BankAccount_ID == 0 || p_From_C_BankAccount_ID == 0)
-            throw new IllegalArgumentException("Banks required");
+        if (p_From_C_BankAccount_ID == 0)
+            throw new IllegalArgumentException("Número de Caja Requerido");
 
-        if (p_DocumentNo == null || p_DocumentNo.length() == 0)
-            throw new IllegalArgumentException("Document No required");
+        // if (p_DocumentNo == null || p_DocumentNo.length() == 0)
+        // throw new IllegalArgumentException("Document No required");
 
-        if (p_To_C_BankAccount_ID == p_From_C_BankAccount_ID)
-            throw new AdempiereUserError("Accounts From and To must be different");
+        // if (p_To_C_BankAccount_ID == p_From_C_BankAccount_ID)
+        // throw new AdempiereUserError("Accounts From and To must be different");
 
         p_C_BPartner_ID = new MUser(getCtx(), Env.getAD_User_ID(getCtx()), get_TrxName()).getC_BPartner_ID();        
         if (p_C_BPartner_ID == 0)
-            throw new AdempiereUserError ("Business Partner required");
+            throw new AdempiereUserError ("Socio de Negocio requerido");
 
-        if (p_C_Currency_ID == 0)
-            throw new AdempiereUserError("Currency required");
+        // if (p_C_Currency_ID == 0)
+        // throw new AdempiereUserError("Currency required");
 
         // Login Date
         if (p_StatementDate == null)
@@ -121,114 +123,22 @@ public class DrawerTransfer extends SvrProcess
         if (p_DateAcct == null)
             p_DateAcct = p_StatementDate;
 
-        generateDrawerTransfer();
+        if (p_BankStatement_ID == 0)
+            throw new AdempiereUserError ("Por favor, seleccione un cierre de caja a transferir.");
+
+        // Si la cuenta, es una caja principal, se transfieren los valores segun 
+        // la forma de pago.
+        final MBankAccount cuenta = new MBankAccount(getCtx(), p_From_C_BankAccount_ID, get_TrxName());
+        if(cuenta.get_ValueAsBoolean("EsCajaPrincipal"))
+            m_transferred = TransaccionCuentaBancaria.transferirValoresPorFormaPago(p_BankStatement_ID, p_Description,
+                    p_C_BPartner_ID, p_StatementDate, p_DateAcct, getCtx(), get_TrxName());
+        else
+            m_transferred = TransaccionCuentaBancaria.transferirMovimientosEntreCuentas(p_BankStatement_ID,
+                    p_From_C_BankAccount_ID, p_Description, p_C_BPartner_ID, p_StatementDate,
+                    p_DateAcct, getCtx(), get_TrxName());
+
         return "@Se transfirieron@ " + m_transferred + " líneas.";
     } // doIt
-
-    /**
-     * Generate BankTransfer()
-     *
-     */
-    private void generateDrawerTransfer()
-    {
-        final MBankAccount mBankFrom = new MBankAccount(getCtx(), p_From_C_BankAccount_ID, get_TrxName());
-        final MBankAccount mBankTo = new MBankAccount(getCtx(), p_To_C_BankAccount_ID, get_TrxName());
-
-        BigDecimal cashAmt = BigDecimal.ZERO;
-        BigDecimal totalAmt = BigDecimal.ZERO;
-        // Iterates over conciliated payments
-        for (final MBankStatementLine line : getLines(mBankFrom))
-        {
-            final MPayment paymentFrom = new MPayment(getCtx(), line.getC_Payment_ID(), get_TrxName());
-            totalAmt = totalAmt.add(paymentFrom.getPayAmt());
-            // Accumulates cash amounts
-            if (paymentFrom.getTenderType().equals(MPayment.TENDERTYPE_Cash)) 
-            {
-                cashAmt = cashAmt.add(paymentFrom.getPayAmt());
-                line.set_ValueOfColumn("IsTransferred", true);
-                line.saveEx();
-                continue;
-            }
-            // Transfer other payments
-            final MPayment paymentBankTo = new MPayment(getCtx(), 0, get_TrxName());
-            paymentBankTo.setC_BankAccount_ID(mBankTo.getC_BankAccount_ID());
-            paymentBankTo.setDocumentNo(p_DocumentNo);
-            paymentBankTo.setDateAcct(p_DateAcct);
-            paymentBankTo.setDateTrx(p_StatementDate);
-            paymentBankTo.setTenderType(paymentFrom.getTenderType());
-            paymentBankTo.setDescription(p_Description);
-            paymentBankTo.setC_BPartner_ID(p_C_BPartner_ID);
-            paymentBankTo.setC_Currency_ID(p_C_Currency_ID);
-            paymentBankTo.setPayAmt(paymentFrom.getPayAmt());
-            paymentBankTo.setOverUnderAmt(Env.ZERO);
-            paymentBankTo.setC_DocType_ID(true);
-            paymentBankTo.saveEx();
-            paymentBankTo.processIt(MPayment.DOCACTION_Complete);
-            paymentBankTo.saveEx();
-
-            // Mark bank statement line as transferred
-            line.set_ValueOfColumn("IsTransferred", true);
-            line.saveEx();
-            m_transferred++;
-        }
-
-        // Transfer an accumulated cash amount
-        if (cashAmt.compareTo(BigDecimal.ZERO) > 0)
-        {
-            final MPayment cashBankTo = new MPayment(getCtx(), 0, get_TrxName());
-            cashBankTo.setC_BankAccount_ID(mBankTo.getC_BankAccount_ID());
-            cashBankTo.setDocumentNo(p_DocumentNo);
-            cashBankTo.setDateAcct(p_DateAcct);
-            cashBankTo.setDateTrx(p_StatementDate);
-            cashBankTo.setTenderType(MPayment.TENDERTYPE_Cash);
-            cashBankTo.setDescription(p_Description);
-            cashBankTo.setC_BPartner_ID(p_C_BPartner_ID);
-            cashBankTo.setC_Currency_ID(p_C_Currency_ID);
-            cashBankTo.setPayAmt(cashAmt);
-            cashBankTo.setOverUnderAmt(Env.ZERO);
-            cashBankTo.setC_DocType_ID(true);
-            cashBankTo.saveEx();
-            cashBankTo.processIt(MPayment.DOCACTION_Complete);
-            cashBankTo.saveEx();
-            m_transferred++;
-        }
-
-        // Creates a debit for transference total amount
-        final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
-        paymentBankFrom.setC_BankAccount_ID(mBankFrom.getC_BankAccount_ID());
-        paymentBankFrom.setDocumentNo(p_DocumentNo);
-        paymentBankFrom.setDateAcct(p_DateAcct);
-        paymentBankFrom.setDateTrx(p_StatementDate);
-        paymentBankFrom.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
-        paymentBankFrom.setDescription(p_Description);
-        paymentBankFrom.setC_BPartner_ID(p_C_BPartner_ID);
-        paymentBankFrom.setC_Currency_ID(p_C_Currency_ID);
-        paymentBankFrom.setPayAmt(totalAmt);
-        paymentBankFrom.setOverUnderAmt(Env.ZERO);
-        paymentBankFrom.setIsReconciled(true);
-        paymentBankFrom.setC_DocType_ID(false);
-        paymentBankFrom.saveEx();
-        paymentBankFrom.processIt(MPayment.DOCACTION_Complete);
-        paymentBankFrom.saveEx();
-
-        // Creates a bank statement and a bank statement line for balance transfer
-        final MBankStatement newStmt = new MBankStatement(mBankFrom);
-        newStmt.setName("Compensacion Transferencia");
-        newStmt.setDocStatus(MBankStatement.DOCSTATUS_Drafted);
-        newStmt.saveEx();
-        final MBankStatementLine newLine = new MBankStatementLine(newStmt);
-        newLine.setC_Currency_ID(p_C_Currency_ID);
-        newLine.setC_Payment_ID(paymentBankFrom.getC_Payment_ID());
-        newLine.setLine(10);
-        newLine.set_ValueOfColumn("IsTransferred", true);
-        newLine.set_ValueOfColumn("TrxAmt", totalAmt.negate());
-        newLine.set_ValueOfColumn("StmtAmt", totalAmt.negate());
-        newLine.saveEx();
-        // process statement
-        newStmt.processIt(MBankStatement.DOCACTION_Complete);
-        newStmt.saveEx();
-        return;
-    } // generateDrawerTransfer
 
     /**
      * Retrieves untransferred lines from a given drawer (bank account)
