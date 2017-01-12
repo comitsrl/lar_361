@@ -76,19 +76,22 @@ public class LAR_ChequeEnCarteraPorCaja extends SvrProcess
 
         if (pays != null)
         {
-            final MPayment payment = new MPayment(getCtx(), (Integer) pays[0], get_TrxName());
-            final X_LAR_RetiroCajaLine lineaRetiro = new X_LAR_RetiroCajaLine(getCtx(), 0, get_TrxName());
+            for (int x = 0; x < pays.length; x++)
+            {
+                final MPayment payment = new MPayment(getCtx(), (Integer) pays[x], get_TrxName());
+                final X_LAR_RetiroCajaLine lineaRetiro = new X_LAR_RetiroCajaLine(getCtx(), 0, get_TrxName());
 
-            lineaRetiro.setLAR_RetiroCaja_ID(retiroCaja.getLAR_RetiroCaja_ID());
-            lineaRetiro.setCobro_ID(payment.getC_Payment_ID());
-            lineaRetiro.setMonto(payment.getPayAmt());
-            lineaRetiro.setRoutingNo(payment.getRoutingNo());
-            lineaRetiro.setAccountNo(payment.getAccountNo());
-            lineaRetiro.setCheckNo(payment.getCheckNo());
-            lineaRetiro.setA_Name(payment.getA_Name());
-            lineaRetiro.setTenderType("Z");
+                lineaRetiro.setLAR_RetiroCaja_ID(retiroCaja.getLAR_RetiroCaja_ID());
+                lineaRetiro.setCobro_ID(payment.getC_Payment_ID());
+                lineaRetiro.setMonto(payment.getPayAmt());
+                lineaRetiro.setRoutingNo(payment.getRoutingNo());
+                lineaRetiro.setAccountNo(payment.getAccountNo());
+                lineaRetiro.setCheckNo(payment.getCheckNo());
+                lineaRetiro.setA_Name(payment.getA_Name());
+                lineaRetiro.setTenderType("Z");
 
-            lineaRetiro.saveEx();
+                lineaRetiro.saveEx();
+            }
         }
 
         return null;
