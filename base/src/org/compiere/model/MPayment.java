@@ -698,13 +698,13 @@ public final class MPayment extends X_C_Payment
 			setOverUnderAmt(Env.ZERO);
 		
 		//	Organization
-		if ((newRecord || is_ValueChanged("C_BankAccount_ID"))
+		/* if ((newRecord || is_ValueChanged("C_BankAccount_ID"))
 			&& getC_Charge_ID() == 0)	//	allow different org for charge
 		{
 			MBankAccount ba = MBankAccount.get(getCtx(), getC_BankAccount_ID());
 			if (ba.getAD_Org_ID() != 0)
 				setAD_Org_ID(ba.getAD_Org_ID());
-		}
+		} */
 		
 		// [ adempiere-Bugs-1885417 ] Validate BP on Payment Prepare or BeforeSave
 		// there is bp and (invoice or order)
