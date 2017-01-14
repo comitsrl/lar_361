@@ -53,6 +53,9 @@ class WithholdingConfig
     private BigDecimal aliquot = BigDecimal.ZERO;
     private BigDecimal rate = BigDecimal.ZERO;
     private BigDecimal paymentThresholdMin = BigDecimal.ZERO;
+    private BigDecimal thresholdMin = BigDecimal.ZERO;
+    private BigDecimal thresholdMax = BigDecimal.ZERO;
+    private BigDecimal amountRefunded = BigDecimal.ZERO;
     private boolean isCalcFromPayment;
     private boolean isSOTrx;
     private int lco_WithholdingRule_ID;
@@ -60,21 +63,28 @@ class WithholdingConfig
     private int c_Tax_ID;
     private int c_DocType_ID;
     private int c_TaxCategory_ID;
+    private boolean isUseBPISIC;
+    private boolean usaTipoGananciasBP;
 
     private WithholdingConfig(final BigDecimal aliquot, final BigDecimal rate,
-            final BigDecimal paymentThresholdMin, final boolean isCalcFromPayment,
+            final BigDecimal paymentThresholdMin, final BigDecimal thresholdMin, final BigDecimal thresholdMax, final BigDecimal amountRefunded, final boolean isCalcFromPayment,
             final int lco_WithholdingRule_ID, final int lco_WithholdingType_ID, final int c_Tax_ID,
-            final int c_DocType_ID, final int c_TaxCategory_ID)
+            final int c_DocType_ID, final int c_TaxCategory_ID, final boolean isUseBPISIC, final boolean usaTipoGananciasBP)
     {
         this.aliquot = aliquot;
         this.rate = rate;
         this.paymentThresholdMin = paymentThresholdMin;
+        this.thresholdMin = thresholdMin;
+        this.thresholdMax = thresholdMax;
+        this.amountRefunded = amountRefunded;
         this.isCalcFromPayment = isCalcFromPayment;
         this.lco_WithholdingRule_ID = lco_WithholdingRule_ID;
         this.lco_WithholdingType_ID = lco_WithholdingType_ID;
         this.c_Tax_ID = c_Tax_ID; 
         this.c_DocType_ID = c_DocType_ID; 
         this.c_TaxCategory_ID = c_TaxCategory_ID;
+        this.isUseBPISIC = isUseBPISIC;
+        this.usaTipoGananciasBP = usaTipoGananciasBP;
     }
 
     /*********************************************************
@@ -99,6 +109,7 @@ class WithholdingConfig
             int bp_taxpayertype_id = 0;
             if (bp_taxpayertype_int != null)
                 bp_taxpayertype_id = bp_taxpayertype_int.intValue();
+            String lar_tipoganancias = bp.get_ValueAsString("LAR_TipoGanancias");
 
             /*
              * No se utiliza la dirección del BP en los tipos de retenciones/percepciones que
@@ -158,8 +169,6 @@ class WithholdingConfig
                 pstmtrc.close();
 
                 // look for applicable rules according to config fields (rule)
-                // TODO: Agregar la confiuración para retenciones de Ganancias
-                // nueva columna LAR_UsaTipoGananciasBP
                 StringBuffer sqlr = new StringBuffer("SELECT LCO_WithholdingRule_ID "
                         + "  FROM LCO_WithholdingRule " + " WHERE LCO_WithholdingType_ID = ? "
                         + "   AND IsActive = 'Y' " + "   AND ValidFrom <= ? ");
@@ -175,6 +184,8 @@ class WithholdingConfig
                     sqlr.append(" AND LCO_BP_City_ID = ? ");
                 if (wrc.isUseOrgCity())
                     sqlr.append(" AND LCO_Org_City_ID = ? ");
+                if (wrc.get_ValueAsBoolean("LAR_UsaTipoGananciasBP"))
+                    sqlr.append(" AND LAR_TipoGananciasBP = ? ");
 
                 if (isSOTrx)
                 {
@@ -296,6 +307,11 @@ class WithholdingConfig
                     if (org_city_id <= 0)
                         log.warning("Possible configuration error org city is used but not set");
                 }
+                if (wrc.get_ValueAsBoolean("LAR_UsaTipoGananciasBP"))
+                {
+                    idxpar++;
+                    pstmtr.setString(idxpar, lar_tipoganancias);
+                }
 
                 ResultSet rsr = pstmtr.executeQuery();
                 while (rsr.next())
@@ -327,10 +343,12 @@ class WithholdingConfig
                     alicuota = tax.getRate().setScale(4, BigDecimal.ROUND_HALF_EVEN);
                     tasa = alicuota.multiply(BigDecimal.valueOf(100));
                     WithholdingConfig config = new WithholdingConfig(alicuota, tasa,
-                            wc.getThresholdmin(), wc.isCalcOnPayment(),
-                            wr.getLCO_WithholdingRule_ID(), wr.getLCO_WithholdingType_ID(),
-                            wc.getC_Tax_ID(), wrc.get_ValueAsInt("C_DocType_ID"),
-                            wr.getC_TaxCategory_ID());
+                            (BigDecimal) wrc.get_Value("PaymentThresholdMin"),
+                            wc.getThresholdmin(), wc.getThresholdMax(), wc.getAmountRefunded(),
+                            wc.isCalcOnPayment(), wr.getLCO_WithholdingRule_ID(),
+                            wr.getLCO_WithholdingType_ID(), wc.getC_Tax_ID(),
+                            wrc.get_ValueAsInt("C_DocType_ID"), wr.getC_TaxCategory_ID(),
+                            wrc.isUseBPISIC(), wrc.get_ValueAsBoolean("LAR_UsaTipoGananciasBP"));
 
                     if (!list.add(config))
                     {
@@ -379,6 +397,21 @@ class WithholdingConfig
         return paymentThresholdMin;
     }
 
+    public BigDecimal getThresholdMin()
+    {
+        return thresholdMin;
+    }
+
+    public BigDecimal getThresholdMax()
+    {
+        return thresholdMax;
+    }
+
+    public BigDecimal getamountRefunded()
+    {
+        return amountRefunded;
+    }
+
     public boolean isCalcFromPayment()
     {
         return isCalcFromPayment;
@@ -392,6 +425,16 @@ class WithholdingConfig
     public int getC_TaxCategory_ID()
     {
         return c_TaxCategory_ID;
+    }
+
+    public boolean isUseBPISIC()
+    {
+        return isUseBPISIC;
+    }
+
+    public boolean usaTipoGananciasBP()
+    {
+        return usaTipoGananciasBP;
     }
 
     @Override

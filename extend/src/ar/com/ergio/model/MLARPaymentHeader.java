@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -45,6 +46,7 @@ import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.globalqss.model.X_LCO_WithholdingType;
 
 /**
  * Payment Header
@@ -150,7 +152,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
     /**
      * Realiza el cálculo de la retención sobre la cabecera de pago dada.
-     * Esto lo lleva a cabo creando por cada confiuración alicable
+     * Esto lo lleva a cabo creando por cada confiuración aplicable
      * un certificado de retención y un pago de tipo "retención".
      *
      * @return verdadero si se generó la retención correctamente
@@ -169,7 +171,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         BorrarPagosRetenciondelHeader();
         updateHeaderWithholding(getLAR_PaymentHeader_ID(), get_TrxName());
         this.load(get_TrxName());
-        final BigDecimal impTotalHeader = getPayHeaderTotalAmt();
+        BigDecimal impTotalHeader = getPayHeaderTotalAmt();
 
         // Recupera la configuración y calcula
         final MBPartner bp = new MBPartner(getCtx(), getC_BPartner_ID(), get_TrxName());
@@ -180,7 +182,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         // Se crean los pagos retención y sus respectivos certificados
         for (final WithholdingConfig wc : configs)
         {
-
             log.config("Withholding conf >> " + wc);
             BigDecimal impRetencion = Env.ZERO;
             // Se recupera el tipo de documento para el Pago Retención
@@ -213,14 +214,187 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
             if (wc.isCalcFromPayment())
             {
-                // Si el pago supera el mínimo se calcula el importe de la retención
-                // TODO: Contemplar que según el tipo de retención el importe se calcula
-                // de distintas formas.
-                if (impTotalHeader.compareTo(wc.getPaymentThresholdMin()) >= 0)
-                    impRetencion = impTotalHeader.multiply(wc.getAliquot())
-                            .divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_EVEN);
-                // Validar que si existen facturas, quede importe disponible a pagar
+
+                // Se calcula el importe a retener según el tipo de retención
                 final MPaymentAllocate[] facturas = getInvoices(get_TrxName());
+                BigDecimal aliquot = wc.getAliquot();
+                BigDecimal impFijo = Env.ZERO;
+                BigDecimal impNoSujeto = wc.getamountRefunded();
+                BigDecimal impRetMin = wc.getPaymentThresholdMin();
+
+                BigDecimal impExencion = Env.ZERO;
+                BigDecimal porcExencion = Env.ZERO;
+
+                // Es retención de Ganancias
+                if (wc.usaTipoGananciasBP())
+                {
+                    final String tipoGanancias = (String) bp.get_Value("LAR_TipoGanancias");
+                    // Si no existen facturas, es un pago a cuenta
+                    // Se toma el importe del pago sin IVA
+                    if (facturas.length < 0)
+                        impTotalHeader = impTotalHeader.divide(BigDecimal.valueOf(1.21));
+
+                    X_LAR_Concepto_Ret_Ganancias cg = null;
+                    final int concepto_id = bp.get_ValueAsInt("LAR_Concepto_Ret_Ganancias_ID");
+                    // Si no tiene concepto configurado o es "Sin Especificar"
+                    if (concepto_id == 0 || concepto_id == 1000024)
+                        continue;
+                    else
+                    {
+                        try
+                        {
+                            // Recuperar todos la información asociada al concepto
+
+                            String sqlcg = "SELECT * " + " FROM LAR_Concepto_Ret_Ganancias "
+                                    + " WHERE LAR_Concepto_Ret_Ganancias_ID = ?";
+                            PreparedStatement pstmtcg = DB.prepareStatement(sqlcg, get_TrxName());
+
+                            pstmtcg.setInt(1, concepto_id);
+
+                            ResultSet rscg = pstmtcg.executeQuery();
+                            if (rscg.next())
+                            {
+                                cg = new X_LAR_Concepto_Ret_Ganancias(Env.getCtx(), rscg,
+                                        get_TrxName());
+                            } else
+                            {
+                                log.warning("No existe configuraci\u00f3n para el concepto LAR_Concepto_Ret_Ganancias_ID = "
+                                        + concepto_id);
+                                rscg.close();
+                                pstmtcg.close();
+                                continue;
+                            }
+                            rscg.close();
+                            pstmtcg.close();
+                        } catch (SQLException e)
+                        {
+                            log.log(Level.SEVERE, "", e);
+                            return false;
+                        }
+                    } // Recuperar toda la información asociada al concepto
+
+                    // Es cálculo por escala
+                    if (cg.isCalculo_Por_Escala() && tipoGanancias.equals("I"))
+                    {
+                        X_LAR_Escala_Ret_Ganancias eg = null;
+                        final List<X_LAR_Escala_Ret_Ganancias> escala = new ArrayList<X_LAR_Escala_Ret_Ganancias>();
+                        // Recuperar la información de la escala
+                        try
+                        {
+                            // Recuperar la información de la escala
+                            String sqleg = "SELECT * " + " FROM LAR_Escala_Ret_Ganancias ";
+                            PreparedStatement pstmteg = DB.prepareStatement(sqleg, get_TrxName());
+
+                            ResultSet rseg = pstmteg.executeQuery();
+                            while (rseg.next())
+                            {
+                                eg = new X_LAR_Escala_Ret_Ganancias(Env.getCtx(), rseg,
+                                        get_TrxName());
+                                if (!escala.add(eg))
+                                {
+                                    log.severe("Error al agregar configuración de escala a la lista");
+                                    continue;
+                                }
+                            }
+                            rseg.close();
+                            pstmteg.close();
+                        } catch (SQLException e)
+                        {
+                            log.log(Level.SEVERE, "", e);
+                            return false;
+                        } // Recuperar la información de la escala
+                          // Recorrer la escala para encontrar el rango del pago
+                        for (final X_LAR_Escala_Ret_Ganancias esc : escala)
+                        {
+                            if (impTotalHeader.compareTo(esc.getImporte_Desde()) >= 0
+                                    && impTotalHeader.compareTo(esc.getImporte_Hasta()) <= 0)
+                            {
+                                // obtener importe fijo, importe no sujeto y alicuota
+                                aliquot = esc.getAlicuota();
+                                impFijo = esc.getImporte_Fijo();
+                                impNoSujeto = esc.getImporte_No_Sujeto();
+                                break;
+                            }
+                        }
+                    }// Es cálculo por escala
+                    else
+                    // Es cáclulo directo
+                    {
+                        // Obtener importe importe no sujeto y alicuota según si el SdN es
+                        // Inscripto o No en el Impuesto a las Ganancias
+                        aliquot = tipoGanancias.equals("I") ? cg.getAlicuota_Inscripto() : cg
+                                .getAlicuota_No_Inscripto();
+                        impNoSujeto = tipoGanancias.equals("I") ? cg
+                                .getImporte_No_Sujeto_Inscripto() : cg
+                                .getImporte_No_Sujeto_No_Insc();
+                        // Exención de Ganancias
+                        if (bp.get_ValueAsBoolean("LAR_Exento_Ret_Ganancias"))
+                        {
+                            Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_Ganancias");
+                            if (!fechaVenc.before(getDateTrx()))
+                            {
+                                impExencion = (BigDecimal) bp
+                                        .get_Value("LAR_Importe_Exencion_Ganancias");
+                                porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_Ganancias");
+                            }
+                        }
+
+                    }
+                } // Es retención de Ganancias
+
+                // Considerar las Exenciones
+                final X_LCO_WithholdingType wt = new X_LCO_WithholdingType(Env.getCtx(),
+                        wc.getWithholdingType_ID(), get_TrxName());
+                // Exención de IIBB
+                if (wc.isUseBPISIC() && bp.get_ValueAsBoolean("LAR_Exento_Ret_IIBB"))
+                    ;
+                {
+                    Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_IIBB");
+                    Date fechaInicio = (Date) bp.get_Value("LAR_Inicio_Cert_IIBB");
+                    if (!fechaInicio.after(getDateTrx()) && !fechaVenc.before(getDateTrx()))
+                    {
+                        impExencion = (BigDecimal) bp.get_Value("LAR_Importe_Exencion_IIBB");
+                        porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_IIBB");
+                    }
+                }
+
+                // Exención de IVA
+                if (wt.getName().contains("IVA") && bp.get_ValueAsBoolean("LAR_Exento_Ret_IVA"))
+                {
+                    Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_IVA");
+                    if (!fechaVenc.before(getDateTrx()))
+                    {
+                        impExencion = (BigDecimal) bp.get_Value("LAR_Importe_Exencion_IVA");
+                        porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_IVA");
+                    }
+                }
+
+                // Exención de SUSS
+                if (wc.isUseBPISIC() && bp.get_ValueAsBoolean("LAR_Exento_Retenciones_SUSS"))
+                {
+                    Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_SUSS");
+                    Date fechaInicio = (Date) bp.get_Value("LAR_Inicio_Cert_SUSS");
+                    if (!fechaInicio.after(getDateTrx()) && !fechaVenc.before(getDateTrx()))
+                    {
+                        impExencion = (BigDecimal) bp.get_Value("LAR_Importe_Exencion_SUSS");
+                        porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_SUSS");
+                    }
+                }
+
+                // Se chequea que el importe a retener sea mayor al mínimo
+                BigDecimal baseRet = impTotalHeader.subtract(impNoSujeto);
+                impRetencion = baseRet.multiply(aliquot).divide(new BigDecimal(100))
+                        .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                impRetencion = impRetencion.add(impFijo);
+                // Exenciones % e importe fijo
+                BigDecimal impExentoDesc = impRetencion.multiply(porcExencion)
+                        .divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                impRetencion = impRetencion.subtract(impExentoDesc).subtract(impExencion);
+
+                if (impRetencion.compareTo(impRetMin) < 0)
+                    continue;
+
+                // Validar que si existen facturas, quede importe disponible a pagar
                 if (facturas.length > 0)
                 {
                     BigDecimal sumaRemanente = Env.ZERO;
