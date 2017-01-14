@@ -382,9 +382,19 @@ class WithholdingConfig
         return c_Tax_ID;
     }
 
+    public void setC_Tax_ID(final int c_tax_ID)
+    {
+        c_Tax_ID = c_tax_ID;
+    }
+
     public BigDecimal getAliquot()
     {
         return isSOTrx ? aliquot.negate() : aliquot;
+    }
+
+    public void setAliquot(final BigDecimal aliq)
+    {
+        aliquot = aliq;
     }
 
     public BigDecimal getRate()

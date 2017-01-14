@@ -18,6 +18,7 @@ package ar.com.ergio.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -231,8 +232,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     final String tipoGanancias = (String) bp.get_Value("LAR_TipoGanancias");
                     // Si no existen facturas, es un pago a cuenta
                     // Se toma el importe del pago sin IVA
-                    if (facturas.length < 0)
-                        impTotalHeader = impTotalHeader.divide(BigDecimal.valueOf(1.21));
+                    if (facturas.length <= 0)
+                        impTotalHeader = impTotalHeader.divide(BigDecimal.valueOf(1.21), 2, RoundingMode.HALF_EVEN);
 
                     X_LAR_Concepto_Ret_Ganancias cg = null;
                     final int concepto_id = bp.get_ValueAsInt("LAR_Concepto_Ret_Ganancias_ID");
@@ -311,6 +312,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             {
                                 // obtener importe fijo, importe no sujeto y alicuota
                                 aliquot = esc.getAlicuota();
+                                // Se corrige la alícuota e impuesto en la config
+                                // para que el certificado de retención quede correcto
+                                wc.setAliquot(aliquot);
+                                wc.setC_Tax_ID(0);
                                 impFijo = esc.getImporte_Fijo();
                                 impNoSujeto = esc.getImporte_No_Sujeto();
                                 break;
@@ -324,6 +329,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                         // Inscripto o No en el Impuesto a las Ganancias
                         aliquot = tipoGanancias.equals("I") ? cg.getAlicuota_Inscripto() : cg
                                 .getAlicuota_No_Inscripto();
+                        // Se corrige la alícuota e impuesto en la config
+                        // para que el certificado de retención quede correcto
+                        wc.setAliquot(aliquot);
+                        wc.setC_Tax_ID(0);
                         impNoSujeto = tipoGanancias.equals("I") ? cg
                                 .getImporte_No_Sujeto_Inscripto() : cg
                                 .getImporte_No_Sujeto_No_Insc();
@@ -347,7 +356,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                         wc.getWithholdingType_ID(), get_TrxName());
                 // Exención de IIBB
                 if (wc.isUseBPISIC() && bp.get_ValueAsBoolean("LAR_Exento_Ret_IIBB"))
-                    ;
                 {
                     Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_IIBB");
                     Date fechaInicio = (Date) bp.get_Value("LAR_Inicio_Cert_IIBB");
@@ -370,7 +378,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 }
 
                 // Exención de SUSS
-                if (wc.isUseBPISIC() && bp.get_ValueAsBoolean("LAR_Exento_Retenciones_SUSS"))
+                if (wt.getName().contains("SUSS") && bp.get_ValueAsBoolean("LAR_Exento_Retenciones_SUSS"))
                 {
                     Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_SUSS");
                     Date fechaInicio = (Date) bp.get_Value("LAR_Inicio_Cert_SUSS");
@@ -391,7 +399,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                         .divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_EVEN);
                 impRetencion = impRetencion.subtract(impExentoDesc).subtract(impExencion);
 
-                if (impRetencion.compareTo(impRetMin) < 0)
+                if (impRetencion.compareTo(impRetMin) < 0 || impRetencion.compareTo(Env.ZERO) == 0)
                     continue;
 
                 // Validar que si existen facturas, quede importe disponible a pagar
@@ -441,7 +449,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     log.config("Pago Retenci\u00f3n: " + pagoRetencion.getC_Payment_ID());
                     // Se crea el Certificado de Retención
                     final MLARPaymentWithholding certificado = creaCertificadodeRetencion(
-                            impRetencion, wc, pagoRetencion.getC_Payment_ID());
+                            impRetencion, baseRet, wc, pagoRetencion.getC_Payment_ID());
                     if (certificado == null)
                     {
                         JDialog dialog = new JDialog();
@@ -466,7 +474,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     log.config("Pago Retenci\u00f3n: " + pagoRetencion.getC_Payment_ID());
                     // Se crea el Certificado de Retención
                     final MLARPaymentWithholding certificado = creaCertificadodeRetencion(
-                            impRetencion, wc, pagoRetencion.getC_Payment_ID());
+                            impRetencion, baseRet, wc, pagoRetencion.getC_Payment_ID());
                     if (certificado == null)
                     {
                         JDialog dialog = new JDialog();
@@ -1149,7 +1157,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
      *        de retención aplicable.
      * @return Certificado de Retención.
      */
-    public MLARPaymentWithholding creaCertificadodeRetencion(final BigDecimal impRetencion,
+    public MLARPaymentWithholding creaCertificadodeRetencion(final BigDecimal impRetencion, final BigDecimal baseRet,
             final WithholdingConfig wc, final int c_Payment_ID)
     {
         final MLARPaymentWithholding pwh = new MLARPaymentWithholding(getCtx(), 0, get_TrxName());
@@ -1163,7 +1171,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         pwh.setPercent(wc.getAliquot());
         pwh.setProcessed(false);
         pwh.setTaxAmt(impRetencion);
-        pwh.setTaxBaseAmt(getPayHeaderTotalAmt());
+        pwh.setTaxBaseAmt(baseRet);
         // Se asocia el Pago Retención con el Certificado
         pwh.set_ValueOfColumn("C_Payment_ID", c_Payment_ID);
 
