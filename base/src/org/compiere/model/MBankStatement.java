@@ -31,6 +31,7 @@ import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
 
 import ar.com.ergio.model.TransaccionCuentaBancaria;
@@ -420,7 +421,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 		}
 
 		// @fchiappano tranferir todos los moviemientos de caja, a las cuentas según corresponda.
-		int m_transferred = 0;
+		KeyNamePair[] m_transferred = null;
 
 		if (get_ValueAsBoolean("EsCierreCaja"))
 		{
@@ -432,22 +433,28 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
                 m_transferred = TransaccionCuentaBancaria.transferirValoresPorFormaPago(getC_BankStatement_ID(),
                         descripcion, C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
 
-                if (m_transferred <= 0)
+                if (m_transferred[0].getName().equals("Error"))
                 {
+                    m_processMsg = m_transferred[1].getName();
                     return STATUS_Invalid;
                 }
 		    }
 
-            final int m_NoTransferred = getLines(true).length - m_transferred;
-            m_processMsg = "Se han transferido " + m_transferred + " líneas. Por el contrario, " + m_NoTransferred
-                    + " líneas quedaron sin transferir.";
-
-            if (m_transferred > 0)
+            if (m_transferred != null)
             {
+                String mensaje = m_transferred[0].getKey() + " Líneas Transferidas. \n Detalle: \n ";
+
+                for (int x = 1; x < m_transferred.length; x ++)
+                {
+                    KeyNamePair value = m_transferred[x];
+                    if (value.getKey() > 0)
+                    {
+                        mensaje = mensaje + value.getKey() + " " + value.getName() + " \n ";
+                    }
+                }
                 final JFrame frame = new JFrame();
                 frame.setIconImage(Adempiere.getImage16());
-                ADialog.info(1, frame, "Transferencia de Valores. \n" + m_transferred + " Líneas Transferidas. \n"
-                        + m_NoTransferred + " Líneas sin Transferir.");
+                ADialog.info(1, frame, mensaje);
             }
 		}
 		//

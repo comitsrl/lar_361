@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
+import org.compiere.util.Env;
 
 import ar.com.ergio.model.MLARPaymentHeader;
 
@@ -56,8 +57,11 @@ public class LAR_GenerateWithholding extends SvrProcess
         if (header.getLAR_PaymentHeader_ID() == 0)
             throw new AdempiereUserError("Sin Cabecera de Pago");
 
-        if (!header.recalcPaymentWithholding())
-            throw new AdempiereUserError("Error al calcular la retenci\u00f3n sobre la cabecera de pago");
+        // Sólo calcula la retención si el total de la cabecera no es cero (Existe algún pago cargado).
+        if (!header.getPayHeaderTotalAmt().equals(Env.ZERO))
+            if (!header.recalcPaymentWithholding())
+                throw new AdempiereUserError(
+                        "Error al calcular la retenci\u00f3n sobre la cabecera de pago");
 
         return "Retención Generada";
     } // doIt

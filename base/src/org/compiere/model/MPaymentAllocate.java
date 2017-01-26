@@ -160,15 +160,16 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
 			getInvoice();
 			if (m_invoice != null)
 				setAD_Org_ID(m_invoice.getAD_Org_ID());
+
+            // Evita que se puedan agregar Notas de Crédito
+            MDocType docType = new MDocType(Env.getCtx(), m_invoice.getC_DocType_ID(), get_TrxName());
+            if (docType.getDocBaseType().equals(DOCBASETYPE_APCreditMemo)
+                    || docType.getDocBaseType().equals(DOCBASETYPE_ARCreditMemo))
+            {
+                log.saveError("Error", "No está permitido ingresar Notas de Crédito");
+                return false;
+            }
 		}
-        // Evita que se puedan agregar Notas de Crédito
-        MDocType docType = new MDocType(Env.getCtx(), m_invoice.getC_DocType_ID(), get_TrxName());
-        if (docType.getDocBaseType().equals(DOCBASETYPE_APCreditMemo)
-                || docType.getDocBaseType().equals(DOCBASETYPE_ARCreditMemo))
-        {
-            log.saveError("Error", "No está permitido ingresar Notas de Crédito");
-            return false;
-        }
 		
 		return true;
 	}	//	beforeSave
