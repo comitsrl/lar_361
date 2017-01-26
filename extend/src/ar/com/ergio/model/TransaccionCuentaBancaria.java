@@ -18,13 +18,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import javax.swing.JFrame;
-
-import org.compiere.Adempiere;
-import org.compiere.apps.ADialog;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MBankStatement;
 import org.compiere.model.MBankStatementLine;
@@ -33,6 +31,7 @@ import org.compiere.model.MSysConfig;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.KeyNamePair;
 
 public class TransaccionCuentaBancaria
 {
@@ -143,12 +142,16 @@ public class TransaccionCuentaBancaria
      * @param trxName
      * @return
      */
-    public static int transferirValoresPorFormaPago(final int p_BankStatement_ID, final String p_Description,
+    public static KeyNamePair[] transferirValoresPorFormaPago(final int p_BankStatement_ID, final String p_Description,
             final int p_C_BPartner_ID, final Timestamp p_StatementDate, final Timestamp p_DateAcct,
             final Properties ctx, final String trxName)
     {
-        int m_transferred = 0;
-        int cash_transferred = 0;
+        List<KeyNamePair> m_informe = new ArrayList<KeyNamePair>();
+        int m_efectivoTransferido = 0;
+        int m_chequeTransferido = 0;
+        int m_debitoTransferido = 0;
+        int m_creditoTransferido = 0;
+        int m_depositoTransferido = 0;
         int tipoPago = 0;
 
         // Chequeo si hay tarjetas de Debito y si las mismas tienen una cuenta bancaria configurada.
@@ -156,10 +159,8 @@ public class TransaccionCuentaBancaria
         if (tipoPago > 0)
         {
             final MLARTarjetaCredito debito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
-            final JFrame frame = new JFrame();
-            frame.setIconImage(Adempiere.getImage16());
-            ADialog.error(1, frame, "La tarjeta de debito " + debito.getDescription() + ", no posee una cuenta bancaria configurada.");
-            return m_transferred;
+            setError(m_informe, "La tarjeta de debito " + debito.getDescription() + ", no posee una cuenta bancaria configurada.");
+            return m_informe.toArray(new KeyNamePair[m_informe.size()]);
         }
 
         // Chequeo si hay tarjetas de Credito y si las mismas tienen una cuenta bancaria configurada.
@@ -167,10 +168,8 @@ public class TransaccionCuentaBancaria
         if (tipoPago > 0)
         {
             final MLARTarjetaCredito credito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
-            final JFrame frame = new JFrame();
-            frame.setIconImage(Adempiere.getImage16());
-            ADialog.error(1, frame, "La tarjeta de credito " + credito.getDescription() + ", no posee una cuenta bancaria configurada.");
-            return m_transferred;
+            setError(m_informe, "La tarjeta de credito " + credito.getDescription() + ", no posee una cuenta bancaria configurada.");
+            return m_informe.toArray(new KeyNamePair[m_informe.size()]);
         }
 
         // Chequeo si hay Tipos de Deposito y si los mismos tienen una cuenta bancaria configurada.
@@ -178,13 +177,19 @@ public class TransaccionCuentaBancaria
         if (tipoPago > 0)
         {
             final MLARTarjetaCredito deposito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
-            final JFrame frame = new JFrame();
-            frame.setIconImage(Adempiere.getImage16());
-            ADialog.error(1, frame, "El tipo de deposito directo " + deposito.getName() + ", no posee una cuenta bancaria configurada.");
-            return m_transferred;
+            setError(m_informe, "El tipo de deposito directo " + deposito.getName() + ", no posee una cuenta bancaria configurada.");
+            return m_informe.toArray(new KeyNamePair[m_informe.size()]);
         }
 
         final MBankStatement statement = new MBankStatement(ctx, p_BankStatement_ID, trxName);
+
+        // Valido que si es una caja de tipo VENTAS, tenga si o si una caja PRINCIPAL asignada.
+        if (!statement.getBankAccount().get_ValueAsBoolean("EsCajaPrincipal")
+                && statement.getBankAccount().get_ValueAsInt("CajaPrincipal_ID") == 0)
+        {
+            setError(m_informe, "La caja de Ventas seleccionada, no posee una caja del tipo Principal/General asignada.");
+            return m_informe.toArray(new KeyNamePair[m_informe.size()]);
+        }
 
         BigDecimal totalAmt = Env.ZERO;
         BigDecimal cashAmt = BigDecimal.ZERO;
@@ -217,7 +222,7 @@ public class TransaccionCuentaBancaria
                             pago.getPayAmt().negate());
                     linea.set_ValueOfColumn("IsTransferred", true);
                     linea.saveEx();
-                    cash_transferred++;
+                    m_efectivoTransferido ++;
                     continue;
                 }
                 else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) | pago.getTenderType().equals("Z")
@@ -244,7 +249,7 @@ public class TransaccionCuentaBancaria
                     final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
                     paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
 
-                    m_transferred++;
+                    m_chequeTransferido ++;
                 }
                 else if (pago.getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
                 {
@@ -265,7 +270,7 @@ public class TransaccionCuentaBancaria
                     final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
                     paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
 
-                    m_transferred++;
+                    m_creditoTransferido ++;
                 }
                 else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDebit))
                 {
@@ -281,7 +286,7 @@ public class TransaccionCuentaBancaria
                     final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
                     paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
 
-                    m_transferred++;
+                    m_debitoTransferido ++;
                 }
                 else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDeposit))
                 {
@@ -296,7 +301,7 @@ public class TransaccionCuentaBancaria
                     paymentBankTo.set_ValueOfColumn("LAR_Deposito_Directo_ID",
                             pago.get_ValueAsInt("LAR_Deposito_Directo_ID"));
 
-                    m_transferred++;
+                    m_depositoTransferido ++;
                 }
             }
             // Guardo y completo el cobro en la caja destino.
@@ -331,7 +336,8 @@ public class TransaccionCuentaBancaria
             totalAmt = totalAmt.add(cashAmt);
         }
 
-        if (m_transferred > 0 || cash_transferred > 0)
+        if (m_chequeTransferido > 0 || m_creditoTransferido > 0 || m_debitoTransferido > 0 || m_depositoTransferido > 0
+                || m_efectivoTransferido > 0)
         {
             debitarValores(statement, p_C_Currency_ID, p_C_BPartner_ID, totalAmt, ctx, trxName);
 
@@ -339,7 +345,15 @@ public class TransaccionCuentaBancaria
             statement.saveEx();
         }
 
-        return m_transferred + cash_transferred;
+        m_informe.add(new KeyNamePair(m_chequeTransferido + m_creditoTransferido + m_debitoTransferido
+                + m_depositoTransferido + m_efectivoTransferido, "Total"));
+        m_informe.add(new KeyNamePair(m_efectivoTransferido, "Efectivo"));
+        m_informe.add(new KeyNamePair(m_chequeTransferido, "Cheques"));
+        m_informe.add(new KeyNamePair(m_creditoTransferido, "Tarjetas de Credito"));
+        m_informe.add(new KeyNamePair(m_debitoTransferido, "Tarjetas de Debito"));
+        m_informe.add(new KeyNamePair(m_depositoTransferido, "Depositos Directos"));
+
+        return m_informe.toArray(new KeyNamePair[m_informe.size()]);
     } // transferirValoresPorFormaPago
 
     /**
@@ -530,5 +544,14 @@ public class TransaccionCuentaBancaria
 
         return 0;
     } // comprobarCuentasPorFormaPago
+
+    /**
+     * Guardar mensaje de error.
+     */
+    private static void setError(List<KeyNamePair> lista, final String mensaje)
+    {
+        lista.add(new KeyNamePair(0, "Error"));
+        lista.add(new KeyNamePair(0, mensaje));
+    } // setError
 
 } // TransaccionCuentaBancaria
