@@ -513,9 +513,139 @@ ADD COLUMN LAR_Exento_Retenciones_IVA character(1) DEFAULT 'N'::bpchar,
 ADD COLUMN LAR_Exencion_IVA numeric,
 ADD COLUMN LAR_Importe_Exencion_IVA numeric DEFAULT 0,
 ADD COLUMN LAR_NroCertificado_IVA character varying(30),
+ADD COLUMN LAR_Inicio_Cert_IIBB timestamp without time zone,
 ADD COLUMN LAR_Vencimiento_Cert_IVA timestamp without time zone,
-ADD CONSTRAINT C_BPartner_LAR_Exento_Retenciones_IVA_check CHECK ((LAR_Exento_Retenciones_IVA = ANY (ARRAY['Y'::bpchar, 'N'::bpchar])))
+ADD CONSTRAINT C_BPartner_LAR_Exento_Retenciones_IVA_check CHECK ((LAR_Exento_Retenciones_IVA = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))),
+-- SUSS
+ADD COLUMN LAR_Exento_Retenciones_SUSS character(1) DEFAULT 'N'::bpchar,
+ADD COLUMN LAR_Exencion_SUSS numeric,
+ADD COLUMN LAR_Importe_Exencion_SUSS numeric DEFAULT 0,
+ADD COLUMN LAR_NroCertificado_SUSS character varying(30),
+ADD COLUMN LAR_Inicio_Cert_SUSS timestamp without time zone,
+ADD COLUMN LAR_Vencimiento_Cert_SUSS timestamp without time zone,
+ADD CONSTRAINT C_BPartner_LAR_Exento_Retenciones_SUSS_check CHECK ((LAR_Exento_Retenciones_SUSS = ANY (ARRAY['Y'::bpchar, 'N'::bpchar])))
 ;
+
+-- LAR_Inicio_Cert_IIBB
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000426,'LAR_Inicio_Cert_IIBB','LAR','LAR_Inicio_Cert_IIBB','LAR_Inicio_Cert_IIBB',0,TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000426 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 23/10/2016 9:30:18 ART
+-- ISSUE #81: Retenciones de Ganancias
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Fecha Inicio Exención IIBB',PrintName='Fecha Inicio Exención IIBB',Updated=TO_TIMESTAMP('2016-10-23 09:30:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000426 AND AD_Language='es_AR'
+;
+
+-- LAR_Exento_Retenciones_SUSS
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000420,'LAR_Exento_Retenciones_SUSS','LAR','LAR_Exento_Retenciones_SUSS','LAR_Exento_Retenciones_SUSS',0,TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000420 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 23/10/2016 9:30:18 ART
+-- ISSUE #81: Retenciones de Ganancias
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Exento Retenciones SUSS',PrintName='Exento Retenciones SUSS',Updated=TO_TIMESTAMP('2016-10-23 09:30:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000420 AND AD_Language='es_AR'
+;
+
+
+-- LAR_Exencion_SUSS
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000421,'LAR_Exencion_SUSS','LAR','LAR_Exencion_SUSS','LAR_Exencion_SUSS',0,TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000421 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 23/10/2016 9:30:18 ART
+-- ISSUE #81: Retenciones de Ganancias
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='% Exención Retenciones SUSS',PrintName='% Exención Retenciones SUSS',Updated=TO_TIMESTAMP('2016-10-23 09:30:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000421 AND AD_Language='es_AR'
+;
+
+
+-- LAR_Importe_Exencion_SUSS
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000422,'LAR_Importe_Exencion_SUSS','LAR','LAR_Importe_Exencion_SUSS','LAR_Importe_Exencion_SUSS',0,TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000422 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 23/10/2016 9:30:18 ART
+-- ISSUE #81: Retenciones de Ganancias
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Importe Exención Ret. SUSS',PrintName='Importe Exención Ret. SUSS',Updated=TO_TIMESTAMP('2016-10-23 09:30:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000422 AND AD_Language='es_AR'
+;
+
+
+
+-- LAR_NroCertificado_SUSS
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000423,'LAR_NroCertificado_SUSS','LAR','LAR_NroCertificado_SUSS','LAR_NroCertificado_SUSS',0,TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000423 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 23/10/2016 9:30:18 ART
+-- ISSUE #81: Retenciones de Ganancias
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Nro. Certificado Exención Ret. SUSS',PrintName='Nro. Certificado Exención Ret. SUSS',Updated=TO_TIMESTAMP('2016-10-23 09:30:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000423 AND AD_Language='es_AR'
+;
+
+
+
+-- LAR_Inicio_Cert_SUSS
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000424,'LAR_Inicio_Cert_SUSS','LAR','LAR_Inicio_Cert_SUSS','LAR_Inicio_Cert_SUSS',0,TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000424 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 23/10/2016 9:30:18 ART
+-- ISSUE #81: Retenciones de Ganancias
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Fecha Inicio Exención SUSS',PrintName='Fecha Inicio Exención SUSS',Updated=TO_TIMESTAMP('2016-10-23 09:30:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000424 AND AD_Language='es_AR'
+;
+
+
+
+-- LAR_Vencimiento_Cert_SUSS
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000425,'LAR_Vencimiento_Cert_SUSS','LAR','LAR_Vencimiento_Cert_SUSS','LAR_Vencimiento_Cert_SUSS',0,TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2016-10-23 09:14:40','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 23/10/2016 9:14:41 ART
+-- ISSUE #81: Retenciones de Ganancias
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000425 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 23/10/2016 9:30:18 ART
+-- ISSUE #81: Retenciones de Ganancias
+UPDATE AD_Element_Trl SET IsTranslated='Y',Name='Vencimiento Cert. Exención SUSS',PrintName='Vencimiento Cert. Exención SUSS',Updated=TO_TIMESTAMP('2016-10-23 09:30:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000425 AND AD_Language='es_AR'
+;
+
 
 -- 26/10/2016 20:29:11 ART
 -- ISSUE #81: Retenciones, configuración en C_BPartner
@@ -5507,6 +5637,1231 @@ UPDATE AD_Field SET IsDisplayed='N', DisplayLogic='@C_Invoice_ID@^''''',Updated=
 -- 03/11/2016 9:54:28 ART
 -- ISSUE #81: Retenciones, configuración en C_BPartner
 UPDATE AD_Field_Trl SET Name='Importe Retención',Description='Importe Retención',Help='Importe de la Retención Sufrida.',Updated=TO_TIMESTAMP('2016-11-03 09:54:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000322 AND AD_Language='es_AR'
+;
+
+-- 19/01/2017 17:03:36 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003116 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:36 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003117,1,'Y','N','N',1000156,'N','Y',224,'N','QSS_LCO','Detailed Names',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:36','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:36','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:36 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003117 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:36 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003118,7,'Y','N','N',53246,'N','Y',224,'N','D','Dunning Grace Date',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:36','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:36','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:36 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003118 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003119,100,'Y','N','N',3000895,'N','Y',224,'N','The Email Address is the Electronic Mail ID for this User and should be fully qualified (e.g. joe.smith@company.com). The Email Address is used to access the self service application functionality from the web.','LAR','Electronic Mail Address','EMail Address',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:36','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:36','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003119 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003120,29,'Y','N','N',3000984,'N','Y',224,'N','D','Fecha de Inicio de Act.',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003120 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003121,60,'Y','N','N',1000157,'N','Y',224,'N','QSS_LCO','First Name 1',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003121 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003122,60,'Y','N','N',1000158,'N','Y',224,'N','QSS_LCO','First Name 2',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003122 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003123,10,'Y','N','N',1000151,'N','Y',224,'N','QSS_LCO','ISIC',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003123 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003124,22,'Y','N','N',3001883,'N','Y',224,'N','LAR','LAR_Exencion_Ganancias',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:37 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003124 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003125,22,'Y','N','N',3001887,'N','Y',224,'N','LAR','LAR_Exencion_IIBB',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:37','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003125 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003126,22,'Y','N','N',3001892,'N','Y',224,'N','LAR','LAR_Exencion_IVA',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003126 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Description,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003127,1,'Y','N','N',3001891,'N','Y',224,'N','LAR','El Socio del Negocio está exento a recibir Retenciones de IVA','LAR_Exento_Retenciones_IVA',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003127 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003128,1,'Y','N','N',3001901,'N','Y',224,'N','LAR','LAR_Exento_Ret_Ganancias',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003128 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003129,1,'Y','N','N',3001900,'N','Y',224,'N','LAR','LAR_Exento_Ret_IIBB',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003129 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003130,22,'Y','N','N',3001884,'N','Y',224,'N','LAR','LAR_Importe_Exencion_Ganancias',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:38 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003130 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:39 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003131,22,'Y','N','N',3001888,'N','Y',224,'N','LAR','LAR_Importe_Exencion_IIBB',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:38','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:39 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003131 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:39 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003132,22,'Y','N','N',3001893,'N','Y',224,'N','LAR','LAR_Importe_Exencion_IVA',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:39','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:39','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:39 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003132 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:39 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003133,30,'Y','N','N',3001885,'N','Y',224,'N','LAR','LAR_NroCertificado_Ganancias',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:39','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:39','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:39 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003133 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003134,30,'Y','N','N',3001889,'N','Y',224,'N','LAR','LAR_NroCertificado_IIBB',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:39','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:39','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003134 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003135,30,'Y','N','N',3001894,'N','Y',224,'N','LAR','LAR_NroCertificado_IVA',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:40','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:40','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003135 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003136,1,'Y','N','N',3001877,'N','Y',224,'N','LAR','LAR_TipoGanancias',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:40','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:40','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003136 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003137,14,'Y','N','N',3001886,'N','Y',224,'N','LAR','LAR_Vencimiento_Cert_Ganancias',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:40','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:40','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003137 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:41 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003138,14,'Y','N','N',3001890,'N','Y',224,'N','LAR','LAR_Vencimiento_Cert_IIBB',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:40','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:40','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:41 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003138 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:41 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003139,14,'Y','N','N',3001895,'N','Y',224,'N','LAR','LAR_Vencimiento_Cert_IVA',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:41','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:41','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:41 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003139 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:41 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003140,60,'Y','N','N',1000159,'N','Y',224,'N','QSS_LCO','Last Name 1',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:41','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:41','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:41 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003140 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:41 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003141,60,'Y','N','N',1000160,'N','Y',224,'N','QSS_LCO','Last Name 2',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:41','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:41','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:41 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003141 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:42 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003142,10,'Y','N','N',58113,'N','Y',224,'N','D','Logo',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:41','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:41','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:42 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003142 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003143,1,'Y','N','N',58381,'N','Y',224,'N','If a business partner is exempt from tax on purchases, the exempt tax rate is used. For this, you need to set up a tax rate with a 0% rate and indicate that this is your tax exempt rate.  This is required for tax reporting, so that you can track tax exempt transactions.','D','Business partner is exempt from tax on purchases','PO Tax exempt',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:42','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:42','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003143 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003144,10,'Y','N','N',54463,'N','Y',224,'N','EE04','Tax Group',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003144 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003145,1,'Y','N','N',1000154,'N','Y',224,'N','QSS_LCO','Tax ID Digit',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003145 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003146,10,'Y','N','N',1000153,'N','Y',224,'N','QSS_LCO','Tax ID Type',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003146 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003147,10,'Y','N','N',1000152,'N','Y',224,'N','QSS_LCO','Tax Payer Type',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003147 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003148,1,'Y','N','N',1000155,'N','Y',224,'N','QSS_LCO','Use Tax Id Digit',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:03:43','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003148 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003117
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003118
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003119
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003120
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003121
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003122
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003123
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003140
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003141
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003142
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003143
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003144
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003145
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003146
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003147
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003148
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=130,IsDisplayed='Y' WHERE AD_Field_ID=3003116
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3003128
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=150,IsDisplayed='Y' WHERE AD_Field_ID=3003124
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=160,IsDisplayed='Y' WHERE AD_Field_ID=3003130
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=170,IsDisplayed='Y' WHERE AD_Field_ID=3003137
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=3003133
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=3003127
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=3003126
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=3003132
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=220,IsDisplayed='Y' WHERE AD_Field_ID=3003139
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3003135
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3003129
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3003125
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3003131
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3003138
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3003134
+;
+
+-- 19/01/2017 17:08:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3003136
+;
+
+-- 19/01/2017 17:08:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001990,291,'LAR',0,'N','N','N','N',1,'N',20,'N',3000420,'N','Y','N','LAR_Exento_Retenciones_SUSS','LAR_Exento_Retenciones_SUSS',100,TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 19/01/2017 17:08:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001990 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 19/01/2017 17:08:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001991,291,'LAR',0,'N','N','N','N',131089,'N',22,'N',3000421,'N','Y','N','LAR_Exencion_SUSS','LAR_Exencion_SUSS',100,TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 19/01/2017 17:08:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001991 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 19/01/2017 17:08:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001992,291,'LAR',0,'N','N','N','N',131089,'N',22,'N',3000422,'N','Y','N','LAR_Importe_Exencion_SUSS','LAR_Importe_Exencion_SUSS',100,TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 19/01/2017 17:08:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001992 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 19/01/2017 17:08:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001993,291,'LAR',0,'N','N','N','N',30,'N',10,'N',3000423,'N','Y','N','LAR_NroCertificado_SUSS','LAR_NroCertificado_SUSS',100,TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 19/01/2017 17:08:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001993 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 19/01/2017 17:08:30 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001994,291,'LAR',0,'N','N','N','N',29,'N',16,'N',3000424,'N','Y','N','LAR_Inicio_Cert_SUSS','LAR_Inicio_Cert_SUSS',100,TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-01-19 17:08:29','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 19/01/2017 17:08:30 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001994 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 19/01/2017 17:08:30 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001995,291,'LAR',0,'N','N','N','N',29,'N',16,'N',3000425,'N','Y','N','LAR_Vencimiento_Cert_SUSS','LAR_Vencimiento_Cert_SUSS',100,TO_TIMESTAMP('2017-01-19 17:08:30','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-01-19 17:08:30','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 19/01/2017 17:08:30 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001995 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003149,131089,'Y','N','N',3001991,'N','Y',224,'N','LAR','LAR_Exencion_SUSS',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:09:08','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:09:08','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003149 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003150,1,'Y','N','N',3001990,'N','Y',224,'N','LAR','LAR_Exento_Retenciones_SUSS',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003150 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003151,131089,'Y','N','N',3001992,'N','Y',224,'N','LAR','LAR_Importe_Exencion_SUSS',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003151 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003152,29,'Y','N','N',3001994,'N','Y',224,'N','LAR','LAR_Inicio_Cert_SUSS',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003152 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003153,30,'Y','N','N',3001993,'N','Y',224,'N','LAR','LAR_NroCertificado_SUSS',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003153 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003154,29,'Y','N','N',3001995,'N','Y',224,'N','LAR','LAR_Vencimiento_Cert_SUSS',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:09:14','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:09:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003154 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:12:07 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3001996,291,'LAR',0,'N','N','N','N',29,'N',16,'N',3000426,'N','Y','N','LAR_Inicio_Cert_IIBB','LAR_Inicio_Cert_IIBB',100,TO_TIMESTAMP('2017-01-19 17:12:06','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-01-19 17:12:06','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 19/01/2017 17:12:07 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3001996 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 19/01/2017 17:12:28 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003155,29,'Y','N','N',3001996,'N','Y',224,'N','LAR','LAR_Inicio_Cert_IIBB',100,0,'Y',TO_TIMESTAMP('2017-01-19 17:12:26','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 17:12:26','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 17:12:28 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003155 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=130,IsDisplayed='Y' WHERE AD_Field_ID=3003136
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3003116
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=150,IsDisplayed='Y' WHERE AD_Field_ID=3003128
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=160,IsDisplayed='Y' WHERE AD_Field_ID=3003124
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=170,IsDisplayed='Y' WHERE AD_Field_ID=3003130
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=3003137
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=3003133
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=3003127
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=3003126
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=220,IsDisplayed='Y' WHERE AD_Field_ID=3003132
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3003139
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3003135
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3003129
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3003125
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3003131
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3003155
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3003138
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3003134
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3003150
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3003149
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3003151
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3003152
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3003154
+;
+
+-- 19/01/2017 17:13:20 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3003153
+;
+
+-- 19/01/2017 17:13:36 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 17:13:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003116
+;
+
+-- 19/01/2017 17:14:05 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 17:14:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003130
+;
+
+-- 19/01/2017 17:14:11 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 17:14:11','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003133
+;
+
+-- 19/01/2017 17:14:27 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 17:14:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003131
+;
+
+-- 19/01/2017 17:14:35 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 17:14:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003138
+;
+
+-- 19/01/2017 17:14:44 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 17:14:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003151
+;
+
+-- 19/01/2017 17:14:56 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 17:14:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003154
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002975
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002953
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002958
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002959
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002960
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002972
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002973
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002961
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002962
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002963
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002964
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002965
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002966
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002967
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002968
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002969
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002970
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=2156
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=70,IsDisplayed='Y' WHERE AD_Field_ID=9627
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=80,IsDisplayed='Y' WHERE AD_Field_ID=3261
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=1000006
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=1000007
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=1000008
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=1000009
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=130,IsDisplayed='Y' WHERE AD_Field_ID=2145
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3228
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=150,IsDisplayed='Y' WHERE AD_Field_ID=2133
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=160,IsDisplayed='Y' WHERE AD_Field_ID=2136
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=170,IsDisplayed='Y' WHERE AD_Field_ID=2141
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=8238
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=10592
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=1000011
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=2132
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=220,IsDisplayed='Y' WHERE AD_Field_ID=3001776
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3955
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=2124
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=2164
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=2139
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=2149
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3001605
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=2144
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=2162
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=2148
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=2128
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=2127
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=2146
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=2154
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=2153
+;
+
+-- 19/01/2017 17:17:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=54555
+;
+
+-- 19/01/2017 17:17:24 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=2135
+;
+
+-- 19/01/2017 17:17:24 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=9620
+;
+
+-- 19/01/2017 17:17:24 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=57533
+;
+
+-- 19/01/2017 20:00:08 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 20:00:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003135
+;
+
+-- 19/01/2017 20:00:46 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_Ganancias@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:00:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003124
+;
+
+-- 19/01/2017 20:00:53 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_Ganancias@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:00:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003130
+;
+
+-- 19/01/2017 20:00:55 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_Ganancias@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:00:55','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003137
+;
+
+-- 19/01/2017 20:00:58 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_Ganancias@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:00:58','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003133
+;
+
+-- 19/01/2017 20:01:23 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Retenciones_IVA',Updated=TO_TIMESTAMP('2017-01-19 20:01:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003126
+;
+
+-- 19/01/2017 20:01:25 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Retenciones_IVA',Updated=TO_TIMESTAMP('2017-01-19 20:01:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003132
+;
+
+-- 19/01/2017 20:01:27 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Retenciones_IVA',Updated=TO_TIMESTAMP('2017-01-19 20:01:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003139
+;
+
+-- 19/01/2017 20:01:29 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Retenciones_IVA',Updated=TO_TIMESTAMP('2017-01-19 20:01:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003135
+;
+
+-- 19/01/2017 20:01:57 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Ret_IIBB',Updated=TO_TIMESTAMP('2017-01-19 20:01:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003125
+;
+
+-- 19/01/2017 20:02:00 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Ret_IIBB',Updated=TO_TIMESTAMP('2017-01-19 20:02:00','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003131
+;
+
+-- 19/01/2017 20:02:04 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Ret_IIBB',Updated=TO_TIMESTAMP('2017-01-19 20:02:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003155
+;
+
+-- 19/01/2017 20:02:10 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Ret_IIBB',Updated=TO_TIMESTAMP('2017-01-19 20:02:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003138
+;
+
+-- 19/01/2017 20:02:13 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='LAR_Exento_Ret_IIBB',Updated=TO_TIMESTAMP('2017-01-19 20:02:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003134
+;
+
+-- 19/01/2017 20:02:42 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_IVA@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:02:42','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003126
+;
+
+-- 19/01/2017 20:02:46 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_IVA@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:02:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003132
+;
+
+-- 19/01/2017 20:02:48 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_IVA@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:02:48','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003139
+;
+
+-- 19/01/2017 20:02:51 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_IVA@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:02:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003135
+;
+
+-- 19/01/2017 20:03:04 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003125
+;
+
+-- 19/01/2017 20:03:07 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003131
+;
+
+-- 19/01/2017 20:03:09 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003155
+;
+
+-- 19/01/2017 20:03:11 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:11','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003138
+;
+
+-- 19/01/2017 20:03:14 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Ret_IIBB@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003134
+;
+
+-- 19/01/2017 20:03:40 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_SUSS@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003150
+;
+
+-- 19/01/2017 20:03:43 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_SUSS@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003149
+;
+
+-- 19/01/2017 20:03:45 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_SUSS@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003151
+;
+
+-- 19/01/2017 20:03:47 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_SUSS@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003152
+;
+
+-- 19/01/2017 20:03:50 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_SUSS@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003154
+;
+
+-- 19/01/2017 20:03:54 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic='@LAR_Exento_Retenciones_SUSS@=Y',Updated=TO_TIMESTAMP('2017-01-19 20:03:54','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003153
+;
+
+-- 19/01/2017 20:05:44 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLogic=NULL,Updated=TO_TIMESTAMP('2017-01-19 20:05:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003150
+;
+
+-- 19/01/2017 20:07:02 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 20:07:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003132
+;
+
+-- 19/01/2017 20:07:34 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLength=29,Updated=TO_TIMESTAMP('2017-01-19 20:07:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003151
+;
+
+-- 19/01/2017 20:08:01 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLength=22,Updated=TO_TIMESTAMP('2017-01-19 20:08:01','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003149
+;
+
+-- 19/01/2017 20:08:05 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Field SET DisplayLength=22,Updated=TO_TIMESTAMP('2017-01-19 20:08:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003151
+;
+
+-- 19/01/2017 20:08:44 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Column SET FieldLength=22,Updated=TO_TIMESTAMP('2017-01-19 20:08:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001991
+;
+
+-- 19/01/2017 20:08:57 ART
+-- ISSUE #80: Opciones de Retenciones en SdN
+UPDATE AD_Column SET FieldLength=22,Updated=TO_TIMESTAMP('2017-01-19 20:08:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001992
 ;
 
 -- Registración de script

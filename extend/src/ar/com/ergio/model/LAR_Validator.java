@@ -491,10 +491,11 @@ import ar.com.ergio.util.LAR_Utils;
     			}
     			if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType
     					.getTaxPayerType(bp))) {
-    				perceptionAmt = (((gravado.add(taxAmt).multiply(wc.getAliquot())).divide(new BigDecimal (100))).setScale(2,
-                            BigDecimal.ROUND_HALF_UP)).abs(); 
+                    perceptionAmt = (((gravado.multiply(wc.getAliquot())).divide(new BigDecimal (100))).setScale(2,
+                            BigDecimal.ROUND_HALF_UP)).abs();
     			} else {
-    				perceptionAmt = (((gravado.multiply(wc.getAliquot())).divide(new BigDecimal (100))).setScale(2,
+
+                    perceptionAmt = (((gravado.add(taxAmt).multiply(wc.getAliquot())).divide(new BigDecimal (100))).setScale(2,
                             BigDecimal.ROUND_HALF_UP)).abs(); 
     			}
     

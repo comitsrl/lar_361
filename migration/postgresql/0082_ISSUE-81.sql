@@ -261,6 +261,146 @@ INSERT INTO LAR_Escala_Ret_Ganancias (LAR_Escala_Ret_Ganancias_ID,AD_Client_ID,A
 -- Correr la secuencia para la tabla LAR_Escala_Ret_Ganancias
 UPDATE AD_Sequence set currentnext = ((SELECT MAX(LAR_Escala_Ret_Ganancias_ID) FROM LAR_Escala_Ret_Ganancias WHERE AD_Client_ID = 1000000) + 1) WHERE AD_Sequence_ID = 3000332;
 
+-- 19/01/2017 21:10:45 ART
+-- ISSUE #81: Retenciones, configuración SdN
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003156,10,'Y','N','N',3001955,'N','Y',224,'N','LAR','Conceptos Retencion Ganancias',100,0,'Y',TO_TIMESTAMP('2017-01-19 21:10:44','YYYY-MM-DD HH24:MI:SS'),0,100,TO_TIMESTAMP('2017-01-19 21:10:44','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 19/01/2017 21:10:45 ART
+-- ISSUE #81: Retenciones, configuración SdN
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003156 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 19/01/2017 21:10:58 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3003156
+;
+
+-- 19/01/2017 21:11:04 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2017-01-19 21:11:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003156
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002975
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002958
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002972
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002962
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002965
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3002968
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3955
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=2124
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=2164
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=2139
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=2149
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3001605
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=2144
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=2162
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=2148
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=2128
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=2127
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=2146
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=2154
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=2153
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=54555
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=2135
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=9620
+;
+
+-- 19/01/2017 21:11:38 ART
+-- ISSUE #81: Retenciones, configuración SdN
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=57533
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0082_ISSUE-81', 'LAR', '')
 ;
