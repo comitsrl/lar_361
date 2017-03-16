@@ -233,10 +233,8 @@ public class TransaccionCuentaBancaria
                             cuentaBancaria.get_ValueAsInt("CajaPrincipal_ID"), pago, p_C_BPartner_ID, p_Description,
                             ctx, trxName);
 
-                    // Desmarco el pago como en cartera, y lo marco como
-                    // depositado.
+                    // Desmarco el pago como en cartera.
                     pago.set_ValueOfColumn("IsOnDrawer", false);
-                    pago.set_ValueOfColumn("IsDeposited", true);
                     pago.saveEx();
 
                     // Copio los datos propios del cheque en el cobro destino.
