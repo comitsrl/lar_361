@@ -84,7 +84,8 @@ public class LAR_OnDrawerChecksSelection extends SvrProcess
 			+ "      C_Payment_ID "
 			+ "FROM C_Payment pt "
 			+ "WHERE "
-			+ "      pt.IsOnDrawer='Y' "
+			+ "      pt.IsOnDrawer='Y'"
+			+ "      AND pt.C_BankAccount_ID=" + header.getC_BankAccount_ID();
 			;
 		String whereSQL="isReceipt='Y' AND Docstatus IN ('CO','CL') AND TenderType IN ('K') AND C_Payment_ID NOT IN ("+usedDocs+") AND C_Payment_ID IN ("+ondrawer+")";
 		Info inf=InfoOnDrawerChecks.create(frame, true, 0, "C_Payment", "C_Payment_ID", "", true, whereSQL);
