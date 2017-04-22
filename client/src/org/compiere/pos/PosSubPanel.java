@@ -22,6 +22,8 @@ import java.util.logging.Level;
 
 import javax.swing.KeyStroke;
 
+import jpos.JposException;
+
 import org.compiere.apps.AppsAction;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
@@ -35,6 +37,7 @@ import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 
+import ar.com.comit.print.javapos.ImprimeTicketCompra;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
@@ -144,6 +147,7 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 		final MOrder order = p_posPanel.m_order;
 		boolean isFiscal = false;
 		boolean isElectronic = false;
+		boolean isJavaPOS = p_pos.get_ValueAsBoolean("IsJavaPOS");
 		int reportType = 0;
 		int documentId = 0;
 		String impresoraFactura = "";
@@ -180,6 +184,7 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 isFiscal = LAR_Utils.isFiscalDocType(C_DocType_ID);
                 isElectronic = MDocType.isElectronicDocType(C_DocType_ID);
 
+                // Si DocType es fiscal se utiliza el controlador fiscal
                 if (isFiscal && !isElectronic)
                 {
                     // Impresión fiscal de factura
@@ -203,10 +208,26 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 
 		    // Si no se trata de un documento fiscal, se imprime de forma tradicional
 		    if (!isFiscal)
-		    {
-		        p_posPanel.newOrder();
-		        ReportCtl.startDocumentPrint(reportType, documentId, null, Env.getWindowNo(this), false);
-		    }
+            {
+                if (isJavaPOS)
+                {
+                    final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
+                    final ImprimeTicketCompra ticketCompra = new ImprimeTicketCompra(invoice);
+                    try
+                    {
+                        ticketCompra.imprimir();
+                    }
+                    catch (JposException e)
+                    {
+                        log.log(Level.SEVERE, "Error al imprimir v\u00eda Java POS", e);
+                    }
+                }
+                else
+                {
+                    p_posPanel.newOrder();
+                    ReportCtl.startDocumentPrint(reportType, documentId, null, Env.getWindowNo(this), false);
+                }
+            }
 
 		    p_posPanel.stopGlassPane();
 		} // if (order != null)

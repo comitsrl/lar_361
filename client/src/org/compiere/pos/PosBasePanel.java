@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import jpos.JposException;
 import net.miginfocom.swing.MigLayout;
 
 import org.compiere.apps.ADialog;
@@ -50,6 +51,7 @@ import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
+import ar.com.comit.print.javapos.ManejadorAbstractoDeImpresion;
 import ar.com.ergio.model.FiscalDocumentPrint;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter;
 import ar.com.ergio.print.fiscal.view.AInfoFiscalPrinter.DialogActionListener;
@@ -197,6 +199,16 @@ public class PosBasePanel extends CPanel
 		}
 		m_focusMgr.start();
 
+        // @emmie - Se intenta inicializar la impresora POS "PRT100FC"
+        try
+        {
+            ManejadorAbstractoDeImpresion.ImpresoraPOS.getInstance();
+            log.info("Impresora POS inicializada OK");
+        }
+        catch (JposException e)
+        {
+            log.severe("No se pudo inicializar impresora POS: " + e.getMessage());
+        }
 	}	//	init
 
 	/**
@@ -237,6 +249,17 @@ public class PosBasePanel extends CPanel
 		m_frame = null;
 		m_ctx = null;
 		infoFiscalPrinter = null;
+
+        // @emmie - Se intenta inicializar la impresora POS "PRT100FC"
+        try
+        {
+            ManejadorAbstractoDeImpresion.ImpresoraPOS.getInstance().getPrinter().close();
+            log.info("Impresora POS cerrada OK");
+        }
+        catch (JposException e)
+        {
+            log.severe("No se pudo cerrar la impresora POS: " + e.getMessage());
+        }
 	}	//	dispose
 
 

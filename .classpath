@@ -8,5 +8,20 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="test/lib/easymock-3.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/adempiere361"/>
+	<classpathentry kind="lib" path="lib/epsonupos.admin.jar"/>
+	<classpathentry kind="lib" path="lib/epsonupos.core.v1.14.0001.jar"/>
+	<classpathentry kind="lib" path="lib/epsonupos.core.v1.14.0001m.jar"/>
+	<classpathentry kind="lib" path="lib/epsonupos.jar"/>
+	<classpathentry kind="lib" path="lib/epsonupos.previous.jar"/>
+	<classpathentry kind="lib" path="lib/epsonupos.trace.jar"/>
+	<classpathentry kind="lib" path="lib/jpos1141.jar"/>
+	<classpathentry kind="lib" path="lib/pos.jar"/>
+	<classpathentry kind="lib" path="lib/pos.v4.0001_01.jar"/>
+	<classpathentry kind="lib" path="lib/pos.v4.0001.jar"/>
+	<classpathentry kind="lib" path="lib/uposcommon.core.v1.14.0001.jar"/>
+	<classpathentry kind="lib" path="lib/uposcommon.core.v1.14.0001m.jar"/>
+	<classpathentry kind="lib" path="lib/uposcommon.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
