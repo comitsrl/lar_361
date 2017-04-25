@@ -77,6 +77,8 @@ public class MLARPlanPago extends X_LAR_Plan_Pago
 			return false;
 		}
 
+		/* Se comenta porcion de codigo, para permitir que se repitan el numero de cuota en los planes de pago.
+		 * 
 		// Obtengo todos los planes de pago.
 		final List<MLARPlanPago> lista = new ArrayList<MLARPlanPago>();
 		final String sql = "SELECT *"
@@ -130,7 +132,7 @@ public class MLARPlanPago extends X_LAR_Plan_Pago
 			            + " comprendidas en el intervalo de otro Plan de Pago existente.");
 			    return false;
 			}
-		}
+		}*/
 
         // Concatenar correctamente el name del plan de pago
 		if (!getLAR_Medio_Pago().getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
