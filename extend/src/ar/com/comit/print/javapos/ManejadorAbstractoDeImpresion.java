@@ -165,5 +165,12 @@ public abstract class ManejadorAbstractoDeImpresion
         {
             return printer;
         }
+
+        public void close() throws JposException
+        {
+            printer.close();
+            printer = null;
+            instance = null;
+        }
     }
 }

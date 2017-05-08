@@ -17,6 +17,7 @@
 package ar.com.comit.print.javapos;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.compiere.model.MClient;
@@ -91,7 +92,8 @@ final class DatosImpresion
 
     public String getInicioActividades()
     {
-        return "01/01/2000";
+        final DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        return df.format(orgInfo.get_Value("Fecha_Inicio_Act"));
     }
 
     public String getLogo()
@@ -167,8 +169,7 @@ final class DatosImpresion
      */
     public String getCAE()
     {
-        //return invoice.getcae();
-        return "66183859964837";
+        return invoice.getcae() == null ? "0123456789" : invoice.getcae();
     }
 
     /**
@@ -178,8 +179,7 @@ final class DatosImpresion
      */
     public Timestamp getVtoCAE()
     {
-        //return invoice.getvtocae();
-        return new Timestamp(System.currentTimeMillis());
+        return invoice.getvtocae() == null ? new Timestamp(System.currentTimeMillis()) : invoice.getvtocae();
     }
 
     /**

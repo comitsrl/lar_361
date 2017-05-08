@@ -14,7 +14,7 @@
 	<classpathentry kind="lib" path="lib/epsonupos.jar"/>
 	<classpathentry kind="lib" path="lib/epsonupos.previous.jar"/>
 	<classpathentry kind="lib" path="lib/epsonupos.trace.jar"/>
-	<classpathentry kind="lib" path="lib/jpos1141.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jpos1141.jar"/>
 	<classpathentry kind="lib" path="lib/pos.jar"/>
 	<classpathentry kind="lib" path="lib/pos.v4.0001_01.jar"/>
 	<classpathentry kind="lib" path="lib/pos.v4.0001.jar"/>

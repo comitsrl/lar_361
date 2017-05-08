@@ -222,11 +222,8 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                         log.log(Level.SEVERE, "Error al imprimir v\u00eda Java POS", e);
                     }
                 }
-                else
-                {
-                    p_posPanel.newOrder();
-                    ReportCtl.startDocumentPrint(reportType, documentId, null, Env.getWindowNo(this), false);
-                }
+                p_posPanel.newOrder();
+                ReportCtl.startDocumentPrint(reportType, documentId, null, Env.getWindowNo(this), false);
             }
 
 		    p_posPanel.stopGlassPane();

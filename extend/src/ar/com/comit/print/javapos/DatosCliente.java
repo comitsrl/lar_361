@@ -50,8 +50,9 @@ final class DatosCliente
 
     public String getDireccion()
     {
-        return new StringBuilder(location.getAddress1())
-                         .append("\n(").append(location.getPostal()).append(")")
+        final String address = location.getAddress1() == null ? "-- " : location.getAddress1() + "\n";
+        return new StringBuilder(address)
+                         .append("(").append(location.getPostal()).append(")")
                          .append(" ").append(location.getCity())
                          .append(", ").append(location.getRegionName())
                          .toString();

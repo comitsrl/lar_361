@@ -207,7 +207,9 @@ public class PosBasePanel extends CPanel
         }
         catch (JposException e)
         {
-            log.severe("No se pudo inicializar impresora POS: " + e.getMessage());
+            final String msg = String.format("No se pudo inicializar impresora POS: %s", e.getMessage());
+            log.severe(msg);
+            ADialog.error(getWindowNo(), this, msg);
         }
 	}	//	init
 
@@ -258,7 +260,9 @@ public class PosBasePanel extends CPanel
         }
         catch (JposException e)
         {
-            log.severe("No se pudo cerrar la impresora POS: " + e.getMessage());
+            final String msg = String.format("No se pudo cerrar la impresora POS: %s", e.getMessage());
+            log.severe(msg);
+            ADialog.error(getWindowNo(), this, msg);
         }
 	}	//	dispose
 
