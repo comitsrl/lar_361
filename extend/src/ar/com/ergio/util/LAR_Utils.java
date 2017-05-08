@@ -131,27 +131,6 @@ public final class LAR_Utils {
     } // checkDuplicateCUIT
 
     /**
-     * Valida el número de IIBB
-     *
-     * @param nroIIBB número a validar
-     * @param lco_ISIC_ID Id del tipo de IIBB
-     * @return true si el número es válido; false caso contrario
-     */
-    public static boolean validateIIBBNumber(final String nroIIBB, int lco_ISIC_ID)
-    {
-        String sqlTipoIIBB = "SELECT value FROM lco_isic WHERE lco_isic_id = ?";
-        String tipoIIBB = DB.getSQLValueString(null, sqlTipoIIBB, lco_ISIC_ID);
-
-        if ((tipoIIBB == null)
-                || (tipoIIBB.equals("D") && nroIIBB.length() != 8)
-                || (tipoIIBB.equals("CM") && nroIIBB.length() != 10))
-        {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Returns whether a document is fiscal or not
      *
      * @param C_docType_ID

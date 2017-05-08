@@ -139,12 +139,6 @@ import ar.com.ergio.util.LAR_Utils;
                  if (!LAR_Utils.validateCUIT(cuit)) {
                      return "ERROR: CUIT invalido";
                  }
-
-                 // Check IIBB number
-                 msg = checkIIBBNumber(bp);
-                 if (msg != null) {
-                     return msg;
-                 }
              }
          }
          // Changes on OrderLines
@@ -430,16 +424,6 @@ import ar.com.ergio.util.LAR_Utils;
      {
          return m_AD_Client_ID;
      }   //  getAD_Client_ID
-
-     private String checkIIBBNumber(final MBPartner bp)
-     {
-         String msg = null;
-         String nroIIBB = (bp.get_ValueAsString("DUNS")).replace("-", "").trim();
-         if (!LAR_Utils.validateIIBBNumber(nroIIBB, bp.get_ValueAsInt("LCO_ISIC_ID")))
-             msg = "ERROR: número de IIBB invalido";
-
-         return msg;
-     }
 
     private String calculatePerceptionLine(final MBPartner bp, final MOrderLine line, int type)
     {
