@@ -18,8 +18,6 @@ package ar.com.ergio.model;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -36,7 +34,6 @@ import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
-import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
@@ -1053,48 +1050,5 @@ import ar.com.ergio.util.LAR_Utils;
 	 		return null;
 	 	}
 	 	//Marcos Zúñiga -end
-
-    // @fchiappano
-    /**
-     * Obtener Location del BPartner.
-     * 
-     * @param bp
-     * @return MLocation
-     */
-    private MLocation obtenerLocacion(final int c_BPartner_ID, final Properties ctx, final String trxName)
-    {
-        final String sql = "SELECT bl.C_Location_ID"
-                         + "  FROM C_BPartner_Location bl "
-                         + " WHERE bl.C_BPartner_Location_ID = (SELECT MAX(bpl.C_BPartner_Location_ID) "
-                         + "                                      FROM C_BPartner_Location bpl"
-                         + "                                     WHERE bpl.C_BPartner_ID = ?"
-                         + "                                       AND bpl.IsActive='Y' AND bpl.IsActive='Y')";
-
-        MLocation location = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        try
-        {
-            pstmt = DB.prepareStatement(sql, null);
-            pstmt.setInt(1, c_BPartner_ID);
-            rs = pstmt.executeQuery();
-            while (rs.next())
-            {
-                location = new MLocation(ctx, rs.getInt("C_Location_ID"), trxName);
-            }
-        }
-        catch (SQLException eSql)
-        {
-            log.log(Level.SEVERE, sql, eSql);
-        }
-        finally
-        {
-            DB.close(rs, pstmt);
-            rs = null;
-            pstmt = null;
-        }
-
-        return location;
-    } // obtenerLocacion
 
  }   //  LAR_Validator
