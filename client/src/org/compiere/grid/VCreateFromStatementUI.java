@@ -45,7 +45,6 @@ import org.compiere.model.MLookupFactory;
 import org.compiere.model.MPayment;
 import org.compiere.model.SystemIDs;
 import org.compiere.swing.CButton;
-import org.compiere.swing.CComboBox;
 import org.compiere.swing.CLabel;
 import org.compiere.swing.CPanel;
 import org.compiere.swing.CTextField;
@@ -53,6 +52,8 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+
+import ar.com.ergio.model.MLARTarjetaCredito;
 
 public class VCreateFromStatementUI extends CreateFromStatement implements ActionListener, SystemIDs
 {
@@ -105,6 +106,10 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 	
 	private JLabel tenderTypeLabel = new JLabel();
 	protected VLookup tenderTypeField;
+
+	// @fchiappano Se agrega un nuevo filtro a la ventana.
+	private JLabel tipoTarjetaLabel = new JLabel();
+	protected VLookup tipoTarjetaField;
 	
 	private CLabel amtFromLabel = new CLabel(Msg.translate(Env.getCtx(), "PayAmt"));
 	protected VNumber amtFromField = new VNumber("AmtFrom", false, false, true, DisplayType.Amount, Msg.translate(Env.getCtx(), "AmtFrom"));
@@ -163,9 +168,12 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 		
 		MLookup lookupTender = MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, MColumn.getColumn_ID(MPayment.Table_Name, MPayment.COLUMNNAME_TenderType), DisplayType.List);
 		tenderTypeField = new VLookup (MPayment.COLUMNNAME_TenderType,false,false,true,lookupTender);
+		tenderTypeField.setName("TenderType");
 		tenderTypeField.addActionListener(this);
 
-		
+		MLookup lookupTipoTarjeta = MLookupFactory.get(Env.getCtx(), p_WindowNo, 0, MColumn.getColumn_ID(MLARTarjetaCredito.Table_Name, "CreditCardType"), DisplayType.List);
+		tipoTarjetaField = new VLookup ("CreditCardType", false, false, true, lookupTipoTarjeta);
+		tipoTarjetaField.addActionListener(this);
 		
 		bPartnerLookup = new VLookup("C_BPartner_ID", false, false, true,
 				MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, 3499, DisplayType.Search));
@@ -202,6 +210,7 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
     	
     	documentTypeLabel.setText(Msg.translate(Env.getCtx(), "C_DocType_ID"));
     	tenderTypeLabel.setText(Msg.translate(Env.getCtx(), "TenderType"));
+    	tipoTarjetaLabel.setText("Tipo de Tarjeta");
     	
     	documentNoLabel.setLabelFor(documentNoField);
     	dateFromLabel.setLabelFor(dateFromField);
@@ -237,7 +246,13 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
     	if(tenderTypeField!=null)
     		parameterBankPanel.add(tenderTypeField, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0
     				,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0)); 
-
+    	
+    	parameterBankPanel.add(tipoTarjetaLabel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0
+                ,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+        if(tipoTarjetaField!=null)
+            parameterBankPanel.add(tipoTarjetaField, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0
+                    ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0)); 
+    	
     	parameterBankPanel.add(BPartner_idLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0
     			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
     		parameterBankPanel.add(bPartnerLookup, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0
@@ -248,18 +263,18 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
     	parameterBankPanel.add(documentNoField, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0
     			,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
 
-    	parameterBankPanel.add(authorizationLabel, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0
+    	/* parameterBankPanel.add(authorizationLabel, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0
     			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
     	parameterBankPanel.add(authorizationField, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0
-    			,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
+    			,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0)); */
 
-    	parameterBankPanel.add(amtFromLabel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0
+    	parameterBankPanel.add(amtFromLabel, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0
     			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-    	parameterBankPanel.add(amtFromField, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0
+    	parameterBankPanel.add(amtFromField, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0
     			,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
-    	parameterBankPanel.add(amtToLabel, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0
+    	parameterBankPanel.add(amtToLabel, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0
     			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-    	parameterBankPanel.add(amtToField, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0
+    	parameterBankPanel.add(amtToField, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0
     			,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
 
     	parameterBankPanel.add(dateFromLabel, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0
@@ -295,7 +310,7 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 	protected void loadBankAccount()
 	{
 		loadTableOIS(getBankData(documentNoField.getText(), bPartnerLookup.getValue(), dateFromField.getValue(), dateToField.getValue(),
-				amtFromField.getValue(), amtToField.getValue(), documentTypeField.getValue(), tenderTypeField.getValue(), 
+				amtFromField.getValue(), amtToField.getValue(), documentTypeField.getValue(), tenderTypeField.getValue(), tipoTarjetaField.getValue(),
 				authorizationField.getText()));
 	}
 	
