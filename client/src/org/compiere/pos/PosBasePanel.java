@@ -255,7 +255,7 @@ public class PosBasePanel extends CPanel
         // @emmie - Se intenta inicializar la impresora POS "PRT100FC"
         try
         {
-            ManejadorAbstractoDeImpresion.ImpresoraPOS.getInstance().getPrinter().close();
+            ManejadorAbstractoDeImpresion.ImpresoraPOS.getInstance().close();
             log.info("Impresora POS cerrada OK");
         }
         catch (JposException e)
