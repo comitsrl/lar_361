@@ -4,5 +4,5 @@ UPDATE AD_Tab SET WhereClause='C_BankStatement.EsCierreCaja=''Y'' AND C_BankStat
 ;
 
 -- Registración de script
-SELECT register_migration_script_lar('0086_ISSUE-80.sql', 'LAR', '')
+SELECT register_migration_script_lar('0087_ISSUE-80.sql', 'LAR', '')
 ;
