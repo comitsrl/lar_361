@@ -202,8 +202,11 @@ public class PosBasePanel extends CPanel
         // @emmie - Se intenta inicializar la impresora POS "PRT100FC"
         try
         {
-            ManejadorAbstractoDeImpresion.ImpresoraPOS.getInstance();
-            log.info("Impresora POS inicializada OK");
+            if (p_pos.get_ValueAsBoolean("IsJavaPOS"))
+            {
+                ManejadorAbstractoDeImpresion.ImpresoraPOS.getInstance();
+                log.info("Impresora POS inicializada OK");
+            }
         }
         catch (JposException e)
         {
@@ -255,8 +258,11 @@ public class PosBasePanel extends CPanel
         // @emmie - Se intenta inicializar la impresora POS "PRT100FC"
         try
         {
-            ManejadorAbstractoDeImpresion.ImpresoraPOS.getInstance().close();
-            log.info("Impresora POS cerrada OK");
+            if (p_pos.get_ValueAsBoolean("IsJavaPOS"))
+            {
+                ManejadorAbstractoDeImpresion.ImpresoraPOS.getInstance().close();
+                log.info("Impresora POS cerrada OK");
+            }
         }
         catch (JposException e)
         {
