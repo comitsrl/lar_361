@@ -252,18 +252,61 @@ import org.compiere.util.Msg;
 	 */
 	private boolean updateHeader()
 	{
-		String sql = "UPDATE C_BankStatement bs"
-			+ " SET StatementDifference=(SELECT COALESCE(SUM(StmtAmt),0) FROM C_BankStatementLine bsl "
-				+ "WHERE bsl.C_BankStatement_ID=bs.C_BankStatement_ID AND bsl.IsActive='Y') "
-			+ "WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+	    // @fchiappano Chequeo si se trata de un cierre de cajas.
+	    final boolean esCierreCaja = ((MBankStatement) getC_BankStatement()).get_ValueAsBoolean("EsCierreCaja");
+	    String sql = "";
+	    if (esCierreCaja)
+	    {
+	        sql = "UPDATE C_BankStatement bs"
+	            + "   SET StatementDifference=((SELECT COALESCE(SUM(StmtAmt),0)"
+                + "                              FROM C_BankStatementLine bsl"
+                + "                             WHERE bsl.C_BankStatement_ID=bs.C_BankStatement_ID AND bsl.IsActive='Y')"
+                + "               + (COALESCE((SELECT SUM(pa.PayAmt)"
+                + "                              FROM C_Payment pa"
+                + "                             WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsOnDrawer='Y'"
+                + "                                                                                        AND pa.IsReceipt='Y'"
+                + "                                                                                        AND pa.DocStatus IN ('CO','CL')"
+                + "                                                                                        AND pa.TenderType IN ('K','Z')"
+                + "                                                                                        AND pa.C_Payment_ID NOT IN (SELECT sli.C_Payment_ID"
+                + "                                                                                                                      FROM C_BankStatementLine sli"
+                + "                                                                                                                     WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)) , 0))"
+                + "               + (COALESCE((SELECT SUM(pa.PayAmt)"
+                + "                              FROM C_Payment pa"
+                + "                             WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsReceipt='N'"
+                + "                                                                                        AND pa.DocStatus IN ('CO','CL')"
+                + "                                                                                        AND pa.TenderType IN ('K','Z')"
+                + "                                                                                        AND pa.IsReconciled='N'"
+                + "                                                                                        AND pa.LAR_PaymentSource_ID > 0"
+                + "                                                                                        AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID"
+                + "                                                                                                                              FROM C_BankStatementLine sli"
+                + "                                                                                                                             WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)) , 0)))"
+	            + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+	    }
+	    else
+	    {
+	        sql = "UPDATE C_BankStatement bs"
+	            + "   SET StatementDifference=(SELECT COALESCE(SUM(StmtAmt),0)"
+	            + "                              FROM C_BankStatementLine bsl"
+	            + "                             WHERE bsl.C_BankStatement_ID=bs.C_BankStatement_ID AND bsl.IsActive='Y')"
+	            + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+	    }
 		int no = DB.executeUpdate(sql, get_TrxName());
 		if (no != 1) {
 			log.warning("StatementDifference #" + no);
 			return false;
 		}
-		sql = "UPDATE C_BankStatement bs"
-			+ " SET EndingBalance=BeginningBalance+StatementDifference "
-			+ "WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+		if (esCierreCaja)
+        {
+		    sql = "UPDATE C_BankStatement bs"
+	                + "   SET EndingBalance=SaldoInicial+StatementDifference "
+	                + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+        }
+		else
+		{
+		    sql = "UPDATE C_BankStatement bs"
+			    + "   SET EndingBalance=BeginningBalance+StatementDifference "
+			    + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+		}
 		no = DB.executeUpdate(sql, get_TrxName());
 		if (no != 1) {
 			log.warning("Balance #" + no);
