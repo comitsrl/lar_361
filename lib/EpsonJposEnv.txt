@@ -1,0 +1,2 @@
+InstallLocation = /opt
+LogFileLocation = /var/epson_javapos/pos

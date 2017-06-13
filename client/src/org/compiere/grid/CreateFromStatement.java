@@ -75,7 +75,7 @@ public class CreateFromStatement extends CreateFrom
 	 *  @return sql where clause
 	 */
 	public String getSQLWhere(String DocumentNo, Object BPartner, Object DateFrom, Object DateTo, 
-			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, String AuthCode)
+			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, String AuthCode)
 	{
 		StringBuffer sql = new StringBuffer("WHERE p.Processed='Y' AND p.IsReconciled='N'"
 		+ " AND p.DocStatus IN ('CO','CL','RE','VO') AND p.PayAmt<>0" 
@@ -117,8 +117,19 @@ public class CreateFromStatement extends CreateFrom
 		
 		if(DocType!=null)
 			sql.append(" AND p.C_DocType_ID=?");
-		if(TenderType != null && TenderType.toString().length() > 0)
-			sql.append(" AND p.TenderType=?");
+        if (TenderType != null && TenderType.toString().length() > 0)
+        {
+            sql.append(" AND p.TenderType=?");
+
+            if (TenderType.equals(MPayment.TENDERTYPE_CreditCard))
+            {
+                if (TipoTarjeta != null && TipoTarjeta.toString().length() > 0)
+                    sql.append(" AND pay.LAR_Tarjeta_Credito_ID IN (SELECT t.LAR_Tarjeta_Credito_ID FROM LAR_Tarjeta_Credito t WHERE t.CreditCardType=?)");
+            }
+            else if (TenderType.equals(MPayment.TENDERTYPE_DirectDebit))
+                if (TipoTarjeta != null && TipoTarjeta.toString().length() > 0)
+                    sql.append(" AND pay.LAR_Tarjeta_Debito_ID IN (SELECT t.LAR_Tarjeta_Credito_ID FROM LAR_Tarjeta_Credito t WHERE t.CreditCardType=?)");
+        }
 		if(AuthCode.length() > 0 )
 			sql.append(" AND p.R_AuthCode LIKE ?");
 
@@ -135,7 +146,7 @@ public class CreateFromStatement extends CreateFrom
 	 */
 	void setParameters(PreparedStatement pstmt, boolean forCount, 
 			String DocumentNo, Object BPartner, Object DateFrom, Object DateTo, 
-			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, String AuthCode) 
+			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, String AuthCode) 
 	throws SQLException
 	{
 		int index = 1;
@@ -185,8 +196,14 @@ public class CreateFromStatement extends CreateFrom
 		}
 		if(DocType!=null)
 			pstmt.setInt(index++, (Integer) DocType);
-		if(TenderType!=null  && TenderType.toString().length() > 0 )
-			pstmt.setString(index++, (String) TenderType);
+        if (TenderType != null && TenderType.toString().length() > 0)
+        {
+            pstmt.setString(index++, (String) TenderType);
+            if (TenderType.equals(MPayment.TENDERTYPE_CreditCard) ||
+                    TenderType.equals(MPayment.TENDERTYPE_DirectDebit))
+                if (TipoTarjeta != null && TipoTarjeta.toString().length() > 0)
+                    pstmt.setString(index++, (String) TipoTarjeta);
+        }
 		if(AuthCode.length() > 0 )
 			pstmt.setString(index++, getSQLText(AuthCode));
 
@@ -207,7 +224,7 @@ public class CreateFromStatement extends CreateFrom
 	}   //  getSQLText
 	
 	protected Vector<Vector<Object>> getBankData(String DocumentNo, Object BPartner, Object DateFrom, Object DateTo, 
-			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, String AuthCode)
+			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, String AuthCode)
 	{
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		
@@ -220,14 +237,14 @@ public class CreateFromStatement extends CreateFrom
 			+ " INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID)"
 			+ " LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID) ";
 
-		sql = sql + getSQLWhere(DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, AuthCode) + " ORDER BY p.DateTrx";
+		sql = sql + getSQLWhere(DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, TipoTarjeta, AuthCode) + " ORDER BY p.DateTrx";
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try
 		{
 			pstmt = DB.prepareStatement(sql.toString(), null);
-			setParameters(pstmt, false, DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, AuthCode);
+			setParameters(pstmt, false, DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, TipoTarjeta, AuthCode);
 			rs = pstmt.executeQuery();
 			while (rs.next())
 			{

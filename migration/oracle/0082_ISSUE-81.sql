@@ -6,16 +6,6 @@
 INSERT INTO LAR_Concepto_Ret_Ganancias (LAR_Concepto_Ret_Ganancias_ID,AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,Value,Name,Description,Alicuota_Inscripto,Alicuota_No_Inscripto,Calculo_Por_Escala,Importe_No_Sujeto_Inscripto,Importe_No_Sujeto_No_Insc,Importe_Ret_Minima_Inscripto,Importe_Ret_Minima_No_Insc) VALUES (1000000,1000000,0,'Y',TO_DATE('2016-12-22 11:51:36','YYYY-MM-DD HH24:MI:SS'),100,TO_DATE('2016-12-22 11:51:36','YYYY-MM-DD HH24:MI:SS'),100,'19','Intereses por operaciones realizadas en entidades financieras.','Intereses por operaciones realizadas en entidades financieras. Ley N° 21.526 y sus modificaciones o agentes de bolsa o mercado abierto. Anexo II, inc. a) pto 1)',3.000000000000,10.000000000000,'N',0,0,90.000000000000,450.000000000000)
 ;
 
--- 22/12/2016 11:53:38 ART
--- ISSUE #81: Régimen de Retenciones Ganancias
-DELETE FROM AD_Preference WHERE AD_Client_ID=1000000 AND AD_Org_ID=0 AND AD_User_ID IS NULL AND AD_Window_ID=3000064 AND Attribute='Importe_Ret_Minima_Inscripto'
-;
-
--- 22/12/2016 11:53:38 ART
--- ISSUE #81: Régimen de Retenciones Ganancias
-INSERT INTO AD_Preference (AD_Preference_ID, AD_Client_ID, AD_Org_ID, IsActive, Created,CreatedBy,Updated,UpdatedBy,AD_Window_ID, AD_User_ID, Attribute, Value) VALUES (1000023,1000000,0, 'Y',SysDate,100,SysDate,100, 3000064,NULL,'Importe_Ret_Minima_Inscripto','90.000000000000')
-;
-
 -- 22/12/2016 11:56:26 ART
 -- ISSUE #81: Régimen de Retenciones Ganancias
 INSERT INTO LAR_Concepto_Ret_Ganancias (LAR_Concepto_Ret_Ganancias_ID,AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,Value,Name,Description,Alicuota_Inscripto,Alicuota_No_Inscripto,Calculo_Por_Escala,Importe_No_Sujeto_Inscripto,Importe_No_Sujeto_No_Insc,Importe_Ret_Minima_Inscripto,Importe_Ret_Minima_No_Insc) VALUES (1000001,1000000,0,'Y',TO_DATE('2016-12-22 11:56:26','YYYY-MM-DD HH24:MI:SS'),100,TO_DATE('2016-12-22 11:56:26','YYYY-MM-DD HH24:MI:SS'),100,'21','Intereses originados en operaciones no comprendidas en el punto 1.','Intereses originados en operaciones no comprendidas en el punto 1. Anexo II, inc. a) pto. 2)',6.000000000000,28.000000000000,'N',3500.000000000000,0,90.000000000000,90.000000000000)
@@ -24,16 +14,6 @@ INSERT INTO LAR_Concepto_Ret_Ganancias (LAR_Concepto_Ret_Ganancias_ID,AD_Client_
 -- 22/12/2016 11:56:43 ART
 -- ISSUE #81: Régimen de Retenciones Ganancias
 UPDATE LAR_Concepto_Ret_Ganancias SET Importe_Ret_Minima_No_Insc=90.000000000000,Updated=TO_DATE('2016-12-22 11:56:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE LAR_Concepto_Ret_Ganancias_ID=1000000
-;
-
--- 22/12/2016 11:56:50 ART
--- ISSUE #81: Régimen de Retenciones Ganancias
-DELETE FROM AD_Preference WHERE AD_Client_ID=1000000 AND AD_Org_ID=0 AND AD_User_ID IS NULL AND AD_Window_ID=3000064 AND Attribute='Importe_Ret_Minima_No_Insc'
-;
-
--- 22/12/2016 11:56:50 ART
--- ISSUE #81: Régimen de Retenciones Ganancias
-INSERT INTO AD_Preference (AD_Preference_ID, AD_Client_ID, AD_Org_ID, IsActive, Created,CreatedBy,Updated,UpdatedBy,AD_Window_ID, AD_User_ID, Attribute, Value) VALUES (1000024,1000000,0, 'Y',SysDate,100,SysDate,100, 3000064,NULL,'Importe_Ret_Minima_No_Insc','90.000000000000')
 ;
 
 -- 22/12/2016 12:02:56 ART
