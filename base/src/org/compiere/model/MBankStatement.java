@@ -18,10 +18,13 @@ package org.compiere.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import javax.swing.JFrame;
 
@@ -328,6 +331,56 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 			if (line.getDateAcct().after(maxDate))
 				maxDate = line.getDateAcct(); 
 		}
+
+		// @fchiappano Si es un cierre de caja, sumo los cheques en cartera
+		// y los que fueron utilizados en alguna orden de pago, pero que la misma
+		// aun no fue conciliada en algun cierre de cajas anterior.
+		if (get_ValueAsBoolean("EsCierreCaja"))
+		{
+		    String sql = "SELECT COALESCE (SUM(pa.PayAmt),0) + COALESCE((SELECT SUM(pa.PayAmt)"
+                       + "                                                 FROM C_Payment pa"
+                       + "                                                WHERE pa.C_BankAccount_ID=? AND pa.IsReceipt='N'"
+                       + "                                                                            AND pa.DocStatus IN ('CO','CL')"
+                       + "                                                                            AND pa.TenderType IN ('K','Z')"
+                       + "                                                                            AND pa.IsReconciled='N'"
+                       + "                                                                            AND pa.LAR_PaymentSource_ID > 0"
+                       + "                                                                            AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID"
+                       + "                                                                                                                  FROM C_BankStatementLine sli"
+                       + "                                                                                                                 WHERE sli.C_BankStatement_ID=?)),0)"
+		               + "  FROM C_Payment pa"
+		               + " WHERE pa.C_BankAccount_ID=? AND pa.IsOnDrawer='Y'"
+                       + "                             AND pa.IsReceipt='Y'"
+                       + "                             AND pa.DocStatus IN ('CO','CL')"
+                       + "                             AND pa.TenderType IN ('K','Z')"
+                       + "                             AND pa.C_Payment_ID NOT IN (SELECT sli.C_Payment_ID"
+                       + "                                                           FROM C_BankStatementLine sli"
+                       + "                                                          WHERE sli.C_BankStatement_ID=?)";
+
+		    PreparedStatement pstmt = null;
+	        ResultSet rs = null;
+	        try
+	        {
+	            pstmt = DB.prepareStatement(sql, null);
+	            pstmt.setInt(1, getC_BankAccount_ID());
+	            pstmt.setInt(2, getC_BankStatement_ID());
+	            pstmt.setInt(3, getC_BankAccount_ID());
+                pstmt.setInt(4, getC_BankStatement_ID());
+	            rs = pstmt.executeQuery();
+
+	            if (rs.next())
+	                total = total.add(rs.getBigDecimal(1));
+	        }
+	        catch (SQLException eSql)
+	        {
+	            log.log(Level.SEVERE, sql, eSql);
+	        }
+	        finally
+	        {
+	            DB.close(rs, pstmt);
+	            rs = null;
+	            pstmt = null;
+	        }
+		}
 		setStatementDifference(total);
         // @fchiappano Si es un cierre de caja, EndingBalance = SaldoInicial + total.
         if (get_ValueAsBoolean("EsCierreCaja"))
@@ -425,7 +478,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 
 		if (get_ValueAsBoolean("EsCierreCaja"))
 		{
-		    if (!getBankAccount().get_ValueAsBoolean("EsCajaPrincipal") && !get_ValueAsBoolean("Transferido"))
+		    if (!get_ValueAsBoolean("Transferido"))
 		    {
 		        final Timestamp fecha = new Timestamp(System.currentTimeMillis());
 		        final int C_BPartner_ID = MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, Env.getAD_Client_ID(getCtx()));
@@ -439,6 +492,9 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
                     return STATUS_Invalid;
                 }
 		    }
+
+		    // @fchiappano actualizar columnas "fisicas" de cheques.
+		    actualizarColumnasCheques();
 
             if (m_transferred != null)
             {
@@ -700,5 +756,107 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 			|| DOCSTATUS_Closed.equals(ds)
 			|| DOCSTATUS_Reversed.equals(ds);
 	}	//	isComplete
+
+	/**
+	 * Actulizar columnas "Fisicas", con los valores obtenidos en las respectivas columnas "Virtuales"(Sql).
+	 */
+	private void actualizarColumnasCheques()
+	{
+	    // @fchiappano Actualizo la columna total de cheques.
+        String sql = "UPDATE C_BankStatement bs"
+                   + "   SET TotalCheques=((SELECT COALESCE(Sum(sl.TrxAmt),0)"
+                   + "                        FROM C_BankStatementLine sl"
+                   + "                        JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)"
+                   + "                       WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN ('K','Z')))"
+                   + "         + (COALESCE((SELECT SUM(pa.PayAmt)"
+                   + "                        FROM C_Payment pa"
+                   + "                       WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsOnDrawer='Y'"
+                   + "                                                                                  AND pa.IsReceipt='Y'"
+                   + "                                                                                  AND pa.DocStatus IN ('CO','CL')"
+                   + "                                                                                  AND pa.TenderType IN ('K','Z')"
+                   + "                                                                                  AND pa.C_Payment_ID NOT IN (SELECT sli.C_Payment_ID"
+                   + "                                                                                                                FROM C_BankStatementLine sli"
+                   + "                                                                                                               WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)), 0))"
+                   + "         + (COALESCE((SELECT SUM(pa.PayAmt)"
+                   + "                        FROM C_Payment pa"
+                   + "                       WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsReceipt='N'"
+                   + "                                                                                  AND pa.DocStatus IN ('CO','CL')"
+                   + "                                                                                  AND pa.TenderType IN ('K','Z')"
+                   + "                                                                                  AND pa.IsReconciled='N'"
+                   + "                                                                                  AND pa.LAR_PaymentSource_ID > 0"
+                   + "                                                                                  AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID"
+                   + "                                                                                                                        FROM C_BankStatementLine sli"
+                   + "                                                                                                                       WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)), 0)))"
+                   + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+
+        DB.executeUpdate(sql, get_TrxName());
+
+        // @fchiappano Actulizar columna DifereciaCheques.
+        sql = "UPDATE C_BankStatement bs"
+            + "   SET DiferenciaCheques=(SELECT (C_BankStatement.ScrutinizedCheckAmt - ((SELECT COALESCE(Sum(sl.TrxAmt),0)"
+            + "                                                                           FROM C_BankStatementLine sl"
+            + "                                                                           JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)"
+            + "                                                                          WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN ('K','Z')))"
+            + "                                                            + (COALESCE((SELECT SUM(pa.PayAmt)"
+            + "                                                                           FROM C_Payment pa"
+            + "                                                                          WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsOnDrawer='Y'"
+            + "                                                                                                                                     AND pa.IsReceipt='Y'"
+            + "                                                                                                                                     AND pa.DocStatus IN ('CO','CL')"
+            + "                                                                                                                                     AND pa.TenderType IN ('K','Z')"
+            + "                                                                                                                                     AND pa.C_Payment_ID NOT IN (SELECT sli.C_Payment_ID"
+            + "                                                                                                                                                                   FROM C_BankStatementLine sli"
+            + "                                                                                                                                                                  WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)), 0))"
+            + "                                                            + (COALESCE((SELECT SUM(pa.PayAmt)"
+            + "                                                                           FROM C_Payment pa"
+            + "                                                                          WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsReceipt='N'"
+            + "                                                                                                                                     AND pa.DocStatus IN ('CO','CL')"
+            + "                                                                                                                                     AND pa.TenderType IN ('K','Z')"
+            + "                                                                                                                                     AND pa.IsReconciled='N'"
+            + "                                                                                                                                     AND pa.LAR_PaymentSource_ID > 0"
+            + "                                                                                                                                     AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID"
+            + "                                                                                                                                                                           FROM C_BankStatementLine sli"
+            + "                                                                                                                                                                          WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)), 0)))))"
+            + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+
+        DB.executeUpdate(sql, get_TrxName());
+
+        // @fchiappano Actualizar columna Total Diferencias.
+        sql = "UPDATE C_BankStatement bs"
+            + "   SET TotalDiferencias=((SELECT (C_BankStatement.ScrutinizedCashAmt - (COALESCE(Sum(TrxAmt),0))) "
+            + "                            FROM C_BankStatementLine sl"
+            + "                            JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)"
+            + "                           WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType = 'X'))"
+            + "                       + (SELECT (C_BankStatement.ScrutinizedCheckAmt - ((SELECT COALESCE(Sum(sl.TrxAmt),0)"
+            + "                            FROM C_BankStatementLine sl"
+            + "                            JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)"
+            + "                           WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN ('K','Z')))"
+            + "             + (COALESCE((SELECT SUM(pa.PayAmt)"
+            + "                            FROM C_Payment pa"
+            + "                           WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsOnDrawer='Y'"
+            + "                                                                                      AND pa.IsReceipt='Y'"
+            + "                                                                                      AND pa.DocStatus IN ('CO','CL')"
+            + "                                                                                      AND pa.TenderType IN ('K','Z')"
+            + "                                                                                      AND pa.C_Payment_ID NOT IN (SELECT sli.C_Payment_ID"
+            + "                                                                                                                    FROM C_BankStatementLine sli"
+            + "                                                                                                                   WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)), 0))"
+            + "              + (COALESCE((SELECT SUM(pa.PayAmt)"
+            + "                             FROM C_Payment pa"
+            + "                            WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsReceipt='N'"
+            + "                                                                                       AND pa.DocStatus IN ('CO','CL')"
+            + "                                                                                       AND pa.TenderType IN ('K','Z')"
+            + "                                                                                       AND pa.IsReconciled='N'"
+            + "                                                                                       AND pa.LAR_PaymentSource_ID > 0"
+            + "                                                                                       AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID"
+            + "                                                                                                                             FROM C_BankStatementLine sli"
+            + "                                                                                                                            WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)), 0)))))"
+            + "                        + (SELECT (C_BankStatement.ScrutinizedCreditCardAmt - (COALESCE(Sum(TrxAmt),0)))"
+            + "                             FROM C_BankStatementLine sl"
+            + "                             JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)"
+            + "                            WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN ('D', 'C'))) - C_BankStatement.SaldoInicial)"
+            + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
+
+        DB.executeUpdate(sql, get_TrxName());
+
+	} // actualizarColumnasCheques
 	
 }	//	MBankStatement
