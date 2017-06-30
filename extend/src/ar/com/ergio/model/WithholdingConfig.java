@@ -117,7 +117,7 @@ class WithholdingConfig
              * operación que obligue a seleccionarla.
              */
             MBPartnerLocation mbpl = new MBPartnerLocation(Env.getCtx(),
-                    bp.getLocations(true)[0].getC_Location_ID(), trxName);
+                    bp.getLocations(true)[0].get_ID(), trxName);
             MLocation bpl = MLocation.get(Env.getCtx(), mbpl.getC_Location_ID(), trxName);
             int bp_city_id = bpl.getC_City_ID();
 
