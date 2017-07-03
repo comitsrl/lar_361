@@ -412,7 +412,7 @@ public class TransaccionCuentaBancaria
         payment.setC_Currency_ID(paymentFrom.getC_Currency_ID());
         payment.setPayAmt(paymentFrom.getPayAmt());
         payment.setOverUnderAmt(Env.ZERO);
-        payment.setC_DocType_ID(true);
+        payment.setC_DocType_ID(paymentFrom.isReceipt());
         payment.setIsReceipt(paymentFrom.isReceipt());
         payment.set_ValueOfColumn("IsOnDrawer", paymentFrom.get_ValueAsBoolean("IsOnDrawer"));
         payment.set_ValueOfColumn("LAR_PaymentSource_ID", paymentFrom.getC_Payment_ID());
