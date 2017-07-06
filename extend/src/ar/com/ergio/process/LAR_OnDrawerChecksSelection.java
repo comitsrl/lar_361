@@ -138,6 +138,7 @@ public class LAR_OnDrawerChecksSelection extends SvrProcess
 			pay.setOverUnderAmt(Env.ZERO);
 			pay.setWriteOffAmt(Env.ZERO);
 			pay.setIsOverUnderPayment(false);
+			pay.setTenderType("Z"); // Cheque de Terceros
 
 			receipt.setIsReconciled(false);
 
