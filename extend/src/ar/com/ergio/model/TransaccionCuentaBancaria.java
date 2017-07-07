@@ -152,6 +152,7 @@ public class TransaccionCuentaBancaria
         int m_debitoTransferido = 0;
         int m_creditoTransferido = 0;
         int m_depositoTransferido = 0;
+        int m_chequeEmitido = 0;
         int tipoPago = 0;
 
         // Chequeo si hay tarjetas de Debito y si las mismas tienen una cuenta bancaria configurada.
@@ -295,6 +296,19 @@ public class TransaccionCuentaBancaria
 
                 m_depositoTransferido++;
             }
+            else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) &&
+                    !pago.isReceipt() && pago.get_ValueAsInt("LAR_Cheque_Emitido_ID") > 0)
+            {
+                totalAmt = totalAmt.add(pago.getPayAmt());
+                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
+                        getCuentaPorFormaPago("LAR_Cheque_Emitido_ID", pago.get_ValueAsInt("LAR_Cheque_Emitido_ID")),
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+
+                paymentBankTo.set_ValueOfColumn("LAR_Cheque_Emitido_ID",
+                        pago.get_ValueAsInt("LAR_Cheque_Emitido_ID"));
+
+                m_chequeEmitido ++;
+            }
             // Guardo y completo el cobro en la caja destino.
             if (paymentBankTo != null)
             {
@@ -343,6 +357,7 @@ public class TransaccionCuentaBancaria
         m_informe.add(new KeyNamePair(m_creditoTransferido, "Tarjetas de Credito"));
         m_informe.add(new KeyNamePair(m_debitoTransferido, "Tarjetas de Debito"));
         m_informe.add(new KeyNamePair(m_depositoTransferido, "Depositos Directos"));
+        m_informe.add(new KeyNamePair(m_chequeEmitido, "Cheques Emitidos"));
 
         return m_informe.toArray(new KeyNamePair[m_informe.size()]);
     } // transferirValoresPorFormaPago

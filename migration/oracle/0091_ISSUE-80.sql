@@ -1,5 +1,16 @@
 ﻿ALTER TABLE C_Payment ADD COLUMN NroCuotas numeric(2,0);
 
+﻿ALTER TABLE LAR_Tarjeta_Credito ADD COLUMN EsChequeEmitido character(1) NOT NULL DEFAULT 'N'::bpchar;
+ALTER TABLE LAR_Tarjeta_Credito ADD CONSTRAINT lar_tarjeta_credito_eschequeemitido_check CHECK (eschequeemitido = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
+
+ALTER TABLE LAR_TenderType_BankAccount ADD COLUMN LAR_Cheque_Emitido_ID numeric(10,0);
+ALTER TABLE LAR_TenderType_BankAccount ADD CONSTRAINT lartendertypebankaccount_larchequeemitido_fkey FOREIGN KEY (LAR_Cheque_Emitido_ID)
+      REFERENCES LAR_Tarjeta_Credito (LAR_Tarjeta_Credito_ID) MATCH SIMPLE;
+
+ALTER TABLE C_Payment ADD COLUMN LAR_Cheque_Emitido_ID numeric(10,0);
+ALTER TABLE C_Payment ADD CONSTRAINT cpayment_larchequeemitido_fkey FOREIGN KEY (LAR_Cheque_Emitido_ID)
+      REFERENCES LAR_Tarjeta_Credito (LAR_Tarjeta_Credito_ID) MATCH SIMPLE;
+
 -- 27/06/2017 18:14:20 ART
 -- ISSUE #80: Nro de Cuotas en Recibos.
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000447,'nrocuotas','LAR','nrocuotas','nrocuotas',0,TO_DATE('2017-06-27 18:14:20','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2017-06-27 18:14:20','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
@@ -724,6 +735,645 @@ UPDATE AD_Field SET SeqNo=660,IsDisplayed='Y' WHERE AD_Field_ID=3000858
 -- 28/06/2017 18:24:12 ART
 -- ISSUE #80: Nro de Cuotas en Recibos.
 UPDATE AD_Field SET IsSameLine='Y',Updated=TO_DATE('2017-06-28 18:24:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003303
+;
+
+-- 29/06/2017 16:58:28 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000456,'eschequeemitido','LAR','eschequeemitido','eschequeemitido',0,TO_DATE('2017-06-29 16:58:28','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2017-06-29 16:58:28','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 29/06/2017 16:58:28 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000456 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 29/06/2017 16:58:28 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3002108,3000031,'LAR',0,'Y','N','N','N',1,'N',20,'N',3000456,'N','Y','N','eschequeemitido','eschequeemitido',100,TO_DATE('2017-06-29 16:58:28','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_DATE('2017-06-29 16:58:28','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 29/06/2017 16:58:28 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3002108 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 29/06/2017 16:59:09 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET Name='Es Cheque Emitido', ColumnName='EsChequeEmitido',Updated=TO_DATE('2017-06-29 16:59:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002108
+;
+
+-- 29/06/2017 16:59:09 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3002108
+;
+
+-- 29/06/2017 16:59:09 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET Name='Es Cheque Emitido', Description=NULL, Help=NULL WHERE AD_Column_ID=3002108 AND IsCentrallyMaintained='Y'
+;
+
+-- 29/06/2017 16:59:19 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column_Trl SET Name='Es Cheque Emitido',Updated=TO_DATE('2017-06-29 16:59:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002108 AND AD_Language='es_AR'
+;
+
+-- 29/06/2017 16:59:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Element SET ColumnName='EsChequeEmitido', Name='Es Cheque Emitido', PrintName='Es Cheque Emitido',Updated=TO_DATE('2017-06-29 16:59:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000456
+;
+
+-- 29/06/2017 16:59:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3000456
+;
+
+-- 29/06/2017 16:59:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET ColumnName='EsChequeEmitido', Name='Es Cheque Emitido', Description=NULL, Help=NULL WHERE AD_Element_ID=3000456
+;
+
+-- 29/06/2017 16:59:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Process_Para SET ColumnName='EsChequeEmitido', Name='Es Cheque Emitido', Description=NULL, Help=NULL, AD_Element_ID=3000456 WHERE UPPER(ColumnName)='ESCHEQUEEMITIDO' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 29/06/2017 16:59:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Process_Para SET ColumnName='EsChequeEmitido', Name='Es Cheque Emitido', Description=NULL, Help=NULL WHERE AD_Element_ID=3000456 AND IsCentrallyMaintained='Y'
+;
+
+-- 29/06/2017 16:59:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET Name='Es Cheque Emitido', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3000456) AND IsCentrallyMaintained='Y'
+;
+
+-- 29/06/2017 16:59:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_PrintFormatItem pi SET PrintName='Es Cheque Emitido', Name='Es Cheque Emitido' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3000456)
+;
+
+-- 29/06/2017 16:59:57 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Element_Trl SET Name='Es Cheque Emitido',PrintName='Es Cheque Emitido',Updated=TO_DATE('2017-06-29 16:59:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000456 AND AD_Language='es_AR'
+;
+
+-- 29/06/2017 17:01:36 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003310,1,'Y','N','N',3002108,'N','Y',3000052,'N','LAR','Es Cheque Emitido',100,0,TO_DATE('2017-06-29 17:01:36','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2017-06-29 17:01:36','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 29/06/2017 17:01:36 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003310 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 29/06/2017 17:01:45 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=80,IsDisplayed='Y' WHERE AD_Field_ID=3003310
+;
+
+-- 29/06/2017 17:01:45 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=3001860
+;
+
+-- 29/06/2017 17:02:01 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_DATE('2017-06-29 17:02:01','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003310
+;
+
+-- 29/06/2017 17:03:12 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET DisplayLogic='@EsDeposito@=N & @EsChequeEmitido@=N',Updated=TO_DATE('2017-06-29 17:03:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001957
+;
+
+-- 29/06/2017 17:09:34 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000457,'lar_cheque_emitido_id','LAR','lar_cheque_emitido_id','lar_cheque_emitido_id',0,TO_DATE('2017-06-29 17:09:33','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2017-06-29 17:09:33','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 29/06/2017 17:09:34 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000457 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 29/06/2017 17:09:34 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3002109,335,'LAR',0,'N','N','N','N',10,'N',19,'N',3000457,'N','Y','N','lar_cheque_emitido_id','lar_cheque_emitido_id',100,TO_DATE('2017-06-29 17:09:33','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_DATE('2017-06-29 17:09:33','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 29/06/2017 17:09:34 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3002109 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 29/06/2017 17:10:47 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET Name='Tipo de Cheque Emitido', ColumnName='LAR_Cheque_Emitido_ID',Updated=TO_DATE('2017-06-29 17:10:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002109
+;
+
+-- 29/06/2017 17:10:47 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3002109
+;
+
+-- 29/06/2017 17:10:47 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET Name='Tipo de Cheque Emitido', Description=NULL, Help=NULL WHERE AD_Column_ID=3002109 AND IsCentrallyMaintained='Y'
+;
+
+-- 29/06/2017 17:11:05 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column_Trl SET Name='Tipo de Cheque Emitido',Updated=TO_DATE('2017-06-29 17:11:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002109 AND AD_Language='es_AR'
+;
+
+-- 29/06/2017 17:11:30 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Element SET ColumnName='LAR_Cheque_Emitido_ID', Name='Tipo de Cheque Emitido', PrintName='Tipo de Cheque Emitido',Updated=TO_DATE('2017-06-29 17:11:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000457
+;
+
+-- 29/06/2017 17:11:30 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3000457
+;
+
+-- 29/06/2017 17:11:30 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET ColumnName='LAR_Cheque_Emitido_ID', Name='Tipo de Cheque Emitido', Description=NULL, Help=NULL WHERE AD_Element_ID=3000457
+;
+
+-- 29/06/2017 17:11:30 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Process_Para SET ColumnName='LAR_Cheque_Emitido_ID', Name='Tipo de Cheque Emitido', Description=NULL, Help=NULL, AD_Element_ID=3000457 WHERE UPPER(ColumnName)='LAR_CHEQUE_EMITIDO_ID' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 29/06/2017 17:11:30 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Process_Para SET ColumnName='LAR_Cheque_Emitido_ID', Name='Tipo de Cheque Emitido', Description=NULL, Help=NULL WHERE AD_Element_ID=3000457 AND IsCentrallyMaintained='Y'
+;
+
+-- 29/06/2017 17:11:30 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET Name='Tipo de Cheque Emitido', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3000457) AND IsCentrallyMaintained='Y'
+;
+
+-- 29/06/2017 17:11:30 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_PrintFormatItem pi SET PrintName='Tipo de Cheque Emitido', Name='Tipo de Cheque Emitido' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3000457)
+;
+
+-- 29/06/2017 17:11:39 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Element_Trl SET Name='Tipo de Cheque Emitido',PrintName='Tipo de Cheque Emitido',Updated=TO_DATE('2017-06-29 17:11:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000457 AND AD_Language='es_AR'
+;
+
+-- 29/06/2017 17:14:42 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Reference (AD_Reference_ID,ValidationType,EntityType,IsOrderByValue,Name,AD_Client_ID,AD_Org_ID,CreatedBy,Updated,IsActive,Created,UpdatedBy) VALUES (3000062,'T','LAR','N','Tipos de Cheques Emitidos',0,0,100,TO_DATE('2017-06-29 17:14:42','YYYY-MM-DD HH24:MI:SS'),'Y',TO_DATE('2017-06-29 17:14:42','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 29/06/2017 17:14:42 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Reference_Trl (AD_Language,AD_Reference_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Reference_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Reference t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Reference_ID=3000062 AND NOT EXISTS (SELECT * FROM AD_Reference_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Reference_ID=t.AD_Reference_ID)
+;
+
+-- 29/06/2017 17:15:30 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Ref_Table (IsValueDisplayed,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,CreatedBy,Updated,Created,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N',3000031,3000062,3001045,3001053,'LAR',100,TO_DATE('2017-06-29 17:15:30','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2017-06-29 17:15:30','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
+;
+
+-- 29/06/2017 17:17:20 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Ref_Table SET WhereClause='LAR_Tarjeta_Credito.EsChequeEmitido=''Y''',Updated=TO_DATE('2017-06-29 17:17:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Reference_ID=3000062
+;
+
+-- 29/06/2017 17:17:49 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET AD_Reference_Value_ID=3000062, AD_Reference_ID=18,Updated=TO_DATE('2017-06-29 17:17:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002109
+;
+
+-- 29/06/2017 17:18:43 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003311,29,'Y','N','N',3001958,'N','Y',3000016,'N','LAR','Fecha de Venc. Cheque',100,0,TO_DATE('2017-06-29 17:18:43','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2017-06-29 17:18:43','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 29/06/2017 17:18:43 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003311 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 29/06/2017 17:18:43 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003312,2,'Y','N','N',3002077,'N','Y',3000016,'N','LAR','Nro. Cuotas',100,0,TO_DATE('2017-06-29 17:18:43','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2017-06-29 17:18:43','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 29/06/2017 17:18:43 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003312 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 29/06/2017 17:18:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003313,10,'Y','N','N',3002109,'N','Y',3000016,'N','LAR','Tipo de Cheque Emitido',100,0,TO_DATE('2017-06-29 17:18:43','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2017-06-29 17:18:43','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 29/06/2017 17:18:44 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003313 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003312
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=3000485
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=70,IsDisplayed='Y' WHERE AD_Field_ID=3000412
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=80,IsDisplayed='Y' WHERE AD_Field_ID=3000432
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=3000433
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3000434
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3002763
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3000436
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=130,IsDisplayed='Y' WHERE AD_Field_ID=3000437
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3000438
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=150,IsDisplayed='Y' WHERE AD_Field_ID=3000439
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=160,IsDisplayed='Y' WHERE AD_Field_ID=3000440
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=170,IsDisplayed='Y' WHERE AD_Field_ID=3000435
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=3000441
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=3000442
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=3000443
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=3000444
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=220,IsDisplayed='Y' WHERE AD_Field_ID=3000445
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3000450
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3000452
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3000453
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3000454
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3002020
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3003313
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3000458
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000459
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000460
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000461
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000462
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000463
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000464
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000465
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000466
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000467
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000468
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000469
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000470
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000471
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000472
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000473
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000474
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000475
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000476
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000477
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000478
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000479
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000480
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000481
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000482
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000483
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000484
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000492
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000490
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000489
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3000491
+;
+
+-- 29/06/2017 17:22:25 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3003311
+;
+-- 29/06/2017 17:25:58 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3000455
+;
+
+-- 29/06/2017 17:25:58 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3003311
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3003313
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3000452
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3000453
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3000454
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3000455
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3003311
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3002769
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002770
+;
+
+-- 29/06/2017 17:27:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3002806
+;
+
+-- 04/07/2017 12:00:47 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET DisplayLogic='@TenderType@=''K''',Updated=TO_DATE('2017-07-04 12:00:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003313
+;
+
+-- 04/07/2017 12:02:34 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET DisplayLogic='@TenderType@=''K'' | @TenderType@=''Z''',Updated=TO_DATE('2017-07-04 12:02:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003311
+;
+
+-- 04/07/2017 22:09:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3002110,3000034,'LAR',0,'N','N','N','N',10,'N',19,'N',3000457,'N','Y','N','Tipo de Cheque Emitido','LAR_Cheque_Emitido_ID',100,TO_DATE('2017-07-04 22:09:26','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_DATE('2017-07-04 22:09:26','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 04/07/2017 22:09:27 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3002110 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 04/07/2017 22:11:46 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003314,10,'Y','N','N',3002110,'N','Y',3000055,'N','LAR','Tipo de Cheque Emitido',100,0,TO_DATE('2017-07-04 22:11:46','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_DATE('2017-07-04 22:11:46','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/07/2017 22:11:46 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003314 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/07/2017 22:13:03 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET DisplayLogic='@TenderType@=K',Updated=TO_DATE('2017-07-04 22:13:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003314
+;
+
+-- 04/07/2017 22:18:29 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET MandatoryLogic='@TenderType@=K',Updated=TO_DATE('2017-07-04 22:18:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002109
+;
+
+-- 07/07/2017 18:54:32 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET ColumnSQL='((SELECT COALESCE(Sum(sl.TrxAmt),0)  FROM C_BankStatementLine sl  JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID) WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN (''K'',''Z'') AND p.LAR_Cheque_Emitido_ID IS NULL))  + (COALESCE((SELECT SUM(pa.PayAmt)  FROM C_Payment pa  WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsOnDrawer=''Y'' AND pa.IsReceipt=''Y'' AND pa.DocStatus IN (''CO'',''CL'') AND pa.TenderType IN (''K'',''Z'') AND pa.C_Payment_ID NOT IN (SELECT sli.C_Payment_ID  FROM C_BankStatementLine sli  WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)) , 0)) + (COALESCE((SELECT SUM(pa.PayAmt)  FROM C_Payment pa  WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsReceipt=''N'' AND pa.DocStatus IN (''CO'',''CL'') AND pa.TenderType IN (''K'',''Z'') AND pa.IsReconciled=''N'' AND pa.LAR_Cheque_Emitido_ID IS NULL AND pa.LAR_PaymentSource_ID > 0 AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID  FROM C_BankStatementLine sli  WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)) , 0)))',Updated=TO_DATE('2017-07-07 18:54:32','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000149
+;
+
+-- 07/07/2017 18:55:14 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET ColumnSQL='(SELECT (C_BankStatement.ScrutinizedCheckAmt  - ((SELECT COALESCE(Sum(sl.TrxAmt),0)        FROM C_BankStatementLine sl        JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)        WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN (''K'',''Z'') AND p.LAR_Cheque_Emitido_ID IS NULL))        + (COALESCE((SELECT SUM(pa.PayAmt) FROM C_Payment pa WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsOnDrawer=''Y'' AND pa.IsReceipt=''Y'' AND pa.DocStatus IN (''CO'',''CL'') AND pa.TenderType IN (''K'',''Z'') AND pa.C_Payment_ID NOT IN (SELECT sli.C_Payment_ID FROM C_BankStatementLine sli WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)) , 0))       + (COALESCE((SELECT SUM(pa.PayAmt) FROM C_Payment pa WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsReceipt=''N'' AND pa.DocStatus IN (''CO'',''CL'') AND pa.TenderType IN (''K'',''Z'') AND pa.IsReconciled=''N'' AND pa.LAR_Cheque_Emitido_ID IS NULL AND pa.LAR_PaymentSource_ID > 0 AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID FROM C_BankStatementLine sli WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)) , 0)))))',Updated=TO_DATE('2017-07-07 18:55:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000157
+;
+
+-- 07/07/2017 18:55:59 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET ColumnSQL='((SELECT (C_BankStatement.ScrutinizedCashAmt - (COALESCE(Sum(TrxAmt),0))) FROM C_BankStatementLine sl JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID) WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType = ''X''))  + (SELECT (C_BankStatement.ScrutinizedCheckAmt - ((SELECT COALESCE(Sum(sl.TrxAmt),0)  FROM C_BankStatementLine sl  JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)  WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN (''K'',''Z'') AND p.LAR_Cheque_Emitido_ID IS NULL)) 	+ (COALESCE((SELECT SUM(pa.PayAmt)  FROM C_Payment pa  WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsOnDrawer=''Y'' AND pa.IsReceipt=''Y'' AND pa.DocStatus IN (''CO'',''CL'') AND pa.TenderType IN (''K'',''Z'') AND pa.C_Payment_ID NOT IN (SELECT sli.C_Payment_ID  FROM C_BankStatementLine sli  WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)) , 0)) 	+ (COALESCE((SELECT SUM(pa.PayAmt)  FROM C_Payment pa  WHERE pa.C_BankAccount_ID=C_BankStatement.C_BankAccount_ID AND pa.IsReceipt=''N'' AND pa.DocStatus IN (''CO'',''CL'') AND pa.TenderType IN (''K'',''Z'') AND pa.IsReconciled=''N'' AND pa.LAR_Cheque_Emitido_ID IS NULL AND pa.LAR_PaymentSource_ID > 0 AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID  FROM C_BankStatementLine sli  WHERE C_BankStatement.C_BankStatement_ID=sli.C_BankStatement_ID)) , 0))))) + (SELECT (C_BankStatement.ScrutinizedCreditCardAmt - (COALESCE(Sum(TrxAmt),0))) FROM C_BankStatementLine sl JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID) WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN (''D'', ''C''))) - C_BankStatement.SaldoInicial)',Updated=TO_DATE('2017-07-07 18:55:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000161
+;
+
+-- 07/07/2017 19:00:31 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET AD_Reference_Value_ID=3000062, AD_Reference_ID=18,Updated=TO_DATE('2017-07-07 19:00:31','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002110
 ;
 
 -- Registración de script
