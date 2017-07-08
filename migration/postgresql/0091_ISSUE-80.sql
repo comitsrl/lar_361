@@ -1,6 +1,6 @@
 ﻿ALTER TABLE C_Payment ADD COLUMN NroCuotas numeric(2,0);
 
-﻿ALTER TABLE LAR_Tarjeta_Credito ADD COLUMN EsChequeEmitido character(1) NOT NULL DEFAULT 'N'::bpchar;
+ALTER TABLE LAR_Tarjeta_Credito ADD COLUMN EsChequeEmitido character(1) NOT NULL DEFAULT 'N'::bpchar;
 ALTER TABLE LAR_Tarjeta_Credito ADD CONSTRAINT lar_tarjeta_credito_eschequeemitido_check CHECK (eschequeemitido = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
 
 ALTER TABLE LAR_TenderType_BankAccount ADD COLUMN LAR_Cheque_Emitido_ID numeric(10,0);
