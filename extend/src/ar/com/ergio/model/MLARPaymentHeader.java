@@ -210,7 +210,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 {
                     final MDocType docRet = new MDocType(getCtx(), c_DocType_ID, get_TrxName());
                     // Se recupera y valida el ID del cargo para retención desde el documento
-                    cargoRetencion = (Integer) docRet.get_Value("LAR_Withholding_Charge_ID");
+                    cargoRetencion = docRet.get_ValueAsInt("LAR_Withholding_Charge_ID");
                     if (cargoRetencion < 0)
                     {
                         JDialog dialog = new JDialog();
@@ -440,9 +440,9 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     else
                     {
                         // Es retención de IVA
-                        MOrgInfo orgI = new MOrgInfo(new MOrg(Env.getCtx(), Env.getAD_Org_ID(Env.getCtx()), this.get_TrxName()));
+                        //MOrgInfo orgI = new MOrgInfo(new MOrg(Env.getCtx(), Env.getAD_Org_ID(Env.getCtx()), this.get_TrxName()));
                         // La organización está configurada como Responsable Inscripto
-                        if (wc.isUseOrgTaxPayerType() && orgI.get_ValueAsInt("LCO_TaxPayerType") == responsableInscripto)
+                        if (wc.isUseOrgTaxPayerType())//no recupera correctamente el loc_taxpayertype_id desde orgInfo && orgI.get_ValueAsInt("LCO_TaxPayerType_ID") == responsableInscripto)
                         {
                             // Recupera la categoría de IVA del SdN
                             final int bpTaxPaxerTypeID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
@@ -468,7 +468,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                                             impIVA = impIVA.add(impuesto.getTaxAmt());
                                             // Se recupera la letra del tipo de documento
                                             // si es letra M se retiene el 100%
-                                            String letra = recuperaLetra(doc.get_ValueAsInt("LAR_DocumentLetter"));
+                                            String letra = recuperaLetra(doc.get_ValueAsInt("LAR_DocumentLetter_ID"));
                                             
                                             if (letra.equals("M"))
                                                 aliquot = Env.ONEHUNDRED;
@@ -489,7 +489,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                                         }
                                     }
                                     // Exención de IVA
-                                    if (bp.get_ValueAsBoolean("LAR_Exento_Ret_IVA"))
+                                    if (bp.get_ValueAsBoolean("LAR_Exento_Retenciones_IVA"))
                                     {
                                         Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_IVA");
                                         if (!fechaVenc.before(getDateTrx()))
