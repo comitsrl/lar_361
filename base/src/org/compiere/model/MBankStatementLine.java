@@ -298,7 +298,7 @@ import org.compiere.util.Msg;
 		if (esCierreCaja)
         {
 		    sql = "UPDATE C_BankStatement bs"
-	                + "   SET EndingBalance=SaldoInicial+StatementDifference "
+	                + "   SET EndingBalance= ScrutinizedCheckAmt + ScrutinizedCashAmt"
 	                + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
         }
 		else

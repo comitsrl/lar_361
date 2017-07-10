@@ -754,7 +754,7 @@ import ar.com.ergio.util.LAR_Utils;
 
                 if (genwh.equals("A")) {
                     // tipo de documento configurado para generar la retención automáticamente
-                    if (!header.recalcPaymentWithholding())
+                    if (!header.recalcPaymentWithholding(true))
                         return "No se pudo generar la retenci\u00f3n sobre la cabecera de pago";
                 }
             }

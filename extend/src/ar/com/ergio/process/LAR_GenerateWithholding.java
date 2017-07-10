@@ -59,7 +59,7 @@ public class LAR_GenerateWithholding extends SvrProcess
 
         // Sólo calcula la retención si el total de la cabecera no es cero (Existe algún pago cargado).
         if (!header.getPayHeaderTotalAmt().equals(Env.ZERO))
-            if (!header.recalcPaymentWithholding())
+            if (!header.recalcPaymentWithholding(true))
                 throw new AdempiereUserError(
                         "Error al calcular la retenci\u00f3n sobre la cabecera de pago");
 
