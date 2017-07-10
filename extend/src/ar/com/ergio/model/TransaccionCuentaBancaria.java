@@ -477,6 +477,8 @@ public class TransaccionCuentaBancaria
             // Seteo el Saldo inicial en 0, para que no genere errores en
             // futuros calculos.
             newStmt.set_ValueOfColumn("SaldoInicial", Env.ZERO);
+            newStmt.set_ValueOfColumn("ScrutinizedCheckAmt", Env.ZERO);
+            newStmt.set_ValueOfColumn("ScrutinizedCashAmt", Env.ZERO);
         }
         // @fchiappano Marco el nuevo Statement como transferido.
         newStmt.set_ValueOfColumn("Transferido", true);
