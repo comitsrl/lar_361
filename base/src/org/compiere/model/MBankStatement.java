@@ -252,9 +252,9 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 			ba.load(get_TrxName());
 			setBeginningBalance(ba.getCurrentBalance());
 		}
-        // @fchiappano Si es un cierre de caja, EndingBalance = SaldoInicial + StatementDifference.
+        // @fchiappano Si es un cierre de caja, EndingBalance = SaldoInicial + Cheques Contabiizados + Efectivo Contabilizado.
         if (get_ValueAsBoolean("EsCierreCaja"))
-            setEndingBalance(((BigDecimal) get_Value("SaldoInicial")).add(getStatementDifference()));
+            setEndingBalance(((BigDecimal) get_Value("ScrutinizedCheckAmt")).add((BigDecimal) get_Value("ScrutinizedCashAmt")));
         else
             setEndingBalance(getBeginningBalance().add(getStatementDifference()));
 		return true;
@@ -343,6 +343,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
                        + "                                                                            AND pa.DocStatus IN ('CO','CL')"
                        + "                                                                            AND pa.TenderType IN ('K','Z')"
                        + "                                                                            AND pa.IsReconciled='N'"
+                       + "                                                                            AND pa.LAR_Cheque_Emitido_ID IS NULL"
                        + "                                                                            AND pa.LAR_PaymentSource_ID > 0"
                        + "                                                                            AND pa.LAR_PaymentSource_ID NOT IN (SELECT sli.C_Payment_ID"
                        + "                                                                                                                  FROM C_BankStatementLine sli"
@@ -382,9 +383,9 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 	        }
 		}
 		setStatementDifference(total);
-        // @fchiappano Si es un cierre de caja, EndingBalance = SaldoInicial + total.
+        // @fchiappano Si es un cierre de caja, EndingBalance = SaldoInicial + Efectivo contabilizado + Cheques Contabilizados.
         if (get_ValueAsBoolean("EsCierreCaja"))
-            setEndingBalance(((BigDecimal) get_Value("SaldoInicial")).add(total));
+            setEndingBalance(((BigDecimal) get_Value("ScrutinizedCashAmt")).add((BigDecimal) get_Value("scrutinizedcheckamt")));
         else
             setEndingBalance(getBeginningBalance().add(total));
 		MPeriod.testPeriodOpen(getCtx(), minDate, MDocType.DOCBASETYPE_BankStatement, 0);

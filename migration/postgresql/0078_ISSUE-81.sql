@@ -497,32 +497,53 @@ UPDATE AD_Field SET DisplayLogic='@LAR_UsaTipoGananciasBP@=Y',Updated=TO_TIMESTA
 
 -- ISSUE #81: Retenciones
 -- Se agregan las columnas relacionadas a las exenciones de Retenciones
-ALTER TABLE C_BPartner 
+ALTER TABLE C_BPartner
 -- Ganancias
-ADD COLUMN LAR_Exencion_Ganancias numeric,
-ADD COLUMN LAR_Importe_Exencion_Ganancias numeric DEFAULT 0,
-ADD COLUMN LAR_NroCertificado_Ganancias character varying(30),
-ADD COLUMN LAR_Vencimiento_Cert_Ganancias timestamp without time zone,
+ADD COLUMN LAR_Exencion_Ganancias numeric;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Importe_Exencion_Ganancias numeric DEFAULT 0;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_NroCertificado_Ganancias character varying(30);
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Vencimiento_Cert_Ganancias timestamp without time zone;
 -- IIBB
-ADD COLUMN LAR_Exencion_IIBB numeric,
-ADD COLUMN LAR_Importe_Exencion_IIBB numeric DEFAULT 0,
-ADD COLUMN LAR_NroCertificado_IIBB character varying(30),
-ADD COLUMN LAR_Vencimiento_Cert_IIBB timestamp without time zone,
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Exencion_IIBB numeric;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Importe_Exencion_IIBB numeric DEFAULT 0;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_NroCertificado_IIBB character varying(30);
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Vencimiento_Cert_IIBB timestamp without time zone;
+ALTER TABLE C_BPartner
 -- IVA
-ADD COLUMN LAR_Exento_Retenciones_IVA character(1) DEFAULT 'N'::bpchar,
-ADD COLUMN LAR_Exencion_IVA numeric,
-ADD COLUMN LAR_Importe_Exencion_IVA numeric DEFAULT 0,
-ADD COLUMN LAR_NroCertificado_IVA character varying(30),
-ADD COLUMN LAR_Inicio_Cert_IIBB timestamp without time zone,
-ADD COLUMN LAR_Vencimiento_Cert_IVA timestamp without time zone,
-ADD CONSTRAINT C_BPartner_LAR_Exento_Retenciones_IVA_check CHECK ((LAR_Exento_Retenciones_IVA = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))),
+ADD COLUMN LAR_Exento_Retenciones_IVA character(1) DEFAULT 'N'::bpchar;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Exencion_IVA numeric;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Importe_Exencion_IVA numeric DEFAULT 0;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_NroCertificado_IVA character varying(30);
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Inicio_Cert_IIBB timestamp without time zone;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Vencimiento_Cert_IVA timestamp without time zone;
+ALTER TABLE C_BPartner
+ADD CONSTRAINT C_BPartner_LAR_Exento_Retenciones_IVA_check CHECK ((LAR_Exento_Retenciones_IVA = ANY (ARRAY['Y'::bpchar, 'N'::bpchar])));
+ALTER TABLE C_BPartner
 -- SUSS
-ADD COLUMN LAR_Exento_Retenciones_SUSS character(1) DEFAULT 'N'::bpchar,
-ADD COLUMN LAR_Exencion_SUSS numeric,
-ADD COLUMN LAR_Importe_Exencion_SUSS numeric DEFAULT 0,
-ADD COLUMN LAR_NroCertificado_SUSS character varying(30),
-ADD COLUMN LAR_Inicio_Cert_SUSS timestamp without time zone,
-ADD COLUMN LAR_Vencimiento_Cert_SUSS timestamp without time zone,
+ADD COLUMN LAR_Exento_Retenciones_SUSS character(1) DEFAULT 'N'::bpchar;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Exencion_SUSS numeric;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Importe_Exencion_SUSS numeric DEFAULT 0;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_NroCertificado_SUSS character varying(30);
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Inicio_Cert_SUSS timestamp without time zone;
+ALTER TABLE C_BPartner
+ADD COLUMN LAR_Vencimiento_Cert_SUSS timestamp without time zone;
+ALTER TABLE C_BPartner
 ADD CONSTRAINT C_BPartner_LAR_Exento_Retenciones_SUSS_check CHECK ((LAR_Exento_Retenciones_SUSS = ANY (ARRAY['Y'::bpchar, 'N'::bpchar])))
 ;
 
