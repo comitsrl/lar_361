@@ -1316,14 +1316,34 @@ UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3002770
 UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3002806
 ;
 
--- 04/07/2017 12:00:47 ART
+-- 04/07/2017 22:09:27 ART
 -- ISSUE #80: Forma de pago "Cheque Emitido".
-UPDATE AD_Field SET DisplayLogic='@TenderType@=''K''',Updated=TO_TIMESTAMP('2017-07-04 12:00:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003313
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3002110,3000034,'LAR',0,'N','N','N','N',10,'N',19,'N',3000457,'N','Y','N','Tipo de Cheque Emitido','LAR_Cheque_Emitido_ID',100,TO_TIMESTAMP('2017-07-04 22:09:26','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-07-04 22:09:26','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
--- 04/07/2017 12:02:34 ART
+-- 04/07/2017 22:09:27 ART
 -- ISSUE #80: Forma de pago "Cheque Emitido".
-UPDATE AD_Field SET DisplayLogic='@TenderType@=''K'' | @TenderType@=''Z''',Updated=TO_TIMESTAMP('2017-07-04 12:02:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003311
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3002110 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 04/07/2017 22:11:46 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3003314,10,'Y','N','N',3002110,'N','Y',3000055,'N','LAR','Tipo de Cheque Emitido',100,0,TO_TIMESTAMP('2017-07-04 22:11:46','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2017-07-04 22:11:46','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 04/07/2017 22:11:46 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003314 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 04/07/2017 22:13:03 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Field SET DisplayLogic='@TenderType@=K',Updated=TO_TIMESTAMP('2017-07-04 22:13:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003314
+;
+
+-- 04/07/2017 22:18:29 ART
+-- ISSUE #80: Forma de pago "Cheque Emitido".
+UPDATE AD_Column SET MandatoryLogic='@TenderType@=K',Updated=TO_TIMESTAMP('2017-07-04 22:18:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002109
 ;
 
 -- 04/07/2017 12:00:47 ART
