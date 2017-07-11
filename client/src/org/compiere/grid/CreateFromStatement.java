@@ -230,11 +230,13 @@ public class CreateFromStatement extends CreateFrom
 		
 		String sql = "SELECT p.DateTrx,p.C_Payment_ID,p.DocumentNo, p.C_Currency_ID,c.ISO_Code, p.PayAmt,"
 			+ "currencyConvert(p.PayAmt,p.C_Currency_ID,ba.C_Currency_ID,pay.DateAcct,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"
-			+ " bp.Name "
+			+ " bp.Name, rt.Name, p.A_Name, p.CheckNo, pay.Fecha_Venc_Cheque, p.R_PnRef, pay.NroCuotas "
 			+ "FROM C_BankAccount ba"
 			+ " INNER JOIN C_Payment_v p ON (p.C_BankAccount_ID=ba.C_BankAccount_ID)"
 			+ " INNER JOIN C_Payment pay ON (p.C_Payment_ID=pay.C_Payment_ID)"
 			+ " INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID)"
+			+ " INNER JOIN AD_Ref_List r ON (r.Value=p.TenderType AND r.AD_Reference_ID=214)"
+			+ " INNER JOIN AD_Ref_List_Trl rt ON (rt.AD_Ref_List_ID=r.AD_Ref_List_ID)"
 			+ " LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID) ";
 
 		sql = sql + getSQLWhere(DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, TipoTarjeta, AuthCode) + " ORDER BY p.DateTrx";
@@ -258,6 +260,13 @@ public class CreateFromStatement extends CreateFrom
 				line.add(rs.getBigDecimal(6));      //  4-PayAmt
 				line.add(rs.getBigDecimal(7));      //  5-Conv Amt
 				line.add(rs.getString(8));      	//  6-BParner
+				// @fchiappano
+				line.add(rs.getString(9));          //  7-TenderType
+				line.add(rs.getString(10));         //  8-A_Name
+				line.add(rs.getString(11));         //  9-CheckNo
+				line.add(rs.getTimestamp(12));      // 10-Fecha Venc.
+				line.add(rs.getString(13));         // 11-Nro Posnet
+				line.add(rs.getInt(14));            // 12-NroCuotas
 				data.add(line);
 			}
 		}
@@ -288,6 +297,14 @@ public class CreateFromStatement extends CreateFrom
 		miniTable.setColumnClass(4, BigDecimal.class, true);    //  4-Amount
 		miniTable.setColumnClass(5, BigDecimal.class, true);    //  5-ConvAmount
 		miniTable.setColumnClass(6, String.class, true);    	//  6-BPartner
+
+		// @fchiappano
+		miniTable.setColumnClass(7, String.class, true);        //  7-TenderType
+		miniTable.setColumnClass(8, String.class, true);        //  8-A_Name
+		miniTable.setColumnClass(9, String.class, true);        //  9-CheckNo
+		miniTable.setColumnClass(10, Timestamp.class, true);    // 10-FechaVenc,
+		miniTable.setColumnClass(11, String.class, true);       // 11-NroPostnet
+		miniTable.setColumnClass(12, Integer.class, true);      // 12-NroCuota
 		//  Table UI
 		miniTable.autoSize();
 	}
@@ -336,7 +353,7 @@ public class CreateFromStatement extends CreateFrom
 	protected Vector<String> getOISColumnNames()
 	{
 		//  Header Info
-		Vector<String> columnNames = new Vector<String>(6);
+		Vector<String> columnNames = new Vector<String>(11);
 		columnNames.add(Msg.getMsg(Env.getCtx(), "Select"));
 		columnNames.add(Msg.translate(Env.getCtx(), "Date"));
 		columnNames.add(Msg.getElement(Env.getCtx(), "C_Payment_ID"));
@@ -344,6 +361,14 @@ public class CreateFromStatement extends CreateFrom
 		columnNames.add(Msg.translate(Env.getCtx(), "Amount"));
 		columnNames.add(Msg.translate(Env.getCtx(), "ConvertedAmount"));
 		columnNames.add(Msg.translate(Env.getCtx(), "C_BPartner_ID"));
+
+		// @fchiappano
+		columnNames.add(Msg.translate(Env.getCtx(), "TenderType"));
+		columnNames.add(Msg.translate(Env.getCtx(), "A_Name"));
+		columnNames.add(Msg.translate(Env.getCtx(), "CheckNo"));
+		columnNames.add(Msg.translate(Env.getCtx(), "Fecha_Venc_Cheque"));
+		columnNames.add(Msg.translate(Env.getCtx(), "R_PnRef"));
+		columnNames.add("Nro. Cuotas");
 	    
 	    return columnNames;
 	}
