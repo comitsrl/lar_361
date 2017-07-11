@@ -66,11 +66,12 @@ class WithholdingConfig
     private boolean isUseBPISIC;
     private boolean usaTipoGananciasBP;
     private boolean isUseOrgTaxPayerType;
+    private String baseType;
 
     private WithholdingConfig(final BigDecimal aliquot, final BigDecimal rate,
             final BigDecimal paymentThresholdMin, final BigDecimal thresholdMin, final BigDecimal thresholdMax, final BigDecimal amountRefunded, final boolean isCalcFromPayment,
             final int lco_WithholdingRule_ID, final int lco_WithholdingType_ID, final int c_Tax_ID,
-            final int c_DocType_ID, final int c_TaxCategory_ID, final boolean isUseBPISIC, final boolean usaTipoGananciasBP, final boolean isUseOrgTaxPayerType)
+            final int c_DocType_ID, final int c_TaxCategory_ID, final boolean isUseBPISIC, final boolean usaTipoGananciasBP, final boolean isUseOrgTaxPayerType, final String baseType)
     {
         this.aliquot = aliquot;
         this.rate = rate;
@@ -87,6 +88,7 @@ class WithholdingConfig
         this.isUseBPISIC = isUseBPISIC;
         this.usaTipoGananciasBP = usaTipoGananciasBP;
         this.isUseOrgTaxPayerType = isUseOrgTaxPayerType;
+        this.baseType = baseType;
     }
 
     /*********************************************************
@@ -355,7 +357,8 @@ class WithholdingConfig
                             wc.isCalcOnPayment(), wr.getLCO_WithholdingRule_ID(),
                             wr.getLCO_WithholdingType_ID(), wc.getC_Tax_ID(),
                             wrc.get_ValueAsInt("C_DocType_ID"), wr.getC_TaxCategory_ID(),
-                            wrc.isUseBPISIC(), wrc.get_ValueAsBoolean("LAR_UsaTipoGananciasBP"), wrc.get_ValueAsBoolean("IsUseOrgTaxPayerType"));
+                            wrc.isUseBPISIC(), wrc.get_ValueAsBoolean("LAR_UsaTipoGananciasBP"),
+                            wrc.get_ValueAsBoolean("IsUseOrgTaxPayerType"), wc.getBaseType());
 
                     if (!list.add(config))
                     {
@@ -457,6 +460,11 @@ class WithholdingConfig
     public boolean isUseOrgTaxPayerType()
     {
         return isUseOrgTaxPayerType;
+    }
+
+    public String getBaseType()
+    {
+        return baseType;
     }
 
     @Override

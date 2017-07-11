@@ -440,7 +440,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     else
                     {
                         // Es retención de IVA
-                        //MOrgInfo orgI = new MOrgInfo(new MOrg(Env.getCtx(), Env.getAD_Org_ID(Env.getCtx()), this.get_TrxName()));
+                        // MOrgInfo orgI = new MOrgInfo(new MOrg(Env.getCtx(), Env.getAD_Org_ID(Env.getCtx()), this.get_TrxName()));
                         // La organización está configurada como Responsable Inscripto
                         if (wc.isUseOrgTaxPayerType())//no recupera correctamente el loc_taxpayertype_id desde orgInfo && orgI.get_ValueAsInt("LCO_TaxPayerType_ID") == responsableInscripto)
                         {
@@ -451,76 +451,82 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             if (bpTaxPaxerTypeID != responsableInscripto && facturas.length <= 0)
                                 continue;
                             else 
-                            {// Se calcula el importe sujeto a retención
+                            {   // Se calcula el importe sujeto a retención
+                                // Se recorren las facturas de la OP
                                 for (final MPaymentAllocate mp : facturas)
                                 {
                                     MInvoice factura = mp.getInvoice();
                                     MDocType doc = new MDocType(Env.getCtx(), factura.getC_DocType_ID(), this.get_TrxName());
                                     MInvoiceTax[] impFactura = factura.getTaxes(false);
-                                    BigDecimal impIVA = Env.ZERO;
+                                    // Se recorren los impuestos de la factura
                                     for (final MInvoiceTax impuesto : impFactura)
                                     {
                                         MTax tax = new MTax(Env.getCtx(), impuesto.getC_Tax_ID(),
                                                 this.get_TrxName());
-
-                                        if (tax.getName().contains("IVA"))
+                                        // Se recupera la letra del tipo de documento
+                                        // si es letra M se retiene el 100%
+                                        String letra = recuperaLetra(doc.get_ValueAsInt("LAR_DocumentLetter_ID"));
+                                        // Si el cálculo esta configurado como Documento se asume que es retención por tipo de doc M
+                                        if (wc.getBaseType().equals("D"))
                                         {
-                                            impIVA = impIVA.add(impuesto.getTaxAmt());
-                                            // Se recupera la letra del tipo de documento
-                                            // si es letra M se retiene el 100%
-                                            String letra = recuperaLetra(doc.get_ValueAsInt("LAR_DocumentLetter_ID"));
-                                            
                                             if (letra.equals("M"))
-                                                aliquot = Env.ONEHUNDRED;
-                                            else
                                             {
-                                                // Si es alicuota reducida
-                                                if (tax.getRate().compareTo(alicuotaIVAGral) < 0)
-                                                    aliquot = alicuotaRetReducida;
-                                                // Si no es M y no es reducida, se utiliza la
-                                                // alicuota de la configuración
-                                                else
-                                                    aliquot = wc.getAliquot();
+                                                aliquot = wc.getAliquot();
+                                                if (tax.getName().contains("IVA"))
+                                                    impSujetoaRet = impSujetoaRet.add(impuesto.getTaxAmt());
                                             }
-
-                                            impRetencion = impRetencion.add(impIVA
-                                                    .multiply(aliquot).divide(Env.ONEHUNDRED)
-                                                    .setScale(2, BigDecimal.ROUND_HALF_EVEN));
-                                        }
-                                    }
-                                    // Exención de IVA
-                                    if (bp.get_ValueAsBoolean("LAR_Exento_Retenciones_IVA"))
-                                    {
-                                        Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_IVA");
-                                        if (!fechaVenc.before(getDateTrx()))
-                                        {
-                                            impExencion = (BigDecimal) bp.get_Value("LAR_Importe_Exencion_IVA");
-                                            porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_IVA");
+                                            else
+                                                continue;
                                         }
                                         else
-                                        {
-                                            // Advertir al ususario que el certificado de Exención esta vencido
-                                            JDialog dialog = new JDialog();
-                                            dialog.setIconImage(Adempiere.getImage16());
-                                            ADialog.warn(1, dialog,
-                                                    "Certificado de Exenci\u00f3n de IVA Vencido");
-                                        }
-                                        
-                                    }
-                                    // Exenciones % e importe fijo
-                                    BigDecimal impExentoDesc = impRetencion.multiply(porcExencion)
-                                            .divide(Env.ONEHUNDRED).setScale(2, BigDecimal.ROUND_HALF_EVEN);
-                                    impRetencion = impRetencion.subtract(impExentoDesc).subtract(impExencion);
-                                    // Se chequea si el importe de la retención supera
-                                    // el importe a pagar
-                                    if (totalOP.compareTo(impRetencion) < 0)
-                                        impRetencion = totalOP;
+                                            if (tax.getName().contains("IVA"))
+                                                {
+                                                    impSujetoaRet = impSujetoaRet.add(impuesto.getTaxAmt());
+                                                    // Si es alicuota reducida
+                                                    if (tax.getRate().compareTo(alicuotaIVAGral) < 0)
+                                                    aliquot = alicuotaRetReducida;
+                                                    // Si no es reducida, se utiliza la
+                                                    // alicuota de la configuración
+                                                    else
+                                                    aliquot = wc.getAliquot();
+                                                }
+                                        // Se calcula y acumula la retención
+                                         impRetencion = impRetencion.add(impSujetoaRet
+                                                .multiply(aliquot).divide(Env.ONEHUNDRED)
+                                                .setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                                    } // Se recorren los impuestos de la factura
+                                } // Se recorren las facturas de la OP
+                            }
+                            // Exención de IVA
+                            if (bp.get_ValueAsBoolean("LAR_Exento_Retenciones_IVA"))
+                            {
+                                Date fechaVenc = (Date) bp.get_Value("LAR_Vencimiento_Cert_IVA");
+                                if (!fechaVenc.before(getDateTrx()))
+                                {
+                                    impExencion = (BigDecimal) bp.get_Value("LAR_Importe_Exencion_IVA");
+                                    porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_IVA");
+                                }
+                                else
+                                {
+                                    // Advertir al ususario que el certificado de Exención esta vencido
+                                    JDialog dialog = new JDialog();
+                                    dialog.setIconImage(Adempiere.getImage16());
+                                    ADialog.warn(1, dialog,
+                                            "Certificado de Exenci\u00f3n de IVA Vencido");
                                 }
                             }
-                        }
-                    }// Es retención de IVA
+                            // Exenciones % e importe fijo
+                            BigDecimal impExentoDesc = impRetencion.multiply(porcExencion)
+                                    .divide(Env.ONEHUNDRED).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                            impRetencion = impRetencion.subtract(impExentoDesc).subtract(impExencion);
+                            // Se chequea si el importe de la retención supera
+                            // el importe a pagar
+                            if (totalOP.compareTo(impRetencion) < 0)
+                                impRetencion = totalOP;
 
-                    
+                        } // Es retención de IVA
+                    }
+
                     // Considerar las Exenciones
                     final X_LCO_WithholdingType wt = new X_LCO_WithholdingType(Env.getCtx(),
                             wc.getWithholdingType_ID(), get_TrxName());
