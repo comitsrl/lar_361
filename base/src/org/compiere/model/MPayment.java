@@ -1353,6 +1353,49 @@ public final class MPayment extends X_C_Payment
 	}	//	setC_DocType_ID
 
 	/**
+	 * Set C_DocType_ID
+	 * @param esRecibo
+	 * @author fchiappano
+	 */
+	public void setLAR_C_DoctType_ID (final boolean esRecibo, final int AD_Org_ID)
+	{
+        setIsReceipt(esRecibo);
+        String sql = "SELECT C_DocType_ID"
+                   + "  FROM C_DocType"
+                   + " WHERE IsActive='Y' AND AD_Client_ID=?"
+                   + "                    AND AD_Org_ID=?"
+                   + "                    AND DocBaseType=?"
+                   + " ORDER BY IsDefault DESC";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, getAD_Client_ID());
+            pstmt.setInt(2, AD_Org_ID);
+            if (esRecibo)
+                pstmt.setString(3, X_C_DocType.DOCBASETYPE_ARReceipt);
+            else
+                pstmt.setString(3, X_C_DocType.DOCBASETYPE_APPayment);
+            rs = pstmt.executeQuery();
+            if (rs.next())
+                setC_DocType_ID(rs.getInt(1));
+            else
+                log.warning("setDocType - NOT found - isReceipt=" + esRecibo);
+        }
+        catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+	} // setLAR_C_DoctType_ID
+
+	/**
 	 * 	Set Doc Type
 	 * 	@param isReceipt is receipt
 	 */
