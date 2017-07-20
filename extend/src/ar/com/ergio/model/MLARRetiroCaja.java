@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.model.MBankAccount;
 import org.compiere.model.MPayment;
 import org.compiere.model.MSysConfig;
 import org.compiere.process.DocAction;
@@ -162,7 +163,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
             paymentBankFrom.setPayAmt(linea.getMonto());
             paymentBankFrom.setOverUnderAmt(Env.ZERO);
-            paymentBankFrom.setC_DocType_ID(false);
+            paymentBankFrom.setLAR_C_DoctType_ID(false, paymentBankFrom.getC_BankAccount().getAD_Org_ID());
 
             // Si el TenderType es cheque, cambio la marca IsOnDrawer a false.
             if (linea.getTenderType().equals("Z"))
@@ -229,7 +230,8 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 }
 
                 // Si es una trasferencia, seteo la caja destino. Si no, seteo la cuenta bancaria destino.
-                paymentBankTo.setC_BankAccount_ID(isTransferencia() ? getC_BankAccountTo_ID() : get_ValueAsInt("CuentaDestino_ID"));
+                final MBankAccount destino = new MBankAccount(p_ctx, isTransferencia() ? getC_BankAccountTo_ID() : get_ValueAsInt("CuentaDestino_ID"), get_TrxName());
+                paymentBankTo.setC_BankAccount_ID(destino.getC_BankAccount_ID());
                 paymentBankTo.setDateAcct(new Timestamp(System.currentTimeMillis()));
                 paymentBankTo.setDateTrx(new Timestamp(System.currentTimeMillis()));
                 paymentBankTo.setDescription(getDescription());
@@ -238,7 +240,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 paymentBankTo.setC_Currency_ID(getC_Currency_ID());
                 paymentBankTo.setPayAmt(linea.getMonto());
                 paymentBankTo.setOverUnderAmt(Env.ZERO);
-                paymentBankTo.setC_DocType_ID(true);
+                paymentBankTo.setLAR_C_DoctType_ID(true, destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(p_ctx));
                 paymentBankTo.setIsReceipt(true);
                 paymentBankTo.saveEx();
                 if (paymentBankTo.processIt(MPayment.DOCACTION_Complete))

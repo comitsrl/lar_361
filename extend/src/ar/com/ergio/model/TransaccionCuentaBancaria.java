@@ -120,7 +120,7 @@ public class TransaccionCuentaBancaria
             cashBankTo.setC_Currency_ID(p_C_Currency_ID);
             cashBankTo.setPayAmt(cashAmt);
             cashBankTo.setOverUnderAmt(Env.ZERO);
-            cashBankTo.setC_DocType_ID(true);
+            cashBankTo.setLAR_C_DoctType_ID(true, mBankTo.getAD_Org_ID());
             cashBankTo.saveEx();
             cashBankTo.processIt(MPayment.DOCACTION_Complete);
             cashBankTo.saveEx();
@@ -331,7 +331,7 @@ public class TransaccionCuentaBancaria
             cashBankTo.setC_Currency_ID(p_C_Currency_ID);
             cashBankTo.setPayAmt(cashAmt);
             cashBankTo.setOverUnderAmt(Env.ZERO);
-            cashBankTo.setC_DocType_ID(true);
+            cashBankTo.setLAR_C_DoctType_ID(true, cuentaBancaria.getAD_Org_ID());
             cashBankTo.setIsReceipt(true);
             cashBankTo.saveEx();
             cashBankTo.processIt(MPayment.DOCACTION_Complete);
@@ -418,6 +418,7 @@ public class TransaccionCuentaBancaria
             final String p_Description, final Properties ctx, final String trxName)
     {
         final MPayment payment = new MPayment(ctx, 0, trxName);
+        final MBankAccount destino = new MBankAccount(ctx, bankAccount_ID, trxName);
         payment.setC_BankAccount_ID(bankAccount_ID);
         payment.setDateAcct(p_DateAcct);
         payment.setDateTrx(p_StatementDate);
@@ -427,7 +428,7 @@ public class TransaccionCuentaBancaria
         payment.setC_Currency_ID(paymentFrom.getC_Currency_ID());
         payment.setPayAmt(paymentFrom.getPayAmt());
         payment.setOverUnderAmt(Env.ZERO);
-        payment.setC_DocType_ID(paymentFrom.isReceipt());
+        payment.setLAR_C_DoctType_ID(paymentFrom.isReceipt(), destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(ctx));
         payment.setIsReceipt(paymentFrom.isReceipt());
         payment.set_ValueOfColumn("IsOnDrawer", paymentFrom.get_ValueAsBoolean("IsOnDrawer"));
         payment.set_ValueOfColumn("LAR_PaymentSource_ID", paymentFrom.getC_Payment_ID());
@@ -460,7 +461,7 @@ public class TransaccionCuentaBancaria
         paymentBankFrom.setPayAmt(totalAmt);
         paymentBankFrom.setOverUnderAmt(Env.ZERO);
         paymentBankFrom.setIsReconciled(true);
-        paymentBankFrom.setC_DocType_ID(false);
+        paymentBankFrom.setLAR_C_DoctType_ID(false, statement.getC_BankAccount().getAD_Org_ID());
         paymentBankFrom.saveEx();
         paymentBankFrom.processIt(MPayment.DOCACTION_Complete);
         paymentBankFrom.saveEx();
