@@ -983,7 +983,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 }
                 MPaymentAllocate pa = invoices[i];
                 MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
-                final BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt()).subtract(pays[p].getAllocatedAmt());
+                final BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt()).subtract(pays[p].getAllocatedAmt().abs());
                 final BigDecimal importeFactura = invoice.getOpenAmt().subtract(pa.getDiscountAmt());
                 int comp = impPago.compareTo(importeFactura);
                 MAllocationLine aLine = null;
@@ -991,19 +991,16 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 BigDecimal alineAmt;
                 // Evita Sobrepagos
                 if (comp <= 0)
-                {
                     alineAmt = impPago;
-                    alineOUAmt = importeFactura.subtract(alineAmt);
-                } else {
+                else
                     alineAmt = importeFactura;
-                    alineOUAmt = alineAmt.subtract(impPago);
-                }
+                alineOUAmt = importeFactura.subtract(impPago);
                 if (isReceipt())
                     aLine = new MAllocationLine(alloc, alineAmt, Env.ZERO,
                             pa.getWriteOffAmt(), alineOUAmt);
                 else
                     aLine = new MAllocationLine(alloc, alineAmt.negate(), Env.ZERO
-                            , pa.getWriteOffAmt().negate(), alineOUAmt.negate());
+                            , pa.getWriteOffAmt().negate(), alineOUAmt);
                 aLine.setDocInfo(pa.getC_BPartner_ID(), 0, pa.getC_Invoice_ID());
                 aLine.setPaymentInfo(pays[p].getC_Payment_ID(), 0);
                 if (!aLine.save(get_TrxName()))
