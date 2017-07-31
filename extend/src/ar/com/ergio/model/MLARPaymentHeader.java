@@ -257,6 +257,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             impSujetoaRet = totalOP.divide(coef_IVA, 2, RoundingMode.HALF_EVEN);
                         else 
                         {// Se calcula el importe sujeto a retención
+                            BigDecimal sumaImpago = Env.ZERO;
                             for (final MPaymentAllocate mp : facturas)
                             {
                                 MInvoice factura = mp.getInvoice();
@@ -270,10 +271,21 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                                  */
                                 impSujetoaRet = impSujetoaRet
                                         .add(neto.compareTo(impago) >= 0 ? impago : neto);
+                                sumaImpago = sumaImpago.add(impago);
                                 // Si el importe sujeto tomado de las facturas supera al total de la OP
                                 // se toma como importe sujeto a retención el total de la OP-
-                                if (totalOP.compareTo(impSujetoaRet) < 0)
-                                    impSujetoaRet = totalOP;
+                            }
+                            if (totalOP.compareTo(impSujetoaRet) <= 0)
+                                impSujetoaRet = totalOP;
+                            else
+                            {
+                                /*
+                                 * Se suma al importe sujeto a retención la diferencia
+                                 * exedente de la orden de pago (sin tomar en cuenta
+                                 *  los impuestos de las facturas.
+                                 */
+                                if (totalOP.compareTo(sumaImpago) > 0)
+                                    impSujetoaRet = impSujetoaRet.add(totalOP.subtract(sumaImpago));
                             }
                         }
 
@@ -446,7 +458,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                         {
                             // Recupera la categoría de IVA del SdN
                             final int bpTaxPaxerTypeID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
-                            // Si el SdN no es Responsable Inscripto o no exitesn facturas en la OP
+                            // Si el SdN no es Responsable Inscripto o no existen facturas en la OP
                             // no se genera retención de IVA.
                             if (bpTaxPaxerTypeID != responsableInscripto && facturas.length <= 0)
                                 continue;
@@ -464,12 +476,12 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                                         MTax tax = new MTax(Env.getCtx(), impuesto.getC_Tax_ID(),
                                                 this.get_TrxName());
                                         // Se recupera la letra del tipo de documento
-                                        // si es letra M se retiene el 100%
+                                        // si es letra M se retiene el 100% y supera el mínimo
                                         String letra = recuperaLetra(doc.get_ValueAsInt("LAR_DocumentLetter_ID"));
                                         // Si el cálculo esta configurado como Documento se asume que es retención por tipo de doc M
                                         if (wc.getBaseType().equals("D"))
                                         {
-                                            if (letra.equals("M"))
+                                            if (letra.equals("M") && (factura.getGrandTotal().compareTo(wc.getPaymentThresholdMin()) > 0))
                                             {
                                                 aliquot = wc.getAliquot();
                                                 if (tax.getName().contains("IVA"))
