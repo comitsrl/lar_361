@@ -129,7 +129,7 @@ import ar.com.ergio.util.LAR_Utils;
          log.info(po.get_TableName() + " Type: " + type);
          String msg;
          // Changes on BPartners
-         if (po.get_TableName().equals(MBPartner.Table_Name) && type == TYPE_BEFORE_CHANGE)
+         if (po.get_TableName().equals(MBPartner.Table_Name) && (type == TYPE_BEFORE_CHANGE || type == TYPE_BEFORE_NEW))
          {
              MBPartner bp = (MBPartner) po;
              LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
