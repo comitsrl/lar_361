@@ -346,8 +346,19 @@ public class MInvoice extends X_C_Invoice implements DocAction
          * A su vez, esto evita tener que utlizar variables de entornos
          * globales en el validador LAR.
          */
+		/*
+		 * @mzuniga: Si la *orden* no tiene un PDV asignada es porque no proviene del POS
+		 * para tener en cuenta las ordenes importadas y se pueda crear la factura es
+		 * necesario contar con un C_POS_ID, por lo que si la orden no lo tiene asignado
+		 * intentaremos recuperarlo de su tipo de documento.
+		 */
+		if (order.get_ValueAsInt("C_POS_ID")!= 0)
         set_ValueOfColumn("C_POS_ID", order.get_ValueAsInt("C_POS_ID"));
-
+		else
+		{
+		    MDocType orderDT = new MDocType(Env.getCtx(), order.getC_DocType_ID(), order.get_TrxName());
+		    set_ValueOfColumn("C_POS_ID", orderDT.get_ValueAsInt("C_POS_ID"));
+		}
         // @mzuniga: Setea la factura Origen
         if (order.get_ValueAsInt("Source_Invoice_ID") != 0)
             set_ValueOfColumn("Source_Invoice_ID", order.get_ValueAsInt("Source_Invoice_ID"));
