@@ -1148,7 +1148,10 @@ public final class MPayment extends X_C_Payment
 			return;
 		
 		//	If external number exists - enforce it 
-		if (getR_PnRef() != null && getR_PnRef().length() > 0)
+		// @fchiappano Chequear parametro antes de sobrescribir el documentNO
+        final String sobrescribirDocumentNO = MSysConfig.getValue("LAR_Sobrescribir_DocumentNo_Pago/Cobro",
+                Env.getAD_Client_ID(Env.getCtx()));
+		if (getR_PnRef() != null && getR_PnRef().length() > 0 && sobrescribirDocumentNO.equals("Y"))
 		{
 			if (!getR_PnRef().equals(documentNo))
 				setDocumentNo(getR_PnRef());
@@ -1207,7 +1210,8 @@ public final class MPayment extends X_C_Payment
 	public void setR_PnRef (String R_PnRef)
 	{
 		super.setR_PnRef (R_PnRef);
-		if (R_PnRef != null)
+		final String parametro = MSysConfig.getValue("LAR_Sobrescribir_DocumentNo_Pago/Cobro", Env.getAD_Client_ID(Env.getCtx()));
+		if (R_PnRef != null && !R_PnRef.equals("") && parametro.equals("Y"))
 			setDocumentNo (R_PnRef);
 	}	//	setR_PnRef
 	
