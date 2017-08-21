@@ -55,6 +55,8 @@ public class Doc_Payment extends Doc
 	private String		m_TenderType = null;
 	/** Prepayment				*/
 	private boolean		m_Prepayment = false;
+	/** Es Retención Efectuada             */
+    private boolean     m_EsRetencionEfectuada = false;
 	/** Bank Account			*/
 	private int			m_C_BankAccount_ID = 0;
 
@@ -69,6 +71,7 @@ public class Doc_Payment extends Doc
 		m_TenderType = pay.getTenderType();
 		m_Prepayment = pay.isPrepayment();
 		m_C_BankAccount_ID = pay.getC_BankAccount_ID();
+		m_EsRetencionEfectuada = pay.get_ValueAsBoolean("EsRetencionIIBB");
 		//	Amount
 		setAmount(Doc.AMTTYPE_Gross, pay.getPayAmt());
 		return null;
@@ -148,17 +151,29 @@ public class Doc_Payment extends Doc
 				acct = getAccount(Doc.ACCTTYPE_V_Prepayment, as);
 			else
 				acct = getAccount(Doc.ACCTTYPE_PaymentSelect, as);
-			FactLine fl = fact.createLine(null, acct,
-				getC_Currency_ID(), getAmount(), null);
+
+            // En el caso de una retención efectuada se modifica la forma de contabilizar
+            FactLine fl = null;
+            if (m_EsRetencionEfectuada)
+                fl = fact.createLine(null, acct, getC_Currency_ID(), null, getAmount());
+            else
+                fl = fact.createLine(null, acct, getC_Currency_ID(), getAmount(), null);
+
 			if (fl != null && AD_Org_ID != 0
 				&& getC_Charge_ID() == 0)		//	don't overwrite charge
 				fl.setAD_Org_ID(AD_Org_ID);
 
-			//	Asset
-			fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-				getC_Currency_ID(), null, getAmount());
-			if (fl != null && AD_Org_ID != 0)
-				fl.setAD_Org_ID(AD_Org_ID);
+            // Asset
+            // En el caso de una retención efectuada se modifica la forma de contabilizar
+            if (m_EsRetencionEfectuada)
+            fl = fact.createLine(null, m_Prepayment ? getAccount(Doc.ACCTTYPE_V_Prepayment, as) : getAccount(Doc.ACCTTYPE_PaymentSelect, as),
+                    getC_Currency_ID(), getAmount(), null);
+            else
+            fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+                    getC_Currency_ID(), null, getAmount());
+
+            if (fl != null && AD_Org_ID != 0)
+                fl.setAD_Org_ID(AD_Org_ID);
 		}
 		else
 		{
