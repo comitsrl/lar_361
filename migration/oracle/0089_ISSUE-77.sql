@@ -88,6 +88,21 @@ INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Up
 INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000117 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
 ;
 
+-- 14/08/2017 21:21:24 ART
+-- ISSUE  #77: Facturación Electronica
+INSERT INTO LCO_TaxPayerType (AD_Client_ID,AD_Org_ID,Created,CreatedBy,Description,UpdatedBy,IsDefault,LCO_TaxPayerType_ID,IsActive,Updated,Name) VALUES (1000000,0,TO_DATE('2017-08-14 21:21:24','YYYY-MM-DD HH24:MI:SS'),100,'Responsable InscriptoM',100,'Y',1000005,'Y',TO_DATE('2017-08-14 21:21:24','YYYY-MM-DD HH24:MI:SS'),'ResponsableInscriptoM')
+;
+
+-- 14/08/2017 21:22:16 ART
+-- ISSUE  #77: Facturación Electronica
+UPDATE LAR_LetterRule SET LCO_TaxPayerType_Vendor_ID=1000005,Updated=TO_DATE('2017-08-14 21:22:16','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE LAR_LetterRule_ID=1000005
+;
+
+-- 14/08/2017 21:22:31 ART
+-- ISSUE  #77: Facturación Electronica
+UPDATE LAR_LetterRule SET LCO_TaxPayerType_Customer_ID=1000005,Updated=TO_DATE('2017-08-14 21:22:31','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE LAR_LetterRule_ID=1000005
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0089_ISSUE-77.sql', 'LAR', '')
 ;
