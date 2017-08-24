@@ -591,10 +591,103 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 					payment.setIsReconciled(false);
 					payment.saveEx();
 					line.setC_Payment_ID(0);
+
+					// @fchiappano Si es un cierre de caja y el LAR_Cierre_Origen_ID es mayor a 0,
+					// quiere decir que se trata de un cierre de compensacion, por lo que anulo el pago de la linea.
+					if (get_ValueAsBoolean("EsCierreCaja") && get_ValueAsInt("LAR_CierreCaja_Origen_ID") > 0)
+					{
+					    if (!payment.voidIt())
+					    {
+					        m_processMsg = payment.getProcessMsg();
+					        return false;
+					    }
+					    MPayment reverso = (MPayment) payment.getReversal();
+					    reverso.setIsReconciled(true);
+					    reverso.saveEx();
+					    payment.setIsReconciled(true);
+					    payment.saveEx();
+					}
+					// @fchiappano Anular cobro que acredita en cuenta destino,
+					// si es que se trata de un cierre de cajas.
+					else if (get_ValueAsBoolean("EsCierreCaja"))
+					{
+					    final String sql = "SELECT C_Payment_ID"
+					                     + "  FROM C_Payment"
+					                     + " WHERE LAR_PaymentSource_ID=? AND DocStatus NOT IN ('RE','VO')";
+					    PreparedStatement pstmt = null;
+				        ResultSet rs = null;
+				        try
+				        {
+				            pstmt = DB.prepareStatement(sql, get_TrxName());
+				            pstmt.setInt(1, payment.getC_Payment_ID());
+				            rs = pstmt.executeQuery();
+
+				            while (rs.next())
+				            {
+				                MPayment paymentTransferencia = new MPayment(p_ctx, rs.getInt("C_Payment_ID"), get_TrxName());
+				                if (!paymentTransferencia.voidIt())
+				                {
+				                    m_processMsg = paymentTransferencia.getProcessMsg();
+				                    return false;
+				                }
+				                MPayment reverso = (MPayment) paymentTransferencia.getReversal();
+				                reverso.setIsReconciled(true);
+				                reverso.saveEx();
+				                paymentTransferencia.setIsReconciled(true);
+				                paymentTransferencia.saveEx();
+				            }
+				        }
+				        catch (SQLException e)
+				        {
+				            log.log(Level.SEVERE, sql, e);
+				        }
+				        finally
+				        {
+				            DB.close(rs, pstmt);
+				            rs = null;
+				            pstmt = null;
+				        }
+					}
 				}
 				line.saveEx();
 			}
 		}
+
+        // @fchiappano Busco el cierre de compensacion y lo anulo.
+        final String sql = "SELECT C_BankStatement_ID"
+                         + "  FROM C_BankStatement"
+                         + " WHERE LAR_CierreCaja_Origen_ID=? AND DocStatus NOT IN ('RE','VO')";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, getC_BankStatement_ID());
+            rs = pstmt.executeQuery();
+
+            if (rs.next())
+            {
+                MBankStatement stmCompensacion = new MBankStatement(p_ctx, rs.getInt("C_BankStatement_ID"), get_TrxName());
+                if (!stmCompensacion.voidIt())
+                {
+                    m_processMsg = stmCompensacion.m_processMsg;
+                    return false;
+                }
+                stmCompensacion.saveEx();
+            }
+        }
+        catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
 		addDescription(Msg.getMsg(getCtx(), "Voided"));
 		setStatementDifference(Env.ZERO);
 		
