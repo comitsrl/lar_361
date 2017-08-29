@@ -102,6 +102,11 @@ UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3003355
 UPDATE AD_Tab SET WhereClause='EsCierreCaja=''Y'' AND LAR_CierreCaja_Origen_ID IS NULL',Updated=TO_TIMESTAMP('2017-08-23 21:32:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Tab_ID=3000007
 ;
 
+-- 29/08/2017 16:26:02 ART
+-- ISSUE #80: Validación Tarjetas de Credito.
+UPDATE AD_Val_Rule SET Code='LAR_Tarjeta_Credito.EsDebito=''N'' AND LAR_Tarjeta_Credito.EsDeposito=''N'' AND LAR_Tarjeta_Credito.EsChequeEmitido=''N''',Updated=TO_TIMESTAMP('2017-08-29 16:26:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000031
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0095_ISSUE-80.sql', 'LAR', '')
 ;
