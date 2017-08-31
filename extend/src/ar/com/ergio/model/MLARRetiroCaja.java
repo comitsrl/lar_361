@@ -95,9 +95,9 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             }
         }
 
-        if (!isTransferencia() && !isRetiro() && !get_ValueAsBoolean("Deposito"))
+        if (!isTransferencia() && !isRetiro() && !get_ValueAsBoolean("Deposito") && !get_ValueAsBoolean("ExtraccionBancaria"))
         {
-            log.saveError("Error al Guardar","Por favor, marque si se trata de un Retiro, Transferencia o Depósito bancario.");
+            log.saveError("Error al Guardar","Por favor, marque si se trata de un Retiro, Transferencia, Depósito o Extracción Bancaria.");
             return false;
         }
         return true;
@@ -155,7 +155,13 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             // Pago que debita los valores transferidos de la cuenta.
             final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
-            paymentBankFrom.setC_BankAccount_ID(getC_BankAccountFrom_ID());
+
+            // Si se trata de una Extaccion Bancaria, todo la cuenta bancaria origen.
+            if (get_ValueAsBoolean("ExtraccionBancaria"))
+                paymentBankFrom.setC_BankAccount_ID(get_ValueAsInt("CuentaOrigen_ID"));
+            else
+                paymentBankFrom.setC_BankAccount_ID(getC_BankAccountFrom_ID());
+
             paymentBankFrom.setDateAcct(new Timestamp(System.currentTimeMillis()));
             paymentBankFrom.setDateTrx(new Timestamp(System.currentTimeMillis()));
             paymentBankFrom.setDescription(getDescription());
@@ -163,7 +169,8 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
             paymentBankFrom.setPayAmt(linea.getMonto());
             paymentBankFrom.setOverUnderAmt(Env.ZERO);
-            paymentBankFrom.setLAR_C_DoctType_ID(false, paymentBankFrom.getC_BankAccount().getAD_Org_ID());
+            paymentBankFrom.setLAR_C_DoctType_ID(false,((MBankAccount) paymentBankFrom.getC_BankAccount()).get_ValueAsBoolean("IsDrawer") ?
+                    paymentBankFrom.getC_BankAccount().getAD_Org_ID() : Env.getAD_Org_ID(p_ctx));
 
             // Si el TenderType es cheque, cambio la marca IsOnDrawer a false.
             if (linea.getTenderType().equals("Z"))
