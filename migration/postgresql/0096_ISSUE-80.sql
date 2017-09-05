@@ -6,6 +6,9 @@ ALTER TABLE LAR_RetiroCaja ADD COLUMN CuentaOrigen_ID numeric(10,0);
 ALTER TABLE LAR_RetiroCaja ADD CONSTRAINT cuentaorigenid_larretirocaja FOREIGN KEY (CuentaOrigen_ID)
       REFERENCES C_BankAccount (C_BankAccount_ID) MATCH SIMPLE;
 
+﻿ALTER TABLE LAR_RetiroCaja ADD COLUMN TransferenciaBancaria character(1) NOT NULL DEFAULT 'N'::bpchar;
+ALTER TABLE LAR_RetiroCaja ADD CONSTRAINT lar_retirocaja_transferenciabancaria_check CHECK (TransferenciaBancaria = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
+
 -- 31/08/2017 17:33:08 ART
 -- ISSUE #80: Extracción Bancaria.
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3000464,'extraccionbancaria','LAR','extraccionbancaria','extraccionbancaria',0,TO_TIMESTAMP('2017-08-31 17:33:08','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2017-08-31 17:33:08','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
@@ -344,6 +347,286 @@ UPDATE AD_Column SET IsSelectionColumn='Y',Updated=TO_TIMESTAMP('2017-08-31 17:5
 -- 31/08/2017 20:04:45 ART
 -- ISSUE #80: Extracción Bancaria.
 UPDATE AD_Field SET DisplayLogic='@ExtraccionBancaria@=N',Updated=TO_TIMESTAMP('2017-08-31 20:04:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002787
+;
+
+-- 05/09/2017 16:00:56 ART
+-- ISSUE #80: Extracción Bancaria.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3000466,'transferenciabancaria','LAR','transferenciabancaria','transferenciabancaria',0,TO_TIMESTAMP('2017-09-05 16:00:54','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2017-09-05 16:00:54','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)
+;
+
+-- 05/09/2017 16:00:56 ART
+-- ISSUE #80: Extracción Bancaria.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3000466 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 05/09/2017 16:00:57 ART
+-- ISSUE #80: Extracción Bancaria.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3002122,3000081,'LAR',0,'Y','N','N','N',1,'N',20,'N',3000466,'N','Y','N','transferenciabancaria','transferenciabancaria',100,TO_TIMESTAMP('2017-09-05 16:00:54','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2017-09-05 16:00:54','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 05/09/2017 16:00:57 ART
+-- ISSUE #80: Extracción Bancaria.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3002122 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 05/09/2017 16:01:32 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column SET Name='Transferencia Bancaria', ColumnName='TransferenciaBancaria',Updated=TO_TIMESTAMP('2017-09-05 16:01:32','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002122
+;
+
+-- 05/09/2017 16:01:32 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3002122
+;
+
+-- 05/09/2017 16:01:32 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET Name='Transferencia Bancaria', Description=NULL, Help=NULL WHERE AD_Column_ID=3002122 AND IsCentrallyMaintained='Y'
+;
+
+-- 05/09/2017 16:01:43 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column_Trl SET Name='Transferencia Bancaria',Updated=TO_TIMESTAMP('2017-09-05 16:01:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002122 AND AD_Language='es_AR'
+;
+
+-- 05/09/2017 16:01:59 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Element SET ColumnName='TransferenciaBancaria', Name='Transferencia Bancaria', PrintName='Transferencia Bancaria',Updated=TO_TIMESTAMP('2017-09-05 16:01:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000466
+;
+
+-- 05/09/2017 16:01:59 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3000466
+;
+
+-- 05/09/2017 16:01:59 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column SET ColumnName='TransferenciaBancaria', Name='Transferencia Bancaria', Description=NULL, Help=NULL WHERE AD_Element_ID=3000466
+;
+
+-- 05/09/2017 16:01:59 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Process_Para SET ColumnName='TransferenciaBancaria', Name='Transferencia Bancaria', Description=NULL, Help=NULL, AD_Element_ID=3000466 WHERE UPPER(ColumnName)='TRANSFERENCIABANCARIA' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 05/09/2017 16:02:00 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Process_Para SET ColumnName='TransferenciaBancaria', Name='Transferencia Bancaria', Description=NULL, Help=NULL WHERE AD_Element_ID=3000466 AND IsCentrallyMaintained='Y'
+;
+
+-- 05/09/2017 16:02:00 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET Name='Transferencia Bancaria', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3000466) AND IsCentrallyMaintained='Y'
+;
+
+-- 05/09/2017 16:02:00 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_PrintFormatItem SET PrintName='Transferencia Bancaria', Name='Transferencia Bancaria' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3000466)
+;
+
+-- 05/09/2017 16:02:13 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Element_Trl SET Name='Transferencia Bancaria',PrintName='Transferencia Bancaria',Updated=TO_TIMESTAMP('2017-09-05 16:02:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000466 AND AD_Language='es_AR'
+;
+
+-- 05/09/2017 16:04:15 ART
+-- ISSUE #80: Extracción Bancaria.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3003367,1,'Y','N','N',3002122,'N','Y',3000127,'N','LAR','Transferencia Bancaria',100,0,TO_TIMESTAMP('2017-09-05 16:04:14','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2017-09-05 16:04:14','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 05/09/2017 16:04:15 ART
+-- ISSUE #80: Extracción Bancaria.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3003367 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3003367
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3003366
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3002814
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=130,IsDisplayed='Y' WHERE AD_Field_ID=3002815
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3002743
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=150,IsDisplayed='Y' WHERE AD_Field_ID=3002754
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=160,IsDisplayed='Y' WHERE AD_Field_ID=3002748
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=170,IsDisplayed='Y' WHERE AD_Field_ID=3002744
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=3002787
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=3002747
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=3002746
+;
+
+-- 05/09/2017 16:04:35 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=3002739
+;
+
+-- 05/09/2017 16:05:22 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3002814
+;
+
+-- 05/09/2017 16:05:22 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3003367
+;
+
+-- 05/09/2017 16:06:15 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@Transferencia@=N & @Deposito@=N & @ExtraccionBancaria@=N & @TransferenciaBancaria@=N',Updated=TO_TIMESTAMP('2017-09-05 16:06:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002750
+;
+
+-- 05/09/2017 16:06:53 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@Retiro@=N & @Deposito@=N & @ExtraccionBancaria@=N & @TransferenciaBancaria@=N',Updated=TO_TIMESTAMP('2017-09-05 16:06:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002752
+;
+
+-- 05/09/2017 16:07:04 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@Retiro@=N & @Transferencia@=N & @ExtraccionBancaria@=N & @TransferenciaBancaria@=N',Updated=TO_TIMESTAMP('2017-09-05 16:07:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002814
+;
+
+-- 05/09/2017 16:07:18 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@Retiro@=N & @Deposito@=N & @Transferencia@=N & @TransferenciaBancaria@=N',Updated=TO_TIMESTAMP('2017-09-05 16:07:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003366
+;
+
+-- 05/09/2017 16:08:18 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@Retiro@=N & @Deposito@=N & @Transferencia@=N & @ExtraccionBancaria@=N',Updated=TO_TIMESTAMP('2017-09-05 16:08:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003367
+;
+
+-- 05/09/2017 16:09:22 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@ExtraccionBancaria@=Y | @TransferenciaBancaria@=Y',Updated=TO_TIMESTAMP('2017-09-05 16:09:22','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003365
+;
+
+-- 05/09/2017 16:10:08 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@Transferencia@=Y | @ExtraccionBancaria@=Y',Updated=TO_TIMESTAMP('2017-09-05 16:10:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002740
+;
+
+-- 05/09/2017 16:10:36 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@Deposito@=Y | @TransferenciaBancaria@=Y',Updated=TO_TIMESTAMP('2017-09-05 16:10:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002816
+;
+
+-- 05/09/2017 16:12:15 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET DisplayLogic='@ExtraccionBancaria@=N & @TransferenciaBancaria@=N',Updated=TO_TIMESTAMP('2017-09-05 16:12:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002787
+;
+
+-- 05/09/2017 16:14:52 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column SET MandatoryLogic='@ExtraccionBancaria@=Y | @TransferenciaBancaria@=Y',Updated=TO_TIMESTAMP('2017-09-05 16:14:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002121
+;
+
+-- 05/09/2017 16:15:28 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column SET MandatoryLogic='@Deposito@=Y @TransferenciaBancaria@=Y',Updated=TO_TIMESTAMP('2017-09-05 16:15:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001869
+;
+
+-- 05/09/2017 16:17:12 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column SET MandatoryLogic='@Transferencia@=Y | @ExtraccionBancaria@=Y',Updated=TO_TIMESTAMP('2017-09-05 16:17:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001818
+;
+
+-- 05/09/2017 16:24:52 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column SET MandatoryLogic='@Deposito@=Y | @TransferenciaBancaria@=Y',Updated=TO_TIMESTAMP('2017-09-05 16:24:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001869
+;
+
+-- 05/09/2017 16:28:25 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column_Trl SET Name='Cuenta Bancaria Origen',Updated=TO_TIMESTAMP('2017-09-05 16:28:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002121 AND AD_Language='es_AR'
+;
+
+-- 05/09/2017 16:28:37 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Element SET Name='Cuenta Bancaria Origen', PrintName='Cuenta Bancaria Origen',Updated=TO_TIMESTAMP('2017-09-05 16:28:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000465
+;
+
+-- 05/09/2017 16:28:37 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3000465
+;
+
+-- 05/09/2017 16:28:37 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column SET ColumnName='CuentaOrigen_ID', Name='Cuenta Bancaria Origen', Description=NULL, Help=NULL WHERE AD_Element_ID=3000465
+;
+
+-- 05/09/2017 16:28:37 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Process_Para SET ColumnName='CuentaOrigen_ID', Name='Cuenta Bancaria Origen', Description=NULL, Help=NULL, AD_Element_ID=3000465 WHERE UPPER(ColumnName)='CUENTAORIGEN_ID' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 05/09/2017 16:28:37 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Process_Para SET ColumnName='CuentaOrigen_ID', Name='Cuenta Bancaria Origen', Description=NULL, Help=NULL WHERE AD_Element_ID=3000465 AND IsCentrallyMaintained='Y'
+;
+
+-- 05/09/2017 16:28:37 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field SET Name='Cuenta Bancaria Origen', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3000465) AND IsCentrallyMaintained='Y'
+;
+
+-- 05/09/2017 16:28:37 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_PrintFormatItem SET PrintName='Cuenta Bancaria Origen', Name='Cuenta Bancaria Origen' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3000465)
+;
+
+-- 05/09/2017 16:28:43 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Element_Trl SET Name='Cuenta Bancaria Origen',PrintName='Cuenta Bancaria Origen',Updated=TO_TIMESTAMP('2017-09-05 16:28:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000465 AND AD_Language='es_AR'
+;
+
+-- 05/09/2017 16:30:58 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Field_Trl SET Name='Cuenta Bancaria Origen',Updated=TO_TIMESTAMP('2017-09-05 16:30:58','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3003365 AND AD_Language='es_AR'
+;
+
+-- 05/09/2017 17:00:44 ART
+-- ISSUE #80: Extracción Bancaria.
+UPDATE AD_Column SET IsSelectionColumn='Y',Updated=TO_TIMESTAMP('2017-09-05 17:00:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002122
 ;
 
 -- Registración de script
