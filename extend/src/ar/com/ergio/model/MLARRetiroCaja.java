@@ -86,6 +86,14 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             setRetiro(false);
         }
+        else if (get_ValueAsBoolean("TransferenciaBancaria"))
+        {
+            if (get_ValueAsInt("CuentaOrigen_ID") == get_ValueAsInt("CuentaDestino_ID"))
+            {
+                log.saveError("Error al Guardar", "No se pueden transferir valores a la misma cuenta.");
+                return false;
+            }
+        }
         else if (get_ValueAsBoolean("Deposito"))
         {
             if (get_ValueAsInt("CuentaDestino_ID") <= 0)
@@ -95,9 +103,9 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             }
         }
 
-        if (!isTransferencia() && !isRetiro() && !get_ValueAsBoolean("Deposito"))
+        if (!isTransferencia() && !isRetiro() && !get_ValueAsBoolean("Deposito") && !get_ValueAsBoolean("ExtraccionBancaria") && !get_ValueAsBoolean("TransferenciaBancaria"))
         {
-            log.saveError("Error al Guardar","Por favor, marque si se trata de un Retiro, Transferencia o Depósito bancario.");
+            log.saveError("Error al Guardar","Por favor, marque si se trata de un Retiro, Transferencia, Depósito, Extracción Bancaria o Transferencia Bancaria.");
             return false;
         }
         return true;
@@ -155,7 +163,13 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             // Pago que debita los valores transferidos de la cuenta.
             final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
-            paymentBankFrom.setC_BankAccount_ID(getC_BankAccountFrom_ID());
+
+            // Si se trata de una Extaccion Bancaria, tomo la cuenta bancaria origen.
+            if (get_ValueAsBoolean("ExtraccionBancaria") || get_ValueAsBoolean("TransferenciaBancaria"))
+                paymentBankFrom.setC_BankAccount_ID(get_ValueAsInt("CuentaOrigen_ID"));
+            else
+                paymentBankFrom.setC_BankAccount_ID(getC_BankAccountFrom_ID());
+
             paymentBankFrom.setDateAcct(new Timestamp(System.currentTimeMillis()));
             paymentBankFrom.setDateTrx(new Timestamp(System.currentTimeMillis()));
             paymentBankFrom.setDescription(getDescription());
@@ -163,7 +177,8 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
             paymentBankFrom.setPayAmt(linea.getMonto());
             paymentBankFrom.setOverUnderAmt(Env.ZERO);
-            paymentBankFrom.setLAR_C_DoctType_ID(false, paymentBankFrom.getC_BankAccount().getAD_Org_ID());
+            paymentBankFrom.setLAR_C_DoctType_ID(false,((MBankAccount) paymentBankFrom.getC_BankAccount()).get_ValueAsBoolean("IsDrawer") ?
+                    paymentBankFrom.getC_BankAccount().getAD_Org_ID() : Env.getAD_Org_ID(p_ctx));
 
             // Si el TenderType es cheque, cambio la marca IsOnDrawer a false.
             if (linea.getTenderType().equals("Z"))
@@ -200,14 +215,15 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 return STATUS_Drafted;
             }
 
-            if (isTransferencia() || get_ValueAsBoolean("Deposito"))
+            if (isTransferencia() || get_ValueAsBoolean("Deposito") ||
+                    get_ValueAsBoolean("ExtraccionBancaria") || get_ValueAsBoolean("TransferenciaBancaria"))
             {
                 final MPayment paymentBankTo = new MPayment(getCtx(), 0, get_TrxName());
-                // Si el tenderType es cheque, solo cambio la cuenta bancaria al Pago.
+                // Si el tenderType es cheque, copio los campos pertinentes al mismo.
                 if (linea.getTenderType().equals("Z"))
                 {
                     final MPayment cobro = new MPayment(getCtx(), linea.getCobro_ID(), get_TrxName());
-                    paymentBankTo.setTenderType(cobro.getTenderType());
+                    paymentBankTo.setTenderType(linea.getTenderType());
                     paymentBankTo.setRoutingNo(cobro.getRoutingNo());
                     paymentBankTo.setCheckNo(cobro.getCheckNo());
                     paymentBankTo.setAccountNo(cobro.getAccountNo());
@@ -229,8 +245,13 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                     paymentBankTo.set_ValueOfColumn("IsOnDrawer", false);
                 }
 
-                // Si es una trasferencia, seteo la caja destino. Si no, seteo la cuenta bancaria destino.
-                final MBankAccount destino = new MBankAccount(p_ctx, isTransferencia() ? getC_BankAccountTo_ID() : get_ValueAsInt("CuentaDestino_ID"), get_TrxName());
+                // Si es una trasferencia o una extraccion bancaria, seteo la caja destino. Si no, seteo la cuenta bancaria destino.
+                MBankAccount destino = null;
+                if (isTransferencia() || get_ValueAsBoolean("ExtraccionBancaria"))
+                    destino = (MBankAccount) getC_BankAccountTo();
+                else
+                    destino = new MBankAccount(p_ctx, get_ValueAsInt("CuentaDestino_ID"), get_TrxName());
+
                 paymentBankTo.setC_BankAccount_ID(destino.getC_BankAccount_ID());
                 paymentBankTo.setDateAcct(new Timestamp(System.currentTimeMillis()));
                 paymentBankTo.setDateTrx(new Timestamp(System.currentTimeMillis()));

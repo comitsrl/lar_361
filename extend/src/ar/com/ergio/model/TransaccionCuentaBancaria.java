@@ -483,6 +483,7 @@ public class TransaccionCuentaBancaria
         }
         // @fchiappano Marco el nuevo Statement como transferido.
         newStmt.set_ValueOfColumn("Transferido", true);
+        newStmt.set_ValueOfColumn("LAR_CierreCaja_Origen_ID", statement.getC_BankStatement_ID());
         newStmt.saveEx();
         final MBankStatementLine newLine = new MBankStatementLine(newStmt);
         newLine.setC_Currency_ID(p_C_Currency_ID);
