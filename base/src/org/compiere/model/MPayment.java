@@ -2492,7 +2492,7 @@ public final class MPayment extends X_C_Payment
 			dateAcct = new Timestamp(System.currentTimeMillis());
 		
 		//	Auto Reconcile if not on Bank Statement				
-		boolean reconciled = getC_BankStatementLine_ID() == 0; //AZ Goodwill
+		boolean reconciled = true; // getC_BankStatementLine_ID() == 0; //AZ Goodwill
 
 		//	Create Reversal
 		MPayment reversal = new MPayment (getCtx(), 0, get_TrxName());
