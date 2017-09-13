@@ -39,6 +39,8 @@ import org.compiere.util.Msg;
 import org.compiere.util.Trx;
 import org.compiere.util.ValueNamePair;
 
+import ar.com.ergio.model.MLARPaymentHeader;
+
 /**
  *  Payment Model.
  *  - retrieve and create payments for invoice
@@ -2406,10 +2408,15 @@ public final class MPayment extends X_C_Payment
 			|| DOCSTATUS_Reversed.equals(getDocStatus())
 			|| DOCSTATUS_Voided.equals(getDocStatus()))
 		{
-			m_processMsg = "Document Closed: " + getDocStatus();
+			m_processMsg = "No es posible anular el Documento en estado: " + getDocStatus();
 			setDocAction(DOCACTION_None);
 			return false;
 		}
+
+		// @fchiappano Buscar y anular copia de cobro (transferencia).
+		if (!anularCopias())
+		    return false;
+
 		//	If on Bank Statement, don't void it - reverse it
 		if (getC_BankStatementLine_ID() > 0)
 			return reverseCorrectIt();
@@ -2438,7 +2445,8 @@ public final class MPayment extends X_C_Payment
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
 		if (m_processMsg != null)
 			return false;
-		
+
+		setIsReconciled(true);
 		setProcessed(true);
 		setDocAction(DOCACTION_None);
 		return true;
@@ -2754,5 +2762,82 @@ public final class MPayment extends X_C_Payment
 			return getWriteOffAmt();
 		return getPayAmt();
 	}	//	getApprovalAmt
-	
+
+	/**
+	 * Anular copias de cobro, creadas por transferencia.
+	 * @author fchiappano
+	 * @return
+	 */
+	private boolean anularCopias()
+	{
+        String sql = "SELECT C_Payment_ID"
+                   + "  FROM C_Payment"
+                   + " WHERE LAR_PaymentSource_ID=?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, getC_Payment_ID());
+            rs = pstmt.executeQuery();
+
+            while (rs.next())
+            {
+                MPayment paymentCopia = new MPayment(p_ctx, rs.getInt("C_Payment_ID"), get_TrxName());
+
+                // @fchiappano si el cobro/pago copia, ya fue conciliado en
+                // cuenta bancaria, no se puede anular.
+                final int C_BankStatementLine_ID = paymentCopia.getC_BankStatementLine_ID();
+                if (C_BankStatementLine_ID > 0)
+                {
+                    MBankStatementLine stmtLine = new MBankStatementLine(p_ctx, C_BankStatementLine_ID, get_TrxName());
+                    if (!((MBankStatement) stmtLine.getC_BankStatement()).get_ValueAsBoolean("EsCierreCaja"))
+                    {
+                        m_processMsg = "No se puede anular el cobro, ya que el mismo ya fue conciliado en una cuenta bancaria.";
+                        return false;
+                    }
+                }
+                // Si el cobro/pago copia, se esta utilizando en una orden de
+                // pago, no se puede anular.
+                if (!paymentCopia.isReceipt() && !paymentCopia.getDocStatus().equals(DOCSTATUS_Voided)
+                        && !paymentCopia.getDocStatus().equals(DOCSTATUS_Reversed))
+                {
+                    int LAR_PaymentHeader_ID = paymentCopia.get_ValueAsInt("LAR_PaymentHeader_ID");
+                    if (LAR_PaymentHeader_ID > 0)
+                    {
+                        MLARPaymentHeader header = new MLARPaymentHeader(p_ctx, LAR_PaymentHeader_ID, get_TrxName());
+                        m_processMsg = "No se puede anular el cobro seleccionado. El mismo está siendo utilizado en la Orden de Pago Nro: "
+                                + header.getDocumentNo();
+                        return false;
+                    }
+                }
+
+                // Anulo la copia del cobro/pago.
+                if (!paymentCopia.voidIt())
+                {
+                    m_processMsg = paymentCopia.getProcessMsg();
+                    return false;
+                }
+                // @fchiappano Marco el cobro reverso, como conciliado.
+                MPayment reverso = (MPayment) paymentCopia.getReversal();
+                reverso.setIsReconciled(true);
+                reverso.saveEx();
+                paymentCopia.saveEx();
+            }
+        }
+        catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+	    return true;
+	} // anularCopias
+
 }   //  MPayment
