@@ -671,6 +671,11 @@ public final class MPayment extends X_C_Payment
 				&& (getC_Order_ID() != 0 
 					|| (getC_Project_ID() != 0 && getC_Invoice_ID() == 0)));
 		}
+
+		/* FIXME
+		 * @fchiappano Se comenta porcion de codigo, ya que interfiere con la funcionalidad
+		 * de descuento por forma de pago. Determinar que impacto negativo pueda tener a futuro.
+
 			if (isPrepayment())
 		{
 			if (newRecord 
@@ -681,7 +686,7 @@ public final class MPayment extends X_C_Payment
 				setIsOverUnderPayment(false);
 				setOverUnderAmt(Env.ZERO);
 			}
-		}
+		} */
 		
 		//	Document Type/Receipt
 		if (getC_DocType_ID() == 0)
