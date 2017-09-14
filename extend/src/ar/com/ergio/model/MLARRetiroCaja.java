@@ -189,6 +189,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 paymentBankFrom.setCheckNo(cobro.getCheckNo());
                 paymentBankFrom.setAccountNo(cobro.getAccountNo());
                 paymentBankFrom.setA_Name(cobro.getA_Name());
+                paymentBankFrom.set_ValueOfColumn("LAR_PaymentSource_ID", cobro.getC_Payment_ID());
 
                 final String sql = "UPDATE C_Payment"
                                  + "   SET IsOnDrawer='N'"

@@ -126,7 +126,7 @@ public class TransaccionCuentaBancaria
             cashBankTo.saveEx();
         }
 
-        debitarValores(statement, p_C_Currency_ID, p_C_BPartner_ID, totalAmt, ctx, trxName);
+        // debitarValores(statement, p_C_Currency_ID, p_C_BPartner_ID, totalAmt, ctx, trxName);
 
         // @fchiappano Marco el Statement original como transferido.
         statement.set_ValueOfColumn("Transferido", true);
@@ -196,6 +196,29 @@ public class TransaccionCuentaBancaria
         BigDecimal cashAmt = BigDecimal.ZERO;
         int p_C_Currency_ID = 0;
 
+        // Creo un nuevo Statement, para conciliar los pagos que debitan los valores de la caja.
+        final MBankStatement newStmt = new MBankStatement(ctx, 0, trxName);
+        newStmt.setC_BankAccount_ID(statement.getC_BankAccount_ID());
+        newStmt.setName("Compensacion Transferencia");
+        newStmt.setDocStatus(MBankStatement.DOCSTATUS_Drafted);
+        // @fchiappano si el Statement original, Es un cierre de caja,
+        // marco el nuevo Statement como cierre de caja tambien.
+        if (statement.get_ValueAsBoolean("EsCierreCaja"))
+        {
+            newStmt.set_ValueOfColumn("EsCierreCaja", true);
+            // Seteo el Saldo inicial en 0, para que no genere errores en
+            // futuros calculos.
+            newStmt.set_ValueOfColumn("SaldoInicial", Env.ZERO);
+            newStmt.set_ValueOfColumn("ScrutinizedCheckAmt", Env.ZERO);
+            newStmt.set_ValueOfColumn("ScrutinizedCashAmt", Env.ZERO);
+            newStmt.set_ValueOfColumn("ScrutinizedCreditCardAmt", Env.ZERO);
+            newStmt.set_ValueOfColumn("ScrutinizedDirectDebitAmt", Env.ZERO);
+        }
+        // @fchiappano Marco el nuevo Statement como transferido.
+        newStmt.set_ValueOfColumn("Transferido", true);
+        newStmt.set_ValueOfColumn("LAR_CierreCaja_Origen_ID", statement.getC_BankStatement_ID());
+        newStmt.saveEx();
+
         // Reccorro todas las lineas del statement para transferir a una nueva cuenta segun corresponda.
         for (MBankStatementLine linea : statement.getLines(true))
         {
@@ -248,6 +271,9 @@ public class TransaccionCuentaBancaria
                     final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
                     paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
 
+                    // Creo el pago que debita el cheque.
+                    debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago, newStmt);
+
                     m_chequeTransferido ++;
                 }
             }
@@ -267,6 +293,9 @@ public class TransaccionCuentaBancaria
                 final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
                 paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
 
+                // Creo el pago que debita el cupon de tarjeta de credito.
+                debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago, newStmt);
+
                 m_creditoTransferido++;
             }
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDebit))
@@ -279,6 +308,9 @@ public class TransaccionCuentaBancaria
                 paymentBankTo.set_ValueOfColumn("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID"));
                 final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
                 paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
+
+                // Creo el pago que debita el cupon de tarjeta de debito.
+                debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago, newStmt);
 
                 m_debitoTransferido++;
             }
@@ -294,6 +326,9 @@ public class TransaccionCuentaBancaria
                 paymentBankTo.set_ValueOfColumn("LAR_Deposito_Directo_ID",
                         pago.get_ValueAsInt("LAR_Deposito_Directo_ID"));
 
+                // Creo el pago que debita el deposito directo.
+                debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago, newStmt);
+
                 m_depositoTransferido++;
             }
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) &&
@@ -306,6 +341,9 @@ public class TransaccionCuentaBancaria
 
                 paymentBankTo.set_ValueOfColumn("LAR_Cheque_Emitido_ID",
                         pago.get_ValueAsInt("LAR_Cheque_Emitido_ID"));
+
+                // Creo el pago en negativo, que debita el cheque emitido.
+                debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago, newStmt);
 
                 m_chequeEmitido ++;
             }
@@ -337,17 +375,22 @@ public class TransaccionCuentaBancaria
             cashBankTo.processIt(MPayment.DOCACTION_Complete);
             cashBankTo.saveEx();
 
+            // Creo el pago, que debita todo el efectivo transferido.
+            debitarValores(statement, p_C_BPartner_ID, ctx, trxName, cashBankTo, newStmt);
+
             // Sumo el cashAmt al totalAmt para debitar el total de los valores posteriormente.
-            totalAmt = totalAmt.add(cashAmt);
+            // totalAmt = totalAmt.add(cashAmt);
         }
 
         if (m_chequeTransferido > 0 || m_creditoTransferido > 0 || m_debitoTransferido > 0 || m_depositoTransferido > 0
                 || m_efectivoTransferido > 0)
         {
-            debitarValores(statement, p_C_Currency_ID, p_C_BPartner_ID, totalAmt, ctx, trxName);
-
             statement.set_ValueOfColumn("Transferido", true);
             statement.saveEx();
+
+            // process new statement
+            newStmt.processIt(MBankStatement.DOCACTION_Complete);
+            newStmt.saveEx();
         }
 
         m_informe.add(new KeyNamePair(m_chequeTransferido + m_creditoTransferido + m_debitoTransferido
@@ -446,56 +489,38 @@ public class TransaccionCuentaBancaria
      * @param ctx
      * @param trxName
      */
-    private static void debitarValores(final MBankStatement statement, final int p_C_Currency_ID, final int p_C_BPartner_ID,
-            final BigDecimal totalAmt, final Properties ctx, final String trxName)
+    private static void debitarValores(final MBankStatement statement, final int p_C_BPartner_ID,
+            final Properties ctx, final String trxName, final MPayment cobro, final MBankStatement newStmt)
     {
         // Pago que debita los valores transferidos de la cuenta.
         final MPayment paymentBankFrom = new MPayment(ctx, 0, trxName);
         paymentBankFrom.setC_BankAccount_ID(statement.getC_BankAccount_ID());
         paymentBankFrom.setDateAcct(new Timestamp(System.currentTimeMillis()));
         paymentBankFrom.setDateTrx(new Timestamp(System.currentTimeMillis()));
-        paymentBankFrom.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
+        paymentBankFrom.setTenderType(cobro.getTenderType());
         paymentBankFrom.setDescription("Pago en concepto de Transferencia de valores.");
         paymentBankFrom.setC_BPartner_ID(p_C_BPartner_ID);
-        paymentBankFrom.setC_Currency_ID(p_C_Currency_ID);
-        paymentBankFrom.setPayAmt(totalAmt);
-        paymentBankFrom.setOverUnderAmt(Env.ZERO);
+        paymentBankFrom.setC_Currency_ID(cobro.getC_Currency_ID());
+        if (cobro.isReceipt())
+            paymentBankFrom.setPayAmt(cobro.getPayAmt());
+        else
+            paymentBankFrom.setPayAmt(cobro.getPayAmt().negate());
+        paymentBankFrom.setOverUnderAmt(cobro.getOverUnderAmt());
         paymentBankFrom.setIsReconciled(true);
+        paymentBankFrom.set_ValueOfColumn("LAR_PaymentSource_ID", cobro.getC_Payment_ID());
         paymentBankFrom.setLAR_C_DoctType_ID(false, statement.getC_BankAccount().getAD_Org_ID());
         paymentBankFrom.saveEx();
         paymentBankFrom.processIt(MPayment.DOCACTION_Complete);
         paymentBankFrom.saveEx();
 
-        final MBankStatement newStmt = new MBankStatement(ctx, 0, trxName);
-        newStmt.setC_BankAccount_ID(statement.getC_BankAccount_ID());
-        newStmt.setName("Compensacion Transferencia");
-        newStmt.setDocStatus(MBankStatement.DOCSTATUS_Drafted);
-        // @fchiappano si el Statement original, Es un cierre de caja,
-        // marco el nuevo Statement como cierre de caja tambien.
-        if (statement.get_ValueAsBoolean("EsCierreCaja"))
-        {
-            newStmt.set_ValueOfColumn("EsCierreCaja", true);
-            // Seteo el Saldo inicial en 0, para que no genere errores en
-            // futuros calculos.
-            newStmt.set_ValueOfColumn("SaldoInicial", Env.ZERO);
-            newStmt.set_ValueOfColumn("ScrutinizedCheckAmt", Env.ZERO);
-            newStmt.set_ValueOfColumn("ScrutinizedCashAmt", Env.ZERO);
-        }
-        // @fchiappano Marco el nuevo Statement como transferido.
-        newStmt.set_ValueOfColumn("Transferido", true);
-        newStmt.set_ValueOfColumn("LAR_CierreCaja_Origen_ID", statement.getC_BankStatement_ID());
-        newStmt.saveEx();
         final MBankStatementLine newLine = new MBankStatementLine(newStmt);
-        newLine.setC_Currency_ID(p_C_Currency_ID);
+        newLine.setC_Currency_ID(paymentBankFrom.getC_Currency_ID());
         newLine.setC_Payment_ID(paymentBankFrom.getC_Payment_ID());
         newLine.setLine(10);
         newLine.set_ValueOfColumn("IsTransferred", true);
-        newLine.set_ValueOfColumn("TrxAmt", totalAmt.negate());
-        newLine.set_ValueOfColumn("StmtAmt", totalAmt.negate());
+        newLine.set_ValueOfColumn("TrxAmt", paymentBankFrom.getPayAmt().negate());
+        newLine.set_ValueOfColumn("StmtAmt", paymentBankFrom.getPayAmt().negate());
         newLine.saveEx();
-        // process statement
-        newStmt.processIt(MBankStatement.DOCACTION_Complete);
-        newStmt.saveEx();
     } // debitarValores
 
     /**
