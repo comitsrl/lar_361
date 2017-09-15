@@ -606,7 +606,21 @@ public class MInOutLine extends X_M_InOutLine
 				return false;
 			}
 		}
-		
+
+        // @fchiappano Valido que no se pueda entregar mas mercaderia,
+        //             que la pendiente de entrega en la OV.
+        if (getC_OrderLine_ID() > 0 && getM_InOut().isSOTrx())
+        {
+            final MOrderLine ovLine = (MOrderLine) getC_OrderLine();
+            final BigDecimal pendiente = ovLine.getQtyOrdered().subtract(ovLine.getQtyDelivered());
+            final BigDecimal diferencia = pendiente.subtract(getQtyEntered());
+            if (diferencia.compareTo(Env.ZERO) < 0)
+            {
+                log.saveError("Error", "La cantidad ingresada, es mayor a la mercadería pendiente de entrega.");
+                return false;
+            }
+        }
+
 		return true;
 	}	//	beforeSave
 
