@@ -867,13 +867,14 @@ import ar.com.ergio.util.LAR_Utils;
 
         // Controla si el tipo de la orden es "Orden de Remito"
         // ("Orden de Remito" <=> "Warehouse Order")
-        if (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
-        {
-            if (order.processIt(MOrder.ACTION_Void))
-                order.saveEx(trx);
-            else
-                return "Falló la anulaci\u00f3n de la Orden de Remito";
-        }
+        if (dt.getDocSubTypeSO() != null) // Se chequea que la irden tenga seteado un SubTipo de Doc OV
+            if (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
+            {
+                if (order.processIt(MOrder.ACTION_Void))
+                    order.saveEx(trx);
+                else
+                    return "Falló la anulaci\u00f3n de la Orden de Remito";
+            }
 
         return null;
     } // voidWarehouseOrder
