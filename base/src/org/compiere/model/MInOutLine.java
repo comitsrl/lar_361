@@ -609,11 +609,24 @@ public class MInOutLine extends X_M_InOutLine
 
         // @fchiappano Valido que no se pueda entregar mas mercaderia,
         //             que la pendiente de entrega en la OV.
-        if (getC_OrderLine_ID() > 0 && getM_InOut().isSOTrx())
+        if (getM_InOut().isSOTrx())
         {
-            final MOrderLine ovLine = (MOrderLine) getC_OrderLine();
-            final BigDecimal pendiente = ovLine.getQtyOrdered().subtract(ovLine.getQtyDelivered());
-            final BigDecimal diferencia = pendiente.subtract(getQtyEntered());
+            BigDecimal pendiente = Env.ZERO;
+            BigDecimal diferencia = Env.ZERO;
+
+            if (getC_OrderLine_ID() > 0)
+            {
+                final MOrderLine ovLine = (MOrderLine) getC_OrderLine();
+                pendiente = ovLine.getQtyOrdered().subtract(ovLine.getQtyDelivered());
+            }
+            else if (getM_RMALine_ID() > 0)
+            {
+                final MRMALine rmaLine = (MRMALine) getM_RMALine();
+                pendiente = rmaLine.getQty().subtract(rmaLine.getQtyDelivered());
+            }
+
+            diferencia = pendiente.subtract(getQtyEntered());
+
             if (diferencia.compareTo(Env.ZERO) < 0)
             {
                 log.saveError("Error", "La cantidad ingresada, es mayor a la mercadería pendiente de entrega.");
