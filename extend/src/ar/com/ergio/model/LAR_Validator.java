@@ -41,6 +41,7 @@ import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MSequence;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
@@ -133,13 +134,18 @@ import ar.com.ergio.util.LAR_Utils;
          {
              MBPartner bp = (MBPartner) po;
              LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
-             if (!taxPayerType.equals(LAR_TaxPayerType.CONSUMIDOR_FINAL)) {
+             if (MSysConfig.getBooleanValue("LAR_ValidarCuitSdN", true, Env.getAD_Client_ID(Env.getCtx())) &&
+                     !taxPayerType.equals(LAR_TaxPayerType.CONSUMIDOR_FINAL)) {
                  // Check CUIT number
                  String cuit = bp.get_ValueAsString("TaxID");
                  if (!LAR_Utils.validateCUIT(cuit)) {
                      return "ERROR: CUIT invalido";
                  }
              }
+
+             if (!MSysConfig.getBooleanValue("LAR_PermitirDuplicidadCuit/Dni", false, Env.getAD_Client_ID(Env.getCtx())) &&
+                     LAR_Utils.checkDuplicateCUIT(bp.getTaxID(), bp.getC_BPartner_ID()))
+                 return "ERROR: CUIT/DNI Duplicado";
          }
          // Changes on OrderLines
          if (po.get_TableName().equals(MOrderLine.Table_Name) &&
