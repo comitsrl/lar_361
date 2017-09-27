@@ -143,7 +143,8 @@ import ar.com.ergio.util.LAR_Utils;
                  }
              }
 
-             if (!MSysConfig.getBooleanValue("LAR_PermitirDuplicidadCuit/Dni", false, Env.getAD_Client_ID(Env.getCtx())) &&
+             String checkDuplicidad = MSysConfig.getValue("LAR_PermitirDuplicidadCuit/Dni", Env.getAD_Client_ID(Env.getCtx()));
+             if ((checkDuplicidad.equals("N") || (checkDuplicidad.equals("A") && type == TYPE_BEFORE_NEW)) &&
                      LAR_Utils.checkDuplicateCUIT(bp.getTaxID(), bp.getC_BPartner_ID()))
                  return "ERROR: CUIT/DNI Duplicado";
          }
