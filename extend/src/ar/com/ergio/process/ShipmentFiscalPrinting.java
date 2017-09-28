@@ -53,7 +53,7 @@ public class ShipmentFiscalPrinting extends SvrProcess
 
         // Determina si la orden es de remito para continuar con el proceso
         final MDocType dtTarget = new MDocType(getCtx(), order.getC_DocTypeTarget_ID(), get_TrxName());
-        if (dtTarget.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
+        if (order.isSOTrx() && dtTarget.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
         {
             final MInOut shipment = order.getShipments()[0];
 
