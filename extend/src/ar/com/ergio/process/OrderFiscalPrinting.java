@@ -54,8 +54,8 @@ public class OrderFiscalPrinting extends SvrProcess
         
         // Determina si la orden es POS o de Nota de Crédito para continuar con el proceso
         final MDocType dtTarget = new MDocType(getCtx(), order.getC_DocTypeTarget_ID(), get_TrxName());
-        if (dtTarget.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_OnCreditOrder)
-                || dtTarget.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder))
+        if (order.isSOTrx() && (dtTarget.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_OnCreditOrder)
+                || dtTarget.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder)))
         {
             final MInvoice invoice = new MInvoice(getCtx(), order.getC_Invoice_ID(), get_TrxName());
 

@@ -98,7 +98,7 @@ public abstract class BasicFiscalPrinter implements FiscalPrinterDevice {
             for (int i = 1; i <= decimalPart; num += "0", i++)
                 ;
         } else if (num.substring(pointIndex + 1).length() > decimalPart) {
-            num = num.substring(0, num.indexOf('.') + decimalPart);
+            num = num.substring(0, num.indexOf('.') + decimalPart + 1);
         }
         return num;
 	}

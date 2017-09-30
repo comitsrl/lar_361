@@ -123,10 +123,17 @@ public final class LAR_Utils {
      * @param cuit
      * @return true si está duplicado; false caso contrario
      */
-    public static boolean checkDuplicateCUIT(final String cuit)
+    public static boolean checkDuplicateCUIT(final String cuit, final int C_BPartner_ID)
     {
-        String sql = "SELECT COUNT(*) FROM c_bpartner WHERE taxid = ?";
-        int cant = DB.getSQLValue(null, sql, cuit);
+        int cant = 0;
+        String sql = "SELECT COUNT(*) FROM C_BPartner WHERE taxid = ?";
+        if (C_BPartner_ID > 0)
+        {
+            sql = sql + " AND C_BPartner_ID!=?";
+            cant = DB.getSQLValue(null, sql, cuit, C_BPartner_ID);
+        }
+        else
+            cant = DB.getSQLValue(null, sql, cuit);
         return cant > 0;
     } // checkDuplicateCUIT
 

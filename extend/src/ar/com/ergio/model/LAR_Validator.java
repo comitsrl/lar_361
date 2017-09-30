@@ -41,6 +41,7 @@ import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MSequence;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
@@ -133,13 +134,19 @@ import ar.com.ergio.util.LAR_Utils;
          {
              MBPartner bp = (MBPartner) po;
              LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
-             if (!taxPayerType.equals(LAR_TaxPayerType.CONSUMIDOR_FINAL)) {
+             if (MSysConfig.getBooleanValue("LAR_ValidarCuitSdN", true, Env.getAD_Client_ID(Env.getCtx())) &&
+                     !taxPayerType.equals(LAR_TaxPayerType.CONSUMIDOR_FINAL)) {
                  // Check CUIT number
                  String cuit = bp.get_ValueAsString("TaxID");
                  if (!LAR_Utils.validateCUIT(cuit)) {
                      return "ERROR: CUIT invalido";
                  }
              }
+
+             String checkDuplicidad = MSysConfig.getValue("LAR_PermitirDuplicidadCuit/Dni", Env.getAD_Client_ID(Env.getCtx()));
+             if ((checkDuplicidad.equals("N") || (checkDuplicidad.equals("A") && type == TYPE_BEFORE_NEW)) &&
+                     LAR_Utils.checkDuplicateCUIT(bp.getTaxID(), bp.getC_BPartner_ID()))
+                 return "ERROR: CUIT/DNI Duplicado";
          }
          // Changes on OrderLines
          if (po.get_TableName().equals(MOrderLine.Table_Name) &&
@@ -867,13 +874,14 @@ import ar.com.ergio.util.LAR_Utils;
 
         // Controla si el tipo de la orden es "Orden de Remito"
         // ("Orden de Remito" <=> "Warehouse Order")
-        if (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
-        {
-            if (order.processIt(MOrder.ACTION_Void))
-                order.saveEx(trx);
-            else
-                return "Falló la anulaci\u00f3n de la Orden de Remito";
-        }
+        if (dt.getDocSubTypeSO() != null) // Se chequea que la irden tenga seteado un SubTipo de Doc OV
+            if (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder))
+            {
+                if (order.processIt(MOrder.ACTION_Void))
+                    order.saveEx(trx);
+                else
+                    return "Falló la anulaci\u00f3n de la Orden de Remito";
+            }
 
         return null;
     } // voidWarehouseOrder

@@ -110,6 +110,12 @@ public abstract class Wsfe {
         {
             MPOS pos = new MPOS(m_ctx, invoice.get_ValueAsInt("C_Pos_ID"), trxName);
             String atributo = "WSFE_PV" + pos.get_ValueAsInt("PosNumber");
+
+            // @fchiappano Si el SO es Windows, busco la preferencia del mismo.
+            String osName = System.getProperty("os.name");
+            if(!osName.equals("Linux"))
+                atributo = atributo + "_WIN";
+
             MPreference preference = MPreference.getOrgPreference(Env.getAD_Client_ID(getM_ctx()),
                     Env.getAD_Org_ID(getM_ctx()), atributo, getM_ctx(), getTrxName());
 

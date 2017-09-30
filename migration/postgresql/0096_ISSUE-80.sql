@@ -6,7 +6,7 @@ ALTER TABLE LAR_RetiroCaja ADD COLUMN CuentaOrigen_ID numeric(10,0);
 ALTER TABLE LAR_RetiroCaja ADD CONSTRAINT cuentaorigenid_larretirocaja FOREIGN KEY (CuentaOrigen_ID)
       REFERENCES C_BankAccount (C_BankAccount_ID) MATCH SIMPLE;
 
-﻿ALTER TABLE LAR_RetiroCaja ADD COLUMN TransferenciaBancaria character(1) NOT NULL DEFAULT 'N'::bpchar;
+ALTER TABLE LAR_RetiroCaja ADD COLUMN TransferenciaBancaria character(1) NOT NULL DEFAULT 'N'::bpchar;
 ALTER TABLE LAR_RetiroCaja ADD CONSTRAINT lar_retirocaja_transferenciabancaria_check CHECK (TransferenciaBancaria = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
 
 -- 31/08/2017 17:33:08 ART
