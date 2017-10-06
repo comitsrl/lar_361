@@ -52,18 +52,6 @@ public class ImprimeTicketCompra extends ManejadorAbstractoDeImpresion
         printDetalle(factura);
         printTotales(factura);
 
-        /*
-        printer.setRecLineChars(56);
-        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "Timbre Electrónico SII" + LF);
-        if (documento.getIdTipoDocumento() == 101)
-            printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "Res. 97 de 2012. Verifique Documento: " + datos.getURL() + LF);
-        else
-        {
-            printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "Res. 97 de 2012. Verifique Documento: www.sii.cl" + LF);
-        }
-        printer.setRecLineChars(42);
-         */
-
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CUT);
 
@@ -154,7 +142,6 @@ public class ImprimeTicketCompra extends ManejadorAbstractoDeImpresion
             linea = Util.makePrintString(printer.getRecLineChars(), "Subtotal", Util.formatoParaImporte(subTotal));
             printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF + LF);
         }
-        //printer.setRecLineSpacing(ls);
     } // printDetalle
 
     private void printTotales(final MInvoice factura) throws JposException
@@ -172,11 +159,6 @@ public class ImprimeTicketCompra extends ManejadorAbstractoDeImpresion
 
             linea = Util.makePrintString((printer.getRecLineChars() / 2), "Total", Util.formatoParaImporte(factura.getGrandTotal()));
             printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, DOUBLEH + BOLD + linea + LF + LF);
-
-            // TODO
-            // final long total = doc.getMontoNeto().add(doc.getMontoImpuesto()).longValue();
-            // linea = "SON: " + PrinterUtils.numeroAPalabra(total).trim() + " PESOS";
-            // printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea.toUpperCase() + LF + LF);
         }
         else
         {
@@ -185,10 +167,6 @@ public class ImprimeTicketCompra extends ManejadorAbstractoDeImpresion
         }
 
         linea = Util.justifyString("  " + factura.getPaymentRule(), 30, -1);
-        // TODO
-        // Imprimir todos los medios de pago (recorrer las asignaciones)
-
-        //printer.setRecLineSpacing(ls);
 
         //1cm de espacio
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, ESC + "|1000uF");
