@@ -609,7 +609,8 @@ public class MInOutLine extends X_M_InOutLine
 
         // @fchiappano Valido que no se pueda entregar mas mercaderia,
         //             que la pendiente de entrega en la OV.
-        if (getM_InOut().isSOTrx())
+        if (getM_InOut().isSOTrx() && !getM_InOut().getDocStatus().equals(MInOut.DOCSTATUS_Completed) &&
+                !getM_InOut().getDocStatus().equals(MInOut.DOCSTATUS_Closed))
         {
             BigDecimal pendiente = Env.ZERO;
             BigDecimal diferencia = Env.ZERO;
