@@ -24,10 +24,12 @@ import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MLocation;
+import org.compiere.model.MOrder;
 import org.compiere.model.MOrg;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPOS;
 import org.compiere.model.MUser;
+import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 import ar.com.ergio.model.X_LAR_DocumentLetter;
@@ -38,21 +40,36 @@ import ar.com.ergio.model.X_LAR_DocumentLetter;
  */
 final class DatosImpresion
 {
-    private final MInvoice invoice;
+    private MInvoice invoice;
+    private MOrder order;
     private final MDocType docType;
     private final MClient client;
     private final MOrg org;
     private final MOrgInfo orgInfo;
     private Boolean discriminaIva = null;
     private String letra = null;
+    private final PO documento;
 
-    public DatosImpresion(final MInvoice invoice)
+    public DatosImpresion(final PO documento)
     {
-        this.invoice = invoice;
-        this.docType = new MDocType(Env.getCtx(), invoice.getC_DocType_ID(), invoice.get_TrxName());
-        this.client = MClient.get(Env.getCtx(), invoice.getAD_Client_ID());
-        this.org = MOrg.get(Env.getCtx(), invoice.getAD_Org_ID());
-        this.orgInfo = MOrgInfo.get(Env.getCtx(), invoice.getAD_Org_ID(), invoice.get_TrxName());
+        this.documento = documento;
+
+        if (documento instanceof MOrder)
+        {
+            this.order = (MOrder) documento;
+            this.docType = new MDocType(Env.getCtx(), order.getC_DocType_ID(), order.get_TrxName());
+            this.client = MClient.get(Env.getCtx(), order.getAD_Client_ID());
+            this.org = MOrg.get(Env.getCtx(), order.getAD_Org_ID());
+            this.orgInfo = MOrgInfo.get(Env.getCtx(), order.getAD_Org_ID(), order.get_TrxName());
+        }
+        else
+        {
+            this.invoice = (MInvoice) documento;
+            this.docType = new MDocType(Env.getCtx(), invoice.getC_DocType_ID(), invoice.get_TrxName());
+            this.client = MClient.get(Env.getCtx(), invoice.getAD_Client_ID());
+            this.org = MOrg.get(Env.getCtx(), invoice.getAD_Org_ID());
+            this.orgInfo = MOrgInfo.get(Env.getCtx(), invoice.getAD_Org_ID(), invoice.get_TrxName());
+        }
     }
 
     public String getRazonSocial()
@@ -108,7 +125,7 @@ final class DatosImpresion
 
     public DatosCliente getDatosCliente()
     {
-        return new DatosCliente(invoice);
+        return new DatosCliente(documento);
     }
 
     public String getUsuario()
