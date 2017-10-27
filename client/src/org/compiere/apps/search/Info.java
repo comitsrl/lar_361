@@ -39,10 +39,12 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableModel;
 
 import org.compiere.apps.ADialog;
 import org.compiere.apps.AEnv;
 import org.compiere.apps.AWindow;
+import org.compiere.apps.AppsAction;
 import org.compiere.apps.ConfirmPanel;
 import org.compiere.apps.PrintScreenPainter;
 import org.compiere.apps.StatusBar;
@@ -55,6 +57,7 @@ import org.compiere.model.MSysConfig;
 import org.compiere.swing.CDialog;
 import org.compiere.swing.CMenuItem;
 import org.compiere.swing.CPanel;
+import org.compiere.swing.CToggleButton;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -376,6 +379,10 @@ public abstract class Info extends CDialog
 	private JPopupMenu popup = new JPopupMenu();
 	private CMenuItem calcMenu = new CMenuItem();
 
+	// @fchiappano Boton seleccionar todo
+    private static final String SELECT_DESELECT_ALL = "SelectAll";
+    protected AppsAction selectDeselectAllAction = new AppsAction (SELECT_DESELECT_ALL, null, Msg.getMsg(Env.getCtx(), SELECT_DESELECT_ALL), true);
+
 	/**
 	 *	Static Init
 	 *  @throws Exception
@@ -398,6 +405,14 @@ public abstract class Info extends CDialog
 		confirmPanel.getResetButton().setVisible(hasReset());
 		confirmPanel.getCustomizeButton().setVisible(hasCustomize());
 		confirmPanel.getHistoryButton().setVisible(hasHistory());
+
+        // @fchiappano Se agrega boton seleccionar todo
+        CToggleButton selectAllButton = (CToggleButton) selectDeselectAllAction.getButton();
+        selectAllButton.addActionListener(this);
+        selectAllButton.setMargin(ConfirmPanel.s_insets);
+        selectAllButton.setVisible(hasSelectAll());
+        confirmPanel.addComponent(selectAllButton);
+
 		confirmPanel.getZoomButton().setVisible(hasZoom());
 		//
 		JButton print = ConfirmPanel.createPrintButton(true);
@@ -798,6 +813,19 @@ public abstract class Info extends CDialog
 			doReset();
 		else if (cmd.equals(ConfirmPanel.A_PRINT))
 			PrintScreenPainter.printScreen(this);
+		// @fchiappano Boton seleccionar todo
+        else if (cmd.equals(SELECT_DESELECT_ALL))
+        {
+            TableModel model = p_table.getModel();
+
+            int rows = model.getRowCount() - 1;
+            Boolean selectAll = selectDeselectAllAction.isPressed() ? Boolean.FALSE : Boolean.TRUE;
+            for (int i = 0; i < rows; i++)
+            {
+                ((IDColumn) model.getValueAt(i, 0)).setSelected(selectAll);
+            }
+            p_table.updateUI();
+        }
 		//	Default
 		else
 			executeQuery();
@@ -982,6 +1010,14 @@ public abstract class Info extends CDialog
 	 *  @return true if it has zoom (default false)
 	 */
 	protected boolean hasZoom()					{return false;}
+
+	/**
+	 * Mostrar boton Seleccionar todo.
+	 * @return true si se desea mostrar (por defecto falso)
+	 * @author fchiappano
+	 */
+	protected boolean hasSelectAll()            {return false;}
+
 	/**
 	 *  Save Selection Details
 	 *	To be overwritten by concrete classes
