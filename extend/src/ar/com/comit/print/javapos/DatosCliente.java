@@ -19,6 +19,8 @@ package ar.com.comit.print.javapos;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MLocation;
+import org.compiere.model.MOrder;
+import org.compiere.model.PO;
 import org.compiere.util.Env;
 
 /**
@@ -32,10 +34,21 @@ final class DatosCliente
     private final MBPartner bpartner;
     private MLocation location;
 
-    DatosCliente(final MInvoice invoice)
+    DatosCliente(final PO documento)
     {
-        bpartner = new MBPartner(Env.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
-        location = MLocation.getBPLocation(Env.getCtx(), invoice.getC_BPartner_Location_ID(), invoice.get_TrxName());
+        if (documento instanceof MOrder)
+        {
+            final MOrder orden = (MOrder) documento;
+            bpartner = new MBPartner(Env.getCtx(), orden.getC_BPartner_ID(), orden.get_TrxName());
+            location = MLocation.getBPLocation(Env.getCtx(), orden.getC_BPartner_Location_ID(), orden.get_TrxName());
+        }
+        else
+        {
+            final MInvoice invoice = (MInvoice) documento;
+            bpartner = new MBPartner(Env.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
+            location = MLocation
+                    .getBPLocation(Env.getCtx(), invoice.getC_BPartner_Location_ID(), invoice.get_TrxName());
+        }
     }
 
     public String getNombre()

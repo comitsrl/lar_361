@@ -911,8 +911,13 @@ public class VLookup extends JComponent
             // Replace Value with name if no value exists
             if (queryValue.length() == 0 && m_text.getText().length() > 0)
                 queryValue = m_text.getText();
-            int AD_Table_ID = MColumn.getTable_ID(Env.getCtx(), m_mField.getAD_Column_ID(), null);
-            multipleSelection = (MPaymentAllocate.Table_ID ==  AD_Table_ID);
+
+            // @fchiappano Chequear que mField no sea nulo.
+            if (m_mField != null)
+            {
+                int AD_Table_ID = MColumn.getTable_ID(Env.getCtx(), m_mField.getAD_Column_ID(), null);
+                multipleSelection = (MPaymentAllocate.Table_ID == AD_Table_ID);
+            }
             InfoInvoice ii = new InfoInvoice(frame, true, m_lookup.getWindowNo(), queryValue,
                     multipleSelection, whereClause);
             ii.setVisible(true);

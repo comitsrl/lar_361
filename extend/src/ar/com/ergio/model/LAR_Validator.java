@@ -199,6 +199,28 @@ import ar.com.ergio.util.LAR_Utils;
             }
         }
 
+        // @fchiappano Pisar DocumentNo, si difiere con lo que devuelve el CF
+        if (po.get_TableName().equals(MInvoice.Table_Name) && type == TYPE_BEFORE_CHANGE)
+        {
+            MInvoice invoice = (MInvoice) po;
+            if (invoice.getDocStatus().equals(MInvoice.DOCSTATUS_Completed) && !invoice.get_ValueAsString("FiscalReceiptNumber").equals(""))
+            {
+                String documentoNo = invoice.getDocumentNo();
+                String nroFactura = documentoNo.substring(documentoNo.length() -8, documentoNo.length());
+                String fiscalreceiptnumber = "00000000" + invoice.get_ValueAsString("FiscalReceiptNumber");
+                fiscalreceiptnumber = fiscalreceiptnumber.substring(fiscalreceiptnumber.length() -8, fiscalreceiptnumber.length());
+                if (!nroFactura.equals(fiscalreceiptnumber))
+                {
+                    documentoNo = documentoNo.substring(0, documentoNo.length() -8) + fiscalreceiptnumber;
+                    invoice.setDocumentNo(documentoNo);
+
+                    // Corregir Secuencia.
+                    MSequence.setFiscalDocTypeNextNroComprobante(invoice.getC_DocType().getDefiniteSequence_ID(), Integer.parseInt(fiscalreceiptnumber) + 1,
+                            null);
+                }
+            }
+        }
+
         // Despues de modificar un pago, se actualiza la retención y el total de al cabecera
         if (po.get_TableName().equals(MPayment.Table_Name) &&
                 (type == TYPE_AFTER_NEW || type == TYPE_AFTER_CHANGE || type == TYPE_AFTER_DELETE)
