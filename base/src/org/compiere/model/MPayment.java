@@ -2497,7 +2497,12 @@ public final class MPayment extends X_C_Payment
 			dateAcct = new Timestamp(System.currentTimeMillis());
 		
 		//	Auto Reconcile if not on Bank Statement				
-		boolean reconciled = true; // getC_BankStatementLine_ID() == 0; //AZ Goodwill
+		boolean reconciled = getC_BankStatementLine_ID() == 0; //AZ Goodwill
+
+		// @fchiappano identificar si el payment a anular, es el original
+        boolean paymentOriginal = false;
+        if (get_ValueAsInt("LAR_PaymentSource_ID") == 0)
+            paymentOriginal = true;
 
 		//	Create Reversal
 		MPayment reversal = new MPayment (getCtx(), 0, get_TrxName());
@@ -2517,7 +2522,7 @@ public final class MPayment extends X_C_Payment
 		reversal.setOverUnderAmt(getOverUnderAmt().negate());
 		//
 		reversal.setIsAllocated(true);
-		reversal.setIsReconciled(reconciled);	//	to put on bank statement
+		reversal.setIsReconciled(paymentOriginal ? reconciled : true);	//	to put on bank statement
 		reversal.setIsOnline(false);
 		reversal.setIsApproved(true); 
 		reversal.setR_PnRef(null);
@@ -2547,7 +2552,7 @@ public final class MPayment extends X_C_Payment
 
 		//	Unlink & De-Allocate
 		deAllocate();
-		setIsReconciled (reconciled);
+		setIsReconciled (true);
 		setIsAllocated (true);	//	the allocation below is overwritten
 		//	Set Status 
 		addDescription("(" + reversal.getDocumentNo() + "<-)");

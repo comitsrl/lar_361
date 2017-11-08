@@ -321,7 +321,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             // Si se trata de una transferencia o un deposito, revierto el cobro
             // de la caja/cuenta destino.
-            if (isTransferencia() || get_ValueAsBoolean("Deposito"))
+            if (isTransferencia() || get_ValueAsBoolean("Deposito") || get_ValueAsBoolean("TransferenciaBancaria"))
             {
                 MPayment cobro = new MPayment(p_ctx, linea.getCobro_ID(), get_TrxName());
 
@@ -332,11 +332,6 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 }
 
                 cobro.saveEx();
-
-                // Obligo que el Reversal este marcado como conciliado.
-                final MPayment reversal = new MPayment(getCtx(), cobro.getReversal_ID(), get_TrxName());
-                reversal.setIsReconciled(true);
-                reversal.saveEx();
             }
         }
 
