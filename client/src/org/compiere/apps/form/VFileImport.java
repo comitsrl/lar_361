@@ -208,6 +208,8 @@ public class VFileImport extends CPanel
 		pickFormat.addItem(s_none);
 		String sql = MRole.getDefault().addAccessSQL("SELECT Name FROM AD_ImpFormat", "AD_ImpFormat",
 				MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+		// Se listan únicamente los formatos de impresión activos
+        sql = sql.concat(" AND AD_ImpFormat.IsActive = 'Y'");
 		try
 		{
 			PreparedStatement pstmt = DB.prepareStatement(sql, null);
