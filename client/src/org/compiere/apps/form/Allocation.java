@@ -27,6 +27,7 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.minigrid.IMiniTable;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.model.MRole;
@@ -730,6 +731,13 @@ public class Allocation
 							DiscountAmt, WriteOffAmt, OverUnderAmt);
 						aLine.setDocInfo(C_BPartner_ID, C_Order_ID, C_Invoice_ID);
 						aLine.setPaymentInfo(C_Payment_ID, C_CashLine_ID);
+
+                        // @fchiappano Si se trata de una NC, Copio el
+                        // C_Invoice_ID en la columna NotaCredito_ID.
+                        if (aLine.getC_Invoice().getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo) ||
+                                aLine.getC_Invoice().getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo))
+                            aLine.set_ValueOfColumn("NotaCredito_ID", C_Invoice_ID);
+
 						aLine.saveEx();
 
 						//  Apply Discounts and WriteOff only first time
@@ -753,6 +761,13 @@ public class Allocation
 						DiscountAmt, WriteOffAmt, OverUnderAmt);
 					aLine.setDocInfo(C_BPartner_ID, C_Order_ID, C_Invoice_ID);
 					aLine.setPaymentInfo(C_Payment_ID, C_CashLine_ID);
+
+                    // @fchiappano Si se trata de una NC, Copio el
+                    // C_Invoice_ID en la columna NotaCredito_ID.
+                    if (aLine.getC_Invoice().getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)
+                            || aLine.getC_Invoice().getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo))
+                        aLine.set_ValueOfColumn("NotaCredito_ID", C_Invoice_ID);
+
 					aLine.saveEx();
 					log.fine("Allocation Amount=" + AppliedAmt);
 					unmatchedApplied = unmatchedApplied.add(AppliedAmt);
