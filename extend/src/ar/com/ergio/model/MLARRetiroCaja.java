@@ -163,6 +163,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             // Pago que debita los valores transferidos de la cuenta.
             final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
+            final MPayment cobro = new MPayment(getCtx(), linea.getCobro_ID(), get_TrxName());
 
             // Si se trata de una Extaccion Bancaria, tomo la cuenta bancaria origen.
             if (get_ValueAsBoolean("ExtraccionBancaria") || get_ValueAsBoolean("TransferenciaBancaria"))
@@ -183,7 +184,6 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             // Si el TenderType es cheque, cambio la marca IsOnDrawer a false.
             if (linea.getTenderType().equals("Z"))
             {
-                final MPayment cobro = new MPayment(getCtx(), linea.getCobro_ID(), get_TrxName());
                 paymentBankFrom.setTenderType(cobro.getTenderType());
                 paymentBankFrom.setRoutingNo(cobro.getRoutingNo());
                 paymentBankFrom.setCheckNo(cobro.getCheckNo());
@@ -223,7 +223,6 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 // Si el tenderType es cheque, copio los campos pertinentes al mismo.
                 if (linea.getTenderType().equals("Z"))
                 {
-                    final MPayment cobro = new MPayment(getCtx(), linea.getCobro_ID(), get_TrxName());
                     paymentBankTo.setTenderType(linea.getTenderType());
                     paymentBankTo.setRoutingNo(cobro.getRoutingNo());
                     paymentBankTo.setCheckNo(cobro.getCheckNo());

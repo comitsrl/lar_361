@@ -588,24 +588,29 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				if (line.getC_Payment_ID() != 0)
 				{
 					MPayment payment = new MPayment (getCtx(), line.getC_Payment_ID(), get_TrxName());
-					payment.setIsReconciled(false);
-					payment.saveEx();
 					line.setC_Payment_ID(0);
+					boolean originalConciliado = false;
 
 					// @fchiappano Si es un cierre de caja y el LAR_Cierre_Origen_ID es mayor a 0,
 					// quiere decir que se trata de un cierre de compensacion, por lo que anulo el pago de la linea.
 					if (get_ValueAsBoolean("EsCierreCaja") && get_ValueAsInt("LAR_CierreCaja_Origen_ID") > 0)
 					{
-					    if (!payment.voidIt())
-					    {
-					        m_processMsg = payment.getProcessMsg();
-					        return false;
-					    }
-					    MPayment reverso = (MPayment) payment.getReversal();
-					    reverso.setIsReconciled(true);
-					    reverso.saveEx();
-					    payment.setIsReconciled(true);
-					    payment.saveEx();
+					    originalConciliado = true;
+					    // @fchiappano Chequear que el pago no se haya anulado antes (Esto puede ser, producto de la anulacion en cascada).
+                        if (!payment.getDocStatus().equals(MPayment.DOCSTATUS_Reversed)
+                                && !payment.getDocStatus().equals(MPayment.DOCSTATUS_Voided))
+                        {
+                            if (!payment.voidIt())
+                            {
+                                m_processMsg = payment.getProcessMsg();
+                                return false;
+                            }
+                            MPayment reverso = (MPayment) payment.getReversal();
+                            reverso.setIsReconciled(true);
+                            reverso.saveEx();
+                            payment.setIsReconciled(true);
+                            payment.saveEx();
+                        }
 					}
 					// @fchiappano Anular cobro que acredita en cuenta destino,
 					// si es que se trata de un cierre de cajas.
@@ -648,6 +653,10 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				            pstmt = null;
 				        }
 					}
+
+					// @fchiappano Marcar cobro original como conciliado.
+	                payment.setIsReconciled(originalConciliado);
+	                payment.saveEx();
 				}
 				line.saveEx();
 			}
