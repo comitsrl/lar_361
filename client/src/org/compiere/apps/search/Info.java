@@ -822,7 +822,11 @@ public abstract class Info extends CDialog
             Boolean selectAll = selectDeselectAllAction.isPressed() ? Boolean.FALSE : Boolean.TRUE;
             for (int i = 0; i < rows; i++)
             {
-                ((IDColumn) model.getValueAt(i, 0)).setSelected(selectAll);
+                Object linea = model.getValueAt(i, 0);
+                if (linea != null)
+                    ((IDColumn) linea).setSelected(selectAll);
+                else
+                    rows ++;
             }
             p_table.updateUI();
         }
