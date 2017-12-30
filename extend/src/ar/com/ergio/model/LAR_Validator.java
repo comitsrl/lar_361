@@ -348,7 +348,8 @@ import ar.com.ergio.util.LAR_Utils;
             if (dt.getDocSubTypeSO() != null
                     && (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder)
                             || dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder) || (dt
-                                .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_OnCreditOrder))))
+                            .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_OnCreditOrder) || dt
+                            .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_StandardOrder))))
                 invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
 
             invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", findDocType.getLAR_DocumentLetter_ID());
