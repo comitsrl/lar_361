@@ -217,6 +217,7 @@ public class TransaccionCuentaBancaria
         // @fchiappano Marco el nuevo Statement como transferido.
         newStmt.set_ValueOfColumn("Transferido", true);
         newStmt.set_ValueOfColumn("LAR_CierreCaja_Origen_ID", statement.getC_BankStatement_ID());
+        newStmt.setStatementDate(p_StatementDate);
         newStmt.saveEx();
 
         // Reccorro todas las lineas del statement para transferir a una nueva cuenta segun corresponda.
@@ -495,8 +496,8 @@ public class TransaccionCuentaBancaria
         // Pago que debita los valores transferidos de la cuenta.
         final MPayment paymentBankFrom = new MPayment(ctx, 0, trxName);
         paymentBankFrom.setC_BankAccount_ID(statement.getC_BankAccount_ID());
-        paymentBankFrom.setDateAcct(new Timestamp(System.currentTimeMillis()));
-        paymentBankFrom.setDateTrx(new Timestamp(System.currentTimeMillis()));
+        paymentBankFrom.setDateAcct(statement.getStatementDate());
+        paymentBankFrom.setDateTrx(statement.getStatementDate());
         paymentBankFrom.setTenderType(cobro.getTenderType());
         paymentBankFrom.setDescription("Pago en concepto de Transferencia de valores.");
         paymentBankFrom.setC_BPartner_ID(p_C_BPartner_ID);
