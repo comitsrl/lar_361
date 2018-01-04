@@ -204,7 +204,7 @@ import ar.com.ergio.util.LAR_Utils;
                 return msg;
             }
         }
-
+/*
         // @fchiappano Pisar DocumentNo, si difiere con lo que devuelve el CF
         if (po.get_TableName().equals(MInvoice.Table_Name) && type == TYPE_BEFORE_CHANGE)
         {
@@ -232,7 +232,7 @@ import ar.com.ergio.util.LAR_Utils;
                             Integer.parseInt(fiscalreceiptnumber) + 1, null);
                 }
             }
-        }
+        }*/
 
         // Despues de modificar un pago, se actualiza la retención y el total de al cabecera
         if (po.get_TableName().equals(MPayment.Table_Name) &&
