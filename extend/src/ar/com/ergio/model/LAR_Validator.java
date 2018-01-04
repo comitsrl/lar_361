@@ -326,9 +326,15 @@ import ar.com.ergio.util.LAR_Utils;
 
             // @emmie @mzuniga Se abstrae la forma de recuperar el tipo de documento
             // @mzuniga Se considera el tipo de documento base (NC o Factura)
+            final MDocType docType;
             MDocType dt_orig = new MDocType(invoice.getCtx(), invoice.getC_DocTypeTarget_ID(), invoice.get_TrxName());
+            if (invoice.getC_Order_ID() != 0)
+            {
             final FindInvoiceDocType findDocType = new FindInvoiceDocType(bp, c_POS_ID, ad_Org_ID, dt_orig.getDocBaseType());
-            final MDocType docType = findDocType.getDocType();
+            docType = findDocType.getDocType();
+            }
+            else
+                docType = dt_orig;
 
             // Check retrieved doctype
             if (docType == null) {
@@ -348,10 +354,11 @@ import ar.com.ergio.util.LAR_Utils;
             if (dt.getDocSubTypeSO() != null
                     && (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder)
                             || dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder) || (dt
-                                .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_OnCreditOrder))))
+                            .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_OnCreditOrder) || dt
+                            .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_StandardOrder))))
                 invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
 
-            invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", findDocType.getLAR_DocumentLetter_ID());
+            invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", docType.get_ValueAsInt("LAR_DocumentLetter_ID"));
             if (!invoice.save()) {
                 return "No se pudo cambiar el tipo de documento";
             }
