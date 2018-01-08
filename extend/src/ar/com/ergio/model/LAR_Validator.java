@@ -55,6 +55,7 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.globalqss.model.X_LCO_WithholdingCalc;
 
 import static ar.com.ergio.model.LAR_TaxPayerType.RESPONSABLE_INSCRIPTO;
 import ar.com.ergio.process.PosOrderGlobalVoiding;
@@ -499,16 +500,18 @@ import ar.com.ergio.util.LAR_Utils;
 
             final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, true, order.get_TrxName(), order, order.getDateOrdered());
 
+            deletePerceptionLine(order);
             // Se recorren las configuraciones recuperadas
             // Se crean las líneas de percepción
             for (int i = 0; i < configs.length; i++)
             {
-                final WithholdingConfig wc = configs[0];
+                final WithholdingConfig wc = configs[i];
                 log.info("Withholding conf >> " + wc);
 
                 // Calcula el subtotal y el importe de la percepción
     			BigDecimal taxAmt = BigDecimal.ZERO;
     			BigDecimal gravado = BigDecimal.ZERO;
+                BigDecimal base = BigDecimal.ZERO;
     			BigDecimal perceptionAmt = BigDecimal.ZERO;
     			for (MOrderTax tax : order.getTaxes(true)) {
     				taxAmt = taxAmt.add(tax.getTaxAmt());
@@ -519,24 +522,35 @@ import ar.com.ergio.util.LAR_Utils;
     					gravado = gravado.add(oline.getLineNetAmt());
     				}
     			}
-    			if (RESPONSABLE_INSCRIPTO.equals(LAR_TaxPayerType
-    					.getTaxPayerType(bp))) {
-                    perceptionAmt = (((gravado.multiply(wc.getAliquot())).divide(new BigDecimal (100))).setScale(2,
-                            BigDecimal.ROUND_HALF_UP)).abs();
-    			} else {
+                if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Tax))
+                    base = taxAmt;
+                else
+                    base = gravado;
 
-                    perceptionAmt = (((gravado.add(taxAmt).multiply(wc.getAliquot())).divide(new BigDecimal (100))).setScale(2,
-                            BigDecimal.ROUND_HALF_UP)).abs(); 
-    			}
-    
+                /*
+                 * @mzuniga: No se tiene en cuenta la condición de IVA del SdN ya que en las
+                 * Configuraciones de las percepciones se realiza una entrada para el neto del
+                 * documento y otra para el impuesto. Esto permite utilizar los importes base
+                 * mínimos para el cálculo.
+                 */
+                perceptionAmt = (((base.multiply(wc.getAliquot())).divide(new BigDecimal(100)))
+                        .setScale(2, BigDecimal.ROUND_HALF_UP)).abs();
+                // @mzuniga: Si la base de cálculo no supera el mínimo el importe
+                // de la Perceción debe quedar en 0 (cero).
+                if (base.compareTo(wc.getThresholdMin()) <= 0)
+                    perceptionAmt = Env.ZERO;
+
     			// Crea la percepción de la orden
+                // Si existe recupera la línea anterior y acumula el importe de la percepción.
                 MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
                 perception.setC_Order_ID(order.get_ID());
                 perception.setC_Tax_ID(wc.getC_Tax_ID());
                 perception.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
                 perception.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
-                perception.setTaxAmt(perceptionAmt);
-                perception.setTaxBaseAmt(gravado);
+                // Se acumula el importe
+                perception.setTaxAmt(perception.getTaxAmt().add(perceptionAmt));
+                perception.setTaxBaseAmt(perception.getTaxBaseAmt().add(base));
+
                 perception.setIsTaxIncluded(false);
                 if (!perception.save()) {
                     return "Error al craer percepción";
