@@ -258,4 +258,17 @@ public class Customer implements Serializable{
 //		if(!res)
 //			throw Document.createDocumentException("InvalidCustomerCUIT");
 //	}
+
+	@Override
+	public String toString()
+	{
+	    StringBuffer sb = new StringBuffer("Customer[")
+	            .append("name=").append(name)
+	            .append(",idNumber=").append(identificationNumber)
+	            .append(",type=").append(identificationType)
+	            .append(",iva=").append(ivaResponsibility)
+	            .append(",loc=").append(location)
+	            .append("]");
+	    return sb.toString();
+	}
 }

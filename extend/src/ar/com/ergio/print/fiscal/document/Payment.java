@@ -93,4 +93,14 @@ public class Payment implements Serializable{
 		// Validar descripción.
 		Document.validateText(getDescription(),"InvalidPaymentDescription");
 	}
+
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("Payment[")
+                .append("desc=").append(description)
+                .append(", amt=").append(amount)
+                .append("]");
+        return sb.toString();
+    }
 }

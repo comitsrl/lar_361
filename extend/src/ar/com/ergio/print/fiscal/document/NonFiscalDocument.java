@@ -96,5 +96,13 @@ public class NonFiscalDocument {
 		this.copies = copies;
 	}
 	
-	
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("NonFiscalDoc[")
+                .append("copies=").append(copies)
+                .append(",lines=").append(lines)
+                .append("]");
+        return sb.toString();
+    }
 }
