@@ -178,6 +178,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
             paymentBankFrom.setPayAmt(linea.getMonto());
             paymentBankFrom.setOverUnderAmt(Env.ZERO);
+            paymentBankFrom.setPosted(true);
             paymentBankFrom.setLAR_C_DoctType_ID(false,((MBankAccount) paymentBankFrom.getC_BankAccount()).get_ValueAsBoolean("IsDrawer") ?
                     paymentBankFrom.getC_BankAccount().getAD_Org_ID() : Env.getAD_Org_ID(p_ctx));
 
@@ -252,6 +253,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 else
                     destino = new MBankAccount(p_ctx, get_ValueAsInt("CuentaDestino_ID"), get_TrxName());
 
+                paymentBankTo.setPosted(true);
                 paymentBankTo.setC_BankAccount_ID(destino.getC_BankAccount_ID());
                 paymentBankTo.setDateAcct(new Timestamp(System.currentTimeMillis()));
                 paymentBankTo.setDateTrx(new Timestamp(System.currentTimeMillis()));
