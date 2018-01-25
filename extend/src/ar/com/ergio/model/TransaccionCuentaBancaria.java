@@ -369,6 +369,7 @@ public class TransaccionCuentaBancaria
             cashBankTo.setC_BPartner_ID(p_C_BPartner_ID);
             cashBankTo.setC_Currency_ID(p_C_Currency_ID);
             cashBankTo.setPayAmt(cashAmt);
+            cashBankTo.setPosted(true);
             cashBankTo.setOverUnderAmt(Env.ZERO);
             cashBankTo.setLAR_C_DoctType_ID(true, cuentaBancaria.getAD_Org_ID());
             cashBankTo.setIsReceipt(true);
@@ -472,6 +473,7 @@ public class TransaccionCuentaBancaria
         payment.setC_Currency_ID(paymentFrom.getC_Currency_ID());
         payment.setPayAmt(paymentFrom.getPayAmt());
         payment.setOverUnderAmt(Env.ZERO);
+        payment.setPosted(true);
         payment.setLAR_C_DoctType_ID(paymentFrom.isReceipt(), destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(ctx));
         payment.setIsReceipt(paymentFrom.isReceipt());
         payment.set_ValueOfColumn("IsOnDrawer", paymentFrom.get_ValueAsBoolean("IsOnDrawer"));
@@ -508,6 +510,7 @@ public class TransaccionCuentaBancaria
             paymentBankFrom.setPayAmt(cobro.getPayAmt().negate());
         paymentBankFrom.setOverUnderAmt(cobro.getOverUnderAmt());
         paymentBankFrom.setIsReconciled(true);
+        paymentBankFrom.setPosted(true);
         paymentBankFrom.set_ValueOfColumn("LAR_PaymentSource_ID", cobro.getC_Payment_ID());
         paymentBankFrom.setLAR_C_DoctType_ID(false, statement.getC_BankAccount().getAD_Org_ID());
         paymentBankFrom.saveEx();

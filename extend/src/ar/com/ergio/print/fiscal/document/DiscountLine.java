@@ -170,4 +170,17 @@ public class DiscountLine implements Serializable{
 	{
 	    return isDiscount;
 	}
+
+	@Override
+	public String toString()
+	{
+	    StringBuffer sb = new StringBuffer("DiscountLine[")
+	            .append("description=").append(description)
+	            .append(",isDiscount=").append(isDiscount)
+	            .append(",amount=").append(amount)
+	            .append(",amountIncludeIva=").append(amountIncludeIva)
+	            .append(",taxRate=").append(taxRate)
+	            .append("]");
+	    return sb.toString();
+	}
 }

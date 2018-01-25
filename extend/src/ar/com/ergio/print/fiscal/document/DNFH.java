@@ -88,4 +88,15 @@ public class DNFH extends Document
     {
         this.printEnded = printEnded;
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("DNFH[")
+                .append("copies=").append(numberOfCopies)
+                .append(",printEnded=").append(printEnded)
+                .append(",type=").append(getDocumentType())
+                .append("]");
+        return sb.toString();
+    }
 }

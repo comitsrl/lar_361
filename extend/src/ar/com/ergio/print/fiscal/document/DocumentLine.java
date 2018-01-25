@@ -255,4 +255,19 @@ public class DocumentLine implements Serializable{
 		return MsgRepository.get(errorMsg) + 
 			   " (" + MsgRepository.get("Line") + " " + getLineNumber() + ")";
 	}
+
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("DocumentLine[")
+                .append("desc=").append(description)
+                .append(",qty=").append(quantity)
+                .append(",unitPrice=").append(unitPrice)
+                .append(",ivaRate=").append(ivaRate)
+                .append(",includeIva=").append(priceIncludeIva)
+                .append(",ln=").append(lineNumber)
+                .append(",discount=").append(discount)
+                .append("]");
+        return sb.toString();
+    }
 }

@@ -232,4 +232,17 @@ public class Invoice extends Document {
 	protected void setValidCFInvoice(boolean validCFInvoice) {
 		this.validCFInvoice = validCFInvoice;
 	}
+
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("Invoice[")
+                .append(super.toString()) // toString de la clase abstracta document
+                .append(",cai=").append(caiNumber)
+                .append(",packingSplipNro=").append(packingSlipNumber)
+                .append(",validCF=").append(validCFInvoice)
+                .append(",payments=").append(payments)
+                .append("]");
+        return sb.toString();
+    }
 }

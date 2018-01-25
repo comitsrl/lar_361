@@ -70,4 +70,15 @@ public final class PerceptionLine implements Serializable
     {
         return taxRate;
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("PerceptionLine[")
+                .append("desc=").append(description)
+                .append(",amt=").append(amt)
+                .append(",rate=").append(taxRate)
+                .append("]");
+        return sb.toString();
+    }
 }

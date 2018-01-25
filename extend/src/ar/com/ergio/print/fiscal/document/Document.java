@@ -349,4 +349,19 @@ public abstract class Document implements Serializable{
 	public void addDocumentDiscount(DiscountLine discount) {
 		getDocumentDiscounts().add(discount);
 	}
+
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer()
+                .append("documentNo=").append(documentNo)
+                .append(",letter=").append(letter)
+                .append(",customer=").append(customer)
+                .append(",obs=").append(observations)
+                .append(",perception=").append(perceptionLine)
+                .append(",gd=").append(generalDiscount)
+                .append(",dd=").append(documentDiscounts)
+                .append(",lines=").append(lines);
+        return sb.toString();
+    }
 }
