@@ -17,10 +17,13 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 /**
@@ -145,6 +148,79 @@ public class MProductPrice extends X_M_ProductPrice
 		setPriceList (PriceList.setScale(this.getM_PriceList_Version().getM_PriceList().getPricePrecision(), BigDecimal.ROUND_HALF_UP)); 
 		setPriceStd (PriceStd.setScale(this.getM_PriceList_Version().getM_PriceList().getPricePrecision(), BigDecimal.ROUND_HALF_UP));
 	}	//	setPrice
+
+    /** Establecer Categoría del Producto.
+    @param M_Product_Category_ID
+    Product, Service, Item
+  */
+	public void setM_ProductCategory_ID (int M_Product_Category_ID)
+	{
+	    if (M_Product_Category_ID < 1)
+	        set_ValueNoCheck ("M_Product_Category_ID", 0);
+	    else
+	        set_ValueNoCheck ("M_Product_Category_ID", Integer.valueOf(M_Product_Category_ID));
+	}
+
+	/** Recuperar la Categoría del Producto.
+	    @return ID de la Categoría o cero
+	  */
+	public int getM_ProductCategory_ID ()
+	{
+	    Integer ii = (Integer)get_Value("M_Product_Category_ID");
+	    if (ii == null)
+	         return 0;
+	    return ii.intValue();
+	}
+
+    /**************************************************************************
+     *  Before Save
+     *  @param newRecord
+     *  @return true if save
+     */
+    protected boolean beforeSave (boolean newRecord)
+    {
+        log.fine("New=" + newRecord);
+
+        int m_Product_Category_ID = 0;
+        // Recupera la categoría del producto desde le producto
+        String sql = "SELECT M_Product_Category_ID "
+                + "FROM M_Product "
+                + "WHERE M_Product_ID=?";
+            PreparedStatement pstmt = null;
+            try
+            {
+                pstmt = DB.prepareStatement(sql, get_TrxName());
+                pstmt.setInt(1, getM_Product_ID());
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next())
+                    m_Product_Category_ID = rs.getInt(1);
+                rs.close();
+                pstmt.close();
+                pstmt = null;
+                if (m_Product_Category_ID < 0)
+                    m_Product_Category_ID = 0;
+            }
+            catch (Exception e)
+            {
+                log.log(Level.SEVERE, "getName", e);
+            }
+            finally
+            {
+                try
+                {
+                    if (pstmt != null)
+                        pstmt.close ();
+                }
+                catch (Exception e)
+                {}
+                pstmt = null;
+            }
+
+        // Establecer la categoría del Producto
+        setM_ProductCategory_ID(m_Product_Category_ID);
+
+        return true;
+    }   //  beforeSave
 
 	/**
 	 * 	String Representation
