@@ -185,7 +185,7 @@ public class MProductPrice extends X_M_ProductPrice
         if (is_ValueChanged("PrecioStd_Final") || is_ValueChanged("PrecioLista_Final")
                 || is_ValueChanged("PrecioLimite_Final"))
         {
-            String sql = "SELECT C_Tax_ID From C_Tax WHERE C_TaxCategory_ID=?";
+            String sql = "SELECT C_Tax_ID From C_Tax WHERE C_TaxCategory_ID=? AND IsDefault='Y'";
 
             PreparedStatement pstmt = null;
             ResultSet rs = null;
