@@ -17,6 +17,7 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Properties;
@@ -179,7 +180,57 @@ public class MProductPrice extends X_M_ProductPrice
      */
     protected boolean beforeSave (boolean newRecord)
     {
-        log.fine("New=" + newRecord);
+        s_log.fine("New=" + newRecord);
+
+        if (is_ValueChanged("PrecioStd_Final") || is_ValueChanged("PrecioLista_Final")
+                || is_ValueChanged("PrecioLimite_Final"))
+        {
+            String sql = "SELECT C_Tax_ID From C_Tax WHERE C_TaxCategory_ID=?";
+
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+            int c_Tax_ID = 0;
+            try
+            {
+                pstmt = DB.prepareStatement(sql, get_TrxName());
+                pstmt.setInt(1, getM_Product().getC_TaxCategory_ID());
+                rs = pstmt.executeQuery();
+
+                if (rs.next())
+                    c_Tax_ID = rs.getInt(1);
+
+                rs.close();
+                pstmt.close();
+            }
+            catch (Exception e)
+            {
+                s_log.log(Level.SEVERE, "getName", e);
+            }
+            finally
+            {
+                pstmt = null;
+                rs = null;
+            }
+
+            if (c_Tax_ID > 0)
+            {
+                int precision = this.getM_PriceList_Version().getM_PriceList().getPricePrecision();
+                BigDecimal alic = Env.ONE.add(new MTax(getCtx(), c_Tax_ID, get_TrxName()).getRate().divide(
+                        new BigDecimal(100), precision, RoundingMode.HALF_UP));
+
+                if (is_ValueChanged("PrecioStd_Final"))
+                    setPriceStd(((BigDecimal) get_Value("PrecioStd_Final")).divide(alic, precision,
+                            RoundingMode.HALF_UP));
+                if (is_ValueChanged("PrecioLista_Final"))
+                    setPriceList(((BigDecimal) get_Value("PrecioLista_Final")).divide(alic, precision,
+                            RoundingMode.HALF_UP));
+                if (is_ValueChanged("PrecioLimite_Final"))
+                    setPriceLimit(((BigDecimal) get_Value("PrecioLimite_Final")).divide(alic, precision,
+                            RoundingMode.HALF_UP));
+            }
+            else
+                return false;
+        }
 
         int m_Product_Category_ID = 0;
         // Recupera la categoría del producto desde le producto
