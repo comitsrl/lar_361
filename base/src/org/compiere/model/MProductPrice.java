@@ -182,67 +182,74 @@ public class MProductPrice extends X_M_ProductPrice
     {
         s_log.fine("New=" + newRecord);
 
-        if (is_ValueChanged("PrecioStd_Final") || is_ValueChanged("PrecioLista_Final")
-                || is_ValueChanged("PrecioLimite_Final"))
+        // @fchiappano Actualizar precios.
+        String sql = "SELECT C_Tax_ID From C_Tax WHERE C_TaxCategory_ID=? AND IsDefault='Y'";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int c_Tax_ID = 0;
+        try
         {
-            String sql = "SELECT C_Tax_ID From C_Tax WHERE C_TaxCategory_ID=? AND IsDefault='Y'";
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, getM_Product().getC_TaxCategory_ID());
+            rs = pstmt.executeQuery();
 
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-            int c_Tax_ID = 0;
-            try
-            {
-                pstmt = DB.prepareStatement(sql, get_TrxName());
-                pstmt.setInt(1, getM_Product().getC_TaxCategory_ID());
-                rs = pstmt.executeQuery();
+            if (rs.next())
+                c_Tax_ID = rs.getInt(1);
 
-                if (rs.next())
-                    c_Tax_ID = rs.getInt(1);
-
-                rs.close();
-                pstmt.close();
-            }
-            catch (Exception e)
-            {
-                s_log.log(Level.SEVERE, "getName", e);
-            }
-            finally
-            {
-                pstmt = null;
-                rs = null;
-            }
-
-            if (c_Tax_ID > 0)
-            {
-                int precision = this.getM_PriceList_Version().getM_PriceList().getPricePrecision();
-                BigDecimal alic = Env.ONE.add(new MTax(getCtx(), c_Tax_ID, get_TrxName()).getRate().divide(
-                        new BigDecimal(100), precision, RoundingMode.HALF_UP));
-
-                if (is_ValueChanged("PrecioStd_Final"))
-                    setPriceStd(((BigDecimal) get_Value("PrecioStd_Final")).divide(alic, precision,
-                            RoundingMode.HALF_UP));
-                if (is_ValueChanged("PrecioLista_Final"))
-                    setPriceList(((BigDecimal) get_Value("PrecioLista_Final")).divide(alic, precision,
-                            RoundingMode.HALF_UP));
-                if (is_ValueChanged("PrecioLimite_Final"))
-                    setPriceLimit(((BigDecimal) get_Value("PrecioLimite_Final")).divide(alic, precision,
-                            RoundingMode.HALF_UP));
-            }
-            else
-                return false;
+            rs.close();
+            pstmt.close();
+        }
+        catch (Exception e)
+        {
+            s_log.log(Level.SEVERE, "getName", e);
+        }
+        finally
+        {
+            pstmt = null;
+            rs = null;
         }
 
-        int m_Product_Category_ID = 0;
-        // Recupera la categoría del producto desde le producto
-        String sql = "SELECT M_Product_Category_ID "
-                + "FROM M_Product "
-                + "WHERE M_Product_ID=?";
-            PreparedStatement pstmt = null;
+        if (c_Tax_ID > 0)
+        {
+            int precision = this.getM_PriceList_Version().getM_PriceList().getPricePrecision();
+            BigDecimal alic = Env.ONE.add(new MTax(getCtx(), c_Tax_ID, get_TrxName()).getRate().divide(
+                    new BigDecimal(100), precision, RoundingMode.HALF_UP));
+
+            // Actualizar precio Standart
+            if (is_ValueChanged("PrecioStd_Final"))
+                setPriceStd(((BigDecimal) get_Value("PrecioStd_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+            else if (is_ValueChanged("PriceStd"))
+                set_ValueOfColumn("PrecioStd_Final", getPriceStd().multiply(alic));
+
+            // Actualizar precio de Lista
+            if (is_ValueChanged("PrecioLista_Final"))
+                setPriceList(((BigDecimal) get_Value("PrecioLista_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+            else if (is_ValueChanged("PriceList"))
+                set_ValueOfColumn("PrecioLista_Final", getPriceList().multiply(alic));
+
+            // Actualizar precio Limite
+            if (is_ValueChanged("PrecioLimite_Final"))
+                setPriceLimit(((BigDecimal) get_Value("PrecioLimite_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+            else if (is_ValueChanged("PriceLimit"))
+                set_ValueOfColumn("PrecioLimite_Final", getPriceLimit().multiply(alic));
+        }
+        else
+            return false;
+
+        if (newRecord)
+        {
+            int m_Product_Category_ID = 0;
+            // Recupera la categoría del producto desde le producto
+            sql = "SELECT M_Product_Category_ID "
+                + "  FROM M_Product "
+                + " WHERE M_Product_ID=?";
+            pstmt = null;
             try
             {
                 pstmt = DB.prepareStatement(sql, get_TrxName());
                 pstmt.setInt(1, getM_Product_ID());
-                ResultSet rs = pstmt.executeQuery();
+                rs = pstmt.executeQuery();
                 if (rs.next())
                     m_Product_Category_ID = rs.getInt(1);
                 rs.close();
@@ -260,15 +267,17 @@ public class MProductPrice extends X_M_ProductPrice
                 try
                 {
                     if (pstmt != null)
-                        pstmt.close ();
+                        pstmt.close();
                 }
                 catch (Exception e)
                 {}
                 pstmt = null;
+                rs = null;
             }
 
-        // Establecer la categoría del Producto
-        setM_ProductCategory_ID(m_Product_Category_ID);
+            // Establecer la categoría del Producto
+            setM_ProductCategory_ID(m_Product_Category_ID);
+        }
 
         return true;
     }   //  beforeSave
