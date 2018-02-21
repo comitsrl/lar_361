@@ -17,11 +17,15 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.compiere.util.CCache;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
@@ -305,8 +309,44 @@ public class MTax extends X_C_Tax
 	 */
 	protected boolean afterSave (boolean newRecord, boolean success)
 	{
-		if (newRecord && success)
+	    if (!success)
+            return success;
+
+		if (newRecord)
 			insert_Accounting("C_Tax_Acct", "C_AcctSchema_Default", null);
+
+        // @fchiappano Si se cambia la alicuota del impuesto, se deben
+        // actualizar los precios en todas las listas de venta.
+        if (is_ValueChanged("Rate") && isDefault())
+        {
+            BigDecimal alic = (getRate().divide(new BigDecimal(100), 3, RoundingMode.FLOOR)).add(Env.ONE);
+
+            String sql = "UPDATE M_ProductPrice AS pp"
+                       + "   SET PriceStd = ROUND(PrecioStd_Final / ?, 2), PriceList = ROUND(pp.PrecioLista_Final / ?, 2), PriceLimit = ROUND(pp.PrecioLimite_Final / ?, 2)"
+                       + "  FROM M_PriceList_Version plv"
+                       + "  JOIN M_PriceList pl ON plv.M_PriceList_ID = pl.M_PriceList_ID"
+                       + " WHERE (SELECT p.C_TaxCategory_ID FROM M_Product p WHERE p.M_Product_ID = pp.M_Product_ID) = ? AND pl.IsSOPriceList = 'Y' AND plv.IsActive = 'Y' AND plv.ValidFrom <= Now()";
+
+            PreparedStatement pstmt = null;
+            try
+            {
+                pstmt = DB.prepareStatement(sql, get_TrxName());
+                pstmt.setBigDecimal(1, alic);
+                pstmt.setBigDecimal(2, alic);
+                pstmt.setBigDecimal(3, alic);
+                pstmt.setInt(4, getC_TaxCategory_ID());
+                pstmt.executeUpdate();
+                pstmt.close();
+            }
+            catch (Exception e)
+            {
+                log.log(Level.SEVERE, "getName", e);
+            }
+            finally
+            {
+                pstmt = null;
+            }
+        }
 
 		return success;
 	}	//	afterSave
