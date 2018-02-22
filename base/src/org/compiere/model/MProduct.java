@@ -17,11 +17,15 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
+import org.apache.poi.hssf.record.crypto.Biff8DecryptingStream;
 import org.compiere.util.CCache;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -697,6 +701,60 @@ public class MProduct extends X_M_Product
 		if (newRecord || is_ValueChanged("M_Product_Category_ID"))
 			MCost.create(this);
 
+        // @fchiappano Actualizar precios finales en lista de precios, si se
+        // cambia la categoria del impuesto.
+        if (is_ValueChanged("C_TaxCategory_ID") && !newRecord)
+        {
+            String sql = "SELECT Rate FROM C_Tax WHERE C_TaxCategory_ID = ? AND IsDefault = 'Y'";
+
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+            BigDecimal alic = Env.ZERO;
+
+            try
+            {
+                pstmt = DB.prepareStatement(sql, get_TrxName());
+                pstmt.setInt(1, getC_TaxCategory_ID());
+                rs = pstmt.executeQuery();
+
+                if (rs.next())
+                    alic = (rs.getBigDecimal(1).divide(new BigDecimal(100), 2, RoundingMode.FLOOR)).add(Env.ONE);
+
+                rs.close();
+                pstmt.close();
+
+                if (alic.compareTo(Env.ZERO) > 0)
+                {
+                    sql = "UPDATE M_ProductPrice AS pp"
+                            + "   SET PrecioStd_Final = ROUND(PriceStd * ?, 2), PrecioLista_Final = ROUND(PriceList * ?, 2), PrecioLimite_Final = ROUND(PriceLimit * ?, 2)"
+                            + "  FROM M_PriceList_Version plv"
+                            + "  JOIN M_PriceList pl ON plv.M_PriceList_ID = pl.M_PriceList_ID"
+                            + " WHERE pp.M_Product_ID = ? AND pl.IsSOPriceList = 'Y' AND plv.IsActive = 'Y' AND plv.ValidFrom <= Now()";
+
+                    pstmt = null;
+
+                    pstmt = DB.prepareStatement(sql, get_TrxName());
+                    pstmt.setBigDecimal(1, alic);
+                    pstmt.setBigDecimal(2, alic);
+                    pstmt.setBigDecimal(3, alic);
+                    pstmt.setInt(4, getM_Product_ID());
+                    pstmt.executeUpdate();
+                    pstmt.close();
+                }
+                else
+                    return false;
+            }
+            catch (Exception e)
+            {
+                log.log(Level.SEVERE, "getName", e);
+            }
+            finally
+            {
+                pstmt = null;
+                rs = null;
+            }
+
+        }
 		return success;
 	}	//	afterSave
 
