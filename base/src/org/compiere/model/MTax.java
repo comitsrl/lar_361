@@ -322,7 +322,7 @@ public class MTax extends X_C_Tax
             BigDecimal alic = (getRate().divide(new BigDecimal(100), 3, RoundingMode.FLOOR)).add(Env.ONE);
 
             String sql = "UPDATE M_ProductPrice AS pp"
-                       + "   SET PriceStd = ROUND(PrecioStd_Final / ?, 2), PriceList = ROUND(pp.PrecioLista_Final / ?, 2), PriceLimit = ROUND(pp.PrecioLimite_Final / ?, 2)"
+                       + "   SET PrecioStd_Final = ROUND(PriceStd * ?, 2), PrecioLista_Final = ROUND(pp.PriceList * ?, 2), PrecioLimite_Final = ROUND(pp.PriceLimit * ?, 2)"
                        + "  FROM M_PriceList_Version plv"
                        + "  JOIN M_PriceList pl ON plv.M_PriceList_ID = pl.M_PriceList_ID"
                        + " WHERE (SELECT p.C_TaxCategory_ID FROM M_Product p WHERE p.M_Product_ID = pp.M_Product_ID) = ? AND pl.IsSOPriceList = 'Y' AND plv.IsActive = 'Y' AND plv.ValidFrom <= Now()";
