@@ -23,6 +23,9 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import javax.swing.JDialog;
+
+import org.compiere.apps.ADialog;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -218,9 +221,17 @@ public class MProductPrice extends X_M_ProductPrice
 
             // Actualizar precio Standart
             if (is_ValueChanged("PrecioStd_Final"))
+            {
                 setPriceStd(((BigDecimal) get_Value("PrecioStd_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+                // @fchiappano copiar precio estandar en precio de lista.
+                set_ValueOfColumn("PrecioLista_Final", get_Value("PrecioStd_Final"));
+            }
             else if (is_ValueChanged("PriceStd"))
+            {
                 set_ValueOfColumn("PrecioStd_Final", getPriceStd().multiply(alic));
+                // @fchiappano copiar precio estandar en precio de lista.
+                setPriceList(getPriceStd());
+            }
 
             // Actualizar precio de Lista
             if (is_ValueChanged("PrecioLista_Final"))
@@ -235,7 +246,10 @@ public class MProductPrice extends X_M_ProductPrice
                 set_ValueOfColumn("PrecioLimite_Final", getPriceLimit().multiply(alic));
         }
         else
+        {
+            ADialog.error(0, new JDialog(), "No se pudo recuperar el impuesto del producto.");
             return false;
+        }
 
         if (newRecord)
         {
