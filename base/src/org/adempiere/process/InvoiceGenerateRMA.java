@@ -33,6 +33,9 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
+import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
+import ar.com.ergio.util.LAR_Utils;
+
 /**
  * Generate invoice for Vendor RMA
  * @author  Ashley Ramdass
@@ -154,6 +157,22 @@ public class InvoiceGenerateRMA extends SvrProcess
         MInvoice invoice = new MInvoice(getCtx(), 0, get_TrxName());
         invoice.setRMA(rma);
 
+        // @fchiappano Obtener el ID de la factura Origen, desde el remito
+        // vinculado en la RMA.
+        int c_Invoice_ID = rma.getInOut().getC_Invoice_ID();
+        if (c_Invoice_ID == 0)
+        {
+            int c_OrderLine_ID = rma.getShipment().getLines()[0].getC_OrderLine_ID();
+            String sql = "SELECT i.C_Invoice_ID"
+                       + "  FROM C_OrderLine ol"
+                       + "  JOIN C_InvoiceLine il ON ol.C_OrderLine_ID = il.C_OrderLine_ID"
+                       + "  JOIN C_Invoice i ON il.C_Invoice_ID = i.C_Invoice_ID"
+                       + " WHERE ol.C_OrderLine_ID = ?";
+            c_Invoice_ID = DB.getSQLValue(get_TrxName(), sql, c_OrderLine_ID);
+        }
+
+        invoice.set_ValueOfColumn("Source_Invoice_ID", c_Invoice_ID);
+
         // @emmie custom
         invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
         // @emmie custom
@@ -225,9 +244,18 @@ public class InvoiceGenerateRMA extends SvrProcess
         {
             throw new IllegalStateException("Could not update invoice");
         }
-        
+        // @fchiappano Impresion Fiscal, si se completa la factura.
+        else
+        {
+            if (p_docAction.equals(MInvoice.DOCACTION_Complete) && LAR_Utils.isFiscalDocType(invoice.getC_DocType_ID()))
+            {
+                final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(invoice);
+                manager.print();
+            }
+        }
+
         // Add processing information to process log
-        addLog(invoice.getC_Invoice_ID(), invoice.getDateInvoiced(), null, processMsg.toString());
+        addLog(invoice.getC_Invoice_ID(), invoice.getDateInvoiced(), null, invoice.getDocumentNo());
         m_created++;
     }
 }

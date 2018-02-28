@@ -329,7 +329,7 @@ import ar.com.ergio.util.LAR_Utils;
             // @mzuniga Se considera el tipo de documento base (NC o Factura)
             final MDocType docType;
             MDocType dt_orig = new MDocType(invoice.getCtx(), invoice.getC_DocTypeTarget_ID(), invoice.get_TrxName());
-            if (invoice.getC_Order_ID() != 0)
+            if (invoice.getC_Order_ID() != 0 || invoice.getM_RMA_ID() != 0)
             {
             final FindInvoiceDocType findDocType = new FindInvoiceDocType(bp, c_POS_ID, ad_Org_ID, dt_orig.getDocBaseType());
             docType = findDocType.getDocType();
@@ -352,11 +352,12 @@ import ar.com.ergio.util.LAR_Utils;
             MOrder order = new MOrder(invoice.getCtx(), invoice.getC_Order_ID(), invoice.get_TrxName());
             MDocType dt = new MDocType(invoice.getCtx(), order.getC_DocTypeTarget_ID(), invoice.get_TrxName());
             // Marcos Zúñiga : Se consideran también las Warehouse Orders (WP) y las On Credit Orders (WI)
-            if (dt.getDocSubTypeSO() != null
+            // @fchiappano Se toman en cuenta, las Ordenes de Devoluciones (Deben Generar Notas de Credito)
+            if (invoice.getM_RMA_ID() > 0 || (dt.getDocSubTypeSO() != null
                     && (dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder)
                             || dt.getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_WarehouseOrder) || (dt
                             .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_OnCreditOrder) || dt
-                            .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_StandardOrder))))
+                            .getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_StandardOrder)))))
                 invoice.setC_DocTypeTarget_ID(docType.getC_DocType_ID());
 
             invoice.set_ValueOfColumn("LAR_DocumentLetter_ID", docType.get_ValueAsInt("LAR_DocumentLetter_ID"));
