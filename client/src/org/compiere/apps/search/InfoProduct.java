@@ -462,13 +462,32 @@ public class InfoProduct extends Info implements ActionListener, ChangeListener
 		//	Pick init
 		fillPicks(M_PriceList_ID);
 		int M_PriceList_Version_ID = findPLV (M_PriceList_ID);
-		//	Set Value
-		if (value != null && value.length() > 0 && value.startsWith("@") && value.endsWith("@")) {
-			String values[] = value.substring(1,value.length()-1).split("_");
-			fieldValue.setText(values[0]);
-		}
-		else
-			fieldValue.setText(value);
+
+        // @fchiappano, imitar comportamiento de busqueda de la InfoBPartner
+        // Set Value
+        if (value == null)
+            value = "%";
+        if (!value.endsWith("%"))
+            value += "%";
+
+        // Put query string in Name if not numeric
+        if (value.equals("%"))
+            fieldName.setText(value);
+        // No Numbers entered
+        if ((value.indexOf('0') + value.indexOf('1') + value.indexOf('2') + value.indexOf('3') + value.indexOf('4')
+                + value.indexOf('5') + value.indexOf('6') + value.indexOf('7') + value.indexOf('8') + value
+                    .indexOf('9')) == -10)
+        {
+            if (value.startsWith("%"))
+                fieldName.setText(value);
+            else
+                fieldName.setText("%" + value);
+        }
+        // Number entered
+        else
+            fieldValue.setText(value);
+        // @fchiappano fin.
+
 		//	Set Warehouse
 		if (M_Warehouse_ID == 0)
 			M_Warehouse_ID = Env.getContextAsInt(Env.getCtx(), "#M_Warehouse_ID");
@@ -1041,53 +1060,26 @@ public class InfoProduct extends Info implements ActionListener, ChangeListener
 		s_productLayout = null;
 		s_productLayoutRole = MRole.getDefault().getAD_Role_ID();
 		ArrayList<Info_Column> list = new ArrayList<Info_Column>();
-		list.add(new Info_Column(" ", "p.M_Product_ID", IDColumn.class, !p_multiSelection));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "Discontinued").substring(0, 1), "p.Discontinued", Boolean.class));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "Value"), "p.Value", String.class));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "Name"), "p.Name", String.class));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyAvailable"), "case when p.IsBOM='N' and (p.ProductType!='I' OR p.IsStocked='N') then to_number(get_Sysconfig('QTY_TO_SHOW_FOR_SERVICES', '99999', p.ad_client_id, 0), '99999999999') else bomQtyAvailable(p.M_Product_ID,?,0) end AS QtyAvailable", Double.class, true, true, null));
-		if (MRole.getDefault().isColumnAccess(251 /*M_ProductPrice*/, 3027/*PriceList*/, false))
-			list.add(new Info_Column(Msg.translate(Env.getCtx(), "PriceList"), "bomPriceList(p.M_Product_ID, pr.M_PriceList_Version_ID) AS PriceList",  BigDecimal.class));
-		if (MRole.getDefault().isColumnAccess(251 /*M_ProductPrice*/, 3028/*PriceStd*/, false))
-			list.add(new Info_Column(Msg.translate(Env.getCtx(), "PriceStd"), "bomPriceStd(p.M_Product_ID, pr.M_PriceList_Version_ID) AS PriceStd", BigDecimal.class));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyOnHand"), "case when p.IsBOM='N' and (p.ProductType!='I' OR p.IsStocked='N') then to_number(get_Sysconfig('QTY_TO_SHOW_FOR_SERVICES', '99999', p.ad_client_id, 0), '99999999999') else bomQtyOnHand(p.M_Product_ID,?,0) end AS QtyOnHand", Double.class));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyReserved"), "bomQtyReserved(p.M_Product_ID,?,0) AS QtyReserved", Double.class));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyOrdered"), "bomQtyOrdered(p.M_Product_ID,?,0) AS QtyOrdered", Double.class));
-		if (isUnconfirmed())
-		{
-			list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyUnconfirmed"), "(SELECT SUM(c.TargetQty) FROM M_InOutLineConfirm c INNER JOIN M_InOutLine il ON (c.M_InOutLine_ID=il.M_InOutLine_ID) INNER JOIN M_InOut i ON (il.M_InOut_ID=i.M_InOut_ID) WHERE c.Processed='N' AND i.M_Warehouse_ID=? AND il.M_Product_ID=p.M_Product_ID) AS QtyUnconfirmed", Double.class));
-			list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyUnconfirmedMove"), "(SELECT SUM(c.TargetQty) FROM M_MovementLineConfirm c INNER JOIN M_MovementLine ml ON (c.M_MovementLine_ID=ml.M_MovementLine_ID) INNER JOIN M_Locator l ON (ml.M_LocatorTo_ID=l.M_Locator_ID) WHERE c.Processed='N' AND l.M_Warehouse_ID=? AND ml.M_Product_ID=p.M_Product_ID) AS QtyUnconfirmedMove", Double.class));
-		}
-		if (MRole.getDefault().isColumnAccess(251 /*M_ProductPrice*/, 3028/*PriceStd*/, false) && MRole.getDefault().isColumnAccess(251 /*M_ProductPrice*/, 3029/*PriceLimit*/, false))
-			list.add(new Info_Column(Msg.translate(Env.getCtx(), "Margin"), "bomPriceStd(p.M_Product_ID, pr.M_PriceList_Version_ID)-bomPriceLimit(p.M_Product_ID, pr.M_PriceList_Version_ID) AS Margin", BigDecimal.class));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "Vendor"), "bp.Name", String.class));
-		if (MRole.getDefault().isColumnAccess(251 /*M_ProductPrice*/, 3029/*PriceLimit*/, false))
-			list.add(new Info_Column(Msg.translate(Env.getCtx(), "PriceLimit"), "bomPriceLimit(p.M_Product_ID, pr.M_PriceList_Version_ID) AS PriceLimit", BigDecimal.class));
-		list.add(new Info_Column(Msg.translate(Env.getCtx(), "IsInstanceAttribute"), "pa.IsInstanceAttribute", Boolean.class));
+        list.add(new Info_Column(" ", "p.M_Product_ID", IDColumn.class, !p_multiSelection));
+        list.add(new Info_Column(Msg.translate(Env.getCtx(), "Discontinued").substring(0, 1), "p.Discontinued", Boolean.class));
+        list.add(new Info_Column(Msg.translate(Env.getCtx(), "Value"), "p.Value", String.class));
+        list.add(new Info_Column(Msg.translate(Env.getCtx(), "Name"), "p.Name", String.class));
+        if (MRole.getDefault().isColumnAccess(251 /* M_ProductPrice */, 3028/* PriceStd */, false))
+        {
+            list.add(new Info_Column("Precio Final", "bomPrecioFinal(p.M_Product_ID, pr.M_PriceList_Version_ID) AS PrecioFinal", BigDecimal.class));
+            list.add(new Info_Column("Sin Impuestos", "bomPriceStd (p.M_Product_ID, pr.M_PriceList_Version_ID) AS PriceStd", BigDecimal.class));
+        }
+        list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyAvailable"), "case when p.IsBOM='N' and (p.ProductType!='I' OR p.IsStocked='N') then to_number(get_Sysconfig('QTY_TO_SHOW_FOR_SERVICES', '99999', p.ad_client_id, 0), '99999999999') else bomQtyAvailable(p.M_Product_ID,?,0) end AS QtyAvailable", Double.class, true, true, null));
+        list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyOnHand"), "case when p.IsBOM='N' and (p.ProductType!='I' OR p.IsStocked='N') then to_number(get_Sysconfig('QTY_TO_SHOW_FOR_SERVICES', '99999', p.ad_client_id, 0), '99999999999') else bomQtyOnHand(p.M_Product_ID,?,0) end AS QtyOnHand", Double.class));
+        list.add(new Info_Column(Msg.translate(Env.getCtx(), "QtyReserved"), "bomQtyReserved(p.M_Product_ID,?,0) AS QtyReserved", Double.class));
+        list.add(new Info_Column(Msg.translate(Env.getCtx(), "Vendor"), "bp.Name", String.class));
 		s_productLayout = new Info_Column[list.size()];
 		list.toArray(s_productLayout);
 		INDEX_NAME = 3;
 		INDEX_PATTRIBUTE = s_productLayout.length - 1;	//	last item
 
-			return s_productLayout;
+        return s_productLayout;
 	}   //  getProductLayout
-	
-	/**
-	 * 	System has Unconfirmed records
-	 *	@return true if unconfirmed
-	 */
-	private boolean isUnconfirmed()
-	{
-		int no = DB.getSQLValue(null, 
-			"SELECT COUNT(*) FROM M_InOutLineConfirm WHERE AD_Client_ID=?", 
-			Env.getAD_Client_ID(Env.getCtx()));
-		if (no > 0)
-			return true;
-		no = DB.getSQLValue(null, 
-			"SELECT COUNT(*) FROM M_MovementLineConfirm WHERE AD_Client_ID=?", 
-			Env.getAD_Client_ID(Env.getCtx()));
-		return no > 0;
-	}	//	isUnconfirmed
 	
 	
 	/**
