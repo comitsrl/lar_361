@@ -442,6 +442,26 @@ UPDATE AD_Field SET DisplayLength=26,Updated=TO_TIMESTAMP('2018-02-16 17:21:15',
 UPDATE AD_Field SET DisplayLength=26,Updated=TO_TIMESTAMP('2018-02-16 17:21:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3005355
 ;
 
+-- 23/02/2018 17:48:52 ART
+-- ISSUE 101: Permitir ingresar precio final y calcular el precio base (sin impuestos) del mismo.
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2018-02-23 17:48:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=2101
+;
+
+-- 23/02/2018 17:48:59 ART
+-- ISSUE 101: Permitir ingresar precio final y calcular el precio base (sin impuestos) del mismo.
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2018-02-23 17:48:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3005343
+;
+
+-- 23/02/2018 17:49:59 ART
+-- ISSUE 101: Permitir ingresar precio final y calcular el precio base (sin impuestos) del mismo.
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2018-02-23 17:49:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3005353
+;
+
+-- 24/02/2018 8:14:20 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Field SET SeqNo=75,Updated=TO_TIMESTAMP('2018-02-24 08:14:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3005353
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0101_ISSUE-101.sql', 'LAR', '')
 ;
