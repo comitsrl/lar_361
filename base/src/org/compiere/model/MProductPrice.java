@@ -217,7 +217,7 @@ public class MProductPrice extends X_M_ProductPrice
         {
             int precision = this.getM_PriceList_Version().getM_PriceList().getPricePrecision();
             BigDecimal alic = Env.ONE.add(new MTax(getCtx(), c_Tax_ID, get_TrxName()).getRate().divide(
-                    new BigDecimal(100), precision, RoundingMode.HALF_UP));
+                    new BigDecimal(100), 3, RoundingMode.HALF_UP));
 
             // Actualizar precio Standart
             if (is_ValueChanged("PrecioStd_Final"))
