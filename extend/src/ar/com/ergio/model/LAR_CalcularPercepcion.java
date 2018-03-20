@@ -102,11 +102,8 @@ public class LAR_CalcularPercepcion
                     taxAmt = taxAmt.add(tax.getTaxAmt());
                 }
                 // Acumula la base imponible para calcular la Percepción de IIBB
-                for (MOrderLine oline : order.getLines()) {
-                    if (oline.getM_Product().getC_TaxCategory_ID() == wc.getC_TaxCategory_ID()) {
-                        gravado = gravado.add(oline.getLineNetAmt());
-                    }
-                }
+                for (MOrderLine oline : order.getLines())
+                    gravado = gravado.add(oline.getLineNetAmt());
                 if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Tax))
                     base = taxAmt;
                 else
