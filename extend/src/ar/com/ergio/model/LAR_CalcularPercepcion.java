@@ -106,8 +106,11 @@ public class LAR_CalcularPercepcion
                     gravado = gravado.add(oline.getLineNetAmt());
                 if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Tax))
                     base = taxAmt;
-                else
+                else if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Document))
                     base = gravado;
+                // @fchiappano utilizar como base de calculo, el GranTotal de la Orden.
+                else if (wc.getBaseType().equals("G"))
+                    base = order.getGrandTotal();
 
                 /*
                  * @mzuniga: No se tiene en cuenta la condición de IVA del SdN ya que en las
