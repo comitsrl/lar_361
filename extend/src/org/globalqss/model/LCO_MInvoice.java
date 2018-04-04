@@ -278,11 +278,14 @@ public class LCO_MInvoice extends MInvoice
 					// apply rule to calc base
 					BigDecimal base = null;
 					
-					if (wc.getBaseType() == null) {
+                    if (wc.getBaseType() == null)
 						log.severe("Base Type null in calc record "+wr.getLCO_WithholdingCalc_ID());
-					} else if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Document)) {
-						base = getTotalLines();
-					} else if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Line)) {
+                    else if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Document))
+                        base = getTotalLines();
+                    // @fchiappano Utilizar como base de calculo, el total de la Factura.
+                    else if (wc.getBaseType().equals("G"))
+                        base = getGrandTotal();
+                    else if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Line)) {
 						String sqllca; 
 						if (wrc.isUseWithholdingCategory() && wrc.isUseProductTaxCategory()) {
 							// base = lines of the withholding category and tax category

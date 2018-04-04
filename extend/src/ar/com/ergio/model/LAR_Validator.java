@@ -38,7 +38,6 @@ import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
-import org.compiere.model.MOrderTax;
 import org.compiere.model.MPInstance;
 import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
@@ -55,7 +54,6 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
-import org.globalqss.model.X_LCO_WithholdingCalc;
 
 import static ar.com.ergio.model.LAR_TaxPayerType.RESPONSABLE_INSCRIPTO;
 import ar.com.ergio.process.PosOrderGlobalVoiding;
@@ -150,7 +148,7 @@ import ar.com.ergio.util.LAR_Utils;
                  }
              }
 
-             String checkDuplicidad = MSysConfig.getValue("LAR_PermitirDuplicidadCuit/Dni", Env.getAD_Client_ID(Env.getCtx()));
+             String checkDuplicidad = MSysConfig.getValue("LAR_PermitirDuplicidadCuit/Dni", "N", Env.getAD_Client_ID(Env.getCtx()));
              if ((checkDuplicidad.equals("N") || (checkDuplicidad.equals("A") && type == TYPE_BEFORE_NEW)) &&
                      LAR_Utils.checkDuplicateCUIT(bp.getTaxID(), bp.getC_BPartner_ID()))
                  return "ERROR: CUIT/DNI Duplicado";
@@ -163,7 +161,7 @@ import ar.com.ergio.util.LAR_Utils;
 
              int c_BPartner_ID = ol.getC_BPartner_ID();
              MBPartner bp = new MBPartner(ol.getCtx(), c_BPartner_ID, ol.get_TrxName());
-             msg = calculatePerceptionLine(bp, ol, type);
+             msg = LAR_CalcularPercepcion.calculateWhithholdingLine(bp, ol, type);
              if (msg != null) {
                  return msg;
              }
@@ -172,7 +170,7 @@ import ar.com.ergio.util.LAR_Utils;
         if (po.get_TableName().equals(MOrder.Table_Name) && type == TYPE_BEFORE_DELETE)
         {
             MOrder order = (MOrder) po;
-            msg = deletePerceptionLine(order);
+            msg = LAR_CalcularPercepcion.deleteWhithholdingLine(order);
             if (msg != null) {
                 return msg;
             }
@@ -475,123 +473,6 @@ import ar.com.ergio.util.LAR_Utils;
      {
          return m_AD_Client_ID;
      }   //  getAD_Client_ID
-
-    private String calculatePerceptionLine(final MBPartner bp, final MOrderLine line, int type)
-    {
-        if (type == TYPE_AFTER_NEW || type == TYPE_AFTER_DELETE
-                || (type == TYPE_AFTER_CHANGE
-                    && (line.is_ValueChanged("LineNetAmt")
-                        || line.is_ValueChanged("M_Product_ID")
-                        || line.is_ValueChanged("IsActive")
-                        || line.is_ValueChanged("C_Tax_ID")
-                        || line.is_ValueChanged("C_BPartner_ID")
-                        )
-                    )
-           )
-        {
-            // Check if withholding on sales is needed
-            final MPOS pos = MPOS.get(Env.getCtx(), Env.getContextAsInt(Env.getCtx(),Env.POS_ID));
-            if (!pos.get_ValueAsBoolean("IsGenerateWithholdingOnSale")) {
-                return null;
-            }
-            final MOrder order = line.getParent();
-            // Check if is a sales transaction
-            if (!order.isSOTrx())
-                return null;
-
-            final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, true, order.get_TrxName(), order, order.getDateOrdered());
-
-            deletePerceptionLine(order);
-            // Se recorren las configuraciones recuperadas
-            // Se crean las líneas de percepción
-            for (int i = 0; i < configs.length; i++)
-            {
-                final WithholdingConfig wc = configs[i];
-                log.info("Withholding conf >> " + wc);
-
-                // Calcula el subtotal y el importe de la percepción
-    			BigDecimal taxAmt = BigDecimal.ZERO;
-    			BigDecimal gravado = BigDecimal.ZERO;
-                BigDecimal base = BigDecimal.ZERO;
-    			BigDecimal perceptionAmt = BigDecimal.ZERO;
-    			for (MOrderTax tax : order.getTaxes(true)) {
-    				taxAmt = taxAmt.add(tax.getTaxAmt());
-    			}
-    			// Acumula la base imponible para calcular la Percepción de IIBB
-    			for (MOrderLine oline : order.getLines()) {
-    				if (oline.getM_Product().getC_TaxCategory_ID() == wc.getC_TaxCategory_ID()) {
-    					gravado = gravado.add(oline.getLineNetAmt());
-    				}
-    			}
-                if (wc.getBaseType().equals(X_LCO_WithholdingCalc.BASETYPE_Tax))
-                    base = taxAmt;
-                else
-                    base = gravado;
-
-                /*
-                 * @mzuniga: No se tiene en cuenta la condición de IVA del SdN ya que en las
-                 * Configuraciones de las percepciones se realiza una entrada para el neto del
-                 * documento y otra para el impuesto. Esto permite utilizar los importes base
-                 * mínimos para el cálculo.
-                 */
-                perceptionAmt = (((base.multiply(wc.getAliquot())).divide(new BigDecimal(100)))
-                        .setScale(2, BigDecimal.ROUND_HALF_UP)).abs();
-                // @mzuniga: Si la base de cálculo no supera el mínimo el importe
-                // de la Perceción debe quedar en 0 (cero).
-                if (base.compareTo(wc.getThresholdMin()) <= 0)
-                    perceptionAmt = Env.ZERO;
-
-    			// Crea la percepción de la orden
-                // Si existe recupera la línea anterior y acumula el importe de la percepción.
-                MLAROrderPerception perception = MLAROrderPerception.get(order, order.get_TrxName());
-                perception.setC_Order_ID(order.get_ID());
-                perception.setC_Tax_ID(wc.getC_Tax_ID());
-                perception.setLCO_WithholdingRule_ID(wc.getWithholdingRule_ID());
-                perception.setLCO_WithholdingType_ID(wc.getWithholdingType_ID());
-                // Se acumula el importe
-                perception.setTaxAmt(perception.getTaxAmt().add(perceptionAmt));
-                perception.setTaxBaseAmt(perception.getTaxBaseAmt().add(base));
-
-                perception.setIsTaxIncluded(false);
-                if (!perception.save()) {
-                    return "Error al craer percepción";
-                }
-                // Update order amounts
-                if (!order.save()) {
-                    return "Error al intentar actualizar los importes de la orden";
-                }
-            } // Fin recorrido configuraciones
-        }
-        return null;
-    }
-
-    private String deletePerceptionLine(final MOrder order)
-    {
-        // Check if is a sales transaction
-        if (!order.isSOTrx())
-            return null;
-        // Check if withholding on sales is needed
-        final MPOS pos = MPOS.get(Env.getCtx(), Env.getContextAsInt(Env.getCtx(),Env.POS_ID));
-        if (!pos.get_ValueAsBoolean("IsGenerateWithholdingOnSale")) {
-            return null;
-        }
-        int c_Order_ID = order.get_ID();
-        log.info("Borrar las percepciones para la orden: " + c_Order_ID);
-        String sql = "DELETE FROM LAR_OrderPerception WHERE C_ORDER_ID=?";
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = DB.prepareStatement(sql, order.get_TrxName());
-            pstmt.setInt(1, c_Order_ID);
-            pstmt.executeUpdate();
-        } catch (Exception e) {
-            log.log(Level.SEVERE, sql, e);
-            return e.getMessage();
-        } finally {
-            DB.close(pstmt);
-            pstmt = null;
-        }
-        return null;
-    }
 
     /**
      * Elimina los "Pagos Retención" y los Certificados de Retención

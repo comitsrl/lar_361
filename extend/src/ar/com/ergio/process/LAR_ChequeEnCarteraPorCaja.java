@@ -61,6 +61,10 @@ public class LAR_ChequeEnCarteraPorCaja extends SvrProcess
             + " FROM C_Payment pt"
             + " WHERE pt.IsOnDrawer='Y' ";
 
+        String noDuplicado = " SELECT Cobro_ID"
+                           + "   FROM LAR_RetiroCajaLine rcl"
+                           + "  WHERE rcl.LAR_RetiroCaja_ID = " + retiroCaja_ID;
+
         StringBuilder whereSQL = new StringBuilder();
             whereSQL.append("IsReceipt='Y'");
             whereSQL.append("AND Docstatus IN ('CO','CL')");
@@ -68,6 +72,7 @@ public class LAR_ChequeEnCarteraPorCaja extends SvrProcess
             whereSQL.append("AND TenderType IN ('K', 'Z')");
             whereSQL.append("AND C_Payment_ID NOT IN ("+usedDocs+")");
             whereSQL.append("AND C_Payment_ID IN ("+ondrawer+")");
+            whereSQL.append("AND C_Payment_ID NOT IN ("+noDuplicado+")");
             whereSQL.append("AND C_BankAccount_ID IN (" + retiroCaja.getC_BankAccountFrom_ID() + ")");
 
         Info inf = InfoOnDrawerChecks.create(frame, true, 0, "C_Payment", "C_Payment_ID", "", true, whereSQL.toString());

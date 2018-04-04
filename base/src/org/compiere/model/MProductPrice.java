@@ -217,10 +217,10 @@ public class MProductPrice extends X_M_ProductPrice
         {
             int precision = this.getM_PriceList_Version().getM_PriceList().getPricePrecision();
             BigDecimal alic = Env.ONE.add(new MTax(getCtx(), c_Tax_ID, get_TrxName()).getRate().divide(
-                    new BigDecimal(100), precision, RoundingMode.HALF_UP));
+                    new BigDecimal(100), 3, RoundingMode.HALF_UP));
 
             // Actualizar precio Standart
-            if (is_ValueChanged("PrecioStd_Final"))
+            if (is_ValueChanged("PrecioStd_Final") && (!newRecord || (newRecord && ((BigDecimal) get_Value("PrecioStd_Final")).compareTo(Env.ZERO) != 0)))
             {
                 setPriceStd(((BigDecimal) get_Value("PrecioStd_Final")).divide(alic, precision, RoundingMode.HALF_UP));
                 // @fchiappano copiar precio estandar en precio de lista.
@@ -234,13 +234,13 @@ public class MProductPrice extends X_M_ProductPrice
             }
 
             // Actualizar precio de Lista
-            if (is_ValueChanged("PrecioLista_Final"))
+            if (is_ValueChanged("PrecioLista_Final") && (!newRecord || (newRecord && ((BigDecimal) get_Value("PrecioLista_Final")).compareTo(Env.ZERO) != 0)))
                 setPriceList(((BigDecimal) get_Value("PrecioLista_Final")).divide(alic, precision, RoundingMode.HALF_UP));
             else if (is_ValueChanged("PriceList"))
                 set_ValueOfColumn("PrecioLista_Final", getPriceList().multiply(alic));
 
             // Actualizar precio Limite
-            if (is_ValueChanged("PrecioLimite_Final"))
+            if (is_ValueChanged("PrecioLimite_Final") && (!newRecord || (newRecord && ((BigDecimal) get_Value("PrecioLimite_Final")).compareTo(Env.ZERO) != 0)))
                 setPriceLimit(((BigDecimal) get_Value("PrecioLimite_Final")).divide(alic, precision, RoundingMode.HALF_UP));
             else if (is_ValueChanged("PriceLimit"))
                 set_ValueOfColumn("PrecioLimite_Final", getPriceLimit().multiply(alic));
