@@ -55,7 +55,6 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
-import static ar.com.ergio.model.LAR_TaxPayerType.RESPONSABLE_INSCRIPTO;
 import ar.com.ergio.process.PosOrderGlobalVoiding;
 import ar.com.ergio.util.LAR_Utils;
 
@@ -401,10 +400,16 @@ import ar.com.ergio.util.LAR_Utils;
                 && (timing == TIMING_AFTER_VOID || timing == TIMING_AFTER_REVERSECORRECT))
         {
             MPayment payment  = (MPayment) po;
-            Integer source = (Integer) payment.get_Value("LAR_PaymentSource_ID");
-            msg = setIsOnDrawer(source, "Y", payment.get_TrxName());
-            if (msg != null) {
-                return msg;
+            // @fchiappano Solo si se esta anulando un pago incluido en una
+            // orden de pago, se vuelve a marcar el source como en cartera.
+            if (!payment.isReceipt() && payment.get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
+            {
+                Integer source = (Integer) payment.get_Value("LAR_PaymentSource_ID");
+                msg = setIsOnDrawer(source, "Y", payment.get_TrxName());
+                if (msg != null)
+                {
+                    return msg;
+                }
             }
         }
         

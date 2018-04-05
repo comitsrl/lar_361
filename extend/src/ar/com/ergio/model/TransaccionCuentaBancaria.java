@@ -230,6 +230,11 @@ public class TransaccionCuentaBancaria
             // De la linea obtengo el pago
             final MPayment pago = (MPayment) linea.getC_Payment();
 
+            // Si el pago/cobro, contenido en la linea, no esta en estado
+            // completo o cerrado (por anulacion), se continua con la siguiente linea.
+            if (!pago.getDocStatus().equals( MPayment.DOCSTATUS_Completed) && !pago.getDocStatus().equals(MPayment.DOCSTATUS_Closed))
+                continue;
+
             MPayment paymentBankTo = null;
 
             // Tomo y guardo, la moneda utilizada en el pago para utilizarla posteriormente.
