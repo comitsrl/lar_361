@@ -1303,6 +1303,7 @@ public class MInvoiceLine extends X_C_InvoiceLine
         setC_UOM_ID(rmaLine.getC_UOM_ID());
         setC_Tax_ID(rmaLine.getC_Tax_ID());
         setPrice(rmaLine.getAmt());
+        setPriceList((BigDecimal) rmaLine.get_Value("PriceList"));
         BigDecimal qty = rmaLine.getQty();
         if (rmaLine.getQtyInvoiced() != null)
         	qty = qty.subtract(rmaLine.getQtyInvoiced());
