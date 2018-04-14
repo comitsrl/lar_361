@@ -159,19 +159,12 @@ public class InvoiceGenerateRMA extends SvrProcess
 
         // @fchiappano Obtener el ID de la factura Origen, desde el remito
         // vinculado en la RMA.
-        int c_Invoice_ID = rma.getInOut().getC_Invoice_ID();
-        if (c_Invoice_ID == 0)
-        {
-            int c_OrderLine_ID = rma.getShipment().getLines()[0].getC_OrderLine_ID();
-            String sql = "SELECT i.C_Invoice_ID"
-                       + "  FROM C_OrderLine ol"
-                       + "  JOIN C_InvoiceLine il ON ol.C_OrderLine_ID = il.C_OrderLine_ID"
-                       + "  JOIN C_Invoice i ON il.C_Invoice_ID = i.C_Invoice_ID"
-                       + " WHERE ol.C_OrderLine_ID = ?";
-            c_Invoice_ID = DB.getSQLValue(get_TrxName(), sql, c_OrderLine_ID);
-        }
+        MInvoice facturaOrigen = rma.getOriginalInvoice();
 
-        invoice.set_ValueOfColumn("Source_Invoice_ID", c_Invoice_ID);
+        invoice.set_ValueOfColumn("Source_Invoice_ID", facturaOrigen.getC_Invoice_ID());
+        // @fchiappano Obtener el paymentRule y el PaymentTerm desde la factura origen
+        invoice.setPaymentRule(facturaOrigen.getPaymentRule());
+        invoice.setC_PaymentTerm_ID(facturaOrigen.getC_PaymentTerm_ID());
 
         // @emmie custom
         invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
