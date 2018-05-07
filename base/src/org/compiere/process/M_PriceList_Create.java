@@ -703,6 +703,22 @@ public class M_PriceList_Create extends SvrProcess {
 		curgen.close();
 		curgen = null;
 
+		// @fchiappano Actualizar precios finales
+        sql = "UPDATE M_ProductPrice AS pp"
+            +   " SET PrecioStd_Final = ROUND(PriceStd * (t.Rate / 100 + 1), pl.PricePrecision),"
+            +       " PrecioLista_Final = ROUND(PriceList * (t.Rate / 100 + 1), pl.PricePrecision)"
+            +  " FROM M_Product p, M_PriceList_Version plv, C_Tax t, M_PriceList pl"
+            + " WHERE pp.M_PriceList_Version_ID = ?"
+            +   " AND pp.M_Product_ID = p.M_Product_ID"
+            +   " AND pp.M_PriceList_Version_ID = plv.M_PriceList_Version_ID"
+            +   " AND p.C_TaxCategory_ID = t.C_TaxCategory_ID"
+            +   " AND t.IsDefault = 'Y'"
+            +   " AND plv.M_PriceList_ID = pl.M_PriceList_ID";
+
+        int cant = DB.executeUpdate(sql, p_PriceList_Version_ID, get_TrxName());
+        if (cant == -1)
+            raiseError("Error al actualizar precios finales.", sql);
+
 		return "OK";
 
 	} // del doIt
