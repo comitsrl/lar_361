@@ -25,6 +25,7 @@ import java.util.logging.Level;
 
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
+import org.compiere.model.MPOS;
 import org.compiere.model.MRMA;
 import org.compiere.model.MRMALine;
 import org.compiere.process.DocAction;
@@ -169,6 +170,9 @@ public class InvoiceGenerateRMA extends SvrProcess
         // @emmie custom
         invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
         // @emmie custom
+
+        // @fchiappano pisar la org de la NC, con la org del PDV
+        invoice.setAD_Org_ID(new MPOS(getCtx(), p_C_POS_ID, get_TrxName()).getAD_Org_ID());
 
         invoice.setC_DocTypeTarget_ID(docTypeId);
         if (!invoice.save())
