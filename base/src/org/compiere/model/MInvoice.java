@@ -1031,6 +1031,10 @@ public class MInvoice extends X_C_Invoice implements DocAction
                 }
 
                 setDocumentNo(documentoNo);
+
+                // Corregir Secuencia.
+                MSequence.setFiscalDocTypeNextNroComprobante(getC_DocType().getDefiniteSequence_ID(),
+                        Integer.parseInt(fiscalreceiptnumber) + 1, get_TrxName());
             }
         }
 
