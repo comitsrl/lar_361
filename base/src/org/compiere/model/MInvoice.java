@@ -27,12 +27,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import javax.swing.JDialog;
-
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoAddressException;
 import org.adempiere.exceptions.DBException;
-import org.compiere.apps.ADialog;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
@@ -1004,40 +1001,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			if (order.getC_CashPlanLine_ID() > 0)
 				setC_CashPlanLine_ID(order.getC_CashPlanLine_ID());
 		}
-
-		// @fchiappano si el documentNo difiere del FiscalReceiptNumber, lo piso y actualizo la secuencia.
-        if (getDocStatus().equals(MInvoice.DOCSTATUS_Completed) && !get_ValueAsString("FiscalReceiptNumber").equals("")
-                && get_ValueAsString("FiscalReceiptNumber") != null)
-        {
-            String documentoNo = getDocumentNo();
-            String nroFactura = documentoNo.substring(documentoNo.length() - 8, documentoNo.length());
-            String fiscalreceiptnumber = "00000000" + get_ValueAsString("FiscalReceiptNumber");
-            fiscalreceiptnumber = fiscalreceiptnumber.substring(fiscalreceiptnumber.length() - 8,
-                    fiscalreceiptnumber.length());
-            if (!nroFactura.equals(fiscalreceiptnumber))
-            {
-                documentoNo = documentoNo.substring(0, documentoNo.length() - 8) + fiscalreceiptnumber;
-                String sql = "SELECT COUNT(*) FROM C_Invoice WHERE DocumentNo = ?";
-                int cant_duplicados = DB.getSQLValue(get_TrxName(), sql, documentoNo);
-
-                // Si ya existe, una o mas facturas con el mismo documentNo, le
-                // agrego un sufijo y muestro advertencia al usuario.
-                if (cant_duplicados > 0)
-                {
-                    documentoNo += "->R";
-                    log.info("Se produjo un desfasaje en la secuencia de numeración. La factura se guardara con el siguiente Número de Documento: " + documentoNo);
-                    ADialog.info(1, new JDialog(), "Se produjo un desfasaje en la secuencia de numeración. La factura se guardara con el siguiente Número de Documento: "
-                                    + documentoNo);
-                }
-
-                setDocumentNo(documentoNo);
-
-                // Corregir Secuencia.
-                MSequence.setFiscalDocTypeNextNroComprobante(getC_DocType().getDefiniteSequence_ID(),
-                        Integer.parseInt(fiscalreceiptnumber) + 1, get_TrxName());
-            }
-        }
-
+		
 		return true;
 	}	//	beforeSave
 

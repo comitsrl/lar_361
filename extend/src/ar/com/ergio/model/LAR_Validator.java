@@ -26,6 +26,8 @@ import org.compiere.acct.Doc;
 import org.compiere.acct.DocTax;
 import org.compiere.acct.Fact;
 import org.compiere.acct.FactLine;
+import org.compiere.apps.ADialog;
+import org.compiere.apps.SwingWorker;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
@@ -36,6 +38,7 @@ import org.compiere.model.MInOut;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MPInstance;
 import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
@@ -46,10 +49,13 @@ import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
 import org.compiere.pos.PosOrderModel;
+import org.compiere.process.ProcessInfo;
+import org.compiere.process.ProcessInfoParameter;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
+import ar.com.ergio.process.PosOrderGlobalVoiding;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
@@ -196,6 +202,35 @@ import ar.com.ergio.util.LAR_Utils;
                 return msg;
             }
         }
+/*
+        // @fchiappano Pisar DocumentNo, si difiere con lo que devuelve el CF
+        if (po.get_TableName().equals(MInvoice.Table_Name) && type == TYPE_BEFORE_CHANGE)
+        {
+            MInvoice invoice = (MInvoice) po;
+            if (invoice.getDocStatus().equals(MInvoice.DOCSTATUS_Completed) && !invoice.get_ValueAsString("FiscalReceiptNumber").equals(""))
+            {
+                String documentoNo = invoice.getDocumentNo();
+                String nroFactura = documentoNo.substring(documentoNo.length() -8, documentoNo.length());
+                String fiscalreceiptnumber = "00000000" + invoice.get_ValueAsString("FiscalReceiptNumber");
+                fiscalreceiptnumber = fiscalreceiptnumber.substring(fiscalreceiptnumber.length() -8, fiscalreceiptnumber.length());
+                if (!nroFactura.equals(fiscalreceiptnumber))
+                {
+                    documentoNo = documentoNo.substring(0, documentoNo.length() -8) + fiscalreceiptnumber;
+                    String sql = "SELECT COUNT(*) FROM C_Invoice WHERE DocumentNo = ?";
+                    int cant_duplicados = DB.getSQLValue(invoice.get_TrxName(), sql, documentoNo);
+
+                    // Si ya existe, una o mas facturas con el mismo documentNo, disparo el error.
+                    if (cant_duplicados > 0)
+                        anularOperación(invoice, documentoNo, fiscalreceiptnumber);
+                    else
+                        invoice.setDocumentNo(documentoNo);
+
+                    // Corregir Secuencia.
+                    MSequence.setFiscalDocTypeNextNroComprobante(invoice.getC_DocType().getDefiniteSequence_ID(),
+                            Integer.parseInt(fiscalreceiptnumber) + 1, null);
+                }
+            }
+        }*/
 
         // Despues de modificar un pago, se actualiza la retención y el total de al cabecera
         if (po.get_TableName().equals(MPayment.Table_Name) &&
@@ -950,5 +985,68 @@ import ar.com.ergio.util.LAR_Utils;
 	 		return null;
 	 	}
 	 	//Marcos Zúñiga -end
+
+    /**
+     * Anular toda la operación de venta (OV - Recibos - Factura y Remito).
+     *
+     * @param invoice
+     */
+    private void anularOperación(final MInvoice invoice, final String documentNo, final String fiscalreceiptnumber)
+    {
+        SwingWorker worker = new SwingWorker()
+        {
+            private String errorMsg = null;
+
+            @Override
+            public Object construct()
+            {
+                // Crea parámetro que se enviará al proceso
+                final ProcessInfoParameter param = new ProcessInfoParameter("C_Order_ID", invoice.getC_Order_ID(), "",
+                        "", "");
+
+                // Crea información del proceso
+                int AD_Process_ID = 3000037;
+                final ProcessInfo pi = new ProcessInfo("PosOrderGlobalVoiding", AD_Process_ID);
+                pi.setParameter(new ProcessInfoParameter[] { param });
+
+                // Crea una instancia de proceso (para registro y
+                // sincronizacion)
+                final MPInstance pinstance = new MPInstance(Env.getCtx(), 0, null);
+                pinstance.setAD_Process_ID(AD_Process_ID);
+                pinstance.setRecord_ID(0);
+                pinstance.save();
+
+                // Conecta el proceso con la instancia de proceso
+                pi.setAD_PInstance_ID(pinstance.get_ID());
+
+                // Crea el proceso a ejecutar
+                final PosOrderGlobalVoiding process = new PosOrderGlobalVoiding();
+
+                log.info("Iniciando proceso global de anulaci\u00f3n");
+                return process.startProcess(Env.getCtx(), pi, null);
+            } // construct
+
+            @Override
+            public void finished()
+            {
+                boolean success = (Boolean) getValue();
+                if (!success)
+                {
+                    ADialog.error(0, Env.getWindow(0), errorMsg);
+                }
+                else
+                {
+                    ADialog.warn(0, Env.getWindow(0), "Número de Documento " + documentNo + " duplicado.",
+                            "Operación anulada.");
+                    // Corregir Secuencia.
+                    MSequence.setFiscalDocTypeNextNroComprobante(invoice.getC_DocType().getDefiniteSequence_ID(),
+                            Integer.parseInt(fiscalreceiptnumber) + 1, null);
+                }
+            }
+        }; // new SwingWorker
+
+        worker.start();
+        worker.finished();
+    } // anularOperación
 
  }   //  LAR_Validator
