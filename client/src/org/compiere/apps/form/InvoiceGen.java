@@ -137,7 +137,7 @@ public class InvoiceGen extends GenForm implements SystemIDs
         sql.append("INNER JOIN M_InOut io ON rma.InOut_ID=io.M_InOut_ID ");
         sql.append("WHERE NOT EXISTS (SELECT * FROM C_Invoice i ");
         sql.append("WHERE i.M_RMA_ID=rma.M_RMA_ID AND i.DocStatus IN ('IP', 'CO', 'CL')) ");
-        sql.append("AND rma.AD_Client_ID=?");
+        sql.append("AND rma.AD_Client_ID=? AND rma.Amt > 0");
         if (m_AD_Org_ID != null)
             sql.append(" AND rma.AD_Org_ID=").append(m_AD_Org_ID);
         if (m_C_BPartner_ID != null)
