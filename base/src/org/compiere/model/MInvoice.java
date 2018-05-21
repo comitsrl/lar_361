@@ -43,6 +43,8 @@ import org.eevolution.model.MPPProductBOM;
 import org.eevolution.model.MPPProductBOMLine;
 
 import ar.com.comit.factura.electronica.ProcessorWSFE;
+import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
+import ar.com.ergio.util.LAR_Utils;
 
 
 /**
@@ -1984,6 +1986,17 @@ public class MInvoice extends X_C_Invoice implements DocAction
             }
         }
 
+        // @fchiappano Impresión fiscal
+        if (LAR_Utils.isFiscalDocType(getC_DocType_ID()))
+        {
+            final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(this);
+            if (!manager.print())
+            {
+                m_processMsg = "Error en la Impresión Fiscal";
+                return DocAction.STATUS_Invalid;
+            }
+        }
+
         // Set the definite document number after completed (if needed)
         setDefiniteDocumentNo();
 
@@ -2019,15 +2032,16 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		}
 		if (dt.isOverwriteSeqOnComplete()) {
 		    // @fchiappano
-            if (dt.isElectronic())
+            if (dt.isElectronic() || LAR_Utils.isFiscalDocType(getC_DocType_ID()))
             {
                 final MSequence seq = new MSequence(getCtx(), dt.getDefiniteSequence_ID(), get_TrxName());
                 final int currentNext = seq.getCurrentNext();
+                final int documentNo = dt.isElectronic() ? getNumeroComprobante() : get_ValueAsInt("FiscalReceiptNumber");
 
                 // @fchiappano Comprobar que el siguiente número de la secuencia coincida
                 // con el devuelto por afip.
-                if (currentNext != getNumeroComprobante())
-                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), getNumeroComprobante(),
+                if (currentNext != documentNo)
+                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), documentNo,
                             get_TrxName());
 
                 String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
@@ -2036,7 +2050,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
 
                 // @fchiappano Controlar que el currentNext este correcto para la siguiente
                 // transacción.
-                MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), getNumeroComprobante() + 1,
+                MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), documentNo + 1,
                         get_TrxName());
             }
             else

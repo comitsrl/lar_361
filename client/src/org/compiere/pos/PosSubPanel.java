@@ -162,7 +162,8 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 		        int C_DocType_ID = shipment.getC_DocType_ID();
 		        isFiscal = LAR_Utils.isFiscalDocType(C_DocType_ID);
 
-		        if (isFiscal)
+		        // @fchiappano se comenta codigo de impresión fiscal
+		        /* if (isFiscal)
 		        {
 		            // Impresión fiscal del de remito generado
 		            if (!p_posPanel.printFiscalTicket(shipment))
@@ -170,8 +171,8 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
 		                log.log(Level.SEVERE, "Error in Fiscal Printing Ticket");
 		                return;
 		            }
-		        }
-		        else
+		        } */
+		        if (!isFiscal)
 		        {
 		            reportType = ReportEngine.SHIPMENT;
 		            documentId = order.getC_Order_ID();
@@ -185,6 +186,8 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                 isFiscal = LAR_Utils.isFiscalDocType(C_DocType_ID);
                 isElectronic = MDocType.isElectronicDocType(C_DocType_ID);
 
+                /* @fchiappano se comenta codigo de impresión fiscal
+
                 // Si DocType es fiscal se utiliza el controlador fiscal
                 if (isFiscal && !isElectronic)
                 {
@@ -194,8 +197,8 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                         log.log(Level.SEVERE, "Error en impresi\u00f3n de factura fiscal");
                         return;
                     }
-                }
-                else
+                } */
+                if (!isFiscal)
                 {
                     reportType = ReportEngine.INVOICE;
                     documentId = invoice.getC_Invoice_ID();
@@ -204,36 +207,32 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                     {
                         ReportCtl.startDocumentPrint(reportType, null, documentId, null, Env.getWindowNo(this), true, impresoraFactura);
                     }
+                    else if (isJavaPOS)
+                    {
+                        final ImprimeTicketCompra ticketCompra = new ImprimeTicketCompra(invoice);
+                        try
+                        {
+                            ticketCompra.imprimir();
+
+                            // @fchiappano Imprimir ticket de envio a domicilio.
+                            if (p_posPanel.m_order.get_ValueAsBoolean("ImprimirEnvio"))
+                            {
+                                final ImprimeTicketEnvio ticketEnvio = new ImprimeTicketEnvio(order);
+                                ticketEnvio.imprimir();
+                            }
+                        }
+                        catch (JposException e)
+                        {
+                            log.log(Level.SEVERE, "Error al imprimir v\u00eda Java POS", e);
+                        }
+                    }
+                    // @fchiappano Si no es ni electronica ni JavaPos, se imprime de forma tradicional
+                    else
+                        ReportCtl.startDocumentPrint(reportType, documentId, null, Env.getWindowNo(this), false);
                 }
 		    } // if (isShipment)
 
-		    // Si no se trata de un documento fiscal, se imprime de forma tradicional
-		    if (!isFiscal)
-            {
-                if (isJavaPOS)
-                {
-                    final MInvoice invoice = p_posPanel.m_order.getInvoices()[0];
-                    final ImprimeTicketCompra ticketCompra = new ImprimeTicketCompra(invoice);
-                    try
-                    {
-                        ticketCompra.imprimir();
-
-                        // @fchiappano Imprimir ticket de envio a domicilio.
-                        if (p_posPanel.m_order.get_ValueAsBoolean("ImprimirEnvio"))
-                        {
-                            final ImprimeTicketEnvio ticketEnvio = new ImprimeTicketEnvio(order);
-                            ticketEnvio.imprimir();
-                        }
-                    }
-                    catch (JposException e)
-                    {
-                        log.log(Level.SEVERE, "Error al imprimir v\u00eda Java POS", e);
-                    }
-                }
-                p_posPanel.newOrder();
-                ReportCtl.startDocumentPrint(reportType, documentId, null, Env.getWindowNo(this), false);
-            }
-
+		    p_posPanel.newOrder();
 		    p_posPanel.stopGlassPane();
 		} // if (order != null)
 	}
