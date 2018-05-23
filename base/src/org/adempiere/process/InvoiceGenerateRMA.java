@@ -33,6 +33,7 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Trx;
 
 import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
 import ar.com.ergio.util.LAR_Utils;
@@ -250,6 +251,11 @@ public class InvoiceGenerateRMA extends SvrProcess
                 manager.print();
             }
         }
+
+        // @fchiappano realizar un commit de la trasacción, para que
+        // ante cualquier interrupción, no se pierdan la facturas ya impresas.
+        Trx trx = Trx.get(get_TrxName(), false);
+        trx.commit();
 
         // Add processing information to process log
         addLog(invoice.getC_Invoice_ID(), invoice.getDateInvoiced(), null, invoice.getDocumentNo());

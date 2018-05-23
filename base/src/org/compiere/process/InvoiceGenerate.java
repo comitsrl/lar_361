@@ -41,6 +41,7 @@ import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Language;
+import org.compiere.util.Trx;
 
 import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
 import ar.com.ergio.util.LAR_Utils;
@@ -528,6 +529,11 @@ public class InvoiceGenerate extends SvrProcess
 			        final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(m_invoice);
 			        manager.print();
 			    }
+
+                // @fchiappano realizar un commit de la trasacción, para que
+                // ante cualquier interrupción, no se pierdan la facturas ya impresas.
+                Trx trx = Trx.get(get_TrxName(), false);
+                trx.commit();
 			}
 			// @emmie custom
 
