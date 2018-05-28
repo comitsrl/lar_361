@@ -564,10 +564,6 @@ public final class VBPartner extends CDialog implements ActionListener
         m_partner.setDUNS(fNroIIBB.getText());
         m_partner.set_ValueOfColumn("EMail", fEMail.getText());
 
-        KeyNamePair listaPrecio = (KeyNamePair) fListaPrecio.getSelectedItem();
-        if (listaPrecio != null && listaPrecio.getKey() > 0)
-            m_partner.setM_PriceList_ID(listaPrecio.getKey());
-
         ValueNamePair condVenta = (ValueNamePair) fCondVenta.getSelectedItem();
         if (condVenta != null && !condVenta.getValue().equals(""))
             m_partner.setPaymentRule(condVenta.getValue());
@@ -579,7 +575,14 @@ public final class VBPartner extends CDialog implements ActionListener
 			ADialog.error(m_WindowNo, this, "BPartnerNotSaved");
 			return false;
 		}
-		
+
+        KeyNamePair listaPrecio = (KeyNamePair) fListaPrecio.getSelectedItem();
+        if (listaPrecio != null && listaPrecio.getKey() > 0)
+        {
+            m_partner.setM_PriceList_ID(listaPrecio.getKey());
+            m_partner.saveEx();
+        }
+
 		//	***** Business Partner - Location *****
 		if (m_pLocation == null)
 			m_pLocation = new MBPartnerLocation(m_partner);
