@@ -124,9 +124,11 @@ public abstract class FiscalDocumentPrintManager
                 Msg.parseTranslation(Env.getCtx(), "@PrintingFiscalDocument@"));
         log.info("info fiscal printer windows created");
 
+        /* @fchiappano Se comentan botones de acción, obsoletos en el cambio de ejecución de la IF.
         infoFiscalPrinter.setReprintButtonActive(true);
         infoFiscalPrinter.setVoidButtonActive(true);
-        infoFiscalPrinter.setOkButtonActive(false);
+        infoFiscalPrinter.setOkButtonActive(false); */
+
     } //createInfoFiscalPrinter
 
     /**
