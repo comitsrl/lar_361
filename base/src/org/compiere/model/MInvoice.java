@@ -1951,49 +1951,51 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			return DocAction.STATUS_Invalid;
 		}
 
-        /**
-         * @agregado: Horacio Alvarez - Servicios Digitales S.A.
-         * @fecha: 2009-06-16
-         * @fecha: 2011-06-25 modificado para soportar WSFEv1.0
-         *
-         */
-        if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()))
+        if (!isReversal())
         {
-            // === Lógica adicional para evitar doble notificación a AFIP. ===
-            // Si tiene CAE asignado, no debe generarlo nuevamente
-            if ((getcae() == null || getcae().length() == 0) && getcaecbte() != getNumeroComprobante())
+            /**
+             * @agregado: Horacio Alvarez - Servicios Digitales S.A.
+             * @fecha: 2009-06-16
+             * @fecha: 2011-06-25 modificado para soportar WSFEv1.0
+             */
+            if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()))
             {
-                ProcessorWSFE processor = new ProcessorWSFE(this);
-                String errorMsg = processor.generateCAE();
-                if (Util.isEmpty(processor.getCAE()))
+                // === Lógica adicional para evitar doble notificación a AFIP.
+                // === Si tiene CAE asignado, no debe generarlo nuevamente
+                if ((getcae() == null || getcae().length() == 0) && getcaecbte() != getNumeroComprobante())
                 {
-                    setcaeerror(errorMsg);
-                    m_processMsg = errorMsg;
-                    log.log(Level.SEVERE, "CAE Error: " + errorMsg);
-                    return DocAction.STATUS_Invalid;
-                }
-                else
-                {
-                    setcae(processor.getCAE());
-                    setvtocae(processor.getDateCae());
-                    setcaeerror(errorMsg);
-                    int nroCbte = Integer.parseInt(processor.getNroCbte());
-                    this.setNumeroComprobante(nroCbte);
+                    ProcessorWSFE processor = new ProcessorWSFE(this);
+                    String errorMsg = processor.generateCAE();
+                    if (Util.isEmpty(processor.getCAE()))
+                    {
+                        setcaeerror(errorMsg);
+                        m_processMsg = errorMsg;
+                        log.log(Level.SEVERE, "CAE Error: " + errorMsg);
+                        return DocAction.STATUS_Invalid;
+                    }
+                    else
+                    {
+                        setcae(processor.getCAE());
+                        setvtocae(processor.getDateCae());
+                        setcaeerror(errorMsg);
+                        int nroCbte = Integer.parseInt(processor.getNroCbte());
+                        this.setNumeroComprobante(nroCbte);
 
-                    log.log(Level.WARNING, "CAE: " + processor.getCAE());
-                    log.log(Level.WARNING, "DATE CAE: " + processor.getDateCae());
+                        log.log(Level.WARNING, "CAE: " + processor.getCAE());
+                        log.log(Level.WARNING, "DATE CAE: " + processor.getDateCae());
+                    }
                 }
             }
-        }
 
-        // @fchiappano Impresión fiscal
-        if (LAR_Utils.isFiscalDocType(getC_DocType_ID()))
-        {
-            final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(this);
-            if (!manager.print())
+            // @fchiappano Impresión fiscal
+            if (LAR_Utils.isFiscalDocType(getC_DocType_ID()))
             {
-                m_processMsg = "Error en la Impresión Fiscal";
-                return DocAction.STATUS_Invalid;
+                final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(this);
+                if (!manager.print())
+                {
+                    m_processMsg = "Error en la Impresión Fiscal";
+                    return DocAction.STATUS_Invalid;
+                }
             }
         }
 
