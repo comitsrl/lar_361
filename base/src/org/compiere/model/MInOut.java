@@ -973,6 +973,8 @@ public class MInOut extends X_M_InOut implements DocAction
 	protected boolean beforeSave (boolean newRecord)
 	{
 		MWarehouse wh = MWarehouse.get(getCtx(), getM_Warehouse_ID());
+        /*
+        @emmie - Se permiten utilizar depositos de otras organizaciones.
 		//	Warehouse Org
 		if (newRecord)
 		{
@@ -982,6 +984,8 @@ public class MInOut extends X_M_InOut implements DocAction
 				return false;
 			}
 		}
+        @emmie - Se permiten utilizar depositos de otras organizaciones.
+        */
 
 		boolean disallowNegInv = wh.isDisallowNegativeInv();
 		String DeliveryRule = getDeliveryRule();
@@ -2112,6 +2116,10 @@ public class MInOut extends X_M_InOut implements DocAction
 		//
 		// Void Confirmations
 		setDocStatus(DOCSTATUS_Reversed); // need to set & save docstatus to be able to check it in MInOutConfirm.voidIt()
+        // @emmie patch - IDEMPIERE-296
+        // FR1948157
+        this.setReversal_ID(reversal.getM_InOut_ID());
+        // @emmie patch - IDEMPIERE-296
 		saveEx();
 		voidConfirmations();
 
@@ -2121,8 +2129,6 @@ public class MInOut extends X_M_InOut implements DocAction
 			return false;
 
 		m_processMsg = reversal.getDocumentNo();
-		//FR1948157
-		this.setReversal_ID(reversal.getM_InOut_ID());
 		setProcessed(true);
 		setDocStatus(DOCSTATUS_Reversed);		//	 may come from void
 		setDocAction(DOCACTION_None);
