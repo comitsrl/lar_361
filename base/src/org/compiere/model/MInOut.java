@@ -34,6 +34,9 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
+import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
+import ar.com.ergio.util.LAR_Utils;
+
 /**
  *  Shipment Model
  *
@@ -1603,6 +1606,17 @@ public class MInOut extends X_M_InOut implements DocAction
 			return DocAction.STATUS_Invalid;
 		}
 
+        // @fchiappano Impresión fiscal
+        if (!isReversal() && LAR_Utils.isFiscalDocType(getC_DocType_ID()))
+        {
+            final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(this);
+            if (!manager.print())
+            {
+                m_processMsg = "Error en la Impresión Fiscal. Operación abortada.";
+                return DocAction.STATUS_Invalid;
+            }
+        }
+
 		// Set the definite document number after completed (if needed)
 		setDefiniteDocumentNo();
 
@@ -1707,9 +1721,23 @@ public class MInOut extends X_M_InOut implements DocAction
 			setMovementDate(new Timestamp (System.currentTimeMillis()));
 		}
 		if (dt.isOverwriteSeqOnComplete()) {
-			String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
-			if (value != null)
-				setDocumentNo(value);
+            // @fchiappano pisar la secuencia con el FiscalReceiptNumber
+            if (LAR_Utils.isFiscalDocType(getC_DocType_ID()))
+            {
+                final MSequence seq = new MSequence(getCtx(), dt.getDefiniteSequence_ID(), get_TrxName());
+                final int currentNext = seq.getCurrentNext();
+
+                // @fchiappano Comprobar que el siguiente número de la secuencia
+                // coincida
+                // con el devuelto por afip.
+                if (currentNext != get_ValueAsInt("FiscalReceiptNumber"))
+                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(),
+                            get_ValueAsInt("FiscalReceiptNumber"), get_TrxName());
+
+                String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
+                if (value != null)
+                    setDocumentNo(value);
+            }
 		}
 	}
 
