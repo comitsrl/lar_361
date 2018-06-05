@@ -34,7 +34,7 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
-import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
+import ar.com.ergio.print.fiscal.view.ShipmentFiscalDocumentPrintManager;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
@@ -1609,7 +1609,7 @@ public class MInOut extends X_M_InOut implements DocAction
         // @fchiappano Impresión fiscal
         if (!isReversal() && LAR_Utils.isFiscalDocType(getC_DocType_ID()))
         {
-            final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(this);
+            final ShipmentFiscalDocumentPrintManager manager = new ShipmentFiscalDocumentPrintManager(this);
             if (!manager.print())
             {
                 m_processMsg = "Error en la Impresión Fiscal. Operación abortada.";
