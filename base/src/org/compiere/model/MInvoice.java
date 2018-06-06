@@ -586,6 +586,10 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			// Overwrite Contact
 			setAD_User_ID(order.getBill_User_ID());
 			//
+
+            // @fchiappano tomar el punto de venta desde la orden de venta.
+            if (order.isSOTrx())
+                set_ValueOfColumn("C_Pos_ID", order.getC_POS_ID());
 		}
         // Check if Shipment/Receipt is based on RMA
         if (ship.getM_RMA_ID() != 0)
