@@ -286,16 +286,17 @@ public class InventoryCountCreate extends SvrProcess
 		if (oneLinePerASI)
 		{
 			MInventoryLine line = new MInventoryLine (m_inventory, M_Locator_ID, 
-				M_Product_ID, M_AttributeSetInstance_ID, 
+				M_Product_ID, 0, // @fchiappano No setear M_AttributeSetInstance_ID por defecto en la linea.
 				QtyOnHand, QtyOnHand);		//	book/count
 			if (line.save())
 				return 1;
 			return 0;
 		}
-		
-		if (QtyOnHand.signum() == 0)
-			M_AttributeSetInstance_ID = 0;
-		
+
+        // @fchiappano No setear M_AttributeSetInstance_ID por defecto en la linea.
+        // if (QtyOnHand.signum() == 0)
+        M_AttributeSetInstance_ID = 0;
+
 		if (m_line != null 
 			&& m_line.getM_Locator_ID() == M_Locator_ID
 			&& m_line.getM_Product_ID() == M_Product_ID)
