@@ -25,6 +25,7 @@ import java.util.logging.Level;
 
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
+import org.compiere.model.MPOS;
 import org.compiere.model.MRMA;
 import org.compiere.model.MRMALine;
 import org.compiere.process.DocAction;
@@ -32,6 +33,7 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Trx;
 
 import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
 import ar.com.ergio.util.LAR_Utils;
@@ -170,6 +172,9 @@ public class InvoiceGenerateRMA extends SvrProcess
         invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
         // @emmie custom
 
+        // @fchiappano pisar la org de la NC, con la org del PDV
+        invoice.setAD_Org_ID(new MPOS(getCtx(), p_C_POS_ID, get_TrxName()).getAD_Org_ID());
+
         invoice.setC_DocTypeTarget_ID(docTypeId);
         if (!invoice.save())
         {
@@ -246,6 +251,11 @@ public class InvoiceGenerateRMA extends SvrProcess
                 manager.print();
             }
         }
+
+        // @fchiappano realizar un commit de la trasacción, para que
+        // ante cualquier interrupción, no se pierdan la facturas ya impresas.
+        Trx trx = Trx.get(get_TrxName(), false);
+        trx.commit();
 
         // Add processing information to process log
         addLog(invoice.getC_Invoice_ID(), invoice.getDateInvoiced(), null, invoice.getDocumentNo());

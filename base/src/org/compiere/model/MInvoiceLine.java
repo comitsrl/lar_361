@@ -1294,7 +1294,7 @@ public class MInvoiceLine extends X_C_InvoiceLine
 		{
 			throw new AdempiereException("InvoiceNotCreditMemo");
 		}
-		setAD_Org_ID(rmaLine.getAD_Org_ID());
+		// setAD_Org_ID(rmaLine.getAD_Org_ID()); @fchiappano no tomar la org desde la RMALine, ya que puede diferir de la Org de la Cabecera de la factura.
         setM_RMALine_ID(rmaLine.getM_RMALine_ID());
         setDescription(rmaLine.getDescription());
         setLine(rmaLine.getLine());
