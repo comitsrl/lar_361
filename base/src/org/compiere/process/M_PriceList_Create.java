@@ -706,7 +706,8 @@ public class M_PriceList_Create extends SvrProcess {
 		// @fchiappano Actualizar precios finales
         sql = "UPDATE M_ProductPrice AS pp"
             +   " SET PrecioStd_Final = ROUND(PriceStd * (t.Rate / 100 + 1), pl.PricePrecision),"
-            +       " PrecioLista_Final = ROUND(PriceList * (t.Rate / 100 + 1), pl.PricePrecision)"
+            +       " PrecioLista_Final = ROUND(PriceList * (t.Rate / 100 + 1), pl.PricePrecision),"
+            +       " M_Product_Category_ID = p.M_Product_Category_ID" // @mzuniga Se registra la categoría del producto
             +  " FROM M_Product p, M_PriceList_Version plv, C_Tax t, M_PriceList pl"
             + " WHERE pp.M_PriceList_Version_ID = ?"
             +   " AND pp.M_Product_ID = p.M_Product_ID"
