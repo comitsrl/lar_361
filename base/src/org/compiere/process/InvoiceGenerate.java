@@ -43,9 +43,6 @@ import org.compiere.util.Env;
 import org.compiere.util.Language;
 import org.compiere.util.Trx;
 
-import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
-import ar.com.ergio.util.LAR_Utils;
-
 /**
  *	Generate Invoices
  *	
@@ -509,7 +506,7 @@ public class InvoiceGenerate extends SvrProcess
 					m_invoice.saveEx();
 				}
 			}
-			
+
 			if (!m_invoice.processIt(p_docAction))
 			{
 				log.warning("completeInvoice - failed: " + m_invoice);
@@ -517,18 +514,9 @@ public class InvoiceGenerate extends SvrProcess
 				throw new IllegalStateException("Invoice Process Failed: " + m_invoice + " - " + m_invoice.getProcessMsg());
 				
 			}
-			// @emmie custom - impresion fiscal en caso de que la operación sea CO (completar)
-			//                 y la factura sea fiscal
 			else
 			{
 			    m_invoice.saveEx();
-
-			    if (p_docAction.equals(MInvoice.DOCACTION_Complete) &&
-			        LAR_Utils.isFiscalDocType(m_invoice.getC_DocType_ID()))
-			    {
-			        final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(m_invoice);
-			        manager.print();
-			    }
 
                 // @fchiappano realizar un commit de la trasacción, para que
                 // ante cualquier interrupción, no se pierdan la facturas ya impresas.

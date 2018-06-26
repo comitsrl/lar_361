@@ -35,9 +35,6 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Trx;
 
-import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
-import ar.com.ergio.util.LAR_Utils;
-
 /**
  * Generate invoice for Vendor RMA
  * @author  Ashley Ramdass
@@ -237,19 +234,10 @@ public class InvoiceGenerateRMA extends SvrProcess
             log.warning("Invoice Processing failed: " + invoice + " - " + invoice.getProcessMsg());
             throw new IllegalStateException("Invoice Processing failed: " + invoice + " - " + invoice.getProcessMsg());
         }
-        
+
         if (!invoice.save())
         {
             throw new IllegalStateException("Could not update invoice");
-        }
-        // @fchiappano Impresion Fiscal, si se completa la factura.
-        else
-        {
-            if (p_docAction.equals(MInvoice.DOCACTION_Complete) && LAR_Utils.isFiscalDocType(invoice.getC_DocType_ID()))
-            {
-                final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(invoice);
-                manager.print();
-            }
         }
 
         // @fchiappano realizar un commit de la trasacción, para que

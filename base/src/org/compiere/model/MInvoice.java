@@ -43,6 +43,8 @@ import org.eevolution.model.MPPProductBOM;
 import org.eevolution.model.MPPProductBOMLine;
 
 import ar.com.comit.factura.electronica.ProcessorWSFE;
+import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
+import ar.com.ergio.util.LAR_Utils;
 
 
 /**
@@ -1949,37 +1951,50 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			return DocAction.STATUS_Invalid;
 		}
 
-        /**
-         * @agregado: Horacio Alvarez - Servicios Digitales S.A.
-         * @fecha: 2009-06-16
-         * @fecha: 2011-06-25 modificado para soportar WSFEv1.0
-         *
-         */
-        if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()))
+        if (!isReversal())
         {
-            // === Lógica adicional para evitar doble notificación a AFIP. ===
-            // Si tiene CAE asignado, no debe generarlo nuevamente
-            if ((getcae() == null || getcae().length() == 0) && getcaecbte() != getNumeroComprobante())
+            /**
+             * @agregado: Horacio Alvarez - Servicios Digitales S.A.
+             * @fecha: 2009-06-16
+             * @fecha: 2011-06-25 modificado para soportar WSFEv1.0
+             */
+            if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()))
             {
-                ProcessorWSFE processor = new ProcessorWSFE(this);
-                String errorMsg = processor.generateCAE();
-                if (Util.isEmpty(processor.getCAE()))
+                // === Lógica adicional para evitar doble notificación a AFIP.
+                // === Si tiene CAE asignado, no debe generarlo nuevamente
+                if ((getcae() == null || getcae().length() == 0) && getcaecbte() != getNumeroComprobante())
                 {
-                    setcaeerror(errorMsg);
-                    m_processMsg = errorMsg;
-                    log.log(Level.SEVERE, "CAE Error: " + errorMsg);
-                    return DocAction.STATUS_Invalid;
-                }
-                else
-                {
-                    setcae(processor.getCAE());
-                    setvtocae(processor.getDateCae());
-                    setcaeerror(errorMsg);
-                    int nroCbte = Integer.parseInt(processor.getNroCbte());
-                    this.setNumeroComprobante(nroCbte);
+                    ProcessorWSFE processor = new ProcessorWSFE(this);
+                    String errorMsg = processor.generateCAE();
+                    if (Util.isEmpty(processor.getCAE()))
+                    {
+                        setcaeerror(errorMsg);
+                        m_processMsg = errorMsg;
+                        log.log(Level.SEVERE, "CAE Error: " + errorMsg);
+                        return DocAction.STATUS_Invalid;
+                    }
+                    else
+                    {
+                        setcae(processor.getCAE());
+                        setvtocae(processor.getDateCae());
+                        setcaeerror(errorMsg);
+                        int nroCbte = Integer.parseInt(processor.getNroCbte());
+                        this.setNumeroComprobante(nroCbte);
 
-                    log.log(Level.WARNING, "CAE: " + processor.getCAE());
-                    log.log(Level.WARNING, "DATE CAE: " + processor.getDateCae());
+                        log.log(Level.WARNING, "CAE: " + processor.getCAE());
+                        log.log(Level.WARNING, "DATE CAE: " + processor.getDateCae());
+                    }
+                }
+            }
+
+            // @fchiappano Impresión fiscal
+            if (LAR_Utils.isFiscalDocType(getC_DocType_ID()))
+            {
+                final InvoiceFiscalDocumentPrintManager manager = new InvoiceFiscalDocumentPrintManager(this);
+                if (!manager.print())
+                {
+                    m_processMsg = "Error en la Impresión Fiscal";
+                    return DocAction.STATUS_Invalid;
                 }
             }
         }
@@ -2019,15 +2034,16 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		}
 		if (dt.isOverwriteSeqOnComplete()) {
 		    // @fchiappano
-            if (dt.isElectronic())
+            if (dt.isElectronic() || LAR_Utils.isFiscalDocType(getC_DocType_ID()))
             {
                 final MSequence seq = new MSequence(getCtx(), dt.getDefiniteSequence_ID(), get_TrxName());
                 final int currentNext = seq.getCurrentNext();
+                final int documentNo = dt.isElectronic() ? getNumeroComprobante() : get_ValueAsInt("FiscalReceiptNumber");
 
                 // @fchiappano Comprobar que el siguiente número de la secuencia coincida
                 // con el devuelto por afip.
-                if (currentNext != getNumeroComprobante())
-                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), getNumeroComprobante(),
+                if (currentNext != documentNo)
+                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), documentNo,
                             get_TrxName());
 
                 String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
@@ -2036,7 +2052,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
 
                 // @fchiappano Controlar que el currentNext este correcto para la siguiente
                 // transacción.
-                MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), getNumeroComprobante() + 1,
+                MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), documentNo + 1,
                         get_TrxName());
             }
             else
