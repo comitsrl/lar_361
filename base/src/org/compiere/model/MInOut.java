@@ -1693,7 +1693,7 @@ public class MInOut extends X_M_InOut implements DocAction
 		for (int i = 0; i < lines.length; i++)
 		{
 			MInOutLine dropLine = lines[i];
-			MOrderLine ol = new MOrderLine(getCtx(), dropLine.getC_OrderLine_ID(), null);
+			MOrderLine ol = new MOrderLine(getCtx(), dropLine.getC_OrderLine_ID(), get_TrxName());
 			if ( ol.getC_OrderLine_ID() != 0 ) {
 				dropLine.setC_OrderLine_ID(ol.getLink_OrderLine_ID());
 				dropLine.saveEx();
@@ -1731,13 +1731,12 @@ public class MInOut extends X_M_InOut implements DocAction
                 // coincida
                 // con el devuelto por afip.
                 if (currentNext != get_ValueAsInt("FiscalReceiptNumber"))
-                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(),
-                            get_ValueAsInt("FiscalReceiptNumber"), get_TrxName());
-
-                String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
-                if (value != null)
-                    setDocumentNo(value);
+                    seq.setFiscalDocTypeNextNroComprobante(get_ValueAsInt("FiscalReceiptNumber"));
             }
+
+            String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
+            if (value != null)
+                setDocumentNo(value);
 		}
 	}
 
