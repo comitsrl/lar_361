@@ -799,7 +799,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 			return;
 
 		log.fine("loading line " + lineId);
-		MOrderLine ol = new MOrderLine(p_ctx, lineId, null);
+		MOrderLine ol = new MOrderLine(p_ctx, lineId, p_posPanel.getTrxName());
 		if ( ol != null )
 		{
 			setPrice(ol.getPriceActual());
