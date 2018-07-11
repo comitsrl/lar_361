@@ -25,7 +25,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -1333,18 +1332,14 @@ public class MSequence extends X_AD_Sequence
      * 
      * @param sequenceID
      * @param nextNroComprobante
-     * @param trxName
      * @return
      */
-    public static boolean setFiscalDocTypeNextNroComprobante(final int sequenceID, final int nextNroComprobante, final String trxName)
+    public boolean setFiscalDocTypeNextNroComprobante(final int nextNroComprobante)
     {
-        MSequence seq = new MSequence(Env.getCtx(), sequenceID, trxName);
-        int currentNext = seq.getCurrentNext();
-
-        if (currentNext != nextNroComprobante)
+        if (getCurrentNext() != nextNroComprobante)
         {
-            seq.setCurrentNext(nextNroComprobante);
-            return seq.save();
+            setCurrentNext(nextNroComprobante);
+            return save();
         }
 
         return true;

@@ -2043,24 +2043,12 @@ public class MInvoice extends X_C_Invoice implements DocAction
                 // @fchiappano Comprobar que el siguiente número de la secuencia coincida
                 // con el devuelto por afip.
                 if (currentNext != documentNo)
-                    MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), documentNo,
-                            get_TrxName());
-
-                String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
-                if (value != null)
-                    setDocumentNo(value);
-
-                // @fchiappano Controlar que el currentNext este correcto para la siguiente
-                // transacción.
-                MSequence.setFiscalDocTypeNextNroComprobante(dt.getDefiniteSequence_ID(), documentNo + 1,
-                        get_TrxName());
+                    seq.setFiscalDocTypeNextNroComprobante(documentNo);
             }
-            else
-            {
-                String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
-                if (value != null)
-                    setDocumentNo(value);
-            }
+
+            String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
+            if (value != null)
+                setDocumentNo(value);
 		}
 	}
 
