@@ -1372,13 +1372,15 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			m_processMsg = "@NoLines@";
 			return DocAction.STATUS_Invalid;
 		}
+
+		/* @fchiappano Se comenta codigo, ya que actualmente no se utiliza la funcionalidad de CashBook.
 		//	No Cash Book
 		if (PAYMENTRULE_Cash.equals(getPaymentRule())
 			&& MCashBook.get(getCtx(), getAD_Org_ID(), getC_Currency_ID()) == null)
 		{
 			m_processMsg = "@NoCashBook@";
 			return DocAction.STATUS_Invalid;
-		}
+		} */
 
 		//	Convert/Check DocType
 		if (getC_DocType_ID() != getC_DocTypeTarget_ID() )
