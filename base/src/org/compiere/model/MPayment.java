@@ -2520,7 +2520,9 @@ public final class MPayment extends X_C_Payment
 		reversal.setDiscountAmt(getDiscountAmt().negate());
 		reversal.setWriteOffAmt(getWriteOffAmt().negate());
 		reversal.setOverUnderAmt(getOverUnderAmt().negate());
-		//
+		// @mzuniga Se setea el mismo cargo para que la anulación
+		// contabilice correctamente
+		reversal.setC_Charge_ID(getC_Charge_ID());
 		reversal.setIsAllocated(true);
 		reversal.setIsReconciled(paymentOriginal ? reconciled : true);	//	to put on bank statement
 		reversal.setIsOnline(false);
