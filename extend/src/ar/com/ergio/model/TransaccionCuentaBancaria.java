@@ -469,6 +469,8 @@ public class TransaccionCuentaBancaria
     {
         final MPayment payment = new MPayment(ctx, 0, trxName);
         final MBankAccount destino = new MBankAccount(ctx, bankAccount_ID, trxName);
+        payment.setAD_Org_ID(paymentFrom.getAD_Org_ID());
+        payment.set_ValueOfColumn("AD_Client_ID", paymentFrom.getAD_Client_ID());
         payment.setC_BankAccount_ID(bankAccount_ID);
         payment.setDateAcct(p_DateAcct);
         payment.setDateTrx(p_StatementDate);
@@ -502,6 +504,8 @@ public class TransaccionCuentaBancaria
     {
         // Pago que debita los valores transferidos de la cuenta.
         final MPayment paymentBankFrom = new MPayment(ctx, 0, trxName);
+        paymentBankFrom.setAD_Org_ID(cobro.getAD_Org_ID());
+        paymentBankFrom.set_ValueOfColumn("AD_Client_ID", cobro.getAD_Client_ID());
         paymentBankFrom.setC_BankAccount_ID(statement.getC_BankAccount_ID());
         paymentBankFrom.setDateAcct(statement.getStatementDate());
         paymentBankFrom.setDateTrx(statement.getStatementDate());
