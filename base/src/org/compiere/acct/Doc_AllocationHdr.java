@@ -245,8 +245,14 @@ public class Doc_AllocationHdr extends Doc
 					acct_unallocated_cash =  getCashAcct(as, line.getC_CashLine_ID());
 				MAccount acct_receivable = getAccount(Doc.ACCTTYPE_C_Receivable, as);
 
-				if ((!as.isPostIfClearingEqual()) && acct_unallocated_cash != null && acct_unallocated_cash.equals(acct_receivable) && (!isInterOrg)) {
-
+                /* @mzuniga Se omite la condición de si es una operación Inter-Organización ya
+                   que se trata de una condición que no influye en este caso.
+                   La configuración está óptima para que no contabilicen las
+                   asignaciones, únicamente en los casos de operaciones inter-organización
+                   (cuando se cobran facturas de otra sucursal) estaban generando contabilidad.
+                 */
+                // if ((!as.isPostIfClearingEqual()) && acct_unallocated_cash != null && acct_unallocated_cash.equals(acct_receivable) && (!isInterOrg)) {
+				if ((!as.isPostIfClearingEqual()) && acct_unallocated_cash != null && acct_unallocated_cash.equals(acct_receivable)) {
 					// if not using clearing accounts, then don't post amtsource
 					// change the allocationsource to be writeoff + discount
 					allocationSource = line.getDiscountAmt().add(line.getWriteOffAmt());
