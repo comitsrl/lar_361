@@ -528,6 +528,9 @@ public class TransaccionCuentaBancaria
         paymentBankFrom.processIt(MPayment.DOCACTION_Complete);
         paymentBankFrom.saveEx();
 
+        // Setear el pago como IsReconciled.
+        setReconciled(paymentBankFrom.getC_Payment_ID(), trxName);
+
         /* @fchiappano Se evita generar un nuevo cierre, ya que no es necesario para rastrear el cierre original.
         final MBankStatementLine newLine = new MBankStatementLine(newStmt);
         newLine.setC_Currency_ID(paymentBankFrom.getC_Currency_ID());
@@ -604,5 +607,16 @@ public class TransaccionCuentaBancaria
         lista.add(new KeyNamePair(0, "Error"));
         lista.add(new KeyNamePair(0, mensaje));
     } // setError
+
+    /**
+     * Setear por base de datos, isReconciled = true, para evitar las validaciones en el validador de LAR.
+     * @param c_Payment_ID
+     * @param trxName
+     */
+    private static void setReconciled(final int c_Payment_ID, final String trxName)
+    {
+        String sql = "UPDATE C_Payment SET isReconciled = 'Y' WHERE C_Payment_ID = " + c_Payment_ID;
+        DB.executeUpdate(sql, trxName);
+    } // setReconciled
 
 } // TransaccionCuentaBancaria
