@@ -25,6 +25,7 @@ import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MCharge;
+import org.compiere.model.MDocType;
 import org.compiere.model.MPayment;
 import org.compiere.model.MSysConfig;
 import org.compiere.util.Env;
@@ -59,6 +60,8 @@ public class Doc_Payment extends Doc
     private boolean     m_EsRetencionEfectuada = false;
 	/** Bank Account			*/
 	private int			m_C_BankAccount_ID = 0;
+	   /** Bank Account            */
+    private int         m_GL_Category_ID = 0;
 
 	/**
 	 *  Load Specific Document Details
@@ -72,6 +75,9 @@ public class Doc_Payment extends Doc
 		m_Prepayment = pay.isPrepayment();
 		m_C_BankAccount_ID = pay.getC_BankAccount_ID();
 		m_EsRetencionEfectuada = pay.get_ValueAsBoolean("EsRetencionIIBB");
+		// @mzuniga Se obtiene la categoría de contabilidad del tipo de documento
+		MDocType dt_Pay = new MDocType(Env.getCtx(), pay.getC_DocType_ID(), pay.get_TrxName());
+		m_GL_Category_ID = dt_Pay.getGL_Category_ID();
 		//	Amount
 		setAmount(Doc.AMTTYPE_Gross, pay.getPayAmt());
 		return null;
@@ -118,6 +124,15 @@ public class Doc_Payment extends Doc
 			facts.add(fact);
 			return facts;
 		}
+
+        // Si la Cateoría CG (Contabilidad General) del tipo de documento es None (ID 0)
+        // No se genera contabilidad para ese documento
+        if (m_GL_Category_ID == 0)
+        {
+            ArrayList<Fact> facts = new ArrayList<Fact>();
+            facts.add(fact);
+            return facts;
+        }
 
 		int AD_Org_ID = getBank_Org_ID();		//	Bank Account Org
 		if (getDocumentType().equals(DOCTYPE_ARReceipt))
