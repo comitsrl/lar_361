@@ -251,7 +251,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		{
 			if ( orderLineId > 0 )
 			{
-				MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
+				MOrderLine line = new MOrderLine(p_ctx, orderLineId, p_posPanel.getTrxName());
 				BigDecimal newQty = line.getQtyOrdered().add(Env.ONE);
 				if (line != null && hasStock(line.getProduct(), newQty) && hasCredit(line.getProduct(), newQty))
 				{
@@ -265,7 +265,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		{
 			if ( orderLineId > 0 )
 			{
-				MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
+				MOrderLine line = new MOrderLine(p_ctx, orderLineId, p_posPanel.getTrxName());
 				if ( line != null )
 				{
 				    if (line.getQtyOrdered().compareTo(BigDecimal.ONE) > 0)
@@ -282,7 +282,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
         {
            if (orderLineId > 0)
            {
-               MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
+               MOrderLine line = new MOrderLine(p_ctx, orderLineId, p_posPanel.getTrxName());
                if (line != null)
                {
                    requestProductAttributes(line);
@@ -297,7 +297,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		}
 		else if (e.getSource() == f_price && orderLineId > 0)
 		{
-			MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
+			MOrderLine line = new MOrderLine(p_ctx, orderLineId, p_posPanel.getTrxName());
 			if ( line != null )
 			{
 				line.setPrice(new BigDecimal(f_price.getValue().toString()));
@@ -306,7 +306,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
 		}
 		else if (e.getSource() == f_quantity && orderLineId > 0 )
 		{
-			MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
+			MOrderLine line = new MOrderLine(p_ctx, orderLineId, p_posPanel.getTrxName());
             BigDecimal newQty = new BigDecimal(f_quantity.getValue().toString());
             if (line != null && hasStock(line.getProduct(), newQty))
 			{
@@ -756,7 +756,7 @@ public class SubCurrentLine extends PosSubPanel implements ActionListener, Focus
         // Price
         else if (e.getSource() == f_price && orderLineId > 0)
         {
-            MOrderLine line = new MOrderLine(p_ctx, orderLineId, null);
+            MOrderLine line = new MOrderLine(p_ctx, orderLineId, p_posPanel.getTrxName());
             if (line != null) {
                 // force commit edited value of f_price
                 try {

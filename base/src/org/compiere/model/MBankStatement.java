@@ -331,6 +331,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 			if (line.getDateAcct().after(maxDate))
 				maxDate = line.getDateAcct(); 
 		}
+		setStatementDifference(total);
 
 		// @fchiappano Si es un cierre de caja, sumo los cheques en cartera
 		// y los que fueron utilizados en alguna orden de pago, pero que la misma
@@ -382,7 +383,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 	            pstmt = null;
 	        }
 		}
-		setStatementDifference(total);
+		set_ValueOfColumn("SaldoFinal", total);
         // @fchiappano Si es un cierre de caja, EndingBalance = SaldoInicial + Efectivo contabilizado + Cheques Contabilizados.
         if (get_ValueAsBoolean("EsCierreCaja"))
             setEndingBalance(((BigDecimal) get_Value("ScrutinizedCashAmt")).add((BigDecimal) get_Value("scrutinizedcheckamt")));
