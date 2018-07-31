@@ -51,6 +51,8 @@ public class InvoiceGen extends GenForm implements SystemIDs
 	
 	public Object 			m_AD_Org_ID = null;
 	public Object 			m_C_BPartner_ID = null;
+    // @fchiappano Categoria de IVA
+    public Object           m_LCO_TaxPayerType_ID = null;
 	
 	public void dynInit() throws Exception
 	{
@@ -67,6 +69,7 @@ public class InvoiceGen extends GenForm implements SystemIDs
 		miniTable.addColumn("C_DocType_ID");
 		miniTable.addColumn("DocumentNo");
 		miniTable.addColumn("C_BPartner_ID");
+		miniTable.addColumn("LCO_TaxPayerType_ID");
 		miniTable.addColumn("DateOrdered");
 		miniTable.addColumn("TotalLines");
 		//
@@ -77,8 +80,9 @@ public class InvoiceGen extends GenForm implements SystemIDs
 		miniTable.setColumnClass(2, String.class, true, Msg.translate(Env.getCtx(), "C_DocType_ID"));
 		miniTable.setColumnClass(3, String.class, true, Msg.translate(Env.getCtx(), "DocumentNo"));
 		miniTable.setColumnClass(4, String.class, true, Msg.translate(Env.getCtx(), "C_BPartner_ID"));
-		miniTable.setColumnClass(5, Timestamp.class, true, Msg.translate(Env.getCtx(), "DateOrdered"));
-		miniTable.setColumnClass(6, BigDecimal.class, true, Msg.translate(Env.getCtx(), "TotalLines"));
+		miniTable.setColumnClass(5, String.class, true, Msg.translate(Env.getCtx(), "LCO_TaxPayerType_ID"));
+		miniTable.setColumnClass(6, Timestamp.class, true, Msg.translate(Env.getCtx(), "DateOrdered"));
+		miniTable.setColumnClass(7, BigDecimal.class, true, Msg.translate(Env.getCtx(), "TotalLines"));
 		//
 		miniTable.autoSize();
 	}
@@ -90,20 +94,25 @@ public class InvoiceGen extends GenForm implements SystemIDs
 	private String getOrderSQL()
 	{
 	    StringBuffer sql = new StringBuffer(
-	            "SELECT ic.C_Order_ID, o.Name, dt.Name, io.DocumentNo, bp.Name, ic.DateOrdered, ic.TotalLines "
+	            "SELECT ic.C_Order_ID, o.Name, dt.Name, io.DocumentNo, bp.Name, tpt.Name, ic.DateOrdered, ic.TotalLines "
 	            + "FROM C_Invoice_Candidate_v ic, AD_Org o, C_BPartner bp, C_DocType dt "
 	            + "   , M_InOut io " // @emmie - Proyectar información del remito (tipo de doc y documentNo)
+	            +    ", LCO_TaxPayerType tpt " // @fchiappano Mostrar condición de iva del cliente.
 	            + "WHERE ic.AD_Org_ID=o.AD_Org_ID"
 	            + " AND ic.C_BPartner_ID=bp.C_BPartner_ID"
 	            + " AND io.C_DocType_ID=dt.C_DocType_ID"
 	            + " AND io.C_Order_ID=ic.C_Order_ID"
-	            + " AND ic.AD_Client_ID=?");
+	            + " AND bp.LCO_TaxPayerType_ID = tpt.LCO_TaxPayerType_ID"
+	            + " AND ic.AD_Client_ID=? AND ic.TotalLines > 0");
 
         if (m_AD_Org_ID != null)
             sql.append(" AND ic.AD_Org_ID=").append(m_AD_Org_ID);
         if (m_C_BPartner_ID != null)
             sql.append(" AND ic.C_BPartner_ID=").append(m_C_BPartner_ID);
-        
+        // @fchiappano Filtrar por categoria de IVA del cliente.
+        if (m_LCO_TaxPayerType_ID != null)
+            sql.append(" AND bp.LCO_TaxPayerType_ID=").append(m_LCO_TaxPayerType_ID);
+
         // bug - [ 1713337 ] "Generate Invoices (manual)" show locked records.
         /* begin - Exclude locked records; @Trifon */
         int AD_User_ID = Env.getContextAsInt(Env.getCtx(), "#AD_User_ID");
@@ -129,12 +138,13 @@ public class InvoiceGen extends GenForm implements SystemIDs
 	private String getRMASql()
 	{
 		StringBuffer sql = new StringBuffer();
-        sql.append("SELECT rma.M_RMA_ID, org.Name, dt.Name, rma.DocumentNo, bp.Name, rma.Created, rma.Amt ");
+        sql.append("SELECT rma.M_RMA_ID, org.Name, dt.Name, rma.DocumentNo, bp.Name, tpt.Name, rma.Created, rma.Amt ");
         sql.append("FROM M_RMA_Candidate_v rma ");
         sql.append("INNER JOIN AD_Org org ON rma.AD_Org_ID=org.AD_Org_ID ");
         sql.append("INNER JOIN C_DocType dt ON rma.C_DocType_ID=dt.C_DocType_ID ");
         sql.append("INNER JOIN C_BPartner bp ON rma.C_BPartner_ID=bp.C_BPartner_ID ");
         sql.append("INNER JOIN M_InOut io ON rma.InOut_ID=io.M_InOut_ID ");
+        sql.append("INNER JOIN LCO_TaxPayerType tpt ON bp.LCO_TaxPayerType_ID = tpt.LCO_TaxPayerType_ID ");
         sql.append("WHERE NOT EXISTS (SELECT * FROM C_Invoice i ");
         sql.append("WHERE i.M_RMA_ID=rma.M_RMA_ID AND i.DocStatus IN ('IP', 'CO', 'CL')) ");
         sql.append("AND rma.AD_Client_ID=? AND rma.Amt > 0");
@@ -142,7 +152,10 @@ public class InvoiceGen extends GenForm implements SystemIDs
             sql.append(" AND rma.AD_Org_ID=").append(m_AD_Org_ID);
         if (m_C_BPartner_ID != null)
             sql.append(" AND bp.C_BPartner_ID=").append(m_C_BPartner_ID);
-        
+        // @fchiappano Filtrar por categoria de IVA del cliente.
+        if (m_LCO_TaxPayerType_ID != null)
+            sql.append(" AND bp.LCO_TaxPayerType_ID=").append(m_LCO_TaxPayerType_ID);
+
         int AD_User_ID = Env.getContextAsInt(Env.getCtx(), "#AD_User_ID");
         String lockedIDs = MPrivateAccess.getLockedRecordWhere(MRMA.Table_ID, AD_User_ID);
         if (lockedIDs != null)
@@ -195,8 +208,9 @@ public class InvoiceGen extends GenForm implements SystemIDs
 				miniTable.setValueAt(rs.getString(3), row, 2);              //  DocType
 				miniTable.setValueAt(rs.getString(4), row, 3);              //  Doc No
 				miniTable.setValueAt(rs.getString(5), row, 4);              //  BPartner
-				miniTable.setValueAt(rs.getTimestamp(6), row, 5);           //  DateOrdered
-				miniTable.setValueAt(rs.getBigDecimal(7), row, 6);          //  TotalLines
+				miniTable.setValueAt(rs.getString(6), row, 5);              //  TaxPayerType
+				miniTable.setValueAt(rs.getTimestamp(7), row, 6);           //  DateOrdered
+				miniTable.setValueAt(rs.getBigDecimal(8), row, 7);          //  TotalLines
 				//  prepare next
 				row++;
 			}

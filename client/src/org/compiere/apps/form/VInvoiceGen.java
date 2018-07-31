@@ -18,8 +18,13 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
+import javax.swing.DefaultComboBoxModel;
+
+import org.compiere.apps.ALayout;
+import org.compiere.apps.ALayoutConstraint;
 import org.compiere.grid.ed.VComboBox;
 import org.compiere.grid.ed.VLookup;
 import org.compiere.model.MLookup;
@@ -63,6 +68,10 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
     private CLabel     lPOS = new CLabel();
     private VLookup    fPOS;
     // @emmie custom
+
+    // @fchiappano
+    private CLabel     lTaxPayerType = new CLabel();
+    private VComboBox  fTaxPayerType = new VComboBox();
 
 	/**
 	 *	Initialize Panel
@@ -118,23 +127,38 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		lBPartner.setLabelFor(fBPartner);
 		lBPartner.setText(Msg.translate(Env.getCtx(), "C_BPartner_ID"));
 		lDocAction.setLabelFor(docAction);
-		lDocAction.setText(Msg.translate(Env.getCtx(), "DocAction"));
+        lDocAction.setText(Msg.translate(Env.getCtx(), "Action"));
 		lDocType.setLabelFor(cmbDocType);
-		
-		panel.getParameterPanel().add(lOrg, null);
-		panel.getParameterPanel().add(fOrg, null);
+        // @fchiappano Combo categoria de IVA.
+        lTaxPayerType.setLabelFor(fTaxPayerType);
+        lTaxPayerType.setText(Msg.translate(Env.getCtx(), "LCO_TaxPayerType_ID"));
+
+        // @fchiappano Primera Linea
+        // Organizacion
+        panel.getParameterPanel().setLayout(new ALayout());
+        panel.getParameterPanel().add(lOrg, new ALayoutConstraint(0, 0));
+        panel.getParameterPanel().add(fOrg, null);
+        // Socio del Negocio
+        panel.getParameterPanel().add(lBPartner, null);
+        panel.getParameterPanel().add(fBPartner, null);
+        // Tipo de Documento
+        panel.getParameterPanel().add(lDocType, null);
+        panel.getParameterPanel().add(cmbDocType, null);
+
+        // @fchiappano Segunda Linea
+        // PDV
         // @emmie custom
         lPOS.setLabelFor(fPOS);
-        panel.getParameterPanel().add(lPOS, null);
+        panel.getParameterPanel().add(lPOS, new ALayoutConstraint(1, 0));
         panel.getParameterPanel().add(fPOS, null);
-        lDocAction.setText(Msg.translate(Env.getCtx(), "Action"));
         // @emmie custom
-		panel.getParameterPanel().add(lBPartner, null);
-		panel.getParameterPanel().add(fBPartner, null);
-		panel.getParameterPanel().add(lDocType, null);
-		panel.getParameterPanel().add(cmbDocType, null);
-		panel.getParameterPanel().add(lDocAction, null);
-		panel.getParameterPanel().add(docAction, null);
+
+        // Categoria de IVA
+        panel.getParameterPanel().add(lTaxPayerType, null);
+        panel.getParameterPanel().add(fTaxPayerType, null);
+        // Acccion
+        panel.getParameterPanel().add(lDocAction, null);
+        panel.getParameterPanel().add(docAction, null);
 	}	//	jbInit
 	
 	/**
@@ -177,7 +201,16 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		fBPartner = new VLookup ("C_BPartner_ID", false, false, true, bpL);
 	//	lBPartner.setText(Msg.translate(Env.getCtx(), "C_BPartner_ID"));
 		fBPartner.addVetoableChangeListener(this);
-		
+
+        // @fchiappano Categoria de IVA SdN
+        int AD_Column_ID = 1000152; // C_BPartner.LCO_TaxPayerType_ID
+        MLookup lookup = MLookupFactory.get(Env.getCtx(), 0, 0, AD_Column_ID, DisplayType.Table);
+        final List<Object> ccs = lookup.getData(false, false, true, true);
+        final DefaultComboBoxModel ccsModel = new DefaultComboBoxModel(ccs.toArray());
+        fTaxPayerType = new VComboBox(ccsModel);
+        fTaxPayerType.addActionListener(this);
+        // @fchiappano
+
 		//Document Type Sales Order/Vendor RMA
         lDocType.setText(Msg.translate(Env.getCtx(), "C_DocType_ID"));
         cmbDocType.addItem(new KeyNamePair(MOrder.Table_ID, Msg.translate(Env.getCtx(), "Order")));
@@ -223,6 +256,13 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		   executeQuery();
 		    return;
 		}
+		// @fchiappano Ejecutar Query al seleccionar una categoria de IVA.
+        if (fTaxPayerType.equals(e.getSource()))
+        {
+            m_LCO_TaxPayerType_ID = fTaxPayerType.getValue();
+            executeQuery();
+            return;
+        }
 		
 		validate();
 	}	//	actionPerformed
