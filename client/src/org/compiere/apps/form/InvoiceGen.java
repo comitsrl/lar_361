@@ -29,6 +29,7 @@ import org.compiere.model.MPInstance;
 import org.compiere.model.MPInstancePara;
 import org.compiere.model.MPrivateAccess;
 import org.compiere.model.MRMA;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.SystemIDs;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.ProcessInfo;
@@ -137,6 +138,10 @@ public class InvoiceGen extends GenForm implements SystemIDs
 	 */
 	private String getRMASql()
 	{
+        // @fchiappano recuperar parametro que establece, si se filtran por la
+        // org de la factura origen, las RMA.
+        boolean filtrarRMA = MSysConfig.getBooleanValue("LAR_FiltraRMA_OrgFacturaOrigen", false, Env.getAD_Client_ID(Env.getCtx()));
+
 		StringBuffer sql = new StringBuffer();
         sql.append("SELECT rma.M_RMA_ID, org.Name, dt.Name, rma.DocumentNo, bp.Name, tpt.Name, rma.Created, rma.Amt ");
         sql.append("FROM M_RMA_Candidate_v rma ");
@@ -145,6 +150,11 @@ public class InvoiceGen extends GenForm implements SystemIDs
         sql.append("INNER JOIN C_BPartner bp ON rma.C_BPartner_ID=bp.C_BPartner_ID ");
         sql.append("INNER JOIN M_InOut io ON rma.InOut_ID=io.M_InOut_ID ");
         sql.append("INNER JOIN LCO_TaxPayerType tpt ON bp.LCO_TaxPayerType_ID = tpt.LCO_TaxPayerType_ID ");
+
+        // @fchiappano filtro de RMA
+        if (filtrarRMA)
+            sql.append("INNER JOIN C_Invoice i ON io.C_Order_ID = i.C_Order_ID ");
+
         sql.append("WHERE NOT EXISTS (SELECT * FROM C_Invoice i ");
         sql.append("WHERE i.M_RMA_ID=rma.M_RMA_ID AND i.DocStatus IN ('IP', 'CO', 'CL')) ");
         sql.append("AND rma.AD_Client_ID=? AND rma.Amt > 0");
@@ -155,6 +165,10 @@ public class InvoiceGen extends GenForm implements SystemIDs
         // @fchiappano Filtrar por categoria de IVA del cliente.
         if (m_LCO_TaxPayerType_ID != null)
             sql.append(" AND bp.LCO_TaxPayerType_ID=").append(m_LCO_TaxPayerType_ID);
+
+        // @fchiappano filtrar RMA por org de la factura origen.
+        if (filtrarRMA)
+            sql.append(" AND i.AD_Org_ID = ").append(Env.getContextAsInt(Env.getCtx(), "#AD_Org_ID"));
 
         int AD_User_ID = Env.getContextAsInt(Env.getCtx(), "#AD_User_ID");
         String lockedIDs = MPrivateAccess.getLockedRecordWhere(MRMA.Table_ID, AD_User_ID);
