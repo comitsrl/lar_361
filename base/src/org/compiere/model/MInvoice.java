@@ -18,6 +18,7 @@ package org.compiere.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,9 +28,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import javax.swing.JDialog;
+
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoAddressException;
 import org.adempiere.exceptions.DBException;
+import org.compiere.apps.ADialog;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
@@ -1003,7 +1007,14 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			if (order.getC_CashPlanLine_ID() > 0)
 				setC_CashPlanLine_ID(order.getC_CashPlanLine_ID());
 		}
-		
+
+        // @fchiappano guardar tasa de cambio en la factura
+        if (getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+        {
+            if (!setTipoCambioSdN())
+                return false;
+        }
+
 		return true;
 	}	//	beforeSave
 
@@ -1068,6 +1079,28 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			int no = DB.executeUpdate(sql, get_TrxName());
 			log.fine("Lines -> #" + no);
 		}
+
+        // @fchiappano Actualizar factura, ante un cambio de moneda y/o lista de precios.
+        if (is_ValueChanged(COLUMNNAME_C_Currency_ID) || is_ValueChanged(COLUMNNAME_M_PriceList_ID))
+        {
+            for (MInvoiceLine line : getLines())
+            {
+                // @fchiappano Convertir moneda.
+                if (is_ValueChanged(COLUMNNAME_C_Currency_ID) && !is_ValueChanged(COLUMNNAME_M_PriceList_ID))
+                {
+                    if (!convertirPrecios(line, newRecord))
+                        return false;
+                }
+
+                // @fchiappano Actualizar precios
+                else if (is_ValueChanged(COLUMNNAME_M_PriceList_ID))
+                {
+                    if (!actualizarPrecios(line))
+                        return false;
+                }
+            }
+        }
+
 		return true;
 	}	//	afterSave
 
@@ -2620,5 +2653,126 @@ public class MInvoice extends X_C_Invoice implements DocAction
         }
         return nro;
     }
+
+    /**
+     * Convertir los precios de la orden, utilizando las tasas de cambio, cuando
+     * se cambie la moneda.
+     * @param line
+     * @author fchiappano
+     * @return confirmación
+     */
+    private boolean convertirPrecios(final MInvoiceLine line, final boolean newRecord)
+    {
+        // @fchiappano Cambiar el precio de la linea, usando la tasa de
+        // conversion.
+        if (!newRecord && !is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
+        {
+            String sql = "";
+            int c_Currency_ID = getC_Currency_ID();
+
+            if (c_Currency_ID == LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+            {
+                c_Currency_ID = get_ValueOldAsInt("C_Currency_ID");
+                sql = "SELECT MultiplyRate";
+            }
+            else
+            {
+                sql = "SELECT DivideRate";
+            }
+
+            sql = sql + " FROM C_Conversion_Rate" + " WHERE C_Currency_ID=?" + " AND C_Currency_ID_To=?"
+                    + " AND C_ConversionType_ID=?" + " AND ? BETWEEN ValidFrom AND ValidTo"
+                    + " AND AD_Client_ID IN (0,?)" + " AND AD_Org_ID IN (0,?)"
+                    + " ORDER BY AD_Client_ID DESC, AD_Org_ID DESC, ValidFrom DESC";
+
+            BigDecimal tasaCambio = DB.getSQLValueBD(get_TrxName(), sql, c_Currency_ID,
+                    LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()),
+                    getC_ConversionType_ID(), new Timestamp(System.currentTimeMillis()), getAD_Client_ID(),
+                    getAD_Org_ID());
+
+            if (tasaCambio != null)
+            {
+                BigDecimal precioActual = line.getPriceActual().multiply(tasaCambio)
+                        .setScale(getM_PriceList().getPricePrecision(), RoundingMode.HALF_UP);
+                BigDecimal precioLista = line.getPriceList().multiply(tasaCambio)
+                        .setScale(getM_PriceList().getPricePrecision(), RoundingMode.HALF_UP);
+                line.setPrice(precioActual);
+                line.setPriceList(precioLista);
+                line.saveEx();
+            }
+            else
+            {
+                ADialog.error(0, new JDialog(), "No se logro recuperar, una tasa de cambio.");
+                return false;
+            }
+        }
+
+        return true;
+    } // convertirPrecios
+
+    /**
+     * Actualizar los precios de las lineas, tomando los mismos desde la nueva
+     * lista de precios seleccionada. (No se tendran en cuenta los descuentos de
+     * linea, previamente generados).
+     * @param line
+     * @author fchiappano
+     * @return confirmación
+     */
+    private boolean actualizarPrecios(MInvoiceLine line)
+    {
+        MPriceListVersion m_PriceList_Version = ((MPriceList) getM_PriceList()).getPriceListVersion(new Timestamp(System.currentTimeMillis()));
+        final MWarehousePrice warehousePrice = MWarehousePrice.get((MProduct) line.getM_Product(), m_PriceList_Version.getM_PriceList_Version_ID(),
+                Env.getContextAsInt(p_ctx, "#M_Warehouse_ID"), get_TrxName());
+
+        if (warehousePrice != null)
+        {
+            line.setPrice(warehousePrice.getPriceStd().setScale(getM_PriceList().getPricePrecision(),
+                    RoundingMode.HALF_UP));
+            line.setPriceList(warehousePrice.getPriceList().setScale(getM_PriceList().getPricePrecision(),
+                    RoundingMode.HALF_UP));
+            line.saveEx();
+        }
+        else
+        {
+            ADialog.error(0, new JDialog(), "No se encontro el producto en la lista de precios. \n" + "Producto = "
+                    + line.getM_Product().getName() + "\n" + "N° de Línea = " + line.getLine());
+            return false;
+        }
+
+        return true;
+    } // actualizarPrecios
+
+    /**
+     * Obtener tipo de cambio desde el Socio del Negocio, y setearlo en la factura.
+     * @author fchiappano
+     * @return confirmación
+     */
+    private boolean setTipoCambioSdN()
+    {
+        int conversionType_ID = ((MBPartner) getC_BPartner()).get_ValueAsInt("C_ConversionType_ID");
+
+        if (conversionType_ID > 0)
+            setC_ConversionType_ID(conversionType_ID);
+        else
+        {
+            ADialog.error(0, new JDialog(), "El Socio del Negocio, no posee un tipo de cambio configurado.");
+            return false;
+        }
+
+        BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(),
+                LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()),
+                new Timestamp(System.currentTimeMillis()), conversionType_ID, getAD_Client_ID(), getAD_Org_ID());
+
+        if (rate != null)
+            set_ValueOfColumn("TasaDeCambio", rate);
+        else
+        {
+            ADialog.error(0, new JDialog(), "No fue posible, recuperar una tasa de cambio valida.");
+            return false;
+        }
+
+        return true;
+
+    } // setTipoCambioSdN
 
 }	//	MInvoice

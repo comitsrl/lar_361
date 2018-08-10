@@ -16,8 +16,10 @@
  *****************************************************************************/
 package ar.com.ergio.util;
 
+import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.model.MClient;
 import org.compiere.model.MInvoice;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -153,4 +155,15 @@ public final class LAR_Utils {
 	}
 	return result;
     }
+
+    /**
+     * Obtener la moneda predeterminada de la compañia.
+     * @author fchiappano
+     * @return C_Currency_ID
+     */
+    public static int getMonedaPredeterminada(final Properties p_ctx, final int ad_Client_ID, final String trxName)
+    {
+        MClient compañia = new MClient(p_ctx, ad_Client_ID, trxName);
+        return compañia.getC_Currency_ID();
+    } // getMonedaPredeterminada
 }
