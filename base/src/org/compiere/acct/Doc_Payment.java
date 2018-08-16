@@ -138,8 +138,23 @@ public class Doc_Payment extends Doc
 		if (getDocumentType().equals(DOCTYPE_ARReceipt))
 		{
 			//	Asset
-			FactLine fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-				getC_Currency_ID(), getAmount(), null);
+            /*
+             * Si se trata de un cheque se utiliza la cuenta de valores
+             * en lugar de la cuenta de caja.
+             *  K     | Check  (Cheque propio)
+             *  Z     | Cheque Tercero
+             *  O     | Contra Reembolso Cheque Propio
+             */
+            FactLine fl;
+            int combinacion_ID_Valores_a_Depositar = MSysConfig.getIntValue(
+                    "LAR_Combinacion_ID_Valores_a_Depositar", 0, getAD_Client_ID());
+            if (("K".equals(m_TenderType) || "Z".equals(m_TenderType) || "O".equals(m_TenderType)) & combinacion_ID_Valores_a_Depositar != 0)
+            {
+                MAccount cuenta = MAccount.get (as.getCtx(), combinacion_ID_Valores_a_Depositar);
+                fl = fact.createLine(null, cuenta, getC_Currency_ID(), getAmount(), null);
+            } else
+		    fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+		                  getC_Currency_ID(), getAmount(), null);
 			if (fl != null && AD_Org_ID != 0)
 				fl.setAD_Org_ID(AD_Org_ID);
 			//
@@ -184,9 +199,25 @@ public class Doc_Payment extends Doc
             fl = fact.createLine(null, m_Prepayment ? getAccount(Doc.ACCTTYPE_V_Prepayment, as) : getAccount(Doc.ACCTTYPE_PaymentSelect, as),
                     getC_Currency_ID(), getAmount(), null);
             else
-            fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-                    getC_Currency_ID(), null, getAmount());
-
+            {
+                /*
+                 * Si se trata de un cheque se utiliza la cuenta de valores
+                 * en lugar de la cuenta de caja.
+                 *  K     | Check  (Cheque propio)
+                 *  Z     | Cheque Tercero
+                 *  O     | Contra Reembolso Cheque Propio
+                 */
+                int combinacion_ID_Valores_a_Depositar = MSysConfig.getIntValue(
+                        "LAR_Combinacion_ID_Valores_a_Depositar", 0, getAD_Client_ID());
+                if (("K".equals(m_TenderType) || "Z".equals(m_TenderType) || "O"
+                        .equals(m_TenderType)) & combinacion_ID_Valores_a_Depositar != 0)
+                {
+                    MAccount cuenta = MAccount.get(as.getCtx(), combinacion_ID_Valores_a_Depositar);
+                    fl = fact.createLine(null, cuenta, getC_Currency_ID(), null, getAmount());
+                } else
+                    fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+                            getC_Currency_ID(), null, getAmount());
+            }
             if (fl != null && AD_Org_ID != 0)
                 fl.setAD_Org_ID(AD_Org_ID);
 		}
