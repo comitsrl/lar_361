@@ -25,7 +25,9 @@ import org.compiere.model.MAcctSchema;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MBankStatement;
 import org.compiere.model.MBankStatementLine;
+import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
+import org.compiere.model.MSysConfig;
 import org.compiere.util.Env;
 
 /**
@@ -170,13 +172,32 @@ public class Doc_BankStatement extends Doc
 		{
 			DocLine_Bank line = (DocLine_Bank)p_lines[i];
 			int C_BPartner_ID = line.getC_BPartner_ID();
-
+            MAccount cuenta = null;
+            if (line.getC_Payment_ID() != 0)
+            {
+                MPayment pay = new MPayment(Env.getCtx(), line.getC_Payment_ID(), getTrxName());
+                /*
+                 * Si se trata de un cheque se utiliza la cuenta de valores
+                 * en lugar de la cuenta de caja.
+                 *  K     | Check  (Cheque propio)
+                 *  Z     | Cheque Tercero
+                 *  O     | Contra Reembolso Cheque Propio
+                 */
+                int combinacion_ID_Valores_a_Depositar = MSysConfig.getIntValue(
+                        "LAR_Combinacion_ID_Valores_a_Depositar", 0, getAD_Client_ID());
+                String tenderType = pay.getTenderType();
+                if (("K".equals(tenderType) || "Z".equals(tenderType) || "O".equals(tenderType))
+                        & combinacion_ID_Valores_a_Depositar != 0)
+                    cuenta = MAccount.get(as.getCtx(), combinacion_ID_Valores_a_Depositar);
+            }
 			// Avoid usage of clearing accounts
 			// If both accounts BankAsset and BankInTransit are equal
 			// then remove the posting
 
 			MAccount acct_bank_asset =  getAccount(Doc.ACCTTYPE_BankAsset, as);
 			MAccount acct_bank_in_transit = getAccount(Doc.ACCTTYPE_BankInTransit, as);
+			if (cuenta != null)
+			    acct_bank_in_transit = cuenta;
 
 			// if ((!as.isPostIfClearingEqual()) && acct_bank_asset.equals(acct_bank_in_transit) && (!isInterOrg)) {
 			// don't validate interorg on banks for this - normally banks are balanced by orgs
@@ -212,9 +233,8 @@ public class Doc_BankStatement extends Doc
 					fl.setC_BPartner_ID(C_BPartner_ID);
 
 				//  BankInTransit   DR      CR              (Payment)
-				fl = fact.createLine(line,
-					getAccount(Doc.ACCTTYPE_BankInTransit, as),
-					line.getC_Currency_ID(), line.getTrxAmt().negate());
+                fl = fact.createLine(line, acct_bank_in_transit, line.getC_Currency_ID(), line
+                        .getTrxAmt().negate());
 				if (fl != null)
 				{
 					if (C_BPartner_ID != 0)
@@ -246,10 +266,12 @@ public class Doc_BankStatement extends Doc
 				fl = fact.createLine(line,
 					getAccount(Doc.ACCTTYPE_InterestExp, as), getAccount(Doc.ACCTTYPE_InterestExp, as),
 					line.getC_Currency_ID(), line.getInterestAmt().negate());
+			/*
 			else
 				fl = fact.createLine(line,
 					getAccount(Doc.ACCTTYPE_InterestRev, as), getAccount(Doc.ACCTTYPE_InterestRev, as),
 					line.getC_Currency_ID(), line.getInterestAmt().negate());
+			*/
 			if (fl != null && C_BPartner_ID != 0)
 				fl.setC_BPartner_ID(C_BPartner_ID);
 			//
