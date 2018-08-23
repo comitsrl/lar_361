@@ -271,8 +271,19 @@ public interface FiscalPacket extends Serializable
 	 * @param optional: the field is optional.
 	 */
 	public void setNumber(int field, BigDecimal number, int integerPart, int decimalPart, boolean optional);
-	
-	/**
+
+    /**
+     * Set a numeric field with prefix.
+     * @param field: field number to set.
+     * @param prefix: prefix for the number
+     * @param number: number to set.
+     * @param integerPart: integer part digits count.
+     * @param decimalPart: decimal part digist count.
+     * @param optional: the field is optional.
+     */
+    public void setNumberWithPrefix(int field, String prefix, BigDecimal number, int integerPart, int decimalPart, boolean optional);
+
+    /**
 	 * Set a numeric field.
 	 * @param field: field number to set.
 	 * @param number: number to set.
