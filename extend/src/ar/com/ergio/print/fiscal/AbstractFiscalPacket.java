@@ -447,6 +447,19 @@ public abstract class AbstractFiscalPacket implements FiscalPacket
 			setString(field, numStr);
 	}
 
+    public void setNumberWithPrefix(int field, String prefix, BigDecimal number, int integerPart, int decimalPart, boolean optional) {
+        String numStr = number.toString();
+        if(getFiscalPrinter() != null)
+            numStr = getFiscalPrinter().formatNumber(number, integerPart, decimalPart);
+
+        if(!prefix.isEmpty())
+            numStr = prefix.concat(numStr);
+        if(optional)
+            setOptionalField(field, numStr);
+
+        else
+            setString(field, numStr);
+    }
 	public void setNumber(int field, BigDecimal number, boolean optional) {
 		if(optional)
 			setOptionalField(field, number);
