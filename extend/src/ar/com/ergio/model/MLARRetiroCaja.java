@@ -298,21 +298,6 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
     {
         for (X_LAR_RetiroCajaLine linea : obtenerLineas())
         {
-            // Si el TenderType es cheque, vuelvo a marcar el cheque como en cartera.
-            if (linea.getTenderType().equals("Z"))
-            {
-                final MPayment cobro = new MPayment(p_ctx, linea.getCobro_ID(), get_TrxName());
-                String sql = "UPDATE C_Payment"
-                           + "   SET IsOnDrawer='Y', IsDeposited='N'";
-
-                if (isTransferencia() || get_ValueAsBoolean("Deposito"))
-                    sql = sql + " WHERE C_Payment_ID='" + cobro.get_ValueAsInt("LAR_PaymentSource_ID") + "'";
-                else
-                    sql = sql + " WHERE C_Payment_ID='" + cobro.getC_Payment_ID() + "'";
-
-                DB.executeUpdate(sql, get_TrxName());
-            }
-
             // Revierto el pago realizado desde la caja Origen.
             MPayment pago = new MPayment(p_ctx, linea.getPago_ID(), get_TrxName());
 
@@ -337,6 +322,20 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 }
 
                 cobro.saveEx();
+            }
+
+            // Si el TenderType es cheque, vuelvo a marcar el cheque como en cartera.
+            if (linea.getTenderType().equals("Z"))
+            {
+                final MPayment cobro = new MPayment(p_ctx, linea.getCobro_ID(), get_TrxName());
+                String sql = "UPDATE C_Payment" + "   SET IsOnDrawer='Y', IsDeposited='N'";
+
+                if (isTransferencia() || get_ValueAsBoolean("Deposito"))
+                    sql = sql + " WHERE C_Payment_ID='" + cobro.get_ValueAsInt("LAR_PaymentSource_ID") + "'";
+                else
+                    sql = sql + " WHERE C_Payment_ID='" + cobro.getC_Payment_ID() + "'";
+
+                DB.executeUpdate(sql, get_TrxName());
             }
         }
 
