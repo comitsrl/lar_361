@@ -659,6 +659,8 @@ public class MRMA extends X_M_RMA implements DocAction
 		if (m_processMsg != null)
 			return false;
 
+        // @fchiappano Setear Docstatus
+        setDocStatus(DOCSTATUS_Voided);
 		setProcessed(true);
         setDocAction(DOCACTION_None);
 		return true;
