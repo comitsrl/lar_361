@@ -61,9 +61,9 @@ public class LAR_ChequeEnCarteraPorCaja extends SvrProcess
             + " FROM C_Payment pt"
             + " WHERE pt.IsOnDrawer='Y' ";
 
-        String noDuplicado = " SELECT Cobro_ID"
-                           + "   FROM LAR_RetiroCajaLine rcl"
-                           + "  WHERE rcl.LAR_RetiroCaja_ID = " + retiroCaja_ID;
+        String noDuplicado = " SELECT rcl.Cobro_ID"
+                           +   " FROM LAR_RetiroCajaLine rcl"
+                           +   " JOIN LAR_RetiroCaja rc ON rcl.LAR_RetiroCaja_ID = rc.LAR_RetiroCaja_ID AND rc.DocStatus = 'DR'";
 
         StringBuilder whereSQL = new StringBuilder();
             whereSQL.append("IsReceipt='Y'");
