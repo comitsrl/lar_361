@@ -16,8 +16,11 @@
  *****************************************************************************/
 package org.compiere.model;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.compiere.util.CCache;
 import org.compiere.util.DB;
@@ -94,5 +97,49 @@ public class MConversionType extends X_C_ConversionType
 	{
 		super(ctx, rs, trxName);
 	}	//	MConversionType
+
+    /**
+     * Before Save
+     * @param newRecord new
+     * @return true or false
+     */
+    protected boolean beforeSave(boolean newRecord)
+    {
+        // @fchiappano No permir marcar como predeterminado si ya existe otro predeterminado en la compañia.
+        if (isDefault())
+        {
+            String sql = "SELECT C_ConversionType_ID"
+                       +  " FROM C_ConversionType"
+                       + " WHERE AD_Client_ID = ? AND C_ConversionType_ID != ? AND IsDefault = 'Y'";
+
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+            try
+            {
+                pstmt = DB.prepareStatement(sql, get_TrxName());
+                pstmt.setInt(1, getAD_Client_ID());
+                pstmt.setInt(2, getC_ConversionType_ID());
+                rs = pstmt.executeQuery();
+
+                if (rs.next())
+                {
+                    log.saveError("Error", "Ya existe otro Tipo de Cambio, marcado como Predeterminado");
+                    return false;
+                }
+            }
+            catch (SQLException eSql)
+            {
+                log.log(Level.SEVERE, sql, eSql);
+            }
+            finally
+            {
+                DB.close(rs, pstmt);
+                rs = null;
+                pstmt = null;
+            }
+        } // IsDefault
+
+        return true;
+    } // beforeSave
 
 }	//	MConversionType
