@@ -911,11 +911,6 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 
 -- 30/08/2018 15:39:22 ART
 -- ISSUE #80: Cierre de Cajas.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,SeqNo,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3005669,60,'Y','N','N',3000824,'N',710,'Y',3000200,'N','LAR','TargetAccount',100,0,TO_TIMESTAMP('2018-08-30 15:39:22','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2018-08-30 15:39:22','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 30/08/2018 15:39:22 ART
--- ISSUE #80: Cierre de Cajas.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3005669 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
@@ -927,11 +922,6 @@ INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLi
 -- 30/08/2018 15:39:22 ART
 -- ISSUE #80: Cierre de Cajas.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3005670 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 30/08/2018 15:39:22 ART
--- ISSUE #80: Cierre de Cajas.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,SeqNo,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3005671,1,'Y','N','N',3000826,'N',730,'Y',3000200,'N','LAR','IsDeposited',100,0,TO_TIMESTAMP('2018-08-30 15:39:22','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2018-08-30 15:39:22','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 30/08/2018 15:39:22 ART
@@ -987,11 +977,6 @@ INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLi
 -- 30/08/2018 15:39:24 ART
 -- ISSUE #80: Cierre de Cajas.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3005676 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 30/08/2018 15:39:24 ART
--- ISSUE #80: Cierre de Cajas.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,SeqNo,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3005677,1,'Y','N','N',3000825,'N',790,'Y',3000200,'N','LAR','IsBounced',100,0,TO_TIMESTAMP('2018-08-30 15:39:24','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2018-08-30 15:39:24','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 30/08/2018 15:39:24 ART
