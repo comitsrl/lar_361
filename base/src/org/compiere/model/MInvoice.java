@@ -2667,28 +2667,8 @@ public class MInvoice extends X_C_Invoice implements DocAction
         // conversion.
         if (!newRecord && !is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
         {
-            String sql = "";
-            int c_Currency_ID = getC_Currency_ID();
-
-            if (c_Currency_ID == LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
-            {
-                c_Currency_ID = get_ValueOldAsInt("C_Currency_ID");
-                sql = "SELECT MultiplyRate";
-            }
-            else
-            {
-                sql = "SELECT DivideRate";
-            }
-
-            sql = sql + " FROM C_Conversion_Rate" + " WHERE C_Currency_ID=?" + " AND C_Currency_ID_To=?"
-                    + " AND C_ConversionType_ID=?" + " AND ? BETWEEN ValidFrom AND ValidTo"
-                    + " AND AD_Client_ID IN (0,?)" + " AND AD_Org_ID IN (0,?)"
-                    + " ORDER BY AD_Client_ID DESC, AD_Org_ID DESC, ValidFrom DESC";
-
-            BigDecimal tasaCambio = DB.getSQLValueBD(get_TrxName(), sql, c_Currency_ID,
-                    LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()),
-                    getC_ConversionType_ID(), new Timestamp(System.currentTimeMillis()), getAD_Client_ID(),
-                    getAD_Org_ID());
+            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(getC_Currency_ID(), get_ValueOldAsInt("C_Currency_ID"),
+                    getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID(), p_ctx, get_TrxName());
 
             if (tasaCambio != null)
             {
