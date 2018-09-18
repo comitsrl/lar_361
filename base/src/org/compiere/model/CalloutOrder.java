@@ -17,6 +17,7 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,8 +29,9 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
-import org.compiere.util.Ini;
 import org.compiere.util.Msg;
+
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  *	Order Callouts.
@@ -772,12 +774,43 @@ public class CalloutOrder extends CalloutEngine
 		}
 		pp.setM_PriceList_Version_ID(M_PriceList_Version_ID); 
 		pp.setPriceDate(orderDate);
-		//		
-		mTab.setValue("PriceList", pp.getPriceList());
-		mTab.setValue("PriceLimit", pp.getPriceLimit());
-		mTab.setValue("PriceActual", pp.getPriceStd());
-		mTab.setValue("PriceEntered", pp.getPriceStd());
-		mTab.setValue("C_Currency_ID", new Integer(pp.getC_Currency_ID()));
+		//
+        // @fchiappano Si la moneda de la orden, difiere de la moneda de lista
+        // de precios, hago la conversion de precios.
+        MPriceList listaPrecio = new MPriceList(ctx, M_PriceList_ID, mTab.getTrxInfo());
+        MOrder orden = new MOrder(ctx, (Integer) mTab.getValue("C_Order_ID"), mTab.getTrxInfo());
+        if (listaPrecio.getC_Currency_ID() != orden.getC_Currency_ID())
+        {
+            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(orden.getC_Currency_ID(),
+                    listaPrecio.getC_Currency_ID(), orden.getC_ConversionType_ID(), orden.getAD_Client_ID(),
+                    orden.getAD_Org_ID(), ctx, mTab.getTrxInfo());
+
+            if (tasaCambio != null)
+            {
+                mTab.setValue("PriceList", pp.getPriceList().multiply(tasaCambio)
+                                .setScale(listaPrecio.getPricePrecision(), RoundingMode.HALF_UP));
+                mTab.setValue("PriceLimit", pp.getPriceLimit().multiply(tasaCambio)
+                                .setScale(listaPrecio.getPricePrecision(), RoundingMode.HALF_UP));
+                mTab.setValue("PriceActual", pp.getPriceStd().multiply(tasaCambio)
+                                .setScale(listaPrecio.getPricePrecision(), RoundingMode.HALF_UP));
+                mTab.setValue("PriceEntered", pp.getPriceStd().multiply(tasaCambio)
+                                .setScale(listaPrecio.getPricePrecision(), RoundingMode.HALF_UP));
+                mTab.setValue("C_Currency_ID", orden.getC_Currency_ID());
+            }
+            else
+            {
+                mTab.fireDataStatusEEvent("No se logro recuperar, una tasa de cambio.", "0", false);
+            }
+        }
+        else
+        {
+            mTab.setValue("PriceList", pp.getPriceList());
+            mTab.setValue("PriceLimit", pp.getPriceLimit());
+            mTab.setValue("PriceActual", pp.getPriceStd());
+            mTab.setValue("PriceEntered", pp.getPriceStd());
+            mTab.setValue("C_Currency_ID", new Integer(pp.getC_Currency_ID()));
+        } // @fchiappano
+
 		mTab.setValue("Discount", pp.getDiscount());
 		mTab.setValue("C_UOM_ID", new Integer(pp.getC_UOM_ID()));
 		mTab.setValue("QtyOrdered", mTab.getValue("QtyEntered"));
