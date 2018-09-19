@@ -1037,6 +1037,12 @@ public class MOrder extends X_C_Order implements DocAction
 		// @fchiappano guardar tasa de cambio en la orden
         if (getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
         {
+            if (getC_ConversionType_ID() == 0)
+            {
+                ADialog.error(0, new JDialog(), "No fue posible, recuperar un tipo de cambio valido");
+                return false;
+            }
+
             BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(), LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), new Timestamp(
                     System.currentTimeMillis()), getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
 
