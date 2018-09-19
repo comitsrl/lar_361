@@ -24,6 +24,7 @@ import java.util.logging.Level;
 
 import org.compiere.util.CCache;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 
 /**
  *	Currency Conversion Type Model
@@ -141,5 +142,21 @@ public class MConversionType extends X_C_ConversionType
 
         return true;
     } // beforeSave
+
+    /**
+     * After Save
+     * @param newRecord new
+     * @param success success
+     * @return success
+     */
+    protected boolean afterSave(boolean newRecord, boolean success)
+    {
+        // @fchiappano Setear C_ConversionType en el entorno
+        if (isDefault())
+            Env.setContext(p_ctx, "#C_ConversionType_ID", getC_ConversionType_ID());
+
+        return true;
+
+    } // afterSave
 
 }	//	MConversionType
