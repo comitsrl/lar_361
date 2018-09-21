@@ -591,6 +591,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 					MPayment payment = new MPayment (getCtx(), line.getC_Payment_ID(), get_TrxName());
 					line.setC_Payment_ID(0);
 					boolean originalConciliado = false;
+					boolean enCartera = false;
 
 					// @fchiappano Si es un cierre de caja y el LAR_Cierre_Origen_ID es mayor a 0,
 					// quiere decir que se trata de un cierre de compensacion, por lo que anulo el pago de la linea.
@@ -631,6 +632,15 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				            while (rs.next())
 				            {
 				                MPayment paymentTransferencia = new MPayment(p_ctx, rs.getInt("C_Payment_ID"), get_TrxName());
+                                if ((paymentTransferencia.getTenderType().equals(MPayment.TENDERTYPE_Check) || paymentTransferencia.getTenderType().equals("Z"))
+                                        && paymentTransferencia.isReceipt()
+                                        && paymentTransferencia.get_ValueAsBoolean("IsOnDrawer")
+                                        && (!paymentTransferencia.getDocStatus().equals(MPayment.DOCSTATUS_Reversed)
+                                        || !paymentTransferencia.getDocStatus().equals(MPayment.DOCSTATUS_Voided)))
+                                {
+                                    enCartera = true;
+                                }
+
 				                if (!paymentTransferencia.voidIt())
 				                {
 				                    m_processMsg = paymentTransferencia.getProcessMsg();
@@ -657,6 +667,8 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 
 					// @fchiappano Marcar cobro original como conciliado.
 	                payment.setIsReconciled(originalConciliado);
+	                // @ficahiappno Marcar el cobro original como en cartera.
+	                payment.set_ValueOfColumn("IsOnDrawer", enCartera);
 	                payment.saveEx();
 				}
 				line.saveEx();
