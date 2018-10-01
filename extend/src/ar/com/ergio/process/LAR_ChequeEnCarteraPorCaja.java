@@ -46,34 +46,33 @@ public class LAR_ChequeEnCarteraPorCaja extends SvrProcess
 
         Frame frame = new Frame();
         String usedDocs=""  //Consulta que devuelve el ID de los documentos (recibos) que ya
-            + "SELECT "     //fueron transferidos en algún pago, siempre y cuando ese pago no haya sido cancelado
-            + "     distinct(REC.c_payment_id) "
-            + "FROM c_payment PAY "
-            + "     INNER JOIN c_payment REC "
-            + "     ON REC.c_payment_id = PAY.lar_paymentsource_id "
-            + "     AND REC.Processed='Y' "
-            + "     AND REC.isReceipt='Y' "
-            + "     AND PAY.docstatus NOT IN('IN', 'RE', 'VO')  "
-            ;
+                            //fueron transferidos en algún pago, siempre y cuando ese pago no haya sido cancelado
+            + "SELECT distinct(REC.c_payment_id)"
+            +  " FROM c_payment PAY"
+            +  " JOIN c_payment REC ON REC.c_payment_id = PAY.lar_paymentsource_id"
+            +   " AND REC.docstatus IN ('CO', 'CL')"
+            +   " AND REC.IsReceipt = 'Y'"
+            +   " AND PAY.docstatus IN ('CO', 'CL')";
+
         //Marcos Zúñiga add IsOnDrawer='Y' condition
         String ondrawer=""
             + " SELECT C_Payment_ID"
             + " FROM C_Payment pt"
             + " WHERE pt.IsOnDrawer='Y' ";
 
-        String noDuplicado = " SELECT rcl.Cobro_ID"
+        String noDuplicado = " SELECT COALESCE (rcl.Cobro_ID, 0)"
                            +   " FROM LAR_RetiroCajaLine rcl"
                            +   " JOIN LAR_RetiroCaja rc ON rcl.LAR_RetiroCaja_ID = rc.LAR_RetiroCaja_ID AND rc.DocStatus = 'DR'";
 
         StringBuilder whereSQL = new StringBuilder();
-            whereSQL.append("IsReceipt='Y'");
-            whereSQL.append("AND Docstatus IN ('CO','CL')");
+            whereSQL.append(" p.IsReceipt='Y'");
+            whereSQL.append(" AND p.Docstatus IN ('CO','CL')");
             // ChequePropio = K  ChequeTercero = Z (nuevo)
-            whereSQL.append("AND TenderType IN ('K', 'Z')");
-            whereSQL.append("AND C_Payment_ID NOT IN ("+usedDocs+")");
-            whereSQL.append("AND C_Payment_ID IN ("+ondrawer+")");
-            whereSQL.append("AND C_Payment_ID NOT IN ("+noDuplicado+")");
-            whereSQL.append("AND C_BankAccount_ID IN (" + retiroCaja.getC_BankAccountFrom_ID() + ")");
+            whereSQL.append(" AND p.TenderType IN ('K', 'Z')");
+            whereSQL.append(" AND p.C_Payment_ID NOT IN ("+usedDocs+")");
+            whereSQL.append(" AND p.C_Payment_ID IN ("+ondrawer+")");
+            whereSQL.append(" AND p.C_Payment_ID NOT IN ("+noDuplicado+")");
+            whereSQL.append(" AND p.C_BankAccount_ID IN (" + retiroCaja.getC_BankAccountFrom_ID() + ")");
 
         Info inf = InfoOnDrawerChecks.create(frame, true, 0, "C_Payment", "C_Payment_ID", "", true, whereSQL.toString());
         AEnv.showCenterWindow(frame, inf);
