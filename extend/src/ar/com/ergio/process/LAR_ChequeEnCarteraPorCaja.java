@@ -54,23 +54,16 @@ public class LAR_ChequeEnCarteraPorCaja extends SvrProcess
             +   " AND REC.IsReceipt = 'Y'"
             +   " AND PAY.docstatus IN ('CO', 'CL')";
 
-        //Marcos Zúñiga add IsOnDrawer='Y' condition
-        String ondrawer=""
-            + " SELECT C_Payment_ID"
-            + " FROM C_Payment pt"
-            + " WHERE pt.IsOnDrawer='Y' ";
-
-        String noDuplicado = " SELECT COALESCE (rcl.Cobro_ID, 0)"
+        String noDuplicado = " SELECT COALESCE (rcl.C_Payment_ID, 0)"
                            +   " FROM LAR_RetiroCajaLine rcl"
                            +   " JOIN LAR_RetiroCaja rc ON rcl.LAR_RetiroCaja_ID = rc.LAR_RetiroCaja_ID AND rc.DocStatus = 'DR'";
 
         StringBuilder whereSQL = new StringBuilder();
-            whereSQL.append(" p.IsReceipt='Y'");
+            whereSQL.append(" p.IsOnDrawer = 'Y'");
             whereSQL.append(" AND p.Docstatus IN ('CO','CL')");
             // ChequePropio = K  ChequeTercero = Z (nuevo)
             whereSQL.append(" AND p.TenderType IN ('K', 'Z')");
             whereSQL.append(" AND p.C_Payment_ID NOT IN ("+usedDocs+")");
-            whereSQL.append(" AND p.C_Payment_ID IN ("+ondrawer+")");
             whereSQL.append(" AND p.C_Payment_ID NOT IN ("+noDuplicado+")");
             whereSQL.append(" AND p.C_BankAccount_ID IN (" + retiroCaja.getC_BankAccountFrom_ID() + ")");
 
@@ -86,7 +79,7 @@ public class LAR_ChequeEnCarteraPorCaja extends SvrProcess
                 final X_LAR_RetiroCajaLine lineaRetiro = new X_LAR_RetiroCajaLine(getCtx(), 0, get_TrxName());
 
                 lineaRetiro.setLAR_RetiroCaja_ID(retiroCaja.getLAR_RetiroCaja_ID());
-                lineaRetiro.setCobro_ID(payment.getC_Payment_ID());
+                lineaRetiro.set_ValueOfColumn("C_Payment_ID", payment.getC_Payment_ID());
                 lineaRetiro.setMonto(payment.getPayAmt());
                 lineaRetiro.setRoutingNo(payment.getRoutingNo());
                 lineaRetiro.setAccountNo(payment.getAccountNo());

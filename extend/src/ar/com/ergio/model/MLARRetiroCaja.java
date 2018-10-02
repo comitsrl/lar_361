@@ -163,7 +163,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             // Pago que debita los valores transferidos de la cuenta.
             final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
-            final MPayment cobro = new MPayment(getCtx(), linea.getCobro_ID(), get_TrxName());
+            final MPayment cobro = new MPayment(getCtx(), linea.get_ValueAsInt("C_Payment_ID"), get_TrxName());
 
             // Si se trata de una Extaccion Bancaria, tomo la cuenta bancaria origen.
             if (get_ValueAsBoolean("ExtraccionBancaria") || get_ValueAsBoolean("TransferenciaBancaria"))
@@ -327,13 +327,9 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             // Si el TenderType es cheque, vuelvo a marcar el cheque como en cartera.
             if (linea.getTenderType().equals("Z"))
             {
-                final MPayment cobro = new MPayment(p_ctx, linea.getCobro_ID(), get_TrxName());
-                String sql = "UPDATE C_Payment" + "   SET IsOnDrawer='Y', IsDeposited='N'";
-
-                if (isTransferencia() || get_ValueAsBoolean("Deposito"))
-                    sql = sql + " WHERE C_Payment_ID='" + cobro.get_ValueAsInt("LAR_PaymentSource_ID") + "'";
-                else
-                    sql = sql + " WHERE C_Payment_ID='" + cobro.getC_Payment_ID() + "'";
+                String sql = "UPDATE C_Payment"
+                           +   " SET IsOnDrawer = 'Y', IsDeposited = 'N'"
+                           + " WHERE C_Payment_ID = " + linea.get_ValueAsInt("C_Payment_ID");
 
                 DB.executeUpdate(sql, get_TrxName());
             }
