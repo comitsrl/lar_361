@@ -18,6 +18,7 @@ package org.compiere.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -748,11 +749,12 @@ public final class MPayment extends X_C_Payment
 			return getPayAmt();
 		// @mzuniga Se agrega COALESCE (Evita Null Pointer Exception cuando
 		// no se trabaja en una Cabecera)
-		String sql = "SELECT COALESCE(SUM(currencyConvert(al.Amount,"
-				+ "ah.C_Currency_ID, p.C_Currency_ID,ah.DateTrx,p.C_ConversionType_ID, al.AD_Client_ID,al.AD_Org_ID)), 0) "
+		String sql = "SELECT COALESCE(SUM(currencyConvertRate(al.Amount,"
+				+ "ah.C_Currency_ID, p.C_Currency_ID, ph.TasaDeCambio)), 0) "
 			+ "FROM C_AllocationLine al"
 			+ " INNER JOIN C_AllocationHdr ah ON (al.C_AllocationHdr_ID=ah.C_AllocationHdr_ID) "
 			+ " INNER JOIN C_Payment p ON (al.C_Payment_ID=p.C_Payment_ID) "
+			+  " LEFT JOIN LAR_PaymentHeader ph ON (p.LAR_PaymentHeader_ID = ph.LAR_PaymentHeader_ID) "
 			+ "WHERE al.C_Payment_ID=?"
 			+ " AND ah.IsActive='Y' AND al.IsActive='Y'";
 		//	+ " AND al.C_Invoice_ID IS NOT NULL";
@@ -778,6 +780,10 @@ public final class MPayment extends X_C_Payment
 		}
 	//	log.fine("getAllocatedAmt - " + retValue);
 		//	? ROUND(NVL(v_AllocatedAmt,0), 2);
+
+        if (retValue != null)
+            retValue = retValue.setScale(getC_Currency().getStdPrecision(), RoundingMode.HALF_UP);
+
 		return retValue;
 	}	//	getAllocatedAmt
 

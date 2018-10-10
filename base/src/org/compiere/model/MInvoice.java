@@ -1009,7 +1009,8 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		}
 
         // @fchiappano guardar tasa de cambio en la factura
-        if (getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+        if (getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()) &&
+                !getDocStatus().equals(DOCSTATUS_Completed) && !getDocStatus().equals(DOCSTATUS_Closed))
         {
             if (!setTipoCambioSdN())
                 return false;
@@ -1127,8 +1128,8 @@ public class MInvoice extends X_C_Invoice implements DocAction
 	public BigDecimal getAllocatedAmt ()
 	{
 		BigDecimal retValue = null;
-		String sql = "SELECT SUM(currencyConvert(al.Amount+al.DiscountAmt+al.WriteOffAmt,"
-				+ "ah.C_Currency_ID, i.C_Currency_ID,ah.DateTrx,COALESCE(i.C_ConversionType_ID,0), al.AD_Client_ID,al.AD_Org_ID)) "
+		String sql = "SELECT SUM(currencyConvertRate(al.Amount+al.DiscountAmt+al.WriteOffAmt,"
+				+ "ah.C_Currency_ID, i.C_Currency_ID, i.TasaDeCambio)) "
 			+ "FROM C_AllocationLine al"
 			+ " INNER JOIN C_AllocationHdr ah ON (al.C_AllocationHdr_ID=ah.C_AllocationHdr_ID)"
 			+ " INNER JOIN C_Invoice i ON (al.C_Invoice_ID=i.C_Invoice_ID) "
@@ -1175,6 +1176,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			BigDecimal alloc = getAllocatedAmt();	//	absolute
 			if (alloc == null)
 				alloc = Env.ZERO;
+            alloc = alloc.setScale(getC_Currency().getStdPrecision(), RoundingMode.HALF_UP);
 			BigDecimal total = getGrandTotal();
 			if (!isSOTrx())
 				total = total.negate();
