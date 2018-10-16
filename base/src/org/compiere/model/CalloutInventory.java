@@ -131,8 +131,51 @@ public class CalloutInventory extends CalloutEngine
 			+ " - QtyBook=" + bd);
 		return "";
 	}   //  product
-	
-	
+
+	/**
+     * Cantidad Contada UM.
+     *
+     *  @param ctx      Context
+     *  @param WindowNo current Window No
+     *  @param mTab     Model Tab
+     *  @param mField   Model Field
+     *  @param value    The new value
+     *  @return Error message or ""
+     */
+    public String cantidad(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
+    {
+        if (isCalloutActive())
+            return "";
+
+        Integer m_Product_ID = (Integer) mTab.getValue("M_Product_ID");
+        Integer c_Uom_ID = (Integer) mTab.getValue("C_Uom_ID");
+
+        // @fchiappano Si el producto es nulo, se obvia el proceso.
+        if (m_Product_ID == null)
+            return "";
+
+        // @fchiappano Si la unidad de medida es nula, tomo la predeterminada del producto.
+        if (c_Uom_ID == null)
+        {
+            c_Uom_ID = new MProduct(ctx, m_Product_ID, mTab.getTrxInfo()).getC_UOM_ID();
+            mTab.setValue("C_Uom_ID", c_Uom_ID);
+        }
+
+        // @fchiappano Realizar conversión de UM
+        BigDecimal cantidad = MUOMConversion.convertProductFrom(ctx, m_Product_ID, c_Uom_ID,
+                (BigDecimal) mTab.getValue("CantContadaUM")).setScale(MUOM.getPrecision(ctx, c_Uom_ID),
+                BigDecimal.ROUND_HALF_UP);
+
+        // @fchiappano Si la cantidad es igual a null, quiere decir que no se
+        // logro recuperar una conversión, por lo que se vuelven la cantidades a cero.
+        if (cantidad == null)
+            cantidad = (BigDecimal) mTab.getValue("CantContadaUM");
+
+        mTab.setValue("QtyCount", cantidad);
+
+        return "";
+    } // cantidad
+
 	/**
 	 * kviiksaar
 	 * 
