@@ -76,8 +76,33 @@ public class CalloutMovement extends CalloutEngine
 		if (isCalloutActive() || value == null)
 			return "";
 
-		int M_Product_ID = Env.getContextAsInt(ctx, WindowNo, "M_Product_ID");
-		checkQtyAvailable(ctx, mTab, WindowNo, M_Product_ID, (BigDecimal)value);
+		Integer m_Product_ID = (Integer) mTab.getValue("M_Product_ID");
+        Integer c_Uom_ID = (Integer) mTab.getValue("C_Uom_ID");
+
+        // @fchiappano Si el producto es nulo, se obvia el proceso.
+        if (m_Product_ID == null)
+            return "";
+
+        // @fchiappano Si la unidad de medida es nula, tomo la predeterminada del producto.
+        if (c_Uom_ID == null)
+        {
+            c_Uom_ID = new MProduct(ctx, m_Product_ID, mTab.getTrxInfo()).getC_UOM_ID();
+            mTab.setValue("C_Uom_ID", c_Uom_ID);
+        }
+
+        // @fchiappano Realizar conversión de UM
+        BigDecimal cantidad = MUOMConversion.convertProductFrom(ctx, m_Product_ID, c_Uom_ID,
+                (BigDecimal) mTab.getValue("CantidadUM")).setScale(MUOM.getPrecision(ctx, c_Uom_ID),
+                BigDecimal.ROUND_HALF_UP);
+
+        // @fchiappano Si la cantidad es igual a null, quiere decir que no se
+        // logro recuperar una conversión, por lo que se deja la cantidad ingresada.
+        if (cantidad == null)
+            cantidad = (BigDecimal) mTab.getValue("CantidadUM");
+
+        mTab.setValue("MovementQty", cantidad);
+
+		checkQtyAvailable(ctx, mTab, WindowNo, m_Product_ID, (BigDecimal) mTab.getValue("MovementQty"));
 		//
 		return "";
 	} //  qty
