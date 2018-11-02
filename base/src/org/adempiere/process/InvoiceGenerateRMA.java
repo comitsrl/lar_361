@@ -118,6 +118,7 @@ public class InvoiceGenerateRMA extends SvrProcess
         catch (Exception ex)
         {
             log.log(Level.SEVERE, sql, ex);
+            return "@Error@";
         }
         finally
         {
@@ -230,8 +231,9 @@ public class InvoiceGenerateRMA extends SvrProcess
         
         if (!invoice.processIt(p_docAction))
         {
-            processMsg.append(" (NOT Processed)");
+//            processMsg.append(" (NOT Processed)");
             log.warning("Invoice Processing failed: " + invoice + " - " + invoice.getProcessMsg());
+            addLog("completeInvoice - failed: " + invoice);
             throw new IllegalStateException("Invoice Processing failed: " + invoice + " - " + invoice.getProcessMsg());
         }
 
