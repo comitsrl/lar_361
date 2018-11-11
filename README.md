@@ -18,7 +18,7 @@ and Non Binding offers Invoicing).
 
 Credits
 -------
-* Initial project development by [Ergio]
+* Project development and maintenance by [Comit]
 * ADempiere ERP version [3.61.Final][ADempiere361] ([Source Code][ad361.final]).
 * Colombian Localization (LCO), developed by [Carlos Ruiz] - [GlobalQSS].
 * Fiscal Printing support, developed by [Libertya].
@@ -44,6 +44,6 @@ Argentine Localization is licensed under [GNU GPLv2]
 [Carlos Ruiz]: http://www.adempiere.com/User:CarlosRuiz
 [LCO]: http://www.adempiere.com/LCO_Instrucciones_Instalacion#Soporte_Retenciones_Colombia
 [Alejandro Falcone]: http://www.adempiere.com/User:Afalcone
-[Ergio]: http://www.ergio.com.ar
+[Comit]: http://www.comit.com.ar
 [iDempiere]: http://www.idempiere.org/
 [ad361-final]: https://bitbucket.org/emmie/adempiere361
