@@ -37,7 +37,6 @@ import org.compiere.swing.CPanel;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 
-import ar.com.comit.print.javapos.ImprimeTicketCompra;
 import ar.com.comit.print.javapos.ImprimeTicketEnvio;
 import ar.com.ergio.util.LAR_Utils;
 
@@ -198,6 +197,27 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                         return;
                     }
                 } */
+                if (isJavaPOS)
+                {
+                    try
+                    {
+                        //@emmie - solo imprime ticket de envio
+                        //final ImprimeTicketCompra ticketCompra = new ImprimeTicketCompra(invoice);
+                        //ticketCompra.imprimir();
+
+                        // @fchiappano Imprimir ticket de envio a domicilio.
+                        if (p_posPanel.m_order.get_ValueAsBoolean("ImprimirEnvio"))
+                        {
+                            final ImprimeTicketEnvio ticketEnvio = new ImprimeTicketEnvio(order);
+                            ticketEnvio.imprimir();
+                        }
+                    }
+                    catch (final JposException e)
+                    {
+                        log.log(Level.SEVERE, "Error al imprimir v\u00eda Java POS", e);
+                    }
+                }
+
                 if (!isFiscal)
                 {
                     reportType = ReportEngine.INVOICE;
@@ -206,25 +226,6 @@ public abstract class PosSubPanel extends CPanel implements ActionListener
                     if (isElectronic)
                     {
                         ReportCtl.startDocumentPrint(reportType, null, documentId, null, Env.getWindowNo(this), true, impresoraFactura);
-                    }
-                    else if (isJavaPOS)
-                    {
-                        final ImprimeTicketCompra ticketCompra = new ImprimeTicketCompra(invoice);
-                        try
-                        {
-                            ticketCompra.imprimir();
-
-                            // @fchiappano Imprimir ticket de envio a domicilio.
-                            if (p_posPanel.m_order.get_ValueAsBoolean("ImprimirEnvio"))
-                            {
-                                final ImprimeTicketEnvio ticketEnvio = new ImprimeTicketEnvio(order);
-                                ticketEnvio.imprimir();
-                            }
-                        }
-                        catch (JposException e)
-                        {
-                            log.log(Level.SEVERE, "Error al imprimir v\u00eda Java POS", e);
-                        }
                     }
                     // @fchiappano Si no es ni electronica ni JavaPos, se imprime de forma tradicional
                     else

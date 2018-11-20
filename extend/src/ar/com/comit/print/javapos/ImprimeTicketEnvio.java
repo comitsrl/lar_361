@@ -133,6 +133,7 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
 
             linea = "     " + det.getQtyInvoiced() + " x " + Util.formatDecimal(precioUnitario, 2, 0) + " c/u";
             printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
+            subTotal = subTotal.add(det.getLineNetAmt());
         }
     } // printDetalle
 
