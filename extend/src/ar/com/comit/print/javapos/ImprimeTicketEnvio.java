@@ -32,7 +32,6 @@ import org.compiere.model.PO;
  */
 public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
 {
-    private BigDecimal subTotal = new BigDecimal(0);
     private DatosImpresion datos;
 
     public ImprimeTicketEnvio(final PO documento)
@@ -66,15 +65,11 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
 
         // Información de la Compañia
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
-        printer.printBitmap(POSPrinterConst.PTR_S_RECEIPT, datos.getLogo(), (printer.getRecLineWidth() / 2), POSPrinterConst.PTR_BM_CENTER);
+        printer.printBitmap(POSPrinterConst.PTR_S_RECEIPT, datos.getLogo(), printer.getRecLineWidth(), POSPrinterConst.PTR_BM_CENTER);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
 
-        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + DOUBLEH + BOLD + datos.getRazonSocial() + LF);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + datos.getDireccion() + LF);
-        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "CUIT: " + datos.getCUIT() + LF);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "Email: " + datos.getEmail() + LF);
-        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "IIBB: " + datos.getIIBB() + LF);
-        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "Inicio Actividad: " + datos.getInicioActividades() + LF);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
 
         // Datos del Cliente
@@ -140,13 +135,6 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
     {
         printer.setRecLetterQuality(false);
         String linea;
-
-        linea = Util.makePrintString(printer.getRecLineChars(), "Total Neto", Util.formatoParaImporte(subTotal));
-        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
-
-        linea = Util.makePrintString(printer.getRecLineChars(), "IVA 21%",
-                Util.formatoParaImporte(orden.getGrandTotal().subtract(subTotal)));
-        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
 
         linea = Util.makePrintString((printer.getRecLineChars() / 2), "Total",
                 Util.formatoParaImporte(orden.getGrandTotal()));

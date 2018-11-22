@@ -18,7 +18,7 @@ Presupuestos/Pedidos).
 
 Créditos
 ---------
-* Desarrollo inicial del proyecto por parte de [Ergio]
+* Desarrollo y mantenimiento del proyecto por parte de [Comit]
 * ADempiere ERP version [3.61.Final][ADempiere361] ([Código fuente][ad361.final]).
 * Localización Colombia (LCO), desarrollada por [Carlos Ruiz] - [GlobalQSS].
 * Soporte para impresiones Fiscales mediante Punto de Venta, desarrollado por [Libertya].
@@ -44,6 +44,6 @@ ADempiere Localización Argentina está regulado por la licencia [GNU GPLv2]
 [Carlos Ruiz]: http://www.adempiere.com/User:CarlosRuiz
 [LCO]: http://www.adempiere.com/LCO_Instrucciones_Instalacion#Soporte_Retenciones_Colombia
 [Alejandro Falcone]: http://www.adempiere.com/User:Afalcone
-[Ergio]: http://www.ergio.com.ar
+[Comit]: http://www.comit.com.ar
 [iDempiere]: http://www.idempiere.org/
 [ad361-final]: https://bitbucket.org/emmie/adempiere361
