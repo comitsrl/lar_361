@@ -745,7 +745,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     {
         // Se recuperan los valores parametrizados
         // LCO_ISIC_ID CM Otra Convenio Multilateral c/jurisdicción Río Negro
-        final int LAR_BP_LCO_ISIC_CM_Jurisd_RN = MSysConfig.getIntValue("LAR_C_Charge_ID_Ret_IIBB_RN", 0, Env.getAD_Client_ID(getCtx()));
+        final int LAR_BP_LCO_ISIC_CM_Jurisd_RN = MSysConfig.getIntValue("LAR_BP_LCO_ISIC_CM_Jurisd_RN", 0, Env.getAD_Client_ID(getCtx()));
         // Coeficiente Unificado mínimo para Río Negro
         final BigDecimal LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN = new BigDecimal(MSysConfig.getValue("LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN", Env.getAD_Client_ID(getCtx())));
         // Se iniciaiza la factura para el certificado
