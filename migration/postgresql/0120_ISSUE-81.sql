@@ -978,6 +978,11 @@ UPDATE AD_Column SET IsAlwaysUpdateable='N',Updated=TO_TIMESTAMP('2018-11-15 19:
 UPDATE AD_Column SET ReadOnlyLogic=NULL,Updated=TO_TIMESTAMP('2018-11-15 19:29:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003217
 ;
 
+-- 25/11/2018 9:45:30 ART
+-- ISSUE #80: Cierre de Cajas.
+UPDATE AD_Element_Trl SET Name='Coef. Unif. CM (Río Negro)',PrintName='Coef. Unif. CM (Río Negro)',Updated=TO_TIMESTAMP('2018-11-25 09:45:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3000952 AND AD_Language='es_AR'
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0120_ISSUE-81.sql', 'LAR', '')
 ;
