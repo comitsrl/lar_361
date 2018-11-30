@@ -35,11 +35,13 @@ import org.compiere.apps.ADialog;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCharge;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MInvoiceTax;
+import org.compiere.model.MOrg;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MSysConfig;
@@ -53,6 +55,7 @@ import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.globalqss.model.X_LCO_WithholdingType;
+import org.joda.time.DateTime;
 
 /**
  * Payment Header
@@ -88,6 +91,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     private static final BigDecimal alicuotaRetReducida = new BigDecimal(80);
     // Categoría de IVA Responsable Inscirpto
     final static private int responsableInscripto = 1000000;
+    // C_SalesRegion_ID para Río Negro
+    final static private int regionRioNegroID = 224;
 
     /**
      * Recupera la cabecera de pagos relacionada con el id de la factura dada
@@ -587,7 +592,9 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                         {
                             MInvoice factura = new MInvoice(getCtx(), facturaID_Cert, get_TrxName());
                             // Se deja registrado en la factura la retención
-                            factura.set_CustomColumn("ImporteRetencionIIBB", impRetencion);
+                            BigDecimal retAcumulada = (BigDecimal) factura.get_Value("ImporteRetencionIIBB");
+                            retAcumulada = retAcumulada.add(impRetencion);
+                            factura.set_CustomColumn("ImporteRetencionIIBB", retAcumulada);
                             if (!factura.save(get_TrxName()))
                             {
                                 m_processMsg = "Error al registrar la retenci\u00f3n en la factura";
@@ -753,7 +760,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         // Recupera el tipo de IIBB del Proveedor
         final int bpLCO_ISIC_ID = bp.get_ValueAsInt("LCO_ISIC_ID");
 
-        // Excepxiones
+        // Excepciones
         // Si el SdN es convenio con jurisdicción en RN coef < 0.03
         final BigDecimal bpCoefCM = (BigDecimal) bp.get_Value("CoeficienteUnificadoCM");
         if (bpLCO_ISIC_ID == LAR_BP_LCO_ISIC_CM_Jurisd_RN)
@@ -769,6 +776,26 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     log.warning("No corresponde retener, Coeficiente Unificado: " + bpCoefCM + " < " + LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN);
                     return Env.ONE.negate();
                 }
+
+        // Si el SdN Proveedor no tiene dirección en R.N.
+        MBPartnerLocation[] bpl = bp.getLocations(false);
+        boolean retener = false;
+        for (final MBPartnerLocation loc : bpl)
+        {
+            if (loc.getLocation(false).getC_Region_ID() == 0)
+            {
+                m_processMsg = "Seleccionar la provincia en la direcci\u00f3n del SdN";
+                log.severe(m_processMsg);
+                return Env.ONE.negate();
+            }
+            if (loc.getLocation(false).getC_Region_ID() == regionRioNegroID)
+                retener = true;
+        }
+        if (!retener)
+        {
+            log.warning("No corresponde retener, SdN sin dirección en Río Negro: " + bp.getName());
+            return Env.ZERO;
+        }
 
         impSujetoaRet = Env.ZERO;
         BigDecimal impRetencion = Env.ZERO;
@@ -1528,7 +1555,11 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     {
         final MLARPaymentWithholding pwh = new MLARPaymentWithholding(getCtx(), 0, get_TrxName());
 
-        pwh.set_CustomColumn("Documentno", docNo);
+        DateTime dateTime = new DateTime(getDateTrx());
+        int year = dateTime.getYear();
+        MOrg org = new MOrg(getCtx(), getAD_Org_ID(), get_TrxName());
+        String nroCert = org.getDescription() + "-" + year + "-" + docNo;
+        pwh.set_CustomColumn("Documentno", nroCert);
         pwh.setLAR_PaymentHeader_ID(getLAR_PaymentHeader_ID());
         pwh.setC_Tax_ID(wc.getC_Tax_ID());
         pwh.setDateAcct(getDateTrx());
