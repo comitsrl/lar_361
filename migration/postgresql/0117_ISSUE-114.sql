@@ -891,5 +891,5 @@ UPDATE AD_Field SET DisplayLength=20,Updated=TO_TIMESTAMP('2018-10-11 18:37:25',
 ;
 
 -- Registración de script
-SELECT register_migration_script_lar('0117_BUG-114.sql', 'LAR', '')
+SELECT register_migration_script_lar('0117_ISSUE-114.sql', 'LAR', '')
 ;
