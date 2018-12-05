@@ -22,7 +22,9 @@ import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -55,7 +57,6 @@ import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.globalqss.model.X_LCO_WithholdingType;
-import org.joda.time.DateTime;
 
 /**
  * Payment Header
@@ -1555,8 +1556,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     {
         final MLARPaymentWithholding pwh = new MLARPaymentWithholding(getCtx(), 0, get_TrxName());
 
-        DateTime dateTime = new DateTime(getDateTrx());
-        int year = dateTime.getYear();
+        Timestamp date = getDateTrx();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int year = calendar.get(Calendar.YEAR);
         MOrg org = new MOrg(getCtx(), getAD_Org_ID(), get_TrxName());
         String nroCert = org.getDescription() + "-" + year + "-" + docNo;
         pwh.set_CustomColumn("Documentno", nroCert);
