@@ -142,7 +142,7 @@ public class InfoInvoice extends Info
 		new Info_Column(Msg.translate(Env.getCtx(), "DocumentNo"), "i.DocumentNo", String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "C_Currency_ID"), "(SELECT ISO_Code FROM C_Currency c WHERE c.C_Currency_ID=i.C_Currency_ID)", String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "GrandTotal"), "i.GrandTotal",  BigDecimal.class),
-		new Info_Column(Msg.translate(Env.getCtx(), "ConvertedAmount"), "larCurrencyBase(i.GrandTotal, i.C_Currency_ID, i.C_ConversionType_ID, i.DateAcct, i.AD_Client_ID, i.AD_Org_ID)", BigDecimal.class),
+		new Info_Column(Msg.translate(Env.getCtx(), "ConvertedAmount"), "currencyConvertRate(i.GrandTotal, i.C_Currency_ID, 118, i.TasaDeCambio)", BigDecimal.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "OpenAmt"), "invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID)", BigDecimal.class, true, true, null),
 		new Info_Column(Msg.translate(Env.getCtx(), "IsPaid"), "i.IsPaid", Boolean.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "IsSOTrx"), "i.IsSOTrx", Boolean.class),

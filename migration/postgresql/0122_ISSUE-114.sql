@@ -299,6 +299,167 @@ UPDATE AD_Field_Trl SET IsTranslated='Y',Updated=TO_TIMESTAMP('2018-11-29 16:52:
 UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2018-11-29 16:52:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3005877
 ;
 
+-- Se agrega columna i.TasaDeCambio.
+CREATE OR REPLACE VIEW c_invoice_v AS 
+ SELECT i.c_invoice_id,
+    i.ad_client_id,
+    i.ad_org_id,
+    i.isactive,
+    i.created,
+    i.createdby,
+    i.updated,
+    i.updatedby,
+    i.issotrx,
+    i.documentno,
+    i.docstatus,
+    i.docaction,
+    i.processing,
+    i.processed,
+    i.c_doctype_id,
+    i.c_doctypetarget_id,
+    i.c_order_id,
+    i.description,
+    i.isapproved,
+    i.istransferred,
+    i.salesrep_id,
+    i.dateinvoiced,
+    i.dateprinted,
+    i.dateacct,
+    i.c_bpartner_id,
+    i.c_bpartner_location_id,
+    i.ad_user_id,
+    i.poreference,
+    i.dateordered,
+    i.c_currency_id,
+    i.c_conversiontype_id,
+    i.paymentrule,
+    i.c_paymentterm_id,
+    i.c_charge_id,
+    i.m_pricelist_id,
+    i.c_campaign_id,
+    i.c_project_id,
+    i.c_activity_id,
+    i.isprinted,
+    i.isdiscountprinted,
+    i.ispaid,
+    i.isindispute,
+    i.ispayschedulevalid,
+    NULL::numeric AS c_invoicepayschedule_id,
+    i.invoicecollectiontype,
+    i.dunninggrace,
+        CASE
+            WHEN charat(d.docbasetype::character varying, 3)::text = 'C'::text THEN i.chargeamt * (-1)::numeric
+            ELSE i.chargeamt
+        END AS chargeamt,
+        CASE
+            WHEN charat(d.docbasetype::character varying, 3)::text = 'C'::text THEN i.totallines * (-1)::numeric
+            ELSE i.totallines
+        END AS totallines,
+        CASE
+            WHEN charat(d.docbasetype::character varying, 3)::text = 'C'::text THEN i.grandtotal * (-1)::numeric
+            ELSE i.grandtotal
+        END AS grandtotal,
+        CASE
+            WHEN charat(d.docbasetype::character varying, 3)::text = 'C'::text THEN (-1.0)
+            ELSE 1.0
+        END AS multiplier,
+        CASE
+            WHEN charat(d.docbasetype::character varying, 2)::text = 'P'::text THEN (-1.0)
+            ELSE 1.0
+        END AS multiplierap,
+    d.docbasetype,
+    paymenttermduedate(i.c_paymentterm_id, i.dateinvoiced::timestamp with time zone) AS duedate,
+    i.TasaDeCambio
+   FROM c_invoice i
+     JOIN c_doctype d ON i.c_doctype_id = d.c_doctype_id
+  WHERE i.ispayschedulevalid <> 'Y'::bpchar
+UNION
+ SELECT i.c_invoice_id,
+    i.ad_client_id,
+    i.ad_org_id,
+    i.isactive,
+    i.created,
+    i.createdby,
+    i.updated,
+    i.updatedby,
+    i.issotrx,
+    i.documentno,
+    i.docstatus,
+    i.docaction,
+    i.processing,
+    i.processed,
+    i.c_doctype_id,
+    i.c_doctypetarget_id,
+    i.c_order_id,
+    i.description,
+    i.isapproved,
+    i.istransferred,
+    i.salesrep_id,
+    i.dateinvoiced,
+    i.dateprinted,
+    i.dateacct,
+    i.c_bpartner_id,
+    i.c_bpartner_location_id,
+    i.ad_user_id,
+    i.poreference,
+    i.dateordered,
+    i.c_currency_id,
+    i.c_conversiontype_id,
+    i.paymentrule,
+    i.c_paymentterm_id,
+    i.c_charge_id,
+    i.m_pricelist_id,
+    i.c_campaign_id,
+    i.c_project_id,
+    i.c_activity_id,
+    i.isprinted,
+    i.isdiscountprinted,
+    i.ispaid,
+    i.isindispute,
+    i.ispayschedulevalid,
+    ips.c_invoicepayschedule_id,
+    i.invoicecollectiontype,
+    i.dunninggrace,
+    NULL::numeric AS chargeamt,
+    NULL::numeric AS totallines,
+        CASE
+            WHEN charat(d.docbasetype::character varying, 3)::text = 'C'::text THEN ips.dueamt * (-1)::numeric
+            ELSE ips.dueamt
+        END AS grandtotal,
+        CASE
+            WHEN charat(d.docbasetype::character varying, 3)::text = 'C'::text THEN (-1)
+            ELSE 1
+        END AS multiplier,
+        CASE
+            WHEN charat(d.docbasetype::character varying, 2)::text = 'P'::text THEN (-1)
+            ELSE 1
+        END AS multiplierap,
+    d.docbasetype,
+    ips.duedate,
+    i.TasaDeCambio
+   FROM c_invoice i
+     JOIN c_doctype d ON i.c_doctype_id = d.c_doctype_id
+     JOIN c_invoicepayschedule ips ON i.c_invoice_id = ips.c_invoice_id
+  WHERE i.ispayschedulevalid = 'Y'::bpchar AND ips.isvalid = 'Y'::bpchar;
+
+ALTER TABLE c_invoice_v
+  OWNER TO adempiere;
+
+-- 05/12/2018 18:29:21 ART
+-- ISSUE #114: Venta en dolares.
+INSERT INTO AD_Val_Rule (Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('S',3000066,'LAR','C_ConversionType',100,100,TO_TIMESTAMP('2018-12-05 18:29:20','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_TIMESTAMP('2018-12-05 18:29:20','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 05/12/2018 18:30:51 ART
+-- ISSUE #114: Venta en dolares.
+UPDATE AD_Val_Rule SET Code='IsDefault = ''N''',Updated=TO_TIMESTAMP('2018-12-05 18:30:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000066
+;
+
+-- 05/12/2018 18:35:20 ART
+-- ISSUE #114: Venta en dolares.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000066,Updated=TO_TIMESTAMP('2018-12-05 18:35:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3002966
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0122_BUG-114.sql', 'LAR', '')
 ;
