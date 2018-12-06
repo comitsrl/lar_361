@@ -794,7 +794,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 if (bpCoefCM.compareTo(LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN) < 0)
                 {
                     log.warning("No corresponde retener, Coeficiente Unificado: " + bpCoefCM + " < " + LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN);
-                    return Env.ONE.negate();
+                    return Env.ZERO;
                 }
 
         impSujetoaRet = Env.ZERO;
