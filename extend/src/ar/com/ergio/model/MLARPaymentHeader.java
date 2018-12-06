@@ -762,22 +762,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         final int bpLCO_ISIC_ID = bp.get_ValueAsInt("LCO_ISIC_ID");
 
         // Excepciones
-        // Si el SdN es convenio con jurisdicción en RN coef < 0.03
-        final BigDecimal bpCoefCM = (BigDecimal) bp.get_Value("CoeficienteUnificadoCM");
-        if (bpLCO_ISIC_ID == LAR_BP_LCO_ISIC_CM_Jurisd_RN)
-            if (bpCoefCM.compareTo(Env.ZERO) <= 0)
-            {
-                m_processMsg = "Ingresar el Coeficiente Unificado en la configuraci\u00f3n del SdN";
-                log.severe(m_processMsg);
-                return Env.ONE.negate();
-            }
-            else
-                if (bpCoefCM.compareTo(LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN) < 0)
-                {
-                    log.warning("No corresponde retener, Coeficiente Unificado: " + bpCoefCM + " < " + LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN);
-                    return Env.ONE.negate();
-                }
-
         // Si el SdN Proveedor no tiene dirección en R.N.
         MBPartnerLocation[] bpl = bp.getLocations(false);
         boolean retener = false;
@@ -797,6 +781,21 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             log.warning("No corresponde retener, SdN sin dirección en Río Negro: " + bp.getName());
             return Env.ZERO;
         }
+        // Si el SdN es convenio con jurisdicción en RN coef < 0.03
+        final BigDecimal bpCoefCM = (BigDecimal) bp.get_Value("CoeficienteUnificadoCM");
+        if (bpLCO_ISIC_ID == LAR_BP_LCO_ISIC_CM_Jurisd_RN)
+            if (bpCoefCM.compareTo(Env.ZERO) <= 0)
+            {
+                m_processMsg = "Ingresar el Coeficiente Unificado en la configuraci\u00f3n del SdN";
+                log.severe(m_processMsg);
+                return Env.ONE.negate();
+            }
+            else
+                if (bpCoefCM.compareTo(LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN) < 0)
+                {
+                    log.warning("No corresponde retener, Coeficiente Unificado: " + bpCoefCM + " < " + LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN);
+                    return Env.ONE.negate();
+                }
 
         impSujetoaRet = Env.ZERO;
         BigDecimal impRetencion = Env.ZERO;
