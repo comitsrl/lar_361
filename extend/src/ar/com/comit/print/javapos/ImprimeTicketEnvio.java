@@ -47,6 +47,12 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         final MOrder orden = (MOrder) documento;
         datos = new DatosImpresion(orden);
 
+        imprimirEnvio(orden);
+        imprimirEnvio(orden); //copia
+    } // imprimirDocumento
+
+    private void imprimirEnvio(final MOrder orden) throws JposException
+    {
         printEncabezado(orden);
         printDetalle(orden);
         printTotales(orden);
@@ -55,7 +61,7 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CUT);
 
         printer.transactionPrint(POSPrinterConst.PTR_S_RECEIPT, POSPrinterConst.PTR_TP_NORMAL);
-    } // imprimirDocumento
+    } //imprimirEnvio
 
     private void printEncabezado(final MOrder orden) throws JposException
     {
