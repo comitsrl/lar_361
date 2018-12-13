@@ -22,7 +22,9 @@ import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -55,7 +57,6 @@ import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.globalqss.model.X_LCO_WithholdingType;
-import org.joda.time.DateTime;
 
 /**
  * Payment Header
@@ -761,22 +762,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         final int bpLCO_ISIC_ID = bp.get_ValueAsInt("LCO_ISIC_ID");
 
         // Excepciones
-        // Si el SdN es convenio con jurisdicción en RN coef < 0.03
-        final BigDecimal bpCoefCM = (BigDecimal) bp.get_Value("CoeficienteUnificadoCM");
-        if (bpLCO_ISIC_ID == LAR_BP_LCO_ISIC_CM_Jurisd_RN)
-            if (bpCoefCM.compareTo(Env.ZERO) <= 0)
-            {
-                m_processMsg = "Ingresar el Coeficiente Unificado en la configuraci\u00f3n del SdN";
-                log.severe(m_processMsg);
-                return Env.ONE.negate();
-            }
-            else
-                if (bpCoefCM.compareTo(LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN) < 0)
-                {
-                    log.warning("No corresponde retener, Coeficiente Unificado: " + bpCoefCM + " < " + LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN);
-                    return Env.ONE.negate();
-                }
-
         // Si el SdN Proveedor no tiene dirección en R.N.
         MBPartnerLocation[] bpl = bp.getLocations(false);
         boolean retener = false;
@@ -796,6 +781,21 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             log.warning("No corresponde retener, SdN sin dirección en Río Negro: " + bp.getName());
             return Env.ZERO;
         }
+        // Si el SdN es convenio con jurisdicción en RN coef < 0.03
+        final BigDecimal bpCoefCM = (BigDecimal) bp.get_Value("CoeficienteUnificadoCM");
+        if (bpLCO_ISIC_ID == LAR_BP_LCO_ISIC_CM_Jurisd_RN)
+            if (bpCoefCM.compareTo(Env.ZERO) <= 0)
+            {
+                m_processMsg = "Ingresar el Coeficiente Unificado en la configuraci\u00f3n del SdN";
+                log.severe(m_processMsg);
+                return Env.ONE.negate();
+            }
+            else
+                if (bpCoefCM.compareTo(LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN) < 0)
+                {
+                    log.warning("No corresponde retener, Coeficiente Unificado: " + bpCoefCM + " < " + LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN);
+                    return Env.ZERO;
+                }
 
         impSujetoaRet = Env.ZERO;
         BigDecimal impRetencion = Env.ZERO;
@@ -1555,8 +1555,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     {
         final MLARPaymentWithholding pwh = new MLARPaymentWithholding(getCtx(), 0, get_TrxName());
 
-        DateTime dateTime = new DateTime(getDateTrx());
-        int year = dateTime.getYear();
+        Timestamp date = getDateTrx();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int year = calendar.get(Calendar.YEAR);
         MOrg org = new MOrg(getCtx(), getAD_Org_ID(), get_TrxName());
         String nroCert = org.getDescription() + "-" + year + "-" + docNo;
         pwh.set_CustomColumn("Documentno", nroCert);

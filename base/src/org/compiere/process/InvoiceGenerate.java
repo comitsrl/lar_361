@@ -19,6 +19,7 @@ package org.compiere.process;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
@@ -36,6 +37,7 @@ import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderPaySchedule;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.PO;
 import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
@@ -69,6 +71,9 @@ public class InvoiceGenerate extends SvrProcess
     /** POS Terminal            */
     private int         p_C_POS_ID = 0;
     // @emmie custom
+
+    // @fchiappano parametro que determina si se permiten incluir remitos con distintas direcciones en una misma factura.
+    private boolean permiteDifDirecciones = MSysConfig.getBooleanValue("LAR_Permite_Facturar_Remitos_Distintas_Direcciones", false, Env.getAD_Client_ID(Env.getCtx()));
 
 	/**	The current Invoice	*/
 	private MInvoice 	m_invoice = null;
@@ -208,12 +213,24 @@ public class InvoiceGenerate extends SvrProcess
 			while (rs.next ())
 			{
 				MOrder order = new MOrder (getCtx(), rs, get_TrxName());
-				
-				//	New Invoice Location
-				if (!p_ConsolidateDocument 
-					|| (m_invoice != null 
-					&& m_invoice.getC_BPartner_Location_ID() != order.getBill_Location_ID()) )
-					completeInvoice();
+
+				// @fchiappano Si se permiten remitos con distintas direcciones, comparo los SdN.
+                if (permiteDifDirecciones)
+                {
+                    if (!p_ConsolidateDocument
+                            || (m_invoice != null && m_invoice.getC_BPartner_ID() != order.getC_BPartner_ID()))
+                        completeInvoice();
+                }
+                // @fchiappano Si no se permiten remitos con distinta direccion,
+                // comparo las direcciones de manera tradicional.
+                else
+                {
+                    if (!p_ConsolidateDocument
+                            || (m_invoice != null && m_invoice.getC_BPartner_Location_ID() != order
+                                    .getBill_Location_ID()))
+                        completeInvoice();
+                }
+
 				boolean completeOrder = MOrder.INVOICERULE_AfterOrderDelivered.equals(order.getInvoiceRule());
 				
 				//	Schedule After Delivery
@@ -365,6 +382,26 @@ public class InvoiceGenerate extends SvrProcess
 		if (m_invoice == null)
 		{
 			m_invoice = new MInvoice (order, 0, p_DateInvoiced);
+
+            // @fchiappano Si se permiten remitos con distintas direcciones,
+            // recupero la dirección de facturación del SdN.
+            if (permiteDifDirecciones)
+            {
+                int c_BPartner_Location_ID = getDireccionFacturacion(order.getC_BPartner_ID());
+
+                if (c_BPartner_Location_ID > 0)
+                    m_invoice.setC_BPartner_Location_ID(c_BPartner_Location_ID);
+                // @fchiappano disparar mensaje y excepción, si no se logro
+                // recuperar una dirección.
+                else
+                {
+                    addLog("No se pudo recuperar una dirección de facturación, para el Socio del Negocio: "
+                            + order.getC_BPartner().getName());
+                    throw new IllegalStateException("No se pudo recuperar una dirección de facturación, para el Socio del Negocio: "
+                                    + order.getC_BPartner().getName());
+                }
+            }
+
 			// @emmie custom
 			m_invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
 			// @emmie custom
@@ -393,6 +430,26 @@ public class InvoiceGenerate extends SvrProcess
 		if (m_invoice == null)
 		{
 			m_invoice = new MInvoice (order, 0, p_DateInvoiced);
+
+            // @fchiappano Si se permiten remitos con distintas direcciones,
+            // recupero la dirección de facturación del SdN.
+			if (permiteDifDirecciones)
+			{
+			    int c_BPartner_Location_ID = getDireccionFacturacion(order.getC_BPartner_ID());
+
+			    if (c_BPartner_Location_ID > 0)
+			        m_invoice.setC_BPartner_Location_ID(c_BPartner_Location_ID);
+                // @fchiappano disparar mensaje y excepción, si no se logro
+                // recuperar una dirección.
+			    else
+			    {
+                    addLog("No se pudo recuperar una dirección de facturación, para el Socio del Negocio: "
+                            + order.getC_BPartner().getName());
+                    throw new IllegalStateException("No se pudo recuperar una dirección de facturación, para el Socio del Negocio: "
+                                    + order.getC_BPartner().getName());
+			    }
+			}
+
             // @emmie custom
             m_invoice.set_ValueOfColumn("C_POS_ID", p_C_POS_ID);
             // @emmie custom
@@ -532,5 +589,48 @@ public class InvoiceGenerate extends SvrProcess
 		m_ship = null;
 		m_line = 0;
 	}	//	completeInvoice
-	
+
+	/**
+	 * Obtener la dirección de facturación del SdN
+	 * @author fchiappano
+	 *
+	 * @param c_BPartner_ID
+	 * @return c_BPartner_Location_ID o cero.
+	 */
+    private int getDireccionFacturacion(final int c_BPartner_ID)
+    {
+        int c_BPartner_Location_ID = 0;
+
+        String sql = "SELECT l.C_BPartner_Location_ID"
+                   +  " FROM C_BPartner_Location l"
+                   + " WHERE l.IsActive = 'Y'"
+                   +   " AND l.IsBillTo = 'Y'"
+                   +   " AND l.C_BPartner_ID = ?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, c_BPartner_ID);
+            rs = pstmt.executeQuery();
+
+            if (rs.next())
+                c_BPartner_Location_ID = rs.getInt(1);
+        }
+        catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql.toString(), e);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return c_BPartner_Location_ID;
+
+    } // getDireccionFacturacion
+
 }	//	InvoiceGenerate
