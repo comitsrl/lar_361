@@ -803,6 +803,63 @@ public class CalloutPayment extends CalloutEngine
     } // esretencionsufrida
 
     /**
+     * Blanquear campos particulares de cada TT, al seleccionar otra opción.
+     * @author fchiappano
+     *
+     * @param ctx
+     * @param WindowNo
+     * @param mTab
+     * @param mField
+     * @param value
+     * @return null o mensaje de error
+     */
+    public String tenderType(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
+    {
+        if (isCalloutActive())
+            return "";
+
+        String colName = mField.getColumnName();
+        if (colName.equals("TenderType"))
+        {
+            String tenderType = (String) value;
+
+            if (tenderType.equals(MPayment.TENDERTYPE_CreditCard))
+            {
+                mTab.setValue("LAR_Tarjeta_Debito_ID", null);
+                mTab.setValue("LAR_Deposito_Directo_ID", null);
+                mTab.setValue("LAR_Cheque_Emitido_ID", null);
+            }
+            else if (tenderType.equals(MPayment.TENDERTYPE_DirectDebit))
+            {
+                mTab.setValue("LAR_Tarjeta_Credito_ID", null);
+                mTab.setValue("LAR_Deposito_Directo_ID", null);
+                mTab.setValue("LAR_Cheque_Emitido_ID", null);
+            }
+            else if (tenderType.equals(MPayment.TENDERTYPE_DirectDeposit))
+            {
+                mTab.setValue("LAR_Tarjeta_Credito_ID", null);
+                mTab.setValue("LAR_Tarjeta_Debito_ID", null);
+                mTab.setValue("LAR_Cheque_Emitido_ID", null);
+            }
+            else if (tenderType.equals(MPayment.TENDERTYPE_Check))
+            {
+                mTab.setValue("LAR_Tarjeta_Credito_ID", null);
+                mTab.setValue("LAR_Tarjeta_Debito_ID", null);
+                mTab.setValue("LAR_Deposito_Directo_ID", null);
+            }
+            else
+            {
+                mTab.setValue("LAR_Tarjeta_Credito_ID", null);
+                mTab.setValue("LAR_Tarjeta_Debito_ID", null);
+                mTab.setValue("LAR_Deposito_Directo_ID", null);
+                mTab.setValue("LAR_Cheque_Emitido_ID", null);
+            }
+        }
+
+        return "";
+    } // tenderType
+
+    /**
      * Obtener las facturas asignadas a la cabecera de pago.
      * @return
      */
