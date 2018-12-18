@@ -19,13 +19,14 @@ package ar.com.comit.print.javapos;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import jpos.JposException;
-import jpos.POSPrinterConst;
-
+import org.compiere.model.MInvoice;
+import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrder;
-import org.compiere.model.MOrderLine;
 import org.compiere.model.MProduct;
 import org.compiere.model.PO;
+
+import jpos.JposException;
+import jpos.POSPrinterConst;
 
 /**
  * Impresión de ticket de compra
@@ -124,12 +125,14 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         linea = Util.stringRepeat("_", printer.getRecLineChars());
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
 
-        for (final MOrderLine det : orden.getLines())
+        final MInvoice factura = new MInvoice(orden.getCtx(), orden.getC_Invoice_ID(), orden.get_TrxName());
+        for (final MInvoiceLine det : factura.getLines())
         {
             final MProduct prod = det.getProduct();
 
-            final BigDecimal precioLinea = det.getLineNetAmt();
-            final BigDecimal precioUnitario = det.getPriceActual();
+            // Determina precio con o sin iva en función del tipo de comprobante
+            final BigDecimal precioLinea = det.getLineTotalAmt();
+            final BigDecimal precioUnitario = det.getLineTotalAmt().divide(det.getQtyInvoiced());
 
             linea = Util.justifyString(prod.getValue(), 12, -1)
                   + Util.justifyString(prod.getName(), 20, -1)
