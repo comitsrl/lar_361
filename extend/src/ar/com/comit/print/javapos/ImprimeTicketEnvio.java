@@ -105,7 +105,7 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
 
         // Fecha de Entrega.
         linea = Util.makePrintString(printer.getRecLineChars(), "Fecha Entrega: " + Util.fechaToString(orden.getDatePromised(), "dd/MM/yyyy")
-                , "Turno: " + orden.get_ValueAsString("Turno") == "M" ? "Mañana" : "Tarde");
+                , "Turno: " + orden.get_ValueAsString("Turno_Entrega") == "M" ? "Mañana" : "Tarde");
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
         
     } // printEncabezado

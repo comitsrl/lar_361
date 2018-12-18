@@ -48,7 +48,7 @@ final class DatosCliente
             bpartner = new MBPartner(Env.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
         }
 
-        bpLocation = new MBPartnerLocation(bpartner);
+        bpLocation = new MBPartnerLocation(bpartner.getCtx(), bpartner.getPrimaryC_BPartner_Location_ID(), bpartner.get_TrxName());
     }
 
     public String getNombre()
