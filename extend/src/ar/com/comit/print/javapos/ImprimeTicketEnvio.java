@@ -77,6 +77,8 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + datos.getDireccion() + LF);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "Email: " + datos.getEmail() + LF);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
+        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "DOCUMENTO NO VÁLIDO COMO FACTURA" + LF);
+        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
 
         // Datos del Cliente
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, "Sucursal: " + datos.getSucursal() + LF);
@@ -87,6 +89,8 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         linea = Util.justifyString(rut, 22, -1);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
         linea = Util.justifyString("Dirección: " + bp.getDireccion(), 42, -1);
+        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
+        linea = Util.justifyString("Teléfono: " + bp.getTelefono(), 42, -1);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
         linea = Util.justifyString("Atendido por: " + datos.getUsuario(), 42, -1);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
