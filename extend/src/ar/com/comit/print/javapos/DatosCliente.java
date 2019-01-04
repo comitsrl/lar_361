@@ -17,6 +17,7 @@
 package ar.com.comit.print.javapos;
 
 import org.compiere.model.MBPartner;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
@@ -32,7 +33,7 @@ import org.compiere.util.Env;
 final class DatosCliente
 {
     private final MBPartner bpartner;
-    private MLocation location;
+    private MBPartnerLocation bpLocation;
 
     DatosCliente(final PO documento)
     {
@@ -40,15 +41,14 @@ final class DatosCliente
         {
             final MOrder orden = (MOrder) documento;
             bpartner = new MBPartner(Env.getCtx(), orden.getC_BPartner_ID(), orden.get_TrxName());
-            location = MLocation.getBPLocation(Env.getCtx(), orden.getC_BPartner_Location_ID(), orden.get_TrxName());
         }
         else
         {
             final MInvoice invoice = (MInvoice) documento;
             bpartner = new MBPartner(Env.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
-            location = MLocation
-                    .getBPLocation(Env.getCtx(), invoice.getC_BPartner_Location_ID(), invoice.get_TrxName());
         }
+
+        bpLocation = new MBPartnerLocation(bpartner.getCtx(), bpartner.getPrimaryC_BPartner_Location_ID(), bpartner.get_TrxName());
     }
 
     public String getNombre()
@@ -63,6 +63,7 @@ final class DatosCliente
 
     public String getDireccion()
     {
+        final MLocation location = bpLocation.getLocation(false);
         final String address = location.getAddress1() == null ? "-- " : location.getAddress1() + "\n";
         return new StringBuilder(address)
                          .append("(").append(location.getPostal()).append(")")
@@ -72,4 +73,8 @@ final class DatosCliente
 
     }
 
+    public String getTelefono()
+    {
+        return bpLocation.getPhone() == null ? "--" : bpLocation.getPhone();
+    }
 }

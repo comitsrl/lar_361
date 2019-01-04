@@ -19,13 +19,14 @@ package ar.com.comit.print.javapos;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import jpos.JposException;
-import jpos.POSPrinterConst;
-
+import org.compiere.model.MInvoice;
+import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrder;
-import org.compiere.model.MOrderLine;
 import org.compiere.model.MProduct;
 import org.compiere.model.PO;
+
+import jpos.JposException;
+import jpos.POSPrinterConst;
 
 /**
  * Impresión de ticket de compra
@@ -47,6 +48,12 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         final MOrder orden = (MOrder) documento;
         datos = new DatosImpresion(orden);
 
+        imprimirEnvio(orden);
+        imprimirEnvio(orden); //copia
+    } // imprimirDocumento
+
+    private void imprimirEnvio(final MOrder orden) throws JposException
+    {
         printEncabezado(orden);
         printDetalle(orden);
         printTotales(orden);
@@ -55,7 +62,7 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CUT);
 
         printer.transactionPrint(POSPrinterConst.PTR_S_RECEIPT, POSPrinterConst.PTR_TP_NORMAL);
-    } // imprimirDocumento
+    } //imprimirEnvio
 
     private void printEncabezado(final MOrder orden) throws JposException
     {
@@ -71,6 +78,8 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + datos.getDireccion() + LF);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "Email: " + datos.getEmail() + LF);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
+        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + "DOCUMENTO NO VÁLIDO COMO FACTURA" + LF);
+        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
 
         // Datos del Cliente
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, "Sucursal: " + datos.getSucursal() + LF);
@@ -81,6 +90,8 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         linea = Util.justifyString(rut, 22, -1);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
         linea = Util.justifyString("Dirección: " + bp.getDireccion(), 42, -1);
+        printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
+        linea = Util.justifyString("Teléfono: " + bp.getTelefono(), 42, -1);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
         linea = Util.justifyString("Atendido por: " + datos.getUsuario(), 42, -1);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
@@ -93,8 +104,9 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
 
         // Fecha de Entrega.
+        final String turno = orden.get_ValueAsString("Turno_Entrega").equals("M") ? "Mañana" : "Tarde";
         linea = Util.makePrintString(printer.getRecLineChars(), "Fecha Entrega: " + Util.fechaToString(orden.getDatePromised(), "dd/MM/yyyy")
-                , "Turno: " + orden.get_ValueAsString("Turno") == "M" ? "Mañana" : "Tarde");
+                , "Turno: " + turno);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
         
     } // printEncabezado
@@ -114,12 +126,14 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
         linea = Util.stringRepeat("_", printer.getRecLineChars());
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, linea + LF);
 
-        for (final MOrderLine det : orden.getLines())
+        final MInvoice factura = new MInvoice(orden.getCtx(), orden.getC_Invoice_ID(), orden.get_TrxName());
+        for (final MInvoiceLine det : factura.getLines())
         {
             final MProduct prod = det.getProduct();
 
-            final BigDecimal precioLinea = det.getLineNetAmt();
-            final BigDecimal precioUnitario = det.getPriceActual();
+            // Determina precio con o sin iva en función del tipo de comprobante
+            final BigDecimal precioLinea = det.getLineTotalAmt();
+            final BigDecimal precioUnitario = det.getLineTotalAmt().divide(det.getQtyInvoiced());
 
             linea = Util.justifyString(prod.getValue(), 12, -1)
                   + Util.justifyString(prod.getName(), 20, -1)

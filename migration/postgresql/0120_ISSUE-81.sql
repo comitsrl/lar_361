@@ -160,11 +160,6 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 
 -- 11/11/2018 19:17:07 ART
 -- ISSUE #81: Régimen de Retenciones IIBB
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3006085,1,'Y','N','N',3002276,'N','Y',290,'N','LAR','FE_EOS',100,0,TO_TIMESTAMP('2018-11-11 19:17:07','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2018-11-11 19:17:07','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 11/11/2018 19:17:07 ART
--- ISSUE #81: Régimen de Retenciones IIBB
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3006085 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
@@ -216,11 +211,6 @@ INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLi
 -- 11/11/2018 19:17:08 ART
 -- ISSUE #81: Régimen de Retenciones IIBB
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3006090 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 11/11/2018 19:17:08 ART
--- ISSUE #81: Régimen de Retenciones IIBB
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3006091,30,'Y','N','N',3002810,'N','Y',290,'N','El número del documento es usualmente generado en automático por el sistema y determinado por el tipo del documento. Si el documento no se salva; el número preliminar se despliega entre "<>"','U','Número de secuencia del documento para cada documento','No. del Documento',100,0,TO_TIMESTAMP('2018-11-11 19:17:08','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2018-11-11 19:17:08','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 11/11/2018 19:17:08 ART
