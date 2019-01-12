@@ -18,9 +18,11 @@ package ar.com.ergio.print.fiscal.hasar;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.Normalizer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import ar.com.ergio.print.fiscal.BasicFiscalPrinter;
 import ar.com.ergio.print.fiscal.FiscalPacket;
@@ -1343,33 +1345,12 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 
 	@Override
 	public String formatText(String text, int maxLength) {
-		StringBuffer result = new StringBuffer();
 		text = super.formatText(text, maxLength);
 		if(text == null)
 			return text;
 		// Reemplaza caracteres especiales que las impresoras hasar no permiten.
-		for(int i = 0; i < text.length(); i++) {
-			char ch = text.charAt(i);
-			/*if(ch > 125)
-				switch (ch) {
-					case 'a': ch = 'a'; break;
-					case 'b': ch = 'e'; break;
-					case 'c': ch = 'i'; break;
-					case 'd': ch = 'o'; break;
-					case 'e': ch = 'u'; break;
-					case 'f': ch = 'A'; break;
-					case 'g': ch = 'E'; break;
-					case 'h': ch = 'I'; break;
-					case 'i': ch = 'O'; break;
-					case 'j': ch = 'U'; break;
-					case 'k': ch = 'n'; break;
-					case 'l': ch = 'N'; break;
-					case 'm': ch = ' '; break;
-					default: ch = '#'; break;
-				}*/
-			result.append(ch);
-		}
-		return result.toString();
+		String textoNuevo = stripAccents(text);
+		return textoNuevo.toString();
 	}
 
 	@Override
@@ -1409,5 +1390,49 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		return 4;
 	}
 
+	/**
+	 * @emmie: tomado del código de Apache Commons StringUtils v3
+	 *
+     * <p>Removes diacritics (~= accents) from a string. The case will not be altered.</p>
+     * <p>For instance, '&agrave;' will be replaced by 'a'.</p>
+     * <p>Note that ligatures will be left as is.</p>
+     *
+     * <pre>
+     * StringUtils.stripAccents(null)                = null
+     * StringUtils.stripAccents("")                  = ""
+     * StringUtils.stripAccents("control")           = "control"
+     * StringUtils.stripAccents("&eacute;clair")     = "eclair"
+     * </pre>
+     *
+     * @param input String to be stripped
+     * @return input text with diacritics removed
+     *
+     * @since 3.0
+     *
+     * See also Lucene's ASCIIFoldingFilter (Lucene 2.9) that replaces accented characters by their unaccented equivalent
+     * (and uncommitted bug fix: https://issues.apache.org/jira/browse/LUCENE-1343?focusedCommentId=12858907&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_12858907).
+     */
+	private String stripAccents(final String input) {
+        if (input == null) {
+            return null;
+        }
+        final Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+"); //$NON-NLS-1$
+        final StringBuilder decomposed = new StringBuilder(Normalizer.normalize(input, Normalizer.Form.NFD));
+        convertRemainingAccentCharacters(decomposed);
+        // Note that this doesn't correctly remove ligatures...
+        return pattern.matcher(decomposed).replaceAll("");
+    }
+
+	private static void convertRemainingAccentCharacters(final StringBuilder decomposed) {
+        for (int i = 0; i < decomposed.length(); i++) {
+            if (decomposed.charAt(i) == '\u0141') {
+                decomposed.deleteCharAt(i);
+                decomposed.insert(i, 'L');
+            } else if (decomposed.charAt(i) == '\u0142') {
+                decomposed.deleteCharAt(i);
+                decomposed.insert(i, 'l');
+            }
+        }
+    }
 
 }
