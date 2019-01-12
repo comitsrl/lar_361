@@ -850,27 +850,33 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 else
                     impSujetoaRet = factura.getGrandTotal();
 
-                BigDecimal retAplicada = (BigDecimal) factura.get_Value("ImporteRetencionIIBB");
-                if (retAplicada == null)
-                    retAplicada = Env.ZERO;
-                // Se calculala retención
-                impRetencion = impSujetoaRet.multiply(aliquot)
-                        .divide(Env.ONEHUNDRED)
-                        .setScale(2, BigDecimal.ROUND_HALF_EVEN);
-
-                // Se verifica si la retención en este factura ya fue aplicada al 100%
-                if (retAplicada.compareTo(impRetencion) >= 0)
+                // Verificar si el monto sujeto a retención supera el mínimo
+                if (impSujetoaRet.compareTo(impMinNoSujeto) > 0)
                 {
-                    // La factura tiene aplicado el total de la retención
+                    BigDecimal retAplicada = (BigDecimal) factura.get_Value("ImporteRetencionIIBB");
+                    if (retAplicada == null)
+                        retAplicada = Env.ZERO;
+                    // Se calculala retención
+                    impRetencion = impSujetoaRet.multiply(aliquot).divide(Env.ONEHUNDRED)
+                            .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+
+                    // Se verifica si la retención en este factura ya fue aplicada al 100%
+                    if (retAplicada.compareTo(impRetencion) >= 0)
                     {
-                        impRetencion = Env.ZERO;
-                        continue;
+                        // La factura tiene aplicado el total de la retención
+                        {
+                            impRetencion = Env.ZERO;
+                            continue;
+                        }
                     }
+                    impRetencion = impRetencion.subtract(retAplicada);
+                    // Se asigna el número de factura para registrar en el cetificado
+                    // Tambien se utiliza para registrar el importe de la retención en la
+                    // factura.
+                    facturaID_Cert = factura.getC_Invoice_ID();
                 }
-                impRetencion = impRetencion.subtract(retAplicada);
-                // Se asigna el número de factura para registrar en el cetificado
-                // Tambien se utiliza para registrar el importe de la retención en la factura.
-                facturaID_Cert = factura.getC_Invoice_ID();
+                else
+                    impRetencion = Env.ZERO;
             } // Se recorren las facturas de la OP
         } // Retención sobre las facturas
         return impRetencion;
