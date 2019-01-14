@@ -872,10 +872,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                         }
                     }
                     impRetencion = impRetencion.subtract(retAplicada);
-                    // Se asigna el número de factura para registrar en el cetificado
-                    // Tambien se utiliza para registrar el importe de la retención en la
-                    // factura.
-                    facturaID_Cert = factura.getC_Invoice_ID();
+                    /*
+                     * Se asigna el número de factura para registrar en el cetificado
+                     * Tambien se utiliza para registrar el importe de la retención en la
+                     * factura. --> Solo se setea la factura si se está completando la cabecera,
+                     * , si sólo se está calculando no se debe registrar la retención en la factura.
+                     */
+                    if (m_justPrepared)
+                        facturaID_Cert = factura.getC_Invoice_ID();
                 }
                 else
                     impRetencion = Env.ZERO;
