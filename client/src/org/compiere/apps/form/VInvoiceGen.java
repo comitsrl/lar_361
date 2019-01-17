@@ -303,7 +303,14 @@ public class VInvoiceGen extends InvoiceGen implements FormPanel, ActionListener
 		KeyNamePair docTypeKNPair = (KeyNamePair)cmbDocType.getSelectedItem();
 		String docActionSelected = (String)docAction.getValue();
 		// @emmie custom
-		int C_POS_ID = (Integer) fPOS.getValue();
+
+        // @fchiappano Validar que se ingrese un PDV.
+        int C_POS_ID = 0;
+        if (fPOS.getValue() != null)
+            C_POS_ID = (Integer) fPOS.getValue();
+        else
+            throw new IllegalStateException("Punto de Venta invalido.");
+
 		return generate(panel.getStatusBar(), docTypeKNPair, C_POS_ID, docActionSelected);
 	    // @emmie custom
 	}	//	generateShipments
