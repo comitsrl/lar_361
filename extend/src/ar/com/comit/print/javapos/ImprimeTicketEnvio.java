@@ -29,7 +29,7 @@ import jpos.JposException;
 import jpos.POSPrinterConst;
 
 /**
- * Impresión de ticket de compra
+ * Impresión de ticket de envío
  */
 public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
 {
@@ -72,7 +72,7 @@ public class ImprimeTicketEnvio extends ManejadorAbstractoDeImpresion
 
         // Información de la Compañia
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
-        printer.printBitmap(POSPrinterConst.PTR_S_RECEIPT, datos.getLogo(), printer.getRecLineWidth(), POSPrinterConst.PTR_BM_CENTER);
+        printer.printBitmap(POSPrinterConst.PTR_S_RECEIPT, datos.getLogo(), printer.getRecLineWidth() / 2, POSPrinterConst.PTR_BM_CENTER);
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, LF);
 
         printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, CENTER + datos.getDireccion() + LF);
