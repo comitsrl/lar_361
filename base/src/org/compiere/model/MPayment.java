@@ -732,6 +732,10 @@ public final class MPayment extends X_C_Payment
 			}
 		}
 
+        // @fchiappano Si es una retención sufrida, el TenderType tiene que ser Efectivo.
+        if (get_ValueAsBoolean("EsRetencionSufrida"))
+            setTenderType(TENDERTYPE_Cash);
+
 		return true;
 	}	//	beforeSave
 	
