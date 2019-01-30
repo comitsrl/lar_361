@@ -17,6 +17,7 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,6 +30,9 @@ import java.util.logging.Level;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+
+import ar.com.ergio.model.MLARPaymentHeader;
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  * Payment Callouts. org.compiere.model.CalloutPayment.*
@@ -414,9 +418,14 @@ public class CalloutPayment extends CalloutEngine
                         .toArray(new MPaymentAllocate[invoices.size()]);
                 BigDecimal sumaFacturas = Env.ZERO;
                 BigDecimal sumaDescuento = Env.ZERO;
+                int c_Currency_ID = 0;
                 // Recorrer facturas
                 for (int i = 0; i < facturas.length; i++)
                 {
+                    // @fchiappano Obtengo la moneda de la factura, para
+                    // determinar posteriormente si el monto sugerido necesita conversión.
+                    c_Currency_ID = facturas[i].getC_Invoice().getC_Currency_ID();
+
                     // @fchiappano. Obtengo el C_InvoicePaySchedule_ID para calcular el importe impago.
                     int c_InvoicePaySchedule_ID = facturas[i].get_ValueAsInt("C_InvoicePaySchedule_ID");
 
@@ -458,6 +467,23 @@ public class CalloutPayment extends CalloutEngine
                 // Recorrer Pagos
                 for (int p = 0; p < pagos.length; p++)
                     sumaPagos = sumaPagos.add(pagos[p].getPayAmt().add(pagos[p].getWriteOffAmt()));
+
+                // @fchiappano Determinar si se debe convertir el monto sugerido.
+                if (c_Currency_ID > 0 && c_Currency_ID != LAR_Utils.getMonedaPredeterminada(ctx, Env.getAD_Client_ID(ctx), mTab.getTrxInfo()))
+                {
+                    // @fchiappano Obtener tasa de cambio.
+                    MLARPaymentHeader header = new MLARPaymentHeader(ctx, LAR_PaymentHeader_ID, mTab.getTrxInfo());
+                    BigDecimal tasaCambio = (BigDecimal) header.get_Value("TasaDeCambio");
+
+                    if (tasaCambio != null)
+                    {
+                        sumaFacturas = sumaFacturas.multiply(tasaCambio).setScale(2, RoundingMode.HALF_UP);
+                        sumaDescuento = sumaDescuento.multiply(tasaCambio).setScale(2, RoundingMode.HALF_UP);
+                    }
+                    else
+                        return "No se logro recuperar, una tasa de cambio.";
+                }
+
                 mTab.setValue("PayAmt", sumaFacturas.subtract(sumaPagos).subtract(sumaDescuento));
                 mTab.setValue("OverUnderAmt", Env.ZERO);
                 return "";
@@ -858,6 +884,41 @@ public class CalloutPayment extends CalloutEngine
 
         return "";
     } // tenderType
+
+    /**
+     * Si cambia el SdN, se debe actualizar el Tipo de Cambio.
+     * @author fchiappano
+     *
+     * @param ctx context
+     * @param WindowNo current Window No
+     * @param mTab Grid Tab
+     * @param mField Grid Field
+     * @param value New Value
+     * @return null or error message
+     */
+    public String conversionType(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
+    {
+        int lar_PaymentHeader_ID = Env.getContextAsInt(ctx, WindowNo, "LAR_PaymentHeader_ID");
+        List<MPaymentAllocate> invoices = getInvoices(ctx, lar_PaymentHeader_ID);
+
+        // @fchiappano Validar que se haya cargado el socio del negocio y alguna factura.
+        if (invoices.size() > 0 && mTab.getValue("C_BPartner_ID") != null)
+        {
+            MBPartner partner = new MBPartner(ctx, (Integer) mTab.getValue("C_BPartner_ID"), mTab.getTrxInfo());
+            int c_Currency_ID = invoices.get(0).getC_Invoice().getC_Currency_ID();
+            // Si la moneda de la factura, es distinta de la predeterminada, busco el tipo de conversion.
+            if (c_Currency_ID != LAR_Utils.getMonedaPredeterminada(ctx, Env.getAD_Client_ID(ctx), mTab.getTrxInfo()))
+            {
+                int c_ConversionType_ID = partner.get_ValueAsInt("C_ConversionType_ID");
+
+                if (c_ConversionType_ID > 0)
+                    mTab.setValue("C_ConversionType_ID", c_ConversionType_ID);
+                else
+                    return "El Socio del Negocio, no posee un tipo de cambio asignado.";
+            }
+        }
+        return "";
+    } // conversionType
 
     /**
      * Obtener las facturas asignadas a la cabecera de pago.

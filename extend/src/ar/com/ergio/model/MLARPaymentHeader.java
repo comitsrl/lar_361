@@ -58,6 +58,8 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.globalqss.model.X_LCO_WithholdingType;
 
+import ar.com.ergio.util.LAR_Utils;
+
 /**
  * Payment Header
  *
@@ -1163,8 +1165,12 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             // Asignaciones
             for (int i = 0; (i < invoices.length && p < pays.length);)
             {
+                // @fchiappano crear cabecera de asignación, con la moneda de la factura.
+                MPaymentAllocate pa = invoices[i];
+                MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
+
                 MAllocationHdr alloc = new MAllocationHdr(getCtx(), false, getDateTrx(),
-                        getC_Currency_ID(), "Asignación Pagos a Facturas - Cabecera: "
+                        invoice.getC_Currency_ID(), "Asignación Pagos a Facturas - Cabecera: "
                                 + getDocumentNo(), get_TrxName());
                 alloc.setAD_Org_ID(getAD_Org_ID());
                 if (!alloc.save())
@@ -1172,9 +1178,20 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     log.severe("La Cabecera de Asignacion no pudo crearse");
                     return DocAction.STATUS_Invalid;
                 }
-                MPaymentAllocate pa = invoices[i];
-                MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
-                final BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt()).subtract(pays[p].getAllocatedAmt().abs());
+
+                BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt());
+
+                // @fchiappano Si la moneda de la factura, es distinta de la
+                // moneda predeterminada, realizo la conversión.
+                if (invoice.getC_Currency_ID() != getC_Currency_ID())
+                {
+                    BigDecimal tasaCambio = (BigDecimal) get_Value("TasaDeCambio");
+
+                    if (tasaCambio != null)
+                        impPago = impPago.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                }
+
+                impPago = impPago.subtract(pays[p].getAllocatedAmt().abs());
                 final BigDecimal importeFactura = invoice.getOpenAmt().subtract(pa.getDiscountAmt());
                 int comp = impPago.compareTo(importeFactura);
                 MAllocationLine aLine = null;

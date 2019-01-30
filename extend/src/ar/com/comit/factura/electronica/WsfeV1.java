@@ -18,6 +18,8 @@ import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.globalqss.model.X_LCO_TaxPayerType;
 
+import ar.com.ergio.util.LAR_Utils;
+
 /**
  * @author Castro, Juan Manul
  */
@@ -99,10 +101,12 @@ public class WsfeV1 extends Wsfe{
 			
 			//*****CONVERSION
 			// Se debe convertir a la moneda del comprobante desde la moneda de la compañía
-			BigDecimal cotizacion = MCurrency.currencyConvert(Env.ONE,
-					Env.getContextAsInt(this.getM_ctx(), "$C_Currency_ID"),
-					this.getInvoice().getC_Currency_ID(), this.getInvoice().getDateInvoiced(), 0,
-					this.getM_ctx());
+			BigDecimal cotizacion;
+			if (currency.getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(getM_ctx(), getInvoice().getAD_Client_ID(), getTrxName()))
+			    cotizacion = (BigDecimal) getInvoice().get_Value("TasaDeCambio");
+			else
+                cotizacion = MCurrency.currencyConvert(Env.ONE, Env.getContextAsInt(this.getM_ctx(), "$C_Currency_ID"),
+                        this.getInvoice().getC_Currency_ID(), this.getInvoice().getDateInvoiced(), 0, this.getM_ctx());
 			line.append(cotizacion+"\n");
 			
 			//*****IMPUESTO

@@ -18,6 +18,7 @@ package org.compiere.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -26,10 +27,13 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+import javax.swing.JDialog;
+
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoBillToAddressException;
 import org.adempiere.exceptions.BPartnerNoShipToAddressException;
 import org.adempiere.exceptions.FillMandatoryException;
+import org.compiere.apps.ADialog;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
@@ -39,6 +43,8 @@ import org.compiere.util.Msg;
 import org.compiere.util.Util;
 import org.eevolution.model.MPPProductBOM;
 import org.eevolution.model.MPPProductBOMLine;
+
+import ar.com.ergio.util.LAR_Utils;
 
 
 /**
@@ -1027,7 +1033,28 @@ public class MOrder extends X_C_Order implements DocAction
 					setC_PaymentTerm_ID (ii);
 			}
 		}
-		
+
+		// @fchiappano guardar tasa de cambio en la orden
+        if (getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+        {
+            if (getC_ConversionType_ID() == 0)
+            {
+                ADialog.error(0, new JDialog(), "No fue posible, recuperar un tipo de cambio valido");
+                return false;
+            }
+
+            BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(), LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), new Timestamp(
+                    System.currentTimeMillis()), getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
+
+            if (rate != null)
+                set_ValueOfColumn("TasaDeCambio", rate);
+            else
+            {
+                ADialog.error(0, new JDialog(), "No fue posible, recuperar una tasa de cambio valida.");
+                return false;
+            }
+        }
+
 		return true;
 	}	//	beforeSave
 	
@@ -1093,7 +1120,8 @@ public class MOrder extends X_C_Order implements DocAction
 		    || is_ValueChanged(MOrder.COLUMNNAME_DatePromised)
 		    || is_ValueChanged(MOrder.COLUMNNAME_M_Warehouse_ID)
 		    || is_ValueChanged(MOrder.COLUMNNAME_M_Shipper_ID)
-		    || is_ValueChanged(MOrder.COLUMNNAME_C_Currency_ID)) {
+            || is_ValueChanged(MOrder.COLUMNNAME_C_Currency_ID)
+            || is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID)) {
 			MOrderLine[] lines = getLines();
 			for (MOrderLine line : lines) {
 				if (is_ValueChanged("AD_Org_ID"))
@@ -1111,7 +1139,21 @@ public class MOrder extends X_C_Order implements DocAction
 				if (is_ValueChanged(MOrder.COLUMNNAME_M_Shipper_ID))
 					line.setM_Shipper_ID(getM_Shipper_ID());
 				if (is_ValueChanged(MOrder.COLUMNNAME_C_Currency_ID))
-					line.setC_Currency_ID(getC_Currency_ID());
+                {
+                    line.setC_Currency_ID(getC_Currency_ID());
+
+                    // @fchiappano Convertir los precios de la orden, utilizando las tasas de cambio del cliente.
+                    if(!convertirPrecios(line, newRecord))
+                        return false;
+                }
+				// @fchiappano actualizar los precios de todas las lineas, si se cambia la lista de precios.
+				if (is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
+				{
+				    // @fchiappano actualizar los precios con los de la nueva lista de precios seleccinada.
+				    if (!actualizarPrecios(line))
+				        return false;
+				}
+
 				line.saveEx();
 			}
 		}
@@ -1906,9 +1948,18 @@ public class MOrder extends X_C_Order implements DocAction
 		}
 		// added AdempiereException by zuhri
 		if (!shipment.processIt(DocAction.ACTION_Complete))
-			throw new AdempiereException("Failed when processing document - " + shipment.getProcessMsg());
-		// end added
-		shipment.saveEx(get_TrxName());
+        {
+            // @fchiappano Capturar error desde el remito
+            m_processMsg = shipment.getProcessMsg();
+            throw new AdempiereException("Failed when processing document - " + m_processMsg);
+        }
+        // end added
+        // @fchiappano Controlar errores al guardar remito
+        if (!shipment.save(get_TrxName()))
+        {
+            m_processMsg = "Error al guardar el Remito. Documento N°: " + shipment.getDocumentNo();
+            throw new AdempiereException("Failed when processing document - " + m_processMsg);
+        }
 		if (!DOCSTATUS_Completed.equals(shipment.getDocStatus()))
 		{
 			m_processMsg = "@M_InOut_ID@: " + shipment.getProcessMsg();
@@ -2015,7 +2066,12 @@ public class MOrder extends X_C_Order implements DocAction
             throw new AdempiereException("Failed when processing document - " + m_processMsg);
         }
 		// end added
-		invoice.saveEx(get_TrxName());
+        // @fchiappano Controlar errores al guardar la factura.
+        if (!invoice.save(get_TrxName()))
+        {
+            m_processMsg = "Error al Guardar Factura. Documento N°: " + invoice.getDocumentNo();
+            throw new AdempiereException("Failed when processing document - " + m_processMsg);
+        }
 		setC_CashLine_ID(invoice.getC_CashLine_ID());
 		if (!DOCSTATUS_Completed.equals(invoice.getDocStatus()))
 		{
@@ -2554,5 +2610,72 @@ public class MOrder extends X_C_Order implements DocAction
 			|| DOCSTATUS_Closed.equals(ds)
 			|| DOCSTATUS_Reversed.equals(ds);
 	}	//	isComplete
-	
+
+	/**
+     * Convertir los precios de la orden, utilizando las tasas de cambio,
+     * cuando se cambie la moneda.
+     *
+     * @param line
+     * @author fchiappano
+     * @return confirmación
+     */
+    private boolean convertirPrecios(final MOrderLine line, final boolean newRecord)
+    {
+        // @fchiappano Cambiar el precio de la linea, usando la tasa de conversion.
+        if (!newRecord && !is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
+        {
+            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(getC_Currency_ID(), get_ValueOldAsInt("C_Currency_ID"), getC_ConversionType_ID(),
+                    getAD_Client_ID(), getAD_Org_ID(), p_ctx, get_TrxName());
+
+            if (tasaCambio != null)
+            {
+                BigDecimal precioActual = line.getPriceActual().multiply(tasaCambio)
+                        .setScale(getM_PriceList().getPricePrecision(), RoundingMode.HALF_UP);
+                BigDecimal precioLista = line.getPriceList().multiply(tasaCambio)
+                        .setScale(getM_PriceList().getPricePrecision(), RoundingMode.HALF_UP);
+                line.setPrice(precioActual);
+                line.setPriceList(precioLista);
+            }
+            else
+            {
+                ADialog.error(0, new JDialog(), "No se logro recuperar, una tasa de cambio.");
+                return false;
+            }
+        }
+
+        return true;
+    } // convertirPrecios
+
+	/**
+     * Actualizar los precios de las lineas, tomando los mismos desde la nueva lista de precios seleccionada.
+     * (No se tendran en cuenta los descuentos de linea, previamente generados).
+     *
+     * @param line
+     * @author fchiappano
+     * @return confirmación
+     */
+    private boolean actualizarPrecios(MOrderLine line)
+    {
+        MPriceListVersion m_PriceList_Version = ((MPriceList) getM_PriceList()).getPriceListVersion(new Timestamp(System.currentTimeMillis()));
+        final MWarehousePrice warehousePrice = MWarehousePrice.get((MProduct) line.getM_Product(), m_PriceList_Version.getM_PriceList_Version_ID(),
+                getM_Warehouse_ID(), get_TrxName());
+
+        if (warehousePrice != null)
+        {
+            line.setPrice(warehousePrice.getPriceStd().setScale(getM_PriceList().getPricePrecision(),
+                    RoundingMode.HALF_UP));
+            line.setPriceList(warehousePrice.getPriceList().setScale(getM_PriceList().getPricePrecision(),
+                    RoundingMode.HALF_UP));
+        }
+        else
+        {
+            ADialog.error(0, new JDialog(), "No se encontro el producto en la lista de precios. \n"
+                            + "Producto = " + line.getM_Product().getName() + "\n"
+                            + "N° de Línea = " + line.getLine());
+            return false;
+        }
+
+        return true;
+    } // actualizarPrecios
+
 }	//	MOrder
