@@ -16,8 +16,12 @@
  *****************************************************************************/
 package ar.com.ergio.util;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.model.MClient;
 import org.compiere.model.MInvoice;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -153,4 +157,60 @@ public final class LAR_Utils {
 	}
 	return result;
     }
-}
+
+    /**
+     * Obtener la moneda predeterminada de la compañia.
+     * @author fchiappano
+     * @return C_Currency_ID
+     */
+    public static int getMonedaPredeterminada(final Properties p_ctx, final int ad_Client_ID, final String trxName)
+    {
+        MClient compañia = new MClient(p_ctx, ad_Client_ID, trxName);
+        return compañia.getC_Currency_ID();
+    } // getMonedaPredeterminada
+
+    /**
+     * Obtener tasa de cambio, para realizar la conversión de moneda.
+     * @param c_Currency_ID
+     * @param c_CurrencyOld_ID
+     * @param c_ConversionType_ID
+     * @param ad_Client_ID
+     * @param ad_Org_ID
+     * @param p_ctx
+     * @param trxName
+     * @return Tasa de Cambio
+     */
+    public static BigDecimal getTasaCambio(int c_Currency_ID, final int c_CurrencyOld_ID,
+            final int c_ConversionType_ID, final int ad_Client_ID, final int ad_Org_ID, final Properties p_ctx,
+            final String trxName)
+    {
+        String sql = "";
+
+        if (c_Currency_ID == LAR_Utils.getMonedaPredeterminada(p_ctx, ad_Client_ID, trxName))
+        {
+            c_Currency_ID = c_CurrencyOld_ID;
+            sql = "SELECT MultiplyRate";
+        }
+        else
+        {
+            sql = "SELECT DivideRate";
+        }
+
+        sql = sql +  " FROM C_Conversion_Rate"
+                  + " WHERE C_Currency_ID=?"
+                  +   " AND C_Currency_ID_To=?"
+                  +   " AND C_ConversionType_ID=?"
+                  +   " AND ? BETWEEN ValidFrom AND ValidTo"
+                  +   " AND AD_Client_ID IN (0,?)"
+                  +   " AND AD_Org_ID IN (0,?)"
+                  + " ORDER BY ValidFrom DESC, AD_Client_ID DESC, AD_Org_ID DESC";
+
+        BigDecimal tasaCambio = DB.getSQLValueBD(trxName, sql, c_Currency_ID, LAR_Utils.getMonedaPredeterminada(p_ctx,
+                ad_Client_ID, trxName), c_ConversionType_ID, new Timestamp(System.currentTimeMillis()), ad_Client_ID,
+                ad_Org_ID);
+
+        return tasaCambio;
+
+    } // getTasaCambio
+
+} // LAR_Utils

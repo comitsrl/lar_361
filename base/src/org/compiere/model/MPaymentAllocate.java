@@ -17,12 +17,18 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+
+import ar.com.ergio.model.MLARPaymentHeader;
 
 /**
  * 	Payment Allocate Model
@@ -170,8 +176,66 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
                 return false;
             }
 		}
-		
+
+        // @fchiappano No permitir agregar facturas con distintas monedas.
+        if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0 && is_ValueChanged("C_Invoice_ID"))
+        {
+            String sql = "SELECT i.C_Currency_ID"
+                       +  " FROM C_PaymentAllocate pa"
+                       +  " JOIN C_Invoice i ON pa.C_Invoice_ID = i.C_Invoice_ID"
+                       + " WHERE pa.LAR_PaymentHeader_ID = ? AND pa.C_PaymentAllocate_ID != ?";
+
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+            try
+            {
+                pstmt = DB.prepareStatement(sql, get_TrxName());
+                pstmt.setInt(1, get_ValueAsInt("LAR_PaymentHeader_ID"));
+                pstmt.setInt(2, getC_PaymentAllocate_ID());
+                rs = pstmt.executeQuery();
+
+                while (rs.next())
+                {
+                    if (rs.getInt(1) != getInvoice().getC_Currency_ID())
+                    {
+                        log.saveError("Error", "No está permitido ingresar Facturas con distintas Monedas.");
+                        return false;
+                    }
+                }
+            }
+            catch (SQLException eSql)
+            {
+                log.log(Level.SEVERE, sql, eSql);
+            }
+            finally
+            {
+                DB.close(rs, pstmt);
+                rs = null;
+                pstmt = null;
+            }
+        } // @fchiappano No permitir agregar facturas con distintas monedas.
+
 		return true;
 	}	//	beforeSave
+
+    /**
+     * After Save
+     *
+     * @param newRecord new
+     * @param success success
+     * @return success
+     */
+    protected boolean afterSave(boolean newRecord, boolean success)
+    {
+        // @fchippano Obtener la tasa de cambio, desde la factura.
+        if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
+        {
+            MLARPaymentHeader paymentHeader = new MLARPaymentHeader(p_ctx, get_ValueAsInt("LAR_PaymentHeader_ID"), get_TrxName());
+            paymentHeader.set_Value("TasaDeCambio", getInvoice().get_Value("TasaDeCambio"));
+            paymentHeader.saveEx();
+        }
+
+        return true;
+    } // afterSave
 	
 }	//	MPaymentAllocate
