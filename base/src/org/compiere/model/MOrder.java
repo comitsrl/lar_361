@@ -34,6 +34,7 @@ import org.adempiere.exceptions.BPartnerNoBillToAddressException;
 import org.adempiere.exceptions.BPartnerNoShipToAddressException;
 import org.adempiere.exceptions.FillMandatoryException;
 import org.compiere.apps.ADialog;
+import org.compiere.pos.PosOrderModel;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
@@ -1189,7 +1190,7 @@ public class MOrder extends X_C_Order implements DocAction
 	}	//	processIt
 	
 	/**	Process Message 			*/
-	private String		m_processMsg = null;
+	protected String		m_processMsg = null;
 	/**	Just Prepared Flag			*/
 	private boolean		m_justPrepared = false;
 
@@ -2059,7 +2060,11 @@ public class MOrder extends X_C_Order implements DocAction
 		}
 		
 		// added AdempiereException by zuhri
-        if (!invoice.processIt(DocAction.ACTION_Complete))
+
+        // @fchiappano Si se trata de una instancia de PosOrderModel, no
+        // completar la factura, ya que esto debe hacerse dentro de la
+        // PosOrderModel propiamente dicha.
+        if (!(this instanceof PosOrderModel) && !invoice.processIt(DocAction.ACTION_Complete))
         {
             // @fchiappano capturar el error desde la MInvoice.
             m_processMsg = invoice.getProcessMsg();
@@ -2073,7 +2078,7 @@ public class MOrder extends X_C_Order implements DocAction
             throw new AdempiereException("Failed when processing document - " + m_processMsg);
         }
 		setC_CashLine_ID(invoice.getC_CashLine_ID());
-		if (!DOCSTATUS_Completed.equals(invoice.getDocStatus()))
+        if (!(this instanceof PosOrderModel) && !DOCSTATUS_Completed.equals(invoice.getDocStatus()))
 		{
 			m_processMsg = "@C_Invoice_ID@: " + invoice.getProcessMsg();
 			return null;
