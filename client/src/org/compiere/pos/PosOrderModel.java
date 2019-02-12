@@ -20,9 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderTax;
@@ -369,12 +371,32 @@ public class PosOrderModel extends MOrder {
                 line.saveEx(get_TrxName());
             }
             // Se completa la imputación de pago
-            alloc.processIt(DocAction.ACTION_Complete);
+            // @fchiappano Capturar error al procesar asignación.
+            if (!alloc.processIt(DocAction.ACTION_Complete))
+            {
+                this.m_processMsg = alloc.getProcessMsg();
+                throw new AdempiereException("Failed when processing document - " + m_processMsg);
+            }
+
             alloc.saveEx(get_TrxName());
 
             // Se relaciona la factura generada con la cabecera de cobro
             paymentHeader.setC_Invoice_ID(getC_Invoice_ID());
             paymentHeader.saveEx(get_TrxName());
+
+            // @fchiappano Completar Factura.
+            MInvoice invoice = getInvoices()[0];
+            if (!invoice.processIt(DocAction.ACTION_Complete))
+            {
+                this.m_processMsg = invoice.getProcessMsg();
+                throw new AdempiereException("Failed when processing document - " + m_processMsg);
+            }
+            // @fchiappano Controlar errores al guardar la factura.
+            if (!invoice.save(get_TrxName()))
+            {
+                m_processMsg = "Error al Guardar Factura. Documento N°: " + invoice.getDocumentNo();
+                throw new AdempiereException("Failed when processing document - " + m_processMsg);
+            }
         }
 
         return DocAction.STATUS_Completed;

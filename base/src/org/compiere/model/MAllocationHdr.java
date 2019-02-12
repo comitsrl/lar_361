@@ -398,7 +398,13 @@ public final class MAllocationHdr extends X_C_AllocationHdr implements DocAction
 			return DocAction.STATUS_Invalid;
 
 		//	Std Period open?
-		MPeriod.testPeriodOpen(getCtx(), getDateAcct(), MDocType.DOCBASETYPE_PaymentAllocation, getAD_Org_ID());
+        // @fchiappano Capturar error de periodo cerrado.
+        if (!MPeriod.isOpen(getCtx(), getDateAcct(), MDocType.DOCBASETYPE_PaymentAllocation, getAD_Org_ID()))
+        {
+            m_processMsg = "@PeriodClosed@";
+            return DocAction.STATUS_Invalid;
+        }
+
 		getLines(false);
 		if (m_lines.length == 0)
 		{
