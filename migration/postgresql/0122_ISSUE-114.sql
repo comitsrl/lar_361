@@ -461,5 +461,5 @@ UPDATE AD_Column SET AD_Val_Rule_ID=3000066,Updated=TO_TIMESTAMP('2018-12-05 18:
 ;
 
 -- Registración de script
-SELECT register_migration_script_lar('0122_BUG-114.sql', 'LAR', '')
+SELECT register_migration_script_lar('0122_ISSUE-114.sql', 'LAR', '')
 ;

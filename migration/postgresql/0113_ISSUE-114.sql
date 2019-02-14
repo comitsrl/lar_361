@@ -806,5 +806,5 @@ UPDATE AD_Column SET IsUpdateable='Y',Updated=TO_TIMESTAMP('2018-08-10 17:39:10'
 ;
 
 -- Registración de script
-SELECT register_migration_script_lar('0113_BUG-114.sql', 'LAR', '')
+SELECT register_migration_script_lar('0113_ISSUE-114.sql', 'LAR', '')
 ;
