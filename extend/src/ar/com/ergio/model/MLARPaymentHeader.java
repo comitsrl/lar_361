@@ -1187,12 +1187,21 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
                 // @fchiappano Si la moneda de la factura, es distinta de la
                 // moneda predeterminada, realizo la conversión.
+                boolean impMinimo = false;
                 if (invoice.getC_Currency_ID() != getC_Currency_ID())
                 {
                     BigDecimal tasaCambio = (BigDecimal) get_Value("TasaDeCambio");
 
                     if (tasaCambio != null)
+                    {
                         impPago = impPago.divide(tasaCambio, 4, RoundingMode.FLOOR);
+
+                        BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
+                        min = min.pow(invoice.getC_Currency().getStdPrecision());
+
+                        if (impPago.compareTo(min) < 0)
+                            impMinimo = true;
+                    }
                 }
 
                 impPago = impPago.subtract(pays[p].getAllocatedAmt().abs());
@@ -1202,7 +1211,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 BigDecimal alineOUAmt = Env.ZERO;
                 BigDecimal alineAmt;
                 // Evita Sobrepagos
-                if (comp <= 0)
+                // @fchiappano si la factura es en dolare, y importe del pago es
+                // menor al minimo, utilizar el importe del pago para realizar
+                // la asignacion.
+                if (comp <= 0 || impMinimo)
                     alineAmt = impPago;
                 else
                     alineAmt = importeFactura;
