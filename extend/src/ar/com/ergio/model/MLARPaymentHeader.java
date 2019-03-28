@@ -39,6 +39,7 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCharge;
+import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
@@ -1090,7 +1091,19 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 MPaymentAllocate[] invoices = getInvoices(get_TrxName());
                 BigDecimal sumaFacturas = Env.ZERO;
                 for (int i = 0; i < invoices.length; i++)
-                    sumaFacturas = sumaFacturas.add(invoices[i].getAmount());
+                {
+                    // @fchiappano Si se trata de una factura en moneda
+                    // extranjera, realizar conversión de moneda.
+                    MCurrency moneda = (MCurrency) invoices[i].getC_Invoice().getC_Currency();
+                    if (moneda.getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(),
+                            get_TrxName()))
+                    {
+                        BigDecimal tasaCambio = (BigDecimal) get_Value("TasaDeCambio");
+                        sumaFacturas = sumaFacturas.add(invoices[i].getAmount().multiply(tasaCambio).setScale(moneda.getStdPrecision(), RoundingMode.HALF_UP));
+                    }
+                    else
+                        sumaFacturas = sumaFacturas.add(invoices[i].getAmount());
+                }
 
                 if (sumaFacturas.compareTo(sumPagosRet) == -1)
                 {
