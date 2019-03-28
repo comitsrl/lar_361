@@ -18,6 +18,7 @@ package org.compiere.model;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -35,6 +36,8 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  *  Payment Allocation Model.
@@ -411,15 +414,31 @@ public final class MAllocationHdr extends X_C_AllocationHdr implements DocAction
 		{	
 			if (line.getC_Invoice_ID() != 0)
 			{
-				final String whereClause = I_C_Invoice.COLUMNNAME_C_Invoice_ID + "=? AND " 
-								   + I_C_Invoice.COLUMNNAME_IsPaid + "=? AND "
-								   + I_C_Invoice.COLUMNNAME_DocStatus + " NOT IN (?,?)";
-				boolean InvoiceIsPaid = new Query(getCtx(), I_C_Invoice.Table_Name, whereClause, get_TrxName())
-				.setClient_ID()
-				.setParameters(line.getC_Invoice_ID(), "Y", X_C_Invoice.DOCSTATUS_Voided, X_C_Invoice.DOCSTATUS_Reversed)
-				.match();
-				if(InvoiceIsPaid)
-					throw new  AdempiereException("@ValidationError@ @C_Invoice_ID@ @IsPaid@");
+                // @fchiappano Si el monto de la asignación es menor al minimo,
+                // ignorar validación de factura pagada.
+                boolean ignorarValidacion = false;
+
+                if (getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+                {
+                    BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
+                    min = min.pow(getC_Currency().getStdPrecision());
+
+                    if (line.getAmount().compareTo(min) < 0)
+                        ignorarValidacion = true;
+                }
+
+                if (!ignorarValidacion)
+                {
+                    final String whereClause = I_C_Invoice.COLUMNNAME_C_Invoice_ID + "=? AND "
+                            + I_C_Invoice.COLUMNNAME_IsPaid + "=? AND " + I_C_Invoice.COLUMNNAME_DocStatus
+                            + " NOT IN (?,?)";
+                    boolean InvoiceIsPaid = new Query(getCtx(), I_C_Invoice.Table_Name, whereClause, get_TrxName())
+                            .setClient_ID()
+                            .setParameters(line.getC_Invoice_ID(), "Y", X_C_Invoice.DOCSTATUS_Voided,
+                                    X_C_Invoice.DOCSTATUS_Reversed).match();
+                    if (InvoiceIsPaid)
+                        throw new AdempiereException("@ValidationError@ @C_Invoice_ID@ @IsPaid@");
+                }
 			}
 		}	
 		
