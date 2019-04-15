@@ -285,38 +285,12 @@ public class MAllocationLine extends X_C_AllocationLine
 		//	Payment - Invoice
 		if (C_Payment_ID != 0 && invoice != null)
 		{
-            /*
-             * @mzuniga: Si se trata de un pago retención IIBB RN se registra el monto del pago
-             * como retención en la factura (acumula)
-             */
-            MPayment payment = new MPayment(getCtx(), C_Payment_ID, get_TrxName());
-            if (!reverse && payment.get_ValueAsBoolean("EsRetencionIIBB")
-                && payment.getC_Charge_ID() == MSysConfig.getIntValue("LAR_C_Charge_ID_Ret_IIBB_RN", 0, Env.getAD_Client_ID(getCtx())))
-            {
-                BigDecimal retAplicada = (BigDecimal) invoice.get_Value("ImporteRetencionIIBB");
-                invoice.set_CustomColumn("ImporteRetencionIIBB",
-                        retAplicada.add(payment.getPayAmt()));
-                invoice.saveEx();
-            }
 			//	Link to Invoice
 			if (reverse)
 			{
 				invoice.setC_Payment_ID(0);
 				log.fine("C_Payment_ID=" + C_Payment_ID
 					+ " Unlinked from C_Invoice_ID=" + C_Invoice_ID);
-
-                // Se descuenta el importe de retención en la factura si corresponde
-                if (payment.get_ValueAsBoolean("EsRetencionIIBB")
-                        && payment.getC_Charge_ID() == MSysConfig.getIntValue(
-                                "LAR_C_Charge_ID_Ret_IIBB_RN", 0, Env.getAD_Client_ID(getCtx())) )
-                {
-                    BigDecimal retAplicada = (BigDecimal) invoice.get_Value("ImporteRetencionIIBB");
-                    invoice.set_CustomColumn("ImporteRetencionIIBB",
-                            retAplicada.subtract(payment.getPayAmt()));
-                    invoice.saveEx();
-                    log.fine("Se descuenta retención aplicada = " + payment.getPayAmt()
-                            + ", en la factura: " + C_Invoice_ID);
-                }
 			}
 			else if (invoice.isPaid())
 			{
