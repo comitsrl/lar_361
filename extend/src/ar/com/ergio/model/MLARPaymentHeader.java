@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -79,8 +80,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     private String      m_processMsg = null;
     /** Just Prepared Flag          */
     private boolean     m_justPrepared = false;
-    // factura para registrar en el certificado
-    private int         facturaID_Cert = 0;
+    /** Marca para registrar la Ret de IIBB en las facturas (solo al Completar) */
+    private boolean     registrarRetIIBB = false;
+    // factura para registrar en el certificado.
+    private ArrayList<SimpleImmutableEntry<Integer, BigDecimal>> facturaID_Cert;
     // Importe Sujeto a Retención
     private BigDecimal  impSujetoaRet = Env.ZERO;
     // TODO: Parametrizar estas constantes.
@@ -257,7 +260,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 impSujetoaRet = Env.ZERO;
                 BigDecimal aliquot = wc.getAliquot();
                 BigDecimal impFijo = Env.ZERO;
-                facturaID_Cert = 0;
                 if (wc.isCalcFromPayment())
                 {
                     // Es retención de Ganancias
@@ -591,13 +593,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                                     .divide(Env.ONEHUNDRED).setScale(2, BigDecimal.ROUND_HALF_EVEN);
                             impRetencion = impRetencion.subtract(impExentoDesc).subtract(impExencion);
                         }
-                        // Si existe factura registrar la retención en la misma
-                        if (facturaID_Cert > 0)
+                        // Si existen facturas registrar la retención en las mismas
+                        if (facturaID_Cert != null)
+                            for (int i = 0; i < facturaID_Cert.size(); i++)
                         {
-                            MInvoice factura = new MInvoice(getCtx(), facturaID_Cert, get_TrxName());
+                            MInvoice factura = new MInvoice(getCtx(), facturaID_Cert.get(i).getKey(), get_TrxName());
                             // Se deja registrado en la factura la retención
                             BigDecimal retAcumulada = (BigDecimal) factura.get_Value("ImporteRetencionIIBB");
-                            retAcumulada = retAcumulada.add(impRetencion);
+                            retAcumulada = retAcumulada.add(facturaID_Cert.get(i).getValue());
                             factura.set_CustomColumn("ImporteRetencionIIBB", retAcumulada);
                             if (!factura.save(get_TrxName()))
                             {
@@ -760,7 +763,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         // Coeficiente Unificado mínimo para Río Negro
         final BigDecimal LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN = new BigDecimal(MSysConfig.getValue("LAR_Coef_Unif_Minimo_CM_Ret_IIBB_RN", Env.getAD_Client_ID(getCtx())));
         // Se iniciaiza la factura para el certificado
-        facturaID_Cert = 0;
+        facturaID_Cert = new ArrayList<SimpleImmutableEntry<Integer, BigDecimal>>();
         // Recupera el tipo de IIBB del Proveedor
         final int bpLCO_ISIC_ID = bp.get_ValueAsInt("LCO_ISIC_ID");
 
@@ -801,6 +804,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 }
 
         impSujetoaRet = Env.ZERO;
+        BigDecimal impSujetoTotal = Env.ZERO;
         BigDecimal impRetencion = Env.ZERO;
 
         // Si no existen facturas en la OP
@@ -836,12 +840,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 if (noRetener)
                     continue;
 
-                if (impRetencion.compareTo(Env.ZERO) > 0)
-                {
-                    m_processMsg = "Error: No se puede generar más de una retenci\u00f3n de IIBB en una misma OP";
-                    log.severe(m_processMsg);
-                    return Env.ONE.negate() ;
-                }
                 /*
                  * Se calcula el importe sujeto a retención. Si es factura A o M se utiliza el
                  * neto, caso contrario el importe Total.
@@ -856,15 +854,15 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 // Verificar si el monto sujeto a retención supera el mínimo
                 if (impSujetoaRet.compareTo(impMinNoSujeto) > 0)
                 {
-                    BigDecimal retAplicada = (BigDecimal) factura.get_Value("ImporteRetencionIIBB");
-                    if (retAplicada == null)
-                        retAplicada = Env.ZERO;
+                    BigDecimal retYaAplicada = (BigDecimal) factura.get_Value("ImporteRetencionIIBB");
+                    if (retYaAplicada == null)
+                        retYaAplicada = Env.ZERO;
                     // Se calculala retención
-                    impRetencion = impSujetoaRet.multiply(aliquot).divide(Env.ONEHUNDRED)
+                    BigDecimal impRetCalculada = impSujetoaRet.multiply(aliquot).divide(Env.ONEHUNDRED)
                             .setScale(2, BigDecimal.ROUND_HALF_EVEN);
 
                     // Se verifica si la retención en este factura ya fue aplicada al 100%
-                    if (retAplicada.compareTo(impRetencion) >= 0)
+                    if (retYaAplicada.compareTo(impRetCalculada) >= 0)
                     {
                         // La factura tiene aplicado el total de la retención
                         {
@@ -872,20 +870,29 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             continue;
                         }
                     }
-                    impRetencion = impRetencion.subtract(retAplicada);
+                    impSujetoTotal = impSujetoTotal.add(impSujetoaRet);
+                    BigDecimal retAplicada = impRetCalculada.subtract(retYaAplicada);
+                    impRetencion = impRetencion.add(retAplicada);
                     /*
                      * Se asigna el número de factura para registrar en el cetificado
                      * Tambien se utiliza para registrar el importe de la retención en la
                      * factura. --> Solo se setea la factura si se está completando la cabecera,
                      * , si sólo se está calculando no se debe registrar la retención en la factura.
                      */
-                    if (m_justPrepared)
-                        facturaID_Cert = factura.getC_Invoice_ID();
+                    if (registrarRetIIBB)
+                    {
+                        // Como pueden ser varias facturas se crea un KeNamePair
+                        // con el ID de la factura y el importe retenido
+                        facturaID_Cert.add(new SimpleImmutableEntry<Integer, BigDecimal>(factura
+                                .getC_Invoice_ID(), retAplicada));
+                    }
                 }
                 else
                     impRetencion = Env.ZERO;
             } // Se recorren las facturas de la OP
         } // Retención sobre las facturas
+        // Se asigna el importe sujeto a retención acumulado
+        impSujetoaRet = impSujetoTotal;
         return impRetencion;
     } //calculaRetencionIIBB
 
@@ -1063,6 +1070,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     @Override
     public String prepareIt()
     {
+        // Se está copletando el documento
+        // Se deben registrar en las facturas el importe retenido de IIBB
+        registrarRetIIBB = true;
+
         log.info(toString());
         // Dispara la validación del documento
         m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_BEFORE_PREPARE);
@@ -1298,6 +1309,20 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         if (m_processMsg != null)
             return false;
 
+        // Se descuenta el importe retenido de la factura
+        MLARPaymentWithholdingLine[] certLineas = obtenerLineasCertificados(get_TrxName());
+        for (int i=0; i < certLineas.length; i++)
+        {
+            MInvoice factura = new MInvoice(getCtx(), certLineas[i].getC_Invoice_ID(), get_TrxName());
+            BigDecimal retAplicada = (BigDecimal) factura.get_Value("ImporteRetencionIIBB");
+            factura.set_CustomColumn("ImporteRetencionIIBB", retAplicada.subtract(certLineas[i].getTaxAmt()));
+            if (!factura.save(get_TrxName()))
+            {
+                m_processMsg = "Error al descontar la retenci\u00f3n en la factura";
+                log.severe(m_processMsg);
+                return false;
+            }
+        }
         // Cheque si ya fue procesado
         if (DOCSTATUS_Closed.equals(getDocStatus()) || DOCSTATUS_Voided.equals(getDocStatus()))
         {
@@ -1464,6 +1489,44 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         }
     } // getInvoices
 
+    /**
+     * Devuelve un array con todas las líneas de certtificados vinculados a la cabecera
+     * @param trxName
+     * @return MLARPaymentWithholdingLine[] array con líneas de certificado
+     * @throws SQLException
+     */
+    public MLARPaymentWithholdingLine[] obtenerLineasCertificados(String trxName)
+    {
+        List<MLARPaymentWithholdingLine> certLineas = new ArrayList<MLARPaymentWithholdingLine>();
+
+        String sql = "SELECT * FROM LAR_PaymentWithholdingLine"
+                  + " WHERE LAR_PaymentWithholding_ID IN"
+                  + " (SELECT LAR_PaymentWithholding_ID FROM LAR_PaymentWithholding WHERE LAR_PaymentHeader_ID = ?)";
+
+        PreparedStatement pstmt;
+        pstmt = DB.prepareStatement(sql, trxName);
+        ResultSet rs = null;
+
+        try
+        {
+            pstmt.setInt(1, getLAR_PaymentHeader_ID());
+            rs = pstmt.executeQuery();
+            while (rs.next())
+                certLineas.add(new MLARPaymentWithholdingLine(getCtx(), rs, trxName));
+
+            return certLineas.toArray(new MLARPaymentWithholdingLine[certLineas.size()]);
+        } catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+            return new MLARPaymentWithholdingLine[0];
+        } finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+    } // obtenerLineasCertificados
+
     /*
      * Borra los registros de retención (Certificados) asociados a una cabecera.
      */
@@ -1474,9 +1537,26 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             return null;
 
         int mLARaymentHeader_ID = getLAR_PaymentHeader_ID();
-        log.info("Borrar los certificados de retenci\u00f3n de la Orden de Pago: " + mLARaymentHeader_ID);
-        String sql = "DELETE FROM LAR_PaymentWithholding WHERE LAR_PaymentHeader_ID=?";
+        log.info("Borrar las líneas de los certificados de retenci\u00f3n de la Orden de Pago: " + mLARaymentHeader_ID);
+        String sql = "DELETE FROM LAR_PaymentWithholdingLine WHERE LAR_PaymentWithholding_ID IN (SELECT LAR_PaymentWithholding_ID FROM LAR_PaymentWithholding WHERE LAR_PaymentHeader_ID=?)";
         PreparedStatement pstmt = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, mLARaymentHeader_ID);
+            pstmt.executeUpdate();
+        } catch (Exception e)
+        {
+            log.log(Level.SEVERE, sql, e);
+            return e.getMessage();
+        } finally
+        {
+            DB.close(pstmt);
+            pstmt = null;
+        }
+        log.info("Borrar los certificados de retenci\u00f3n de la Orden de Pago: " + mLARaymentHeader_ID);
+        sql = "DELETE FROM LAR_PaymentWithholding WHERE LAR_PaymentHeader_ID=?";
+        pstmt = null;
         try
         {
             pstmt = DB.prepareStatement(sql, get_TrxName());
@@ -1603,7 +1683,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
      * @return Certificado de Retención.
      */
     public MLARPaymentWithholding creaCertificadodeRetencion(final BigDecimal impRetencion, final BigDecimal baseRet,
-            final WithholdingConfig wc, final int c_Payment_ID, final int c_Invoice_ID, String docNo, int c_DocType)
+            final WithholdingConfig wc, final int c_Payment_ID, final List<SimpleImmutableEntry<Integer, BigDecimal>> facturas, String docNo, int c_DocType)
     {
         final MLARPaymentWithholding pwh = new MLARPaymentWithholding(getCtx(), 0, get_TrxName());
 
@@ -1624,8 +1704,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         pwh.setProcessed(false);
         pwh.setTaxAmt(impRetencion);
         pwh.setTaxBaseAmt(baseRet);
-        if (c_Invoice_ID > 0)
-            pwh.set_ValueOfColumn("C_Invoice_ID", c_Invoice_ID);
+
         // Se asocia el Pago Retención con el Certificado
         pwh.set_ValueOfColumn("C_Payment_ID", c_Payment_ID);
 
@@ -1633,6 +1712,35 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         // de pago mediante MLARPaymentWithholding.afterSave()
         if (!pwh.save(get_TrxName()))
             return null;
+
+        // Registrar las facturas en el certificado
+        if (facturas != null && facturas.size() > 0)
+            for (int i = 0; i < facturaID_Cert.size(); i++)
+            {
+                final MLARPaymentWithholdingLine pwhLine = new MLARPaymentWithholdingLine(getCtx(), 0, get_TrxName());
+                pwhLine.set_ValueOfColumn("C_Invoice_ID", facturas.get(i).getKey());
+                pwhLine.setLAR_PaymentWithholding_ID(pwh.getLAR_PaymentWithholding_ID());
+                pwhLine.setPercent(wc.getAliquot());
+                pwhLine.setProcessed(false);
+                pwhLine.setTaxAmt(facturas.get(i).getValue());
+                /*
+                 * Se calcula el importe sujeto a retención. Si es factura A o M se utiliza el
+                 * neto, caso contrario el importe Total.
+                 */
+                BigDecimal baseRetFc = Env.ZERO;
+                MInvoice factura = new MInvoice(getCtx(), facturas.get(i).getKey(), get_TrxName());
+                MDocType docType = new MDocType(getCtx(), factura.getC_DocType_ID(), get_TrxName());
+                String letra = recuperaLetra(docType.get_ValueAsInt("LAR_DocumentLetter_ID"));
+                if (letra.equals("A") || letra.equals("M"))
+                    baseRetFc = factura.getTotalLines();
+                else
+                    baseRetFc = factura.getGrandTotal();
+                pwhLine.setTaxBaseAmt(baseRetFc);
+
+                // Grabar la línea
+                if (!pwhLine.save(get_TrxName()))
+                    return null;
+            }
 
         return pwh;
     } // creaCertificadodeRetencion
