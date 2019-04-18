@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.compiere.Adempiere;
+import org.compiere.model.MClient;
 import org.compiere.model.MUser;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.util.CLogMgt;
@@ -411,7 +412,7 @@ public final class ADialog
 
 		EMailDialog emd = new EMailDialog(owner,
 			Msg.getMsg(Env.getCtx(), "EMailSupport"),
-			from, to, "Support: " + subject, myMessage.toString(), null);
+			from, to, Msg.getMsg(Env.getCtx(), "Support") + ": " + subject, myMessage.toString(), null);
 	}	//	createEmail
 
 	/**
@@ -432,9 +433,10 @@ public final class ADialog
 		CLogMgt.getInfoDetail(myMessage, Env.getCtx());
 		ModelValidationEngine.get().getInfoDetail(myMessage, Env.getCtx()); // teo_sarca - FR [ 1724662 ]
 
+	    final String asunto = String.format("[%s] %s", MClient.get(Env.getCtx()).getName(), subject);
 		EMailDialog emd = new EMailDialog(owner,
 			Msg.getMsg(Env.getCtx(), "EMailSupport"),
-			from, to, "Support: " + subject, myMessage.toString(), null);
+			from, to, asunto, myMessage.toString(), null);
 	}	//	createEmail
 
 	

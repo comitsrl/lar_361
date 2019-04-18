@@ -52,6 +52,7 @@ import org.adempiere.plaf.PLAFEditorPanel;
 import org.compiere.db.CConnection;
 import org.compiere.grid.ed.VDate;
 import org.compiere.minigrid.MiniTable;
+import org.compiere.model.MClient;
 import org.compiere.model.MRole;
 import org.compiere.model.MSystem;
 import org.compiere.model.MUser;
@@ -695,11 +696,12 @@ public final class Preference extends CDialog
 	 */
 	private void cmd_errorEMail()
 	{
-		EMailDialog emd = new EMailDialog(this, 
-			"EMail Trace", 
+	    final String asunto = String.format("[%s] Informaci\u00f3n de Rastreo", MClient.get(Env.getCtx()).getName());
+		new EMailDialog(this,
+			Msg.getMsg(Env.getCtx(), "EMailSupport"),
 			MUser.get(Env.getCtx()), 
 			"",			//	to 
-			"Adempiere Trace Info", 
+			asunto,
 			CLogErrorBuffer.get(true).getErrorInfo(Env.getCtx(), bErrorsOnly.isSelected()), 
 			null);
 		
