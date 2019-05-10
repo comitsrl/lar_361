@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -191,7 +189,18 @@ public abstract class Wsfe {
 			}
 			p.waitFor();
 			if(p.exitValue() != 0){
-				InputStream is = p.getInputStream();
+                // @fchiappano Recuperar mensaje de error desde el archivo wsfev1_error.log
+                BufferedReader reader = new BufferedReader(new FileReader(getPath() + "wsfev1_error.log"));
+                String linea = "";
+                String ultimaLinea = "";
+
+                while ((linea = reader.readLine()) != null)
+                    ultimaLinea = linea;
+
+                messageError = "Error de Conexión: " + Msg.translate(getM_ctx(), ultimaLinea);
+                log.log(Level.SEVERE, "caeErrorCallProcess:" + ultimaLinea);
+
+				/* InputStream is = p.getInputStream();
 				InputStream ie = p.getErrorStream();
 				BufferedReader br = new BufferedReader (new InputStreamReader (is));
 				BufferedReader brE = new BufferedReader (new InputStreamReader (ie));
@@ -201,8 +210,7 @@ public abstract class Wsfe {
 	            auxE = brE.readLine();
 	            messageError = "Exit Value="+p.exitValue()+",InputStream="+aux+",ErrorStream="+auxE;
 	            //messageError = "La AFIP no aprueba el envio. Por favor corrobore los datos (CUIT, Categoria de IVA, Etc).";
-	            log.log(Level.SEVERE,"caeErrorCallProcess:" +aux + auxE);
-				
+	            log.log(Level.SEVERE,"caeErrorCallProcess:" +aux + auxE); */
 			}
 			
 		} 
