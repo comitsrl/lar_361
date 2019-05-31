@@ -213,4 +213,23 @@ public final class LAR_Utils {
 
     } // getTasaCambio
 
+    /**
+     * Recuperar el Tipo de Cambio predeterminado.
+     *
+     * @author fchiappano
+     * @param ad_Client_ID
+     * @param trxName
+     * @return C_ConversionType_ID
+     */
+    public static int getTipoCambioPredeterminado(final int ad_Client_ID, final String trxName)
+    {
+        String sql = "SELECT C_ConversionType_ID"
+                   +  " FROM C_ConversionType"
+                   + " WHERE IsActive = 'Y'"
+                   +   " AND IsDefault = 'Y'"
+                   +   " AND AD_Client_ID = ?";
+
+        return DB.getSQLValue(trxName, sql, ad_Client_ID);
+    } // getTipoCambioPredeterminado
+
 } // LAR_Utils

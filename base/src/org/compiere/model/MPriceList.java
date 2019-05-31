@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import org.compiere.util.CCache;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 /**
@@ -269,5 +270,43 @@ public class MPriceList extends X_M_PriceList
 		}
 		return m_precision.intValue();
 	}	//	getStandardPrecision
-	
+
+    @Override
+    protected boolean afterSave(boolean newRecord, boolean success)
+    {
+        if (!success)
+            return success;
+
+        // @fchiappano No permitir que se marquen mas de una lista como madre.
+        if (is_ValueChanged("EsListaMadre") && get_ValueAsBoolean("EsListaMadre"))
+        {
+            String sql = "UPDATE M_PriceList"
+                       +   " SET EsListaMadre = 'N'"
+                       + " WHERE AD_Client_ID = ?"
+                       +   " AND M_PriceList_ID != ?"
+                       +   " AND IsSOPriceList = ?";
+
+            Object param[] = { getAD_Client_ID(), getM_PriceList_ID(), isSOPriceList() };
+            int no = DB.executeUpdate(sql, param, false, get_TrxName());
+            log.fine("Lista Madre -> #" + no);
+        }
+
+        // @fchiappano No permitir que se marque mas de una lista como
+        // predeterminado.
+        if (is_ValueChanged("IsDefault") && isDefault())
+        {
+            String sql = "UPDATE M_PriceList"
+                       +   " SET IsDefault = 'N'"
+                       + " WHERE AD_Client_ID = ?"
+                       +   " AND M_PriceList_ID != ?"
+                       +   " AND IsSOPriceList = ?";
+
+            Object param[] = { getAD_Client_ID(), getM_PriceList_ID(), isSOPriceList() };
+            int no = DB.executeUpdate(sql, param, false, get_TrxName());
+            log.fine("Lista Madre -> #" + no);
+        }
+
+        return true;
+    } // afterSave
+
 }	//	MPriceList
