@@ -271,6 +271,24 @@ public class MPriceList extends X_M_PriceList
 		return m_precision.intValue();
 	}	//	getStandardPrecision
 
+    /**************************************************************************
+     * Before Save
+     *
+     * @param newRecord new
+     * @return save
+     */
+    protected boolean beforeSave(boolean newRecord)
+    {
+        // @fchiappano Validar que una misma lista, no se pueda marcar como
+        // madre y predeterminada (base).
+        if (is_ValueChanged("EsListaMadre") && get_ValueAsBoolean("EsListaMadre"))
+            setIsDefault(false);
+        else if (is_ValueChanged("IsDefault") && isDefault())
+            set_ValueOfColumn("EsListaMadre", false);
+
+        return true;
+    } // beforeSave
+
     @Override
     protected boolean afterSave(boolean newRecord, boolean success)
     {
