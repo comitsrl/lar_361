@@ -858,6 +858,56 @@ INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,AD_Process_I
 INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=3000566 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
 ;
 
+-- 04/06/2019 16:19:42 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Column SET AD_Reference_Value_ID=53343, AD_Reference_ID=18,Updated=TO_DATE('2019-06-04 16:19:42','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003476
+;
+
+-- 04/06/2019 16:56:29 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+DELETE  FROM  AD_Process_Para_Trl WHERE AD_Process_Para_ID=3000566
+;
+
+-- 04/06/2019 16:56:30 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+DELETE FROM AD_Process_Para WHERE AD_Process_Para_ID=3000566
+;
+
+-- 04/06/2019 16:59:03 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process SET Help='Al iniciar el proceso, se actualizara la lista de precios BASE, con todos los precios en moneda local. A continuación, se actualizaran todas las demas listas, partiendo siempre desde la lista de precios base configurada en cada una.',Updated=TO_DATE('2019-06-04 16:59:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000359
+;
+
+-- 04/06/2019 16:59:03 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process_Trl SET IsTranslated='N' WHERE AD_Process_ID=3000359
+;
+
+-- 04/06/2019 17:00:47 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process SET Description='Al iniciar el proceso, se actualizara la lista de precios BASE, con todos los precios en moneda local. A continuación, se actualizaran todas las demas listas, partiendo siempre desde la lista de precios base configurada en cada una.',Updated=TO_DATE('2019-06-04 17:00:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000359
+;
+
+-- 04/06/2019 17:00:47 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process_Trl SET IsTranslated='N' WHERE AD_Process_ID=3000359
+;
+
+-- 04/06/2019 18:21:20 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process SET Help='Al iniciar el proceso, se actualizara la lista de precios BASE, con todos los precios en moneda local. A continuación, se actualizaran todas las demas listas, partiendo siempre desde la lista de precios base configurada en cada una.', Description='Generación Masiva de Versiones de Lista de Precios.',Updated=TO_DATE('2019-06-04 18:21:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000359
+;
+
+-- 04/06/2019 18:21:20 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process_Trl SET IsTranslated='N' WHERE AD_Process_ID=3000359
+;
+
+-- 04/06/2019 18:21:29 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process_Trl SET Description='Generación Masiva de Versiones de Lista de Precios.',Help='Al iniciar el proceso, se actualizara la lista de precios BASE, con todos los precios en moneda local. A continuación, se actualizaran todas las demas listas, partiendo siempre desde la lista de precios base configurada en cada una.',Updated=TO_DATE('2019-06-04 18:21:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000359 AND AD_Language='es_AR'
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0130_ISSUE-47.sql', 'LAR', '') FROM dual
 ;

@@ -29,10 +29,12 @@ import org.compiere.model.MPriceList;
 import org.compiere.model.MPriceListVersion;
 import org.compiere.model.MProduct;
 import org.compiere.model.MProductPrice;
+import org.compiere.process.M_PriceList_Create;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
 import org.compiere.util.DB;
+import org.compiere.util.DisplayType;
 
 import ar.com.ergio.util.LAR_Utils;
 
@@ -57,10 +59,6 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
 
             if (para[i].getParameter() == null)
                 ;
-            else if (name.equals("M_PriceList_ID"))
-            {
-                listaMadre = new MPriceList(getCtx(), para[i].getParameterAsInt(), get_TrxName());
-            }
             else
             {
                 log.log(Level.SEVERE, "Unknown Parameter: " + name);
@@ -71,6 +69,8 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
     @Override
     protected String doIt() throws Exception
     {
+        listaMadre = new MPriceList(getCtx(), getRecord_ID(), get_TrxName());
+
         // @fchiappano Obtener la lista de precios base.
         int m_PriceListBase_ID = getM_PriceListBase_ID();
 
@@ -78,19 +78,28 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
             throw new AdempiereUserError("No fue posible recuperar, una lista de precios BASE.");
 
         // @fchiappano Recuperar la ultima version vigente de la lista madre.
-        MPriceListVersion versionMadre = getMPriceListVersionMadre();
+        MPriceListVersion versionMadre = getMPriceListVersion(listaMadre.getM_PriceList_ID());
 
         if (versionMadre == null)
             throw new AdempiereUserError("No existe, una versión vigente, para la lista de precios Madre.");
 
+        // @fchiappano Desactivar versión BASE anterior.
+        MPriceListVersion versionBaseAnterior = getMPriceListVersion(m_PriceListBase_ID);
+        versionBaseAnterior.setIsActive(false);
+        versionBaseAnterior.saveEx(get_TrxName());
+
         // @fchiappano Crear nueva Versión de Lista de precios BASE.
+        MPriceList listaBase = new MPriceList(getCtx(), m_PriceListBase_ID, get_TrxName());
         MPriceListVersion versionBase = new MPriceListVersion(getCtx(), 0, get_TrxName());
         versionBase.setValidFrom(new Timestamp(System.currentTimeMillis()));
         versionBase.setM_PriceList_ID(m_PriceListBase_ID);
+        versionBase.setM_DiscountSchema_ID(listaBase.get_ValueAsInt("M_DiscountSchema_ID"));
+        versionBase.setAD_Org_ID(0);
+        versionBase.setName(listaBase.getName() + " " + DisplayType.getDateFormat(DisplayType.Date).format(versionBase.getValidFrom()));
         versionBase.saveEx(get_TrxName());
 
         // @fchiappano Obtener los precios de la version madre.
-        MProductPrice[] preciosMadre = versionMadre.getProductPrice(true);
+        MProductPrice[] preciosMadre = versionMadre.getProductPrice("");
 
         // @fchiappano Recorrer precios y convertirlos a pesos en la version
         // base.
@@ -98,7 +107,7 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
         {
             MProductPrice precioMadre = preciosMadre[x];
             MProduct producto = (MProduct) precioMadre.getM_Product();
-            MProductPrice precioBase = new MProductPrice(getCtx(), m_PriceListBase_ID, producto.getM_Product_ID(),
+            MProductPrice precioBase = new MProductPrice(getCtx(), versionBase.get_ID(), producto.getM_Product_ID(),
                     get_TrxName());
             int monedaPredeterminada = LAR_Utils.getMonedaPredeterminada(getCtx(), getAD_Client_ID(), get_TrxName());
             int monedaProducto = producto.get_ValueAsInt("C_Currency_ID");
@@ -106,7 +115,7 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
             // @fchiappano Si la moneda configurada en el producto, es distinta
             // de la moneda predeterminada en el ERP, aplico conversion de
             // moneda.
-            if (monedaProducto != monedaPredeterminada)
+            if (monedaProducto > 0 && monedaProducto != monedaPredeterminada)
             {
                 BigDecimal tasaCambio = LAR_Utils.getTasaCambio(monedaProducto, monedaPredeterminada,
                         LAR_Utils.getTipoCambioPredeterminado(getAD_Client_ID(), get_TrxName()), getAD_Client_ID(), 0,
@@ -132,12 +141,51 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
             }
 
             precioBase.saveEx(get_TrxName());
-
-            // @fchiappano Obtener, las demas lista de precios.
-            
         }
 
-        return null;
+        // @fchiappano Obtener, las demas lista de precios.
+        List<MPriceList> listasPrecios = getListasPrecios();
+
+        for (MPriceList lista : listasPrecios)
+        {       
+            int listaBase_ID = lista.get_ValueAsInt("BasePriceList_ID");
+            int esquema_ID = lista.get_ValueAsInt("M_DiscountSchema_ID");
+
+            // @fchiappano validar que la lista de precios tengo una lista base y un esquema configurado.
+            if (listaBase_ID <= 0 || esquema_ID <= 0)
+                throw new AdempiereUserError("Lista de Precios: " + lista.getName() + ".\n"
+                                       + "No posee una Lista de Precios Base o un Esquema de Descuento configurados.");
+
+            // @fchiappano desactivar la ultima versión de la lista de precios (vesión anterior).
+            MPriceListVersion versionAnterior = getMPriceListVersion(lista.getM_PriceList_ID());
+            versionAnterior.setIsActive(false);
+            versionAnterior.saveEx(get_TrxName());
+
+            // @fchiappano Crear nueva versión.
+            MPriceListVersion version = new MPriceListVersion(getCtx(), 0, get_TrxName());
+            version.setM_PriceList_ID(lista.getM_PriceList_ID());
+            version.setAD_Org_ID(0);
+            version.setValidFrom(new Timestamp(System.currentTimeMillis()));
+            version.setName(lista.getName() + " " + DisplayType.getDateFormat(DisplayType.Date).format(version.getValidFrom()));
+
+            // @fchiappano chequear si la lista de precios base configurada,
+            // esta marcada como predeterminada, utilizar la version base. Caso
+            // contrario, recuperar la ultima version de la lista base.
+            MPriceList base = new MPriceList(getCtx(), listaBase_ID, get_TrxName());
+            if (!base.isDefault())
+                version.setM_Pricelist_Version_Base_ID(versionBase.get_ID());
+            else
+                version.setM_Pricelist_Version_Base_ID(getMPriceListVersion(listaBase_ID).getM_PriceList_Version_ID());
+
+            version.setM_DiscountSchema_ID(esquema_ID);
+            version.saveEx(get_TrxName());
+
+            M_PriceList_Create create = new M_PriceList_Create();
+            if (!create.crearVersionLP(version.get_ID(), "N", getAD_PInstance_ID(), get_TrxName()))
+                throw new AdempiereUserError("Error al actualizar lista de precios: " + lista.getName() + ".");
+        }
+
+        return  "Listas Actualzadas: " + (listasPrecios.size() + 1);
     } // doIt
 
     /**
@@ -159,15 +207,15 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
     } // getM_PriceListBase_ID
 
     /**
-     * Obtener la versión vigente, de la lista de precios Madre.
+     * Obtener la versión vigente, de la lista de precios.
      *
      * @author fchiappano
      * @return M_PriceListVersion_ID
      */
-    private MPriceListVersion getMPriceListVersionMadre()
+    private MPriceListVersion getMPriceListVersion(int m_PriceList_ID)
     {
-        String sql = "SELECT plv.M_PriceListVersion_ID"
-                   +  " FROM M_PriceListVersion plv"
+        String sql = "SELECT plv.M_PriceList_Version_ID"
+                   +  " FROM M_PriceList_Version plv"
                    + " WHERE plv.IsActive = 'Y'"
                    +   " AND plv.ValidFrom <= Now()"
                    +   " AND plv.M_PriceList_ID = ?"
@@ -178,7 +226,7 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
         try
         {
             pstmt = DB.prepareStatement(sql, get_TrxName());
-            pstmt.setInt(1, listaMadre.getM_PriceList_ID());
+            pstmt.setInt(1, m_PriceList_ID);
             rs = pstmt.executeQuery();
 
             if (rs.next())
@@ -197,7 +245,7 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
         }
 
         return null;
-    } // getM_PriceListVersionMadre_ID
+    } // getM_PriceListVersion_ID
 
     /**
      * Obtener listas de precios a actualizar.
@@ -209,21 +257,28 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
     {
         List<MPriceList> listasPrecios = new ArrayList<MPriceList>();
 
-        String sql = "";
+        String soPriceList = listaMadre.isSOPriceList() == true ? "'Y'" : "'N'";
+        String sql = "SELECT M_PriceList_ID"
+                   +  " FROM M_PriceList"
+                   + " WHERE IsActive = 'Y'"
+                   +   " AND EsListaMadre = 'N'"
+                   +   " AND IsDefault = 'N'"
+                   +   " AND AD_Client_ID = ?"
+                   +   " AND IsSOPriceList = " + soPriceList;
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try
         {
             pstmt = DB.prepareStatement(sql, get_TrxName());
-            pstmt.setInt(1, listaMadre.getM_PriceList_ID());
+            pstmt.setInt(1, getAD_Client_ID());
             rs = pstmt.executeQuery();
 
             while (rs.next())
             {
-                
+                MPriceList lista = new MPriceList(getCtx(), rs.getInt(1), get_TrxName());
+                listasPrecios.add(lista);
             }
-
         }
         catch (Exception e)
         {
