@@ -81,7 +81,7 @@ public class M_PriceList_Create extends SvrProcess {
 	protected String doIt() throws Exception {
         // @fchiappano Se movio el codigo a un metodo publico, de modo que sea
         // accesible desde otro proceso.
-        if (crearVersionLP(p_PriceList_Version_ID, p_DeleteOld, m_AD_PInstance_ID, get_TrxName()))
+        if (!crearVersionLP(p_PriceList_Version_ID, p_DeleteOld, m_AD_PInstance_ID, get_TrxName()))
             throw new AdempiereUserError("No fue posible crear, la nueva versión de lista de precios.");
 
 		return "OK";

@@ -15,6 +15,9 @@ ALTER TABLE M_PriceList ADD CONSTRAINT mdiscountschema_mpricelist FOREIGN KEY (M
 -- Botón Actualización Masiva de Listas en Precios, en Lista de Precios.
 ALTER TABLE M_PriceList ADD COLUMN CrearVersiones character(1);
 
+-- Columna Orden de Actualización en Lista de Precios.
+ALTER TABLE M_PriceList ADD COLUMN OrdenActualizacion numeric(10,0);
+
 -- Botón Actualización Masiva de Listas en Precios, en Tasa de Cambio.
 ALTER TABLE C_Conversion_Rate ADD COLUMN CrearVersiones character(1);
 
@@ -906,6 +909,101 @@ UPDATE AD_Process_Trl SET IsTranslated='N' WHERE AD_Process_ID=3000359
 -- 04/06/2019 18:21:29 ART
 -- ISSUE #47: Generación Automática de Listas de Precios.
 UPDATE AD_Process_Trl SET Description='Generación Masiva de Versiones de Lista de Precios.',Help='Al iniciar el proceso, se actualizara la lista de precios BASE, con todos los precios en moneda local. A continuación, se actualizaran todas las demas listas, partiendo siempre desde la lista de precios base configurada en cada una.',Updated=TO_TIMESTAMP('2019-06-04 18:21:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_ID=3000359 AND AD_Language='es_AR'
+;
+
+-- 05/06/2019 17:30:08 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3001024,'ordenactualizacion','LAR','ordenactualizacion','ordenactualizacion',0,TO_TIMESTAMP('2019-06-05 17:30:07','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-06-05 17:30:07','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)
+;
+
+-- 05/06/2019 17:30:08 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001024 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 05/06/2019 17:30:08 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003495,255,'LAR',0,'N','N','N','N',10,'N',11,'N',3001024,'N','Y','N','ordenactualizacion','ordenactualizacion',100,TO_TIMESTAMP('2019-06-05 17:30:07','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2019-06-05 17:30:07','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 05/06/2019 17:30:08 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003495 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 05/06/2019 17:30:44 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Column SET Name='Orden de Actualización', ColumnName='OrdenActualizacion',Updated=TO_TIMESTAMP('2019-06-05 17:30:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003495
+;
+
+-- 05/06/2019 17:30:44 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003495
+;
+
+-- 05/06/2019 17:30:44 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Field SET Name='Orden de Actualización', Description=NULL, Help=NULL WHERE AD_Column_ID=3003495 AND IsCentrallyMaintained='Y'
+;
+
+-- 05/06/2019 17:30:50 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Column_Trl SET Name='Orden de Actualización',Updated=TO_TIMESTAMP('2019-06-05 17:30:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003495 AND AD_Language='es_AR'
+;
+
+-- 05/06/2019 17:31:06 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Element SET ColumnName='OrdenActualizacion', Name='Orden de Actualización', PrintName='Orden de Actualización',Updated=TO_TIMESTAMP('2019-06-05 17:31:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001024
+;
+
+-- 05/06/2019 17:31:06 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001024
+;
+
+-- 05/06/2019 17:31:06 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Column SET ColumnName='OrdenActualizacion', Name='Orden de Actualización', Description=NULL, Help=NULL WHERE AD_Element_ID=3001024
+;
+
+-- 05/06/2019 17:31:07 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process_Para SET ColumnName='OrdenActualizacion', Name='Orden de Actualización', Description=NULL, Help=NULL, AD_Element_ID=3001024 WHERE UPPER(ColumnName)='ORDENACTUALIZACION' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 05/06/2019 17:31:07 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Process_Para SET ColumnName='OrdenActualizacion', Name='Orden de Actualización', Description=NULL, Help=NULL WHERE AD_Element_ID=3001024 AND IsCentrallyMaintained='Y'
+;
+
+-- 05/06/2019 17:31:07 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Field SET Name='Orden de Actualización', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001024) AND IsCentrallyMaintained='Y'
+;
+
+-- 05/06/2019 17:31:07 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_PrintFormatItem SET PrintName='Orden de Actualización', Name='Orden de Actualización' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3001024)
+;
+
+-- 05/06/2019 17:31:13 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Element_Trl SET Name='Orden de Actualización',PrintName='Orden de Actualización',Updated=TO_TIMESTAMP('2019-06-05 17:31:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001024 AND AD_Language='es_AR'
+;
+
+-- 05/06/2019 17:32:20 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3006523,10,'Y','N','N',3003495,'N','Y',191,'N','LAR','Orden de Actualización',100,0,TO_TIMESTAMP('2019-06-05 17:32:20','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2019-06-05 17:32:20','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 05/06/2019 17:32:20 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3006523 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 05/06/2019 17:37:53 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3006523
 ;
 
 -- Registración de script

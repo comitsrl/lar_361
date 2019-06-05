@@ -117,7 +117,7 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
             // moneda.
             if (monedaProducto > 0 && monedaProducto != monedaPredeterminada)
             {
-                BigDecimal tasaCambio = LAR_Utils.getTasaCambio(monedaProducto, monedaPredeterminada,
+                BigDecimal tasaCambio = LAR_Utils.getTasaCambio(monedaPredeterminada, monedaProducto,
                         LAR_Utils.getTipoCambioPredeterminado(getAD_Client_ID(), get_TrxName()), getAD_Client_ID(), 0,
                         getCtx(), get_TrxName());
 
@@ -172,7 +172,7 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
             // esta marcada como predeterminada, utilizar la version base. Caso
             // contrario, recuperar la ultima version de la lista base.
             MPriceList base = new MPriceList(getCtx(), listaBase_ID, get_TrxName());
-            if (!base.isDefault())
+            if (base.isDefault())
                 version.setM_Pricelist_Version_Base_ID(versionBase.get_ID());
             else
                 version.setM_Pricelist_Version_Base_ID(getMPriceListVersion(listaBase_ID).getM_PriceList_Version_ID());
@@ -264,7 +264,8 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
                    +   " AND EsListaMadre = 'N'"
                    +   " AND IsDefault = 'N'"
                    +   " AND AD_Client_ID = ?"
-                   +   " AND IsSOPriceList = " + soPriceList;
+                   +   " AND IsSOPriceList = " + soPriceList
+                   + " ORDER BY OrdenActualizacion ASC";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
