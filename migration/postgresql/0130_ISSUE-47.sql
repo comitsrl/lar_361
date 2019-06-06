@@ -1011,6 +1011,31 @@ UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3006523
 UPDATE AD_Column SET AD_Process_ID=3000359,Updated=TO_TIMESTAMP('2019-06-05 19:41:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003478
 ;
 
+-- 06/06/2019 16:28:46 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Val_Rule SET Code='M_PriceList.IsSOPriceList = ''@IsSOTrx@'' AND M_PriceList.EsListaMadre = ''N''',Updated=TO_TIMESTAMP('2019-06-06 16:28:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=271
+;
+
+-- 06/06/2019 16:33:41 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Column SET AD_Val_Rule_ID=271,Updated=TO_TIMESTAMP('2019-06-06 16:33:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3789
+;
+
+-- 06/06/2019 16:38:32 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('M_PriceList.EsListaMadre = ''N''','S',3000074,'LAR','M_PriceList No Madre',100,100,TO_TIMESTAMP('2019-06-06 16:38:32','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_TIMESTAMP('2019-06-06 16:38:32','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 06/06/2019 16:38:42 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000074,Updated=TO_TIMESTAMP('2019-06-06 16:38:42','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3789
+;
+
+-- 06/06/2019 16:50:09 ART
+-- ISSUE #47: Generación Automática de Listas de Precios.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000074,Updated=TO_TIMESTAMP('2019-06-06 16:50:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=2930
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0130_ISSUE-47.sql', 'LAR', '')
 ;
