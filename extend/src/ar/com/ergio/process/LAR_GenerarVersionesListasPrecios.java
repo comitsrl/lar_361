@@ -156,6 +156,12 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
                 throw new AdempiereUserError("Lista de Precios: " + lista.getName() + ".\n"
                                        + "No posee una Lista de Precios Base o un Esquema de Descuento configurados.");
 
+            // @fchiappano validar que la lista base, no sea la misma lista de
+            // precios que se pretende actualizar.
+            if (listaBase_ID == lista.getM_PriceList_ID())
+                throw new AdempiereUserError("Lista de Precios: " + lista.getName() + ".\n"
+                        + "La lista base configurada, es igual a la lista de precios a actualizar.");
+
             // @fchiappano desactivar la ultima versión de la lista de precios (vesión anterior).
             MPriceListVersion versionAnterior = getMPriceListVersion(lista.getM_PriceList_ID());
             versionAnterior.setIsActive(false);
@@ -175,7 +181,15 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
             if (base.isDefault())
                 version.setM_Pricelist_Version_Base_ID(versionBase.get_ID());
             else
-                version.setM_Pricelist_Version_Base_ID(getMPriceListVersion(listaBase_ID).getM_PriceList_Version_ID());
+            {
+                MPriceListVersion versionBaseConfig = getMPriceListVersion(listaBase_ID);
+
+                if (versionBaseConfig == null)
+                    throw new AdempiereUserError("Lista de Precios: " + lista.getName() + ".\n"
+                            + "La lista base configurada, no posee una Versión de Lista de Precios vigente.");
+
+                version.setM_Pricelist_Version_Base_ID(versionBaseConfig.getM_PriceList_Version_ID());
+            }
 
             version.setM_DiscountSchema_ID(esquema_ID);
             version.saveEx(get_TrxName());
