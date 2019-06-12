@@ -315,7 +315,12 @@ public class CalloutOrder extends CalloutEngine
 				if (shipTo_ID == 0)
 					mTab.setValue("C_BPartner_Location_ID", null);
 				else
+				{
 					mTab.setValue("C_BPartner_Location_ID", new Integer(shipTo_ID));
+					// @fchiappano Actualizar el C_BPartner_Location_ID en el contexto, para evitar errores al crear una linea de OV.
+					Env.setContext(ctx, WindowNo, "C_BPartner_Location_ID", shipTo_ID);
+				}
+				
 
 				//	Contact - overwritten by InfoBP selection
 				int contID = rs.getInt("AD_User_ID");
@@ -968,8 +973,14 @@ public class CalloutOrder extends CalloutEngine
 		int shipC_BPartner_Location_ID = 0;
 		if (column.equals("C_BPartner_Location_ID"))
 			shipC_BPartner_Location_ID = ((Integer)value).intValue();
-		else
-			shipC_BPartner_Location_ID = Env.getContextAsInt(ctx, WindowNo, "C_BPartner_Location_ID");
+        else
+        {
+            // @fchiappano Recuperar la dirección del SdN desde la cabecera, en lugar del entorno.
+            MOrder cabecera = new MOrder(ctx, (Integer) mTab.getValue("C_Order_ID"), mTab.getTrxInfo());
+            shipC_BPartner_Location_ID = cabecera.getC_BPartner_Location_ID();
+            mTab.setValue("C_BPartner_Location_ID", shipC_BPartner_Location_ID);
+            // shipC_BPartner_Location_ID = Env.getContextAsInt(ctx, WindowNo, "C_BPartner_Location_ID");
+        }
 		if (shipC_BPartner_Location_ID == 0)
 			return amt(ctx, WindowNo, mTab, mField, value);		//
 		log.fine("Ship BP_Location=" + shipC_BPartner_Location_ID);
