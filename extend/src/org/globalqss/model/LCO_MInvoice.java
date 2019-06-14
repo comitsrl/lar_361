@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -402,11 +403,33 @@ public class LCO_MInvoice extends MInvoice
 					}
 					log.info("Base: "+base+ " Thresholdmin:"+wc.getThresholdmin());
 
+                    // @fchiappano Verificar si el SdN es Exento en percepción
+                    // de IIBB y recalcular la base de calculo.
+                    boolean vigenciaExencionIIBB = false;
+                    BigDecimal baseExcension = base;
+                    BigDecimal porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_IIBB_Venta");
+
+                    if (bp.get_ValueAsBoolean("LAR_Exento_Perc_IIBB"))
+                    {
+                        Date fechaVenc = (Date) bp.get_Value("LAR_Venc_Cert_IIBB_Venta");
+                        Date fechaInicio = (Date) bp.get_Value("LAR_Inicio_Cert_IIBB_Venta");
+
+                        if (fechaVenc == null || (!fechaInicio.after(getDateInvoiced()) && !fechaVenc.before(getDateInvoiced())))
+                            vigenciaExencionIIBB = true;
+
+                        // @fchiappano Aplicar el porcentaje de Exención a la
+                        // base imponible, para determinar si esta por debajo
+                        // del minimo.
+                        baseExcension = baseExcension.subtract(baseExcension.multiply(porcExencion)
+                                .divide(Env.ONEHUNDRED).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    }
+
 					// if base between thresholdmin and thresholdmax inclusive
 					// if thresholdmax = 0 it is ignored
 					if (base != null && 
 							base.compareTo(Env.ZERO) != 0 && 
-							base.compareTo(wc.getThresholdmin()) >= 0 &&
+                            // @fchiappano Utilizar la base con porcentaje de exención aplicado para validar que sea superior al minimo
+                            baseExcension.compareTo(wc.getThresholdmin()) >= 0 &&
 							(wc.getThresholdMax() == null || wc.getThresholdMax().compareTo(Env.ZERO) == 0 || base.compareTo(wc.getThresholdMax()) <= 0) &&
 							tax.getRate() != null &&
 							tax.getRate().compareTo(Env.ZERO) != 0) {
@@ -431,8 +454,25 @@ public class LCO_MInvoice extends MInvoice
 								wc.getAmountRefunded().compareTo(Env.ZERO) > 0) {
 							taxamt = taxamt.subtract(wc.getAmountRefunded());
 						}
+
+                        // @fchiappano Aplicar Exención de IIBB
+                        if (vigenciaExencionIIBB && (taxamt.negate().compareTo(Env.ZERO) > 0))
+                        {
+                            BigDecimal impExencion = (BigDecimal) bp.get_Value("LAR_Imp_Exencion_IIBB_Venta");
+
+                            BigDecimal impExentoDesc = taxamt.multiply(porcExencion).divide(Env.ONEHUNDRED)
+                                    .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                            taxamt = taxamt.subtract(impExentoDesc).subtract(impExencion);
+
+                            // @fchiappano Si el importe de la percepcion,
+                            // es mayor a cero, quiere decir que no debe
+                            // percibirse luego de aplicada la exención.
+                            if (taxamt.compareTo(Env.ZERO) > 0)
+                                taxamt = Env.ZERO;
+                        }
+
 						iwh.setTaxAmt(taxamt);
-						iwh.setTaxBaseAmt(base);
+						iwh.setTaxBaseAmt(baseExcension);
 						iwh.save();
 						totwith = totwith.add(taxamt);
 						noins++;

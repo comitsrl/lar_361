@@ -18,6 +18,7 @@ package ar.com.ergio.model;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
+import java.util.Date;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
@@ -120,6 +121,35 @@ public class LAR_CalcularPercepcion
                  */
                 perceptionAmt = (((base.multiply(wc.getAliquot())).divide(new BigDecimal(100)))
                         .setScale(2, BigDecimal.ROUND_HALF_UP)).abs();
+
+                // @fchiappano Si el SdN, es exento en Percepciones de IIBB,
+                // aplicar Exención.
+                if (wc.isUseBPISIC() && bp.get_ValueAsBoolean("LAR_Exento_Perc_IIBB") && (perceptionAmt.compareTo(Env.ZERO) > 0))
+                {
+                    Date fechaVenc = (Date) bp.get_Value("LAR_Venc_Cert_IIBB_Venta");
+                    Date fechaInicio = (Date) bp.get_Value("LAR_Inicio_Cert_IIBB_Venta");
+
+                    if (fechaVenc == null || (!fechaInicio.after(order.getDateOrdered()) && !fechaVenc.before(order.getDateOrdered())))
+                    {
+                        BigDecimal impExencion = (BigDecimal) bp.get_Value("LAR_Imp_Exencion_IIBB_Venta");
+                        BigDecimal porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_IIBB_Venta");
+
+                        BigDecimal impExentoDesc = perceptionAmt.multiply(porcExencion).divide(Env.ONEHUNDRED)
+                                .setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                        perceptionAmt = perceptionAmt.subtract(impExentoDesc).subtract(impExencion);
+
+                        // @fchiappano Si el importe de la percepcion,
+                        // es menor a cero, quiere decir que no debe
+                        // percibirse luego de aplicada la exención.
+                        if (perceptionAmt.compareTo(Env.ZERO) < 0)
+                            perceptionAmt = Env.ZERO;
+
+                        // @fchiappano Aplicar el porcentaje de Exención a la base imponible, para determinar si esta por debajo del minimo.
+                        base = base.subtract(base.multiply(porcExencion).divide(Env.ONEHUNDRED)
+                                .setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    }
+                }
+
                 // @mzuniga: Si la base de cálculo no supera el mínimo el importe
                 // de la Perceción debe quedar en 0 (cero).
                 if (base.compareTo(wc.getThresholdMin()) <= 0)
