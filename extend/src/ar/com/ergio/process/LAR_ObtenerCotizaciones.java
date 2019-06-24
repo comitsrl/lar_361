@@ -66,6 +66,16 @@ public class LAR_ObtenerCotizaciones extends SvrProcess
     @Override
     protected String doIt() throws Exception
     {
+        /**************************************************************************************************
+         * FIXME @fchiappano
+         *
+         * Para utilizar esta funcionalidad, se debe agregar dentro de la instalación de Adempiere,
+         * la siguiente libreria jsoup-1.10.3.jar (ultima versión compatible con JDK 1.6).
+         *
+         * Ruta dentro del repositorio: lar_361/lib/jsoup-1.10.3.jar
+         * Ruta destino en instalación de Adempiere: Adempiere/jboss/server/adempiere/lib/jsoup-1.10.3.jar
+         **************************************************************************************************/
+
         // @fchiappano Chequear estado de la pagina web, del banco nación.
         try
         {
