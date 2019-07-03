@@ -1037,21 +1037,41 @@ public class MOrder extends X_C_Order implements DocAction
 		// @fchiappano guardar tasa de cambio en la orden
         if (getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
         {
-            if (getC_ConversionType_ID() == 0)
+            // @fchiappano Si se trata de una Orden de Nota de Credito, tomar el
+            // Tipo y Tasa de Cambio desde la Factura Origen.
+            if (getC_DocTypeTarget().getDocSubTypeSO().equals(DocSubTypeSO_OnCredit))
             {
-                ADialog.error(0, new JDialog(), "No fue posible, recuperar un tipo de cambio valido");
-                return false;
+                int facturaOrigen_ID = get_ValueAsInt("Source_Invoice_ID");
+
+                if (facturaOrigen_ID <= 0)
+                {
+                    ADialog.error(0, new JDialog(), "Por favor, seleccione una Factura Origen valida.");
+                    return false;
+                }
+
+                MInvoice facturaOrigen = new MInvoice(p_ctx, facturaOrigen_ID, get_TrxName());
+                setC_ConversionType_ID(facturaOrigen.getC_ConversionType_ID());
+                set_ValueOfColumn("TasaDeCambio", facturaOrigen.get_Value("TasaDeCambio"));
             }
-
-            BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(), LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), new Timestamp(
-                    System.currentTimeMillis()), getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
-
-            if (rate != null)
-                set_ValueOfColumn("TasaDeCambio", rate);
             else
             {
-                ADialog.error(0, new JDialog(), "No fue posible, recuperar una tasa de cambio valida.");
-                return false;
+                if (getC_ConversionType_ID() == 0)
+                {
+                    ADialog.error(0, new JDialog(), "No fue posible, recuperar un tipo de cambio valido");
+                    return false;
+                }
+
+                BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(), LAR_Utils.getMonedaPredeterminada(p_ctx,
+                        getAD_Client_ID(), get_TrxName()), new Timestamp(System.currentTimeMillis()),
+                        getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
+
+                if (rate != null)
+                    set_ValueOfColumn("TasaDeCambio", rate);
+                else
+                {
+                    ADialog.error(0, new JDialog(), "No fue posible, recuperar una tasa de cambio valida.");
+                    return false;
+                }
             }
         }
 
