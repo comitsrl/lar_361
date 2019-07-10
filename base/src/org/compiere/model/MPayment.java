@@ -2808,6 +2808,12 @@ public final class MPayment extends X_C_Payment
             {
                 MPayment paymentCopia = new MPayment(p_ctx, rs.getInt("C_Payment_ID"), get_TrxName());
 
+                // @fchiappano si la copia esta en estado revertido o anulado,
+                // continuar con la siguiente (evita que se corte el proceso)
+                if (paymentCopia.getDocStatus().equals(DOCSTATUS_Reversed)
+                        || paymentCopia.getDocStatus().equals(DOCSTATUS_Voided))
+                    continue;
+
                 // @fchiappano si el cobro/pago copia, ya fue conciliado en
                 // cuenta bancaria, no se puede anular.
                 final int C_BankStatementLine_ID = paymentCopia.getC_BankStatementLine_ID();
