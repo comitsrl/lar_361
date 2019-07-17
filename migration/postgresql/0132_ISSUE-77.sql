@@ -649,6 +649,136 @@ UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2019-07-17 18:02:10','Y
 UPDATE AD_Field SET DisplayLogic='@DocSubtypeINV@=''EL''',Updated=TO_TIMESTAMP('2019-07-17 18:02:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006569
 ;
 
+-- 17/07/2019 18:41:06 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='001',Updated=TO_TIMESTAMP('2019-07-17 18:41:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000007
+;
+
+-- 17/07/2019 18:41:13 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='002',Updated=TO_TIMESTAMP('2019-07-17 18:41:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000008
+;
+
+-- 17/07/2019 18:41:20 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='003',Updated=TO_TIMESTAMP('2019-07-17 18:41:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000009
+;
+
+-- 17/07/2019 18:41:27 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='004',Updated=TO_TIMESTAMP('2019-07-17 18:41:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000010
+;
+
+-- 17/07/2019 18:41:33 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='005',Updated=TO_TIMESTAMP('2019-07-17 18:41:33','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000011
+;
+
+-- 17/07/2019 18:41:39 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='006',Updated=TO_TIMESTAMP('2019-07-17 18:41:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000012
+;
+
+-- 17/07/2019 18:41:47 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='007',Updated=TO_TIMESTAMP('2019-07-17 18:41:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000013
+;
+
+-- 17/07/2019 18:41:56 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='008',Updated=TO_TIMESTAMP('2019-07-17 18:41:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000014
+;
+
+-- 17/07/2019 18:42:01 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='009',Updated=TO_TIMESTAMP('2019-07-17 18:42:01','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000015
+;
+
+-- 17/07/2019 18:42:08 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='010',Updated=TO_TIMESTAMP('2019-07-17 18:42:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000016
+;
+
+-- 17/07/2019 18:42:14 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='011',Updated=TO_TIMESTAMP('2019-07-17 18:42:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=1000012
+;
+
+-- 17/07/2019 18:42:36 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='012',Updated=TO_TIMESTAMP('2019-07-17 18:42:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000096
+;
+
+-- 17/07/2019 18:42:44 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='013',Updated=TO_TIMESTAMP('2019-07-17 18:42:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000095
+;
+
+-- 17/07/2019 18:42:51 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='015',Updated=TO_TIMESTAMP('2019-07-17 18:42:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=1000011
+;
+
+-- 17/07/2019 18:43:07 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='039',Updated=TO_TIMESTAMP('2019-07-17 18:43:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000082
+;
+
+-- 17/07/2019 18:43:14 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='040',Updated=TO_TIMESTAMP('2019-07-17 18:43:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000083
+;
+
+-- 17/07/2019 18:43:23 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='041',Updated=TO_TIMESTAMP('2019-07-17 18:43:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000094
+;
+
+-- 17/07/2019 18:43:30 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='051',Updated=TO_TIMESTAMP('2019-07-17 18:43:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000111
+;
+
+-- 17/07/2019 18:43:39 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='052',Updated=TO_TIMESTAMP('2019-07-17 18:43:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000112
+;
+
+-- 17/07/2019 18:43:48 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='053',Updated=TO_TIMESTAMP('2019-07-17 18:43:48','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000113
+;
+
+-- 17/07/2019 18:43:55 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='054',Updated=TO_TIMESTAMP('2019-07-17 18:43:55','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000114
+;
+
+-- 17/07/2019 18:44:02 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='066',Updated=TO_TIMESTAMP('2019-07-17 18:44:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000148
+;
+
+-- 17/07/2019 18:44:08 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='081',Updated=TO_TIMESTAMP('2019-07-17 18:44:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000086
+;
+
+-- 17/07/2019 18:44:13 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='082',Updated=TO_TIMESTAMP('2019-07-17 18:44:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000087
+;
+
+-- 17/07/2019 18:44:22 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='083',Updated=TO_TIMESTAMP('2019-07-17 18:44:22','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000115
+;
+
+-- 17/07/2019 18:44:27 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Value='099',Updated=TO_TIMESTAMP('2019-07-17 18:44:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000149
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0132_ISSUE-77.sql', 'LAR', '')
 ;
