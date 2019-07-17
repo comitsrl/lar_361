@@ -9,6 +9,13 @@ ALTER TABLE AD_OrgInfo ADD CONSTRAINT cbankaccount_adorginfo FOREIGN KEY (C_Bank
 ALTER TABLE C_BankAccount ADD COLUMN Cbu character varying(40);
 ALTER TABLE C_BankAccount ADD COLUMN Alias character varying(40);
 
+-- Cambiar indice unico de tabla C_DocType
+drop index lar_letter_doctype_idx;
+CREATE UNIQUE INDEX lar_letter_doctype_idx
+  ON c_doctype
+  USING btree
+  (ad_client_id, ad_org_id, isactive COLLATE pg_catalog."default", docbasetype COLLATE pg_catalog."default", fiscaldocument COLLATE pg_catalog."default", lar_documentletter_id, c_pos_id, docsubtypecae);
+
 -- 12/07/2019 16:53:59 ART
 -- ISSUE #77: Factura de Credito Electronica (FCE).
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003516,228,'LAR',0,'N','N','N','The Bank Account identifies an account at this Bank.','N',10,'N',19,'N',836,'N','Y','N','Account at the Bank','Bank Account','C_BankAccount_ID',100,TO_TIMESTAMP('2019-07-12 16:53:58','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2019-07-12 16:53:58','YYYY-MM-DD HH24:MI:SS'),100)
@@ -362,6 +369,106 @@ UPDATE AD_Field SET DisplayLength=3,Updated=TO_TIMESTAMP('2019-07-12 19:12:32','
 -- 12/07/2019 19:12:42 ART
 -- ISSUE #77: Factura de Credito Electronica (FCE).
 UPDATE AD_Column SET FieldLength=3,Updated=TO_TIMESTAMP('2019-07-12 19:12:42','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000035
+;
+
+-- 16/07/2019 20:53:30 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000228,3000002,'LAR','201','Factura de Crédito Electrónica MiPyMEs A',TO_TIMESTAMP('2019-07-16 20:53:29','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:53:29','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:53:30 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000228 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 16/07/2019 20:54:52 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000229,3000002,'LAR','202','Nota De Débito Electónica MiPyMEs A',TO_TIMESTAMP('2019-07-16 20:54:51','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:54:51','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:54:52 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000229 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 16/07/2019 20:55:53 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000230,3000002,'LAR','203','Nota de Credito Electrónica MiPyMEs A',TO_TIMESTAMP('2019-07-16 20:55:53','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:55:53','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:55:53 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000230 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 16/07/2019 20:56:36 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000231,3000002,'LAR','206','Factura de Crédito Electrónica MiPyMEs B',TO_TIMESTAMP('2019-07-16 20:56:36','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:56:36','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:56:36 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000231 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 16/07/2019 20:57:06 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000232,3000002,'LAR','207','Nota de Débito Electónica MiPyMEs B',TO_TIMESTAMP('2019-07-16 20:57:06','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:57:06','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:57:06 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000232 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 16/07/2019 20:57:15 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List SET Name='Nota de Débito Electónica MiPyMEs A',Updated=TO_TIMESTAMP('2019-07-16 20:57:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000229
+;
+
+-- 16/07/2019 20:57:15 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Ref_List_Trl SET IsTranslated='N' WHERE AD_Ref_List_ID=3000229
+;
+
+-- 16/07/2019 20:57:59 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000233,3000002,'LAR','208','Nota de Crédito Electrónica MiPyMEs B',TO_TIMESTAMP('2019-07-16 20:57:59','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:57:59','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:57:59 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000233 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 16/07/2019 20:58:26 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000234,3000002,'LAR','211','Factura de Crédito Electrónica MiPyMEs C',TO_TIMESTAMP('2019-07-16 20:58:26','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:58:26','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:58:26 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000234 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 16/07/2019 20:58:55 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000235,3000002,'LAR','212','Nota de Débito Electónica MiPyMEs C',TO_TIMESTAMP('2019-07-16 20:58:54','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:58:54','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:58:55 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000235 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 16/07/2019 20:59:18 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000236,3000002,'LAR','213','Nota de Credito Electrónica MiPyMEs C',TO_TIMESTAMP('2019-07-16 20:59:18','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-07-16 20:59:18','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 16/07/2019 20:59:18 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000236 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
 ;
 
 -- Registración de script
