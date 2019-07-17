@@ -1,3 +1,6 @@
+ALTER TABLE C_DocType ADD COLUMN EsFce character(1) NOT NULL DEFAULT 'N'::bpchar;
+ALTER TABLE C_DocType ADD CONSTRAINT c_doctype_esfce_check CHECK (EsFce = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
+
 ALTER TABLE C_DocType ALTER COLUMN DocSubTypeCAE TYPE character(3);
 
 -- Agregar columna cuenta bancaria en AD_OrgInfo.
@@ -469,6 +472,181 @@ INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Up
 -- 16/07/2019 20:59:18 ART
 -- ISSUE #77: Factura de Credito Electronica (FCE).
 INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000236 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 17/07/2019 17:55:03 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3001037,'esfce','LAR','esfce','esfce',0,TO_DATE('2019-07-17 17:55:03','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2019-07-17 17:55:03','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)
+;
+
+-- 17/07/2019 17:55:03 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001037 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 17/07/2019 17:55:04 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003519,217,'LAR',0,'Y','N','N','N',1,'N',20,'N',3001037,'N','Y','N','esfce','esfce',100,TO_DATE('2019-07-17 17:55:03','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_DATE('2019-07-17 17:55:03','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 17/07/2019 17:55:04 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003519 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 17/07/2019 17:57:10 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Column SET Name='EsFce', ColumnName='EsFce',Updated=TO_DATE('2019-07-17 17:57:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003519
+;
+
+-- 17/07/2019 17:57:10 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003519
+;
+
+-- 17/07/2019 17:57:10 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET Name='EsFce', Description=NULL, Help=NULL WHERE AD_Column_ID=3003519 AND IsCentrallyMaintained='Y'
+;
+
+-- 17/07/2019 17:57:35 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Column_Trl SET Name='Es Factura de Crédito Electrónica',Updated=TO_DATE('2019-07-17 17:57:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003519 AND AD_Language='es_AR'
+;
+
+-- 17/07/2019 17:57:57 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Column SET Name='Es Factura de Crédito Electrónica',Updated=TO_DATE('2019-07-17 17:57:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003519
+;
+
+-- 17/07/2019 17:57:57 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003519
+;
+
+-- 17/07/2019 17:57:57 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET Name='Es Factura de Crédito Electrónica', Description=NULL, Help=NULL WHERE AD_Column_ID=3003519 AND IsCentrallyMaintained='Y'
+;
+
+-- 17/07/2019 17:58:17 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Element SET ColumnName='EsFce', Name='Es Factura de Crédito Electrónica', PrintName='Es Factura de Crédito Electrónica',Updated=TO_DATE('2019-07-17 17:58:17','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001037
+;
+
+-- 17/07/2019 17:58:17 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001037
+;
+
+-- 17/07/2019 17:58:17 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Column SET ColumnName='EsFce', Name='Es Factura de Crédito Electrónica', Description=NULL, Help=NULL WHERE AD_Element_ID=3001037
+;
+
+-- 17/07/2019 17:58:17 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Process_Para SET ColumnName='EsFce', Name='Es Factura de Crédito Electrónica', Description=NULL, Help=NULL, AD_Element_ID=3001037 WHERE UPPER(ColumnName)='ESFCE' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 17/07/2019 17:58:17 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Process_Para SET ColumnName='EsFce', Name='Es Factura de Crédito Electrónica', Description=NULL, Help=NULL WHERE AD_Element_ID=3001037 AND IsCentrallyMaintained='Y'
+;
+
+-- 17/07/2019 17:58:17 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET Name='Es Factura de Crédito Electrónica', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001037) AND IsCentrallyMaintained='Y'
+;
+
+-- 17/07/2019 17:58:17 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_PrintFormatItem pi SET PrintName='Es Factura de Crédito Electrónica', Name='Es Factura de Crédito Electrónica' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001037)
+;
+
+-- 17/07/2019 17:58:23 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Element_Trl SET Name='Es Factura de Crédito Electrónica',PrintName='Es Factura de Crédito Electrónica',Updated=TO_DATE('2019-07-17 17:58:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001037 AND AD_Language='es_AR'
+;
+
+-- 17/07/2019 17:59:44 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3006569,1,'Y','N','N',3003519,'N','Y',167,'N','LAR','Es Factura de Crédito Electrónica',100,0,TO_DATE('2019-07-17 17:59:44','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2019-07-17 17:59:44','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 17/07/2019 17:59:44 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3006569 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=1000015
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3001289
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000039
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000032
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000038
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000031
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000036
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000035
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000037
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000030
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3006569
+;
+
+-- 17/07/2019 18:01:49 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000034
+;
+
+-- 17/07/2019 18:02:10 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_DATE('2019-07-17 18:02:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006569
+;
+
+-- 17/07/2019 18:02:51 ART
+-- ISSUE #77: Factura de Credito Electronica (FCE).
+UPDATE AD_Field SET DisplayLogic='@DocSubtypeINV@=''EL''',Updated=TO_DATE('2019-07-17 18:02:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006569
 ;
 
 -- Registración de script
