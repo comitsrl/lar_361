@@ -105,7 +105,9 @@ public final class FindInvoiceDocType
                                               .append(" AND DocBaseType=?")
                                               .append(" AND FiscalDocument=?") // 'F' > Invoice
                                               .append(" AND LAR_DocumentLetter_ID=?")
-                                              .append(" AND C_POS_ID=?");
+                                              .append(" AND C_POS_ID=?")
+                                              // @fchiappano Filtrar facturas de credito electronicas.
+                                              .append(" AND EsFce =  ?");
         // @mzuniga Determina si es Factura o Nota de Crédito
         // utilizando el tipo de documentobase
         Object[] params = new Object[] {
@@ -116,7 +118,7 @@ public final class FindInvoiceDocType
                 (docBaseType.equals(MDocType.DOCBASETYPE_ARInvoice) ? LAR_MDocType.FISCALDOCUMENT_Invoice
                         : LAR_MDocType.FISCALDOCUMENT_CreditNote),
                 lar_DocumentLetter_ID,
-                c_POS_ID };
+                c_POS_ID, false };
         docType = new Query(Env.getCtx(), MDocType.Table_Name, whereClause.toString(), bpartner.get_TrxName())
                 .setParameters(params)
                 .firstOnly();

@@ -6,10 +6,12 @@ import java.math.BigDecimal;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
+import org.compiere.model.MBankAccount;
 import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceTax;
+import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPOS;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
@@ -134,7 +136,7 @@ public class WsfeV1 extends Wsfe{
             line.append("\n");
 
             // *****MONTO TOTAL DE IMPUESTOS
-            line.append(total_Impuesto + "\n");
+            // line.append(total_Impuesto + "\n");
 
 			//*****IMPUESTOS PERCEPCIONES
 			BigDecimal total_Perception = BigDecimal.ZERO;
@@ -170,7 +172,18 @@ public class WsfeV1 extends Wsfe{
 			
 			//*****C_INVOICE_ID para seguimiento
 			line.append(this.getInvoice().getC_Invoice_ID()+"\n");
-			
+
+            // @fchiappano Agregar datos opcionales (CBU y Alias).
+            int c_BankAccount_ID = MOrgInfo.get(this.getM_ctx(), this.getInvoice().getAD_Org_ID()).get_ValueAsInt(
+                    "C_BankAccount_ID");
+            MBankAccount cuentaBancaria = new MBankAccount(getM_ctx(), c_BankAccount_ID, getTrxName());
+
+            // ****** CBU
+            line.append(cuentaBancaria.get_Value("CBU") + "\n");
+
+            // ****** ALIAS
+            line.append(cuentaBancaria.get_Value("Alias") + "\n");
+
 			File textFile = new File(getPath()+"entrada.txt");
 			FileWriter textOut;
 			textOut = new FileWriter(textFile);
