@@ -3,6 +3,7 @@ package ar.com.comit.factura.electronica;
 import java.io.File;
 import java.io.FileWriter;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
@@ -183,6 +184,35 @@ public class WsfeV1 extends Wsfe{
 
             // ****** ALIAS
             line.append(cuentaBancaria.get_Value("Alias") + "\n");
+
+            // @fchiappano se agregan datos para NC y ND (FCE).
+            if (getInvoice().get_ValueAsInt("Source_Invoice_ID") > 0)
+            {
+                MInvoice facturaOrigen = new MInvoice(getM_ctx(), getInvoice().get_ValueAsInt("Source_Invoice_ID"), getTrxName());
+
+                // ****** Tipo de Doc. Factura Origen.
+                MDocType tipoDoc = (MDocType) facturaOrigen.getC_DocTypeTarget();
+                line.append(tipoDoc.getdocsubtypecae() + "\n");
+
+                // ****** Punto de Venta Factura Origen.
+                MPOS pdv = new MPOS(getM_ctx(), facturaOrigen.get_ValueAsInt("C_Pos_ID"), getTrxName());
+                line.append(pdv.get_ValueAsInt("PosNumber") + "\n");
+
+                // ****** Nro. Doc. Factura Origen.
+                line.append(facturaOrigen.getNumeroComprobante() + "\n");
+
+                // ****** Fecha Facturación Factura Origen
+                Date fecha = new Date(facturaOrigen.getDateInvoiced().getTime());
+                line.append(fecha.toString().replace("-", "") + "\n");
+
+                // ****** Codigo de Cancelación
+                boolean cancelado = getInvoice().get_ValueAsBoolean("Cancelacion");
+
+                if (cancelado)
+                    line.append("S" + "\n");
+                else
+                    line.append("N" + "\n");
+            }
 
 			File textFile = new File(getPath()+"entrada.txt");
 			FileWriter textOut;

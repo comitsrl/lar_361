@@ -64,7 +64,8 @@ public class CalloutInvoice extends CalloutEngine
 
 		String sql = "SELECT d.HasCharges,d.IsDocNoControlled," // 1..2
 			+ "d.DocBaseType, " // 3
-			+ "s.AD_Sequence_ID " //4
+			+ "s.AD_Sequence_ID, " //4
+			+ "d.DocSubTypeCAE " // 5 @fchiappano DocSubTypeCae
 			+ "FROM C_DocType d "
 			+ "LEFT OUTER JOIN AD_Sequence s ON (d.DocNoSequence_ID=s.AD_Sequence_ID) "
 			+ "WHERE C_DocType_ID=?";		//	1
@@ -88,6 +89,10 @@ public class CalloutInvoice extends CalloutEngine
 				//  DocBaseType - Set Context
 				String s = rs.getString("DocBaseType");
 				Env.setContext(ctx, WindowNo, "DocBaseType", s);
+
+                // @fchiappano Setear en el contexto el DocSubTypeCAE.
+                Env.setContext(ctx, WindowNo, "DocSubTypeCAE", rs.getString("DocSubTypeCAE"));
+
 				//  AP Check & AR Credit Memo
 				if (s.startsWith("AP"))
 					mTab.setValue("PaymentRule", "S");    //  Check
