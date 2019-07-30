@@ -779,6 +779,9 @@ UPDATE AD_Ref_List SET Value='083',Updated=TO_TIMESTAMP('2019-07-17 18:44:22','Y
 UPDATE AD_Ref_List SET Value='099',Updated=TO_TIMESTAMP('2019-07-17 18:44:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000149
 ;
 
+-- Actualizar el DocSubTypeCAE de todos los Tipos de Doc Electronicos.
+UPDATE C_DocType SET DocSubTypeCAE = CONCAT('0', DocSubTypeCAE) WHERE AD_Client_ID = 1000000 AND IsActive = 'Y' AND IsElectronic = 'Y';
+
 -- Registración de script
 SELECT register_migration_script_lar('0132_ISSUE-77.sql', 'LAR', '')
 ;
