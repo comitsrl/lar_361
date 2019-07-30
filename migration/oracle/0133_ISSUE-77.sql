@@ -1,3 +1,6 @@
+ALTER TABLE C_Invoice ADD COLUMN Cancelacion character(1) NOT NULL DEFAULT 'N'::bpchar;
+ALTER TABLE C_Invoice ADD CONSTRAINT c_invoice_cancelacion_check CHECK (Cancelacion = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
+
 -- 26/07/2019 15:29:15 ART
 -- ISSUE #77: Factura de Credito Electronica (FCE).
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3001039,'cancelacion','LAR','cancelacion','cancelacion',0,TO_DATE('2019-07-26 15:29:14','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2019-07-26 15:29:14','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)
