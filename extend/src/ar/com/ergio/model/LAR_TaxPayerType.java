@@ -30,7 +30,8 @@ public enum LAR_TaxPayerType {
     RESPONSABLE_MONOTRIBUTO("ResponsableMonotributo"),
     EXENTO("Exento"),
     RESPONSABLE_INSCRIPTO("ResponsableInscripto"),
-    CONSUMIDOR_FINAL("ConsumidorFinal");
+    CONSUMIDOR_FINAL("ConsumidorFinal"),
+    NO_ALCANZADO("NoAlcanzado");
 
     private final String name;
 
