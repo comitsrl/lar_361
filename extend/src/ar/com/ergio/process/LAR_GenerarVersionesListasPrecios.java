@@ -84,9 +84,9 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
             throw new AdempiereUserError("No existe, una versión vigente, para la lista de precios Madre.");
 
         // @fchiappano Desactivar versión BASE anterior.
-        MPriceListVersion versionBaseAnterior = getMPriceListVersion(m_PriceListBase_ID);
+        /* MPriceListVersion versionBaseAnterior = getMPriceListVersion(m_PriceListBase_ID);
         versionBaseAnterior.setIsActive(false);
-        versionBaseAnterior.saveEx(get_TrxName());
+        versionBaseAnterior.saveEx(get_TrxName()); */
 
         // @fchiappano Crear nueva Versión de Lista de precios BASE.
         MPriceList listaBase = new MPriceList(getCtx(), m_PriceListBase_ID, get_TrxName());
@@ -163,9 +163,9 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
                         + "La lista base configurada, es igual a la lista de precios a actualizar.");
 
             // @fchiappano desactivar la ultima versión de la lista de precios (vesión anterior).
-            MPriceListVersion versionAnterior = getMPriceListVersion(lista.getM_PriceList_ID());
+            /* MPriceListVersion versionAnterior = getMPriceListVersion(lista.getM_PriceList_ID());
             versionAnterior.setIsActive(false);
-            versionAnterior.saveEx(get_TrxName());
+            versionAnterior.saveEx(get_TrxName()); */
 
             // @fchiappano Crear nueva versión.
             MPriceListVersion version = new MPriceListVersion(getCtx(), 0, get_TrxName());
