@@ -16,15 +16,22 @@
  *****************************************************************************/
 package ar.com.ergio.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import org.adempiere.exceptions.AdempiereException;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MSysConfig;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  * Encuentra el tipo de Factura/Nota de Crédito para un determinado
@@ -41,6 +48,8 @@ public final class FindInvoiceDocType
     private MDocType docType;
     private int lar_DocumentLetter_ID;
     private String docBaseType;
+    private MInvoice invoice;
+    private boolean esFce = false;
 
     public FindInvoiceDocType(final MBPartner bpartner, final int c_POS_ID, final int ad_Org_ID, final String docBaseType)
     {
@@ -48,6 +57,28 @@ public final class FindInvoiceDocType
         this.c_POS_ID = c_POS_ID;
         this.ad_Org_ID = ad_Org_ID;
         this.docBaseType = docBaseType;
+        retrieveDocType();
+    }
+
+    /**
+     * Nuevo contructor, que identifica si la factura es MiPymes.
+     *
+     * @author fchiappano
+     *
+     * @param bpartner
+     * @param c_POS_ID
+     * @param ad_Org_ID
+     * @param docBaseType
+     * @param invoice
+     */
+    public FindInvoiceDocType(final MBPartner bpartner, final int c_POS_ID, final int ad_Org_ID, final String docBaseType, final MInvoice invoice)
+    {
+        this.bpartner = bpartner;
+        this.c_POS_ID = c_POS_ID;
+        this.ad_Org_ID = ad_Org_ID;
+        this.docBaseType = docBaseType;
+        this.invoice = invoice;
+        setEsFce();
         retrieveDocType();
     }
 
@@ -118,11 +149,47 @@ public final class FindInvoiceDocType
                 (docBaseType.equals(MDocType.DOCBASETYPE_ARInvoice) ? LAR_MDocType.FISCALDOCUMENT_Invoice
                         : LAR_MDocType.FISCALDOCUMENT_CreditNote),
                 lar_DocumentLetter_ID,
-                c_POS_ID, false };
+                c_POS_ID, esFce };
         docType = new Query(Env.getCtx(), MDocType.Table_Name, whereClause.toString(), bpartner.get_TrxName())
                 .setParameters(params)
                 .firstOnly();
     } // retrieveDocType
+
+    /**
+     * Validar si el tipo de doc que se requiere, debe ser MiPymes (FCE).
+     */
+    private void setEsFce()
+    {
+        // @fchiappano si se trata de una nota de credito, chequear si la factura origen es FCE.
+        if (docBaseType.equals(MDocType.DOCBASETYPE_ARCreditMemo))
+        {
+            MInvoice facturaOrigen = new MInvoice(invoice.getCtx(), invoice.get_ValueAsInt("Source_Invoice_ID"), invoice.get_TrxName());
+            esFce = ((MDocType) facturaOrigen.getC_DocTypeTarget()).get_ValueAsBoolean("EsFce");
+        }
+        else
+        {
+            // @fchiappano Chequear si el tipo de documento, debe ser MiPyme (FCE).
+            BigDecimal minimo_fce = new BigDecimal(MSysConfig.getDoubleValue("LAR_MinimoFacturaMiPyme",
+                    Env.ZERO.doubleValue(), Env.getAD_Client_ID(Env.getCtx())));
+
+            BigDecimal total = invoice.getGrandTotal();
+
+            // @fchiappano si la moneda de la factura es distinta de la
+            // predeterminada, realizar conversión.
+            int moneda_predeterminada_ID = LAR_Utils.getMonedaPredeterminada(Env.getCtx(), invoice.getAD_Client_ID(), invoice.get_TrxName());
+            if (invoice.getC_Currency_ID() != moneda_predeterminada_ID)
+            {
+                BigDecimal tasa = LAR_Utils.getTasaCambio(moneda_predeterminada_ID, invoice.getC_Currency_ID(),
+                        invoice.getC_ConversionType_ID(), invoice.getAD_Client_ID(), ad_Org_ID, Env.getCtx(),
+                        invoice.get_TrxName());
+
+                total = total.multiply(tasa).setScale(2, RoundingMode.HALF_UP);
+            }
+
+            if (bpartner.get_ValueAsBoolean("EsGrande") && total.compareTo(minimo_fce) >= 0)
+                esFce = true;
+        }
+    }
 
     /**
      *  Obtiene el Tipo de Documento
