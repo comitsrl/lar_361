@@ -257,6 +257,9 @@ public class Tax
 		String IsSOTaxExempt = null;
 		String IsPOTaxExempt = null;
 
+        // @fchiappano Recuperar marca de producto "Exento en IVA Venta".
+        String productoExento = null;
+
 		String sql = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -264,7 +267,8 @@ public class Tax
 		{
 			//	Get all at once
 			sql = "SELECT p.C_TaxCategory_ID, o.C_Location_ID, il.C_Location_ID, b.IsTaxExempt, b.IsPOTaxExempt, "
-				+ " w.C_Location_ID, sl.C_Location_ID "
+				+ " w.C_Location_ID, sl.C_Location_ID,"
+                + " p.ExentoIVAVenta " // @fchiappano columna Exento de IVA Venta del producto.
 				+ "FROM M_Product p, AD_OrgInfo o,"
 				+ " C_BPartner_Location il INNER JOIN C_BPartner b ON (il.C_BPartner_ID=b.C_BPartner_ID) "
 				+ " LEFT OUTER JOIN M_Warehouse w ON (w.M_Warehouse_ID=?), C_BPartner_Location sl "
@@ -290,11 +294,12 @@ public class Tax
 				IsTaxExempt = IsSOTrx ? IsSOTaxExempt : IsPOTaxExempt;
 				shipFromC_Location_ID = rs.getInt(6);
 				shipToC_Location_ID = rs.getInt(7);
+				productoExento = IsSOTrx ? rs.getString(8) : "N";
 				found = true;
 			}
 			DB.close(rs, pstmt);
 			//
-			if (found && "Y".equals(IsTaxExempt))
+			if (found && "Y".equals(IsTaxExempt) && productoExento.equals("Y"))
 			{
 				log.fine("getProduct - Business Partner is Tax exempt");
 				return getExemptTax(ctx, AD_Org_ID);
