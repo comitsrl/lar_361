@@ -1,3 +1,6 @@
+ALTER TABLE M_Product
+ADD COLUMN ExentoIVAVenta character(1) NOT NULL DEFAULT 'N'::bpchar;
+
 -- 16/08/2019 17:07:15 ART
 -- ISSUE #125: Eximir de IVA a Consumidores Finales sobre ciertos productos.
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001042,'exentoivaventa','LAR','exentoivaventa','exentoivaventa',0,TO_DATE('2019-08-16 17:07:14','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2019-08-16 17:07:14','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
