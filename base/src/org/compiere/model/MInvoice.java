@@ -2741,8 +2741,15 @@ public class MInvoice extends X_C_Invoice implements DocAction
             return false;
         }
 
-        // @fchiappano Si se trata de una factura, recuperar la tasa del dia.
-        if (getC_DocTypeTarget().getDocBaseType().equals(MDocType.DOCBASETYPE_ARInvoice))
+        // @fchiappano si se trata de una nota de credito, tomar la tasa desde la factura origen (solo si posee una factura origen).
+        if (getC_DocTypeTarget().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)
+                && get_ValueAsInt("Source_Invoice_ID") > 0)
+        {
+            MInvoice facturaOrigen = new MInvoice(p_ctx, get_ValueAsInt("Source_Invoice_ID"), get_TrxName());
+            set_ValueOfColumn("TasaDeCambio", facturaOrigen.get_Value("TasaDeCambio"));
+        }
+        // @fchiappano Si es factura o NC sin factura origen, recuperar tasa del dia.
+        else
         {
             BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(),
                     LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()),
@@ -2755,13 +2762,6 @@ public class MInvoice extends X_C_Invoice implements DocAction
                 ADialog.error(0, new JDialog(), "No fue posible, recuperar una tasa de cambio valida.");
                 return false;
             }
-        }
-        // @fchiappano si se trata de una nota de credito, tomar la tasa desde la factura origen.
-        else if (getC_DocTypeTarget().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)
-                && get_ValueAsInt("Source_Invoice_ID") > 0)
-        {
-            MInvoice facturaOrigen = new MInvoice(p_ctx, get_ValueAsInt("Source_Invoice_ID"), get_TrxName());
-            set_ValueOfColumn("TasaDeCambio", facturaOrigen.get_Value("TasaDeCambio"));
         }
 
         return true;
