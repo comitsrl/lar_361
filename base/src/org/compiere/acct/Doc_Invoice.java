@@ -283,8 +283,9 @@ public class Doc_Invoice extends Doc
 	 *  ARC
 	 *      Receivables             CR
 	 *      Charge          DR
-	 *      TaxDue          DR
-	 *      Revenue         RR
+	 *      @mzuniga Se debe cambiar a TaxCredit
+	 *      TaxCredit       DR
+	 *      Revenue         DR
 	 *
 	 *  API
 	 *      Payables                CR
@@ -295,7 +296,8 @@ public class Doc_Invoice extends Doc
 	 *  APC
 	 *      Payables        DR
 	 *      Charge                  CR
-	 *      TaxCredit               CR
+	 *      @mzuniga Se debe cambiar a TaxDebit
+	 *      TaxDebit                CR
 	 *      Expense                 CR
 	 *  </pre>
 	 *  @param as accounting schema
@@ -405,13 +407,13 @@ public class Doc_Invoice extends Doc
 			if (amt != null && amt.signum() != 0)
 				fact.createLine(null, getAccount(Doc.ACCTTYPE_Charge, as),
 					getC_Currency_ID(), amt, null);
-			//  TaxDue          DR
+			//  @mzuniga TaxCredit          DR
 			for (int i = 0; i < m_taxes.length; i++)
 			{
 				amt = m_taxes[i].getAmount();
 				if (amt != null && amt.signum() != 0)
 				{
-					FactLine tl = fact.createLine(null, m_taxes[i].getAccount(DocTax.ACCTTYPE_TaxDue, as),
+					FactLine tl = fact.createLine(null, m_taxes[i].getAccount(DocTax.ACCTTYPE_TaxCredit, as),
 						getC_Currency_ID(), amt, null);
 					if (tl != null)
 						tl.setC_Tax_ID(m_taxes[i].getC_Tax_ID());
@@ -589,10 +591,10 @@ public class Doc_Invoice extends Doc
 			//  Charge                  CR
 			fact.createLine (null, getAccount(Doc.ACCTTYPE_Charge, as),
 				getC_Currency_ID(), null, getAmount(Doc.AMTTYPE_Charge));
-			//  TaxCredit               CR
+			//  @mzuniga TaxDebit               CR
 			for (int i = 0; i < m_taxes.length; i++)
 			{
-				FactLine tl = fact.createLine (null, m_taxes[i].getAccount(m_taxes[i].getAPTaxType(), as),
+				FactLine tl = fact.createLine (null, m_taxes[i].getAccount(DocTax.ACCTTYPE_TaxDue, as),
 					getC_Currency_ID(), null, m_taxes[i].getAmount());
 				if (tl != null)
 					tl.setC_Tax_ID(m_taxes[i].getC_Tax_ID());
