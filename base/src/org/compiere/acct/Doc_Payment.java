@@ -28,6 +28,7 @@ import org.compiere.model.MCharge;
 import org.compiere.model.MDocType;
 import org.compiere.model.MPayment;
 import org.compiere.model.MSysConfig;
+import org.compiere.model.MTax;
 import org.compiere.util.Env;
 
 /**
@@ -58,6 +59,8 @@ public class Doc_Payment extends Doc
 	private boolean		m_Prepayment = false;
 	/** Es Retención Efectuada             */
     private boolean     m_EsRetencionEfectuada = false;
+    /** Es Retención Efectuada             */
+    private boolean     m_EsRetencionSufrida = false;
 	/** Bank Account			*/
 	private int			m_C_BankAccount_ID = 0;
 	   /** Bank Account            */
@@ -75,6 +78,7 @@ public class Doc_Payment extends Doc
 		m_Prepayment = pay.isPrepayment();
 		m_C_BankAccount_ID = pay.getC_BankAccount_ID();
 		m_EsRetencionEfectuada = pay.get_ValueAsBoolean("EsRetencionIIBB");
+        m_EsRetencionSufrida = pay.get_ValueAsBoolean("EsRetencionSufrida");
 		// @mzuniga Se obtiene la categoría de contabilidad del tipo de documento
 		MDocType dt_Pay = new MDocType(Env.getCtx(), pay.getC_DocType_ID(), pay.get_TrxName());
 		m_GL_Category_ID = dt_Pay.getGL_Category_ID();
@@ -153,8 +157,24 @@ public class Doc_Payment extends Doc
                 MAccount cuenta = MAccount.get (as.getCtx(), combinacion_ID_Valores_a_Depositar);
                 fl = fact.createLine(null, cuenta, getC_Currency_ID(), getAmount(), null);
             } else
-		    fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-		                  getC_Currency_ID(), getAmount(), null);
+            {
+                // @mzuniga Si es retención sufrida se utiliza la cuenta
+                // contable de la tasa de impuesto (a depositar)
+                if (m_EsRetencionSufrida)
+                {
+                    MPayment pay = (MPayment) getPO();
+                    MTax impuesto = new MTax(Env.getCtx(),
+                            pay.get_ValueAsInt("C_TaxWithholding_ID"), pay.get_TrxName());
+                    BigDecimal importe = pay.getWriteOffAmt();
+                    DocTax impuestoDoc = new DocTax(impuesto.getC_Tax_ID(), impuesto.getName(),
+                            impuesto.getRate(), Env.ZERO, Env.ZERO, true);
+                    MAccount cuenta = impuestoDoc.getAccount(DocTax.ACCTTYPE_TaxDue, as);
+                    fl = fact.createLine(null, cuenta, getC_Currency_ID(), importe, null);
+                    // Crear la línea con la cuenta a depositar como contrapartida
+                } else
+                    fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+                            getC_Currency_ID(), getAmount(), null);
+            }
 			if (fl != null && AD_Org_ID != 0)
 				fl.setAD_Org_ID(AD_Org_ID);
 			//
@@ -163,10 +183,23 @@ public class Doc_Payment extends Doc
 				acct = MCharge.getAccount(getC_Charge_ID(), as, getAmount());
 			else if (m_Prepayment)
 				acct = getAccount(Doc.ACCTTYPE_C_Prepayment, as);
-			else
+            else
 				acct = getAccount(Doc.ACCTTYPE_UnallocatedCash, as);
-			fl = fact.createLine(null, acct,
-				getC_Currency_ID(), null, getAmount());
+            // @mzuniga Si es retención sufrida se utiliza la cuenta
+            // contable de la tasa de impuesto
+            if (m_EsRetencionSufrida)
+            {
+                MPayment pay = (MPayment) getPO();
+                MTax impuesto = new MTax(Env.getCtx(), pay.get_ValueAsInt("C_TaxWithholding_ID"),
+                        pay.get_TrxName());
+                BigDecimal importe = pay.getWriteOffAmt();
+                DocTax impuestoDoc = new DocTax(impuesto.getC_Tax_ID(), impuesto.getName(),
+                        impuesto.getRate(), Env.ZERO, Env.ZERO, true);
+                acct = impuestoDoc.getAccount(DocTax.ACCTTYPE_TaxCredit, as);
+                fl = fact.createLine(null, acct, getC_Currency_ID(), null, importe);
+                // Crear la línea con la cuenta a depositar como contrapartida
+            } else
+                fl = fact.createLine(null, acct, getC_Currency_ID(), null, getAmount());
 			if (fl != null && AD_Org_ID != 0
 				&& getC_Charge_ID() == 0)		//	don't overwrite charge
 				fl.setAD_Org_ID(AD_Org_ID);
