@@ -158,20 +158,21 @@ public class Doc_Payment extends Doc
                 fl = fact.createLine(null, cuenta, getC_Currency_ID(), getAmount(), null);
             } else
             {
-                // @mzuniga Si es retención sufrida se utiliza la cuenta
-                // contable de la tasa de impuesto (a depositar)
+                // @mzuniga Si es retención sufrida se utiliza el importe retenido
                 if (m_EsRetencionSufrida)
                 {
+                    MAccount acct = null;
                     MPayment pay = (MPayment) getPO();
-                    MTax impuesto = new MTax(Env.getCtx(),
-                            pay.get_ValueAsInt("C_TaxWithholding_ID"), pay.get_TrxName());
+                    MTax impuesto = new MTax(Env.getCtx(), pay.get_ValueAsInt("C_TaxWithholding_ID"),
+                            pay.get_TrxName());
                     BigDecimal importe = pay.getWriteOffAmt();
                     DocTax impuestoDoc = new DocTax(impuesto.getC_Tax_ID(), impuesto.getName(),
                             impuesto.getRate(), Env.ZERO, Env.ZERO, true);
-                    MAccount cuenta = impuestoDoc.getAccount(DocTax.ACCTTYPE_TaxDue, as);
-                    fl = fact.createLine(null, cuenta, getC_Currency_ID(), importe, null);
-                    // Crear la línea con la cuenta a depositar como contrapartida
-                } else
+                    acct = impuestoDoc.getAccount(DocTax.ACCTTYPE_TaxCredit, as);
+                    fl = fact.createLine(null, acct, getC_Currency_ID(), importe, null);
+                                        // Crear la línea con la cuenta a depositar como contrapartida
+                }
+                else
                     fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
                             getC_Currency_ID(), getAmount(), null);
             }
@@ -190,12 +191,7 @@ public class Doc_Payment extends Doc
             if (m_EsRetencionSufrida)
             {
                 MPayment pay = (MPayment) getPO();
-                MTax impuesto = new MTax(Env.getCtx(), pay.get_ValueAsInt("C_TaxWithholding_ID"),
-                        pay.get_TrxName());
                 BigDecimal importe = pay.getWriteOffAmt();
-                DocTax impuestoDoc = new DocTax(impuesto.getC_Tax_ID(), impuesto.getName(),
-                        impuesto.getRate(), Env.ZERO, Env.ZERO, true);
-                acct = impuestoDoc.getAccount(DocTax.ACCTTYPE_TaxCredit, as);
                 fl = fact.createLine(null, acct, getC_Currency_ID(), null, importe);
                 // Crear la línea con la cuenta a depositar como contrapartida
             } else

@@ -1228,7 +1228,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     }
                 }
 
-                impPago = impPago.subtract(pays[p].getAllocatedAmt().abs());
+                // @fchiappano Obtener el importe asignado pero sin conversion de moneda.
+                impPago = impPago.subtract(pays[p].getLAR_AllocatedAmt().abs());
                 final BigDecimal importeFactura = invoice.getOpenAmt().subtract(pa.getDiscountAmt());
                 int comp = impPago.compareTo(importeFactura);
                 MAllocationLine aLine = null;
