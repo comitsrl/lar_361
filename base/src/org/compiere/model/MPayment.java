@@ -41,6 +41,7 @@ import org.compiere.util.Trx;
 import org.compiere.util.ValueNamePair;
 
 import ar.com.ergio.model.MLARPaymentHeader;
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  *  Payment Model.
@@ -791,6 +792,52 @@ public final class MPayment extends X_C_Payment
 		return retValue;
 	}	//	getAllocatedAmt
 
+    /**
+     * Obtener el importe asignado, sin conversión de moneda.
+     * @return amount o null
+     */
+    public BigDecimal getLAR_AllocatedAmt()
+    {
+        BigDecimal retValue = null;
+        // begin @emmie issue #17
+        if (getC_Charge_ID() != 0 && !get_ValueAsBoolean("EsRetencionIIBB"))
+            // end @emmie
+            return getPayAmt();
+        // @mzuniga Se agrega COALESCE (Evita Null Pointer Exception cuando
+        // no se trabaja en una Cabecera)
+        String sql = "SELECT COALESCE(SUM(al.Amount), 0)"
+                   +  " FROM C_AllocationLine al"
+                   + " INNER JOIN C_AllocationHdr ah ON (al.C_AllocationHdr_ID = ah.C_AllocationHdr_ID)"
+                   + " INNER JOIN C_Payment p ON (al.C_Payment_ID = p.C_Payment_ID)"
+                   +  " LEFT JOIN LAR_PaymentHeader ph ON (p.LAR_PaymentHeader_ID = ph.LAR_PaymentHeader_ID)"
+                   + " WHERE al.C_Payment_ID = ?" + " AND ah.IsActive = 'Y' AND al.IsActive = 'Y'";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, getC_Payment_ID());
+            rs = pstmt.executeQuery();
+            if (rs.next())
+                retValue = rs.getBigDecimal(1);
+        }
+        catch (Exception e)
+        {
+            log.log(Level.SEVERE, "getAllocatedAmt", e);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        if (retValue != null)
+            retValue = retValue.setScale(getC_Currency().getStdPrecision(), RoundingMode.HALF_UP);
+
+        return retValue;
+    } // getLAR_AllocatedAmt
+
 	/**
 	 * 	Test Allocation (and set allocated flag)
 	 *	@return true if updated
@@ -827,6 +874,22 @@ public final class MPayment extends X_C_Payment
         else
         {
 		boolean test = total.compareTo(alloc) == 0;
+
+            // @fchiappano Chequear si las asignaciones, son en moneda
+            // extanjera.
+            if (!test && alloc.compareTo(Env.ZERO) != 0)
+            {
+                int c_Currency_ID = getMonedaAsignacion();
+
+                // @fchiappano Si la moneda utilizada en las asignaciones, es
+                // distinta de la moneda predeterminada (moneda extranjera),
+                // validar si la diferencia en la asignacion, es menor al minimo
+                // de redondeo de la moneda en cuestion.
+                if (c_Currency_ID > 0
+                        && c_Currency_ID != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+                    test = esDespreciable(c_Currency_ID, total.subtract(alloc));
+            }
+
 		boolean change = test != isAllocated();
 		if (change)
 			setIsAllocated(test);
@@ -2867,5 +2930,77 @@ public final class MPayment extends X_C_Payment
 
 	    return true;
 	} // anularCopias
+
+    /**
+     * Obtener Moneda, utilizada en las asignaciones del cobro.
+     * @author fchiappano
+     * @return C_Currency_ID o Cero.
+     */
+    private int getMonedaAsignacion()
+    {
+        String sql = "SELECT alh.C_Currency_ID"
+                   +  " FROM C_AllocationLine al"
+                   +  " JOIN C_AllocationHdr alh ON al.C_AllocationHdr_ID = alh.C_AllocationHdr_ID"
+                   + " WHERE al.C_Payment_ID = ?"
+                   +   " AND alh.IsActive = 'Y'"
+                   +   " AND al.IsActive = 'Y'";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, getC_Payment_ID());
+            rs = pstmt.executeQuery();
+
+            if (rs.next())
+                return rs.getInt(1);
+        }
+        catch (SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return 0;
+    } // getMonedaAsignaciones
+
+    /**
+     * Chequear si la diferencia, es inferior al minimo de redondeo en la moneda extrajera especificada.
+     *
+     * @author fchiappano
+     * @param c_Currency_ID
+     * @param diferencia
+     * @return true o false
+     */
+    private boolean esDespreciable(final int c_Currency_ID, final BigDecimal diferencia)
+    {
+        boolean despreciable = false;
+
+        MCurrency moneda = new MCurrency(p_ctx, c_Currency_ID, get_TrxName());
+
+        int lar_PaymentHeader_ID = get_ValueAsInt("LAR_PaymentHeader_ID");
+
+        if (lar_PaymentHeader_ID <= 0)
+            return despreciable;
+
+        MLARPaymentHeader recibo = new MLARPaymentHeader(p_ctx, lar_PaymentHeader_ID, getTrxType());
+        BigDecimal tasaCambio = (BigDecimal) recibo.get_Value("TasaDeCambio");
+
+        BigDecimal convertido = diferencia.divide(tasaCambio, 8, RoundingMode.FLOOR).abs();
+
+        BigDecimal minimo = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
+        minimo = minimo.pow(moneda.getStdPrecision());
+
+        if (convertido.compareTo(minimo) < 0)
+            despreciable = true;
+
+        return despreciable;
+    } // esDespreciable
 
 }   //  MPayment
