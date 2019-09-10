@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
@@ -173,6 +174,9 @@ public class WsfeV1 extends Wsfe{
 			
 			//*****C_INVOICE_ID para seguimiento
 			line.append(this.getInvoice().getC_Invoice_ID()+"\n");
+
+            // @fchiappano Agregar Fecha de Vencimiento de Pago.
+            line.append(formatTime((Timestamp) this.getInvoice().get_Value("FechaPago"), "yyyyMMdd") + "\n");
 
             // @fchiappano Agregar datos opcionales (CBU y Alias).
             int c_BankAccount_ID = MOrgInfo.get(this.getM_ctx(), this.getInvoice().getAD_Org_ID()).get_ValueAsInt(

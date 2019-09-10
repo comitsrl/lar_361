@@ -1,6 +1,8 @@
 ALTER TABLE C_BPartner ADD COLUMN EsGrande character(1) NOT NULL DEFAULT 'N'::bpchar;
 ALTER TABLE C_BPartner ADD CONSTRAINT c_bpartner_esgrande_check CHECK (EsGrande = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
 
+ALTER TABLE C_Invoice ADD COLUMN FechaPago timestamp without time zone NOT NULL DEFAULT now();
+
 -- 02/08/2019 13:14:55 ART
 -- ISSUE #77: Grandes clientes.
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3001041,'esgrande','LAR','esgrande','esgrande',0,TO_TIMESTAMP('2019-08-02 13:14:55','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-08-02 13:14:55','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)
@@ -584,6 +586,356 @@ INSERT INTO AD_SysConfig (AD_SysConfig_ID,EntityType,ConfigurationLevel,Value,De
 -- 02/08/2019 14:44:10 ART
 -- ISSUE #77: Grandes clientes.
 UPDATE AD_SysConfig SET Value='6000000',Updated=TO_TIMESTAMP('2019-08-02 14:44:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_SysConfig_ID=3000047
+;
+
+-- 10/09/2019 15:45:21 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001044,'fechapago','LAR','fechapago','fechapago',0,TO_TIMESTAMP('2019-09-10 15:45:20','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2019-09-10 15:45:20','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 10/09/2019 15:45:21 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001044 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 10/09/2019 15:45:21 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003527,318,'LAR',0,'Y','N','N','N',29,'N',16,'N',3001044,'N','Y','N','fechapago','fechapago',TO_TIMESTAMP('2019-09-10 15:45:20','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_TIMESTAMP('2019-09-10 15:45:20','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 10/09/2019 15:45:21 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003527 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 10/09/2019 15:46:13 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Column SET Name='Fecha de Pago', ColumnName='FechaPago',Updated=TO_TIMESTAMP('2019-09-10 15:46:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003527
+;
+
+-- 10/09/2019 15:46:13 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003527
+;
+
+-- 10/09/2019 15:46:13 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET Name='Fecha de Pago', Description=NULL, Help=NULL WHERE AD_Column_ID=3003527 AND IsCentrallyMaintained='Y'
+;
+
+-- 10/09/2019 15:46:18 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Column_Trl SET Name='Fecha de Pago',Updated=TO_TIMESTAMP('2019-09-10 15:46:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003527 AND AD_Language='es_AR'
+;
+
+-- 10/09/2019 15:46:35 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Element SET ColumnName='FechaPago', Name='Fecha de Pago', PrintName='Fecha de Pago',Updated=TO_TIMESTAMP('2019-09-10 15:46:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001044
+;
+
+-- 10/09/2019 15:46:35 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001044
+;
+
+-- 10/09/2019 15:46:35 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Column SET ColumnName='FechaPago', Name='Fecha de Pago', Description=NULL, Help=NULL WHERE AD_Element_ID=3001044
+;
+
+-- 10/09/2019 15:46:35 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Process_Para SET ColumnName='FechaPago', Name='Fecha de Pago', Description=NULL, Help=NULL, AD_Element_ID=3001044 WHERE UPPER(ColumnName)='FECHAPAGO' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 10/09/2019 15:46:35 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Process_Para SET ColumnName='FechaPago', Name='Fecha de Pago', Description=NULL, Help=NULL WHERE AD_Element_ID=3001044 AND IsCentrallyMaintained='Y'
+;
+
+-- 10/09/2019 15:46:35 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET Name='Fecha de Pago', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001044) AND IsCentrallyMaintained='Y'
+;
+
+-- 10/09/2019 15:46:35 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_PrintFormatItem SET PrintName='Fecha de Pago', Name='Fecha de Pago' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3001044)
+;
+
+-- 10/09/2019 15:46:40 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Element_Trl SET Name='Fecha de Pago',PrintName='Fecha de Pago',Updated=TO_TIMESTAMP('2019-09-10 15:46:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001044 AND AD_Language='es_AR'
+;
+
+-- 10/09/2019 15:49:42 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,Created,AD_Org_ID,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3006608,29,'Y','N','N',3003527,'N','Y',263,'N','LAR','Fecha de Pago',100,TO_TIMESTAMP('2019-09-10 15:49:42','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,100,TO_TIMESTAMP('2019-09-10 15:49:42','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 10/09/2019 15:49:42 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3006608 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=170,IsDisplayed='Y' WHERE AD_Field_ID=3006608
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=3000603
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=2961
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=2765
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=2770
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=220,IsDisplayed='Y' WHERE AD_Field_ID=8648
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3005560
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=2763
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=2953
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3273
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=2956
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3112
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=2774
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=2764
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=2768
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3001994
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=6935
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=2775
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=7794
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3005743
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=7795
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=2786
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3006572
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=1000017
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=2778
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=2780
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=1000016
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=2771
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=6564
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=2777
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=8657
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3663
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=10485
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=13700
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3899
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000025
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000026
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=60970
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000605
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=53257
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000027
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=53258
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000028
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3002136
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=200050
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3002142
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=3002138
+;
+
+-- 10/09/2019 15:57:10 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3274
+;
+
+-- 10/09/2019 15:57:16 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2019-09-10 15:57:16','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=2761
+;
+
+-- 10/09/2019 16:02:12 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET DisplayLogic='@DocSubTypeCAE@ = 201 | @DocSubTypeCAE@ = 206 | @DocSubTypeCAE@ = 211',Updated=TO_TIMESTAMP('2019-09-10 16:02:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006608
+;
+
+-- 10/09/2019 16:04:46 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2019-09-10 16:04:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006608
+;
+
+-- 10/09/2019 16:07:36 ART
+-- ISSUE #77: Campo Fecha de Pago, en facturas.
+UPDATE AD_Column SET DefaultValue='@#Date@', AD_Reference_ID=15,Updated=TO_TIMESTAMP('2019-09-10 16:07:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003527
 ;
 
 -- Registración de script
