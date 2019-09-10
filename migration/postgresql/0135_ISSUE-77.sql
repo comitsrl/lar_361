@@ -585,7 +585,7 @@ INSERT INTO AD_SysConfig (AD_SysConfig_ID,EntityType,ConfigurationLevel,Value,De
 
 -- 02/08/2019 14:44:10 ART
 -- ISSUE #77: Grandes clientes.
-UPDATE AD_SysConfig SET Value='6000000',Updated=TO_TIMESTAMP('2019-08-02 14:44:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_SysConfig_ID=3000047
+UPDATE AD_SysConfig SET Value='2000000',Updated=TO_TIMESTAMP('2019-08-02 14:44:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_SysConfig_ID=3000047
 ;
 
 -- 10/09/2019 15:45:21 ART
