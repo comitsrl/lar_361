@@ -47,6 +47,7 @@ import org.eevolution.model.MPPProductBOM;
 import org.eevolution.model.MPPProductBOMLine;
 
 import ar.com.comit.factura.electronica.ProcessorWSFE;
+import ar.com.ergio.model.FindInvoiceDocType;
 import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
 import ar.com.ergio.util.LAR_Utils;
 
@@ -1481,6 +1482,16 @@ public class MInvoice extends X_C_Invoice implements DocAction
 				}
 			}
 		}
+
+		// @fchiappano Volver a chequear el tipo de documento, ya que puede tratarse de una factura MiPymes (FCE).
+        if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()) && !isReversal())
+        {
+            final FindInvoiceDocType findDocType = new FindInvoiceDocType((MBPartner) getC_BPartner(), get_ValueAsInt("C_POS_ID"),
+                    getAD_Org_ID(), getC_DocTypeTarget().getDocBaseType(), this);
+            int c_DocType_ID = findDocType.getDocType().getC_DocType_ID();
+            setC_DocType_ID(c_DocType_ID);
+            setC_DocTypeTarget_ID(c_DocType_ID);
+        }
 
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
 		if (m_processMsg != null)
