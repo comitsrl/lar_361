@@ -1483,8 +1483,11 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			}
 		}
 
-		// @fchiappano Volver a chequear el tipo de documento, ya que puede tratarse de una factura MiPymes (FCE).
-        if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()) && !isReversal())
+        // @fchiappano Volver a chequear el tipo de documento, ya que puede tratarse de una factura MiPymes (FCE).
+        BigDecimal minimo_fce = new BigDecimal(MSysConfig.getDoubleValue("LAR_MinimoFacturaMiPyme",
+                Env.ZERO.doubleValue(), Env.getAD_Client_ID(Env.getCtx())));
+
+        if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()) && !isReversal() && minimo_fce.compareTo(Env.ZERO) > 0)
         {
             final FindInvoiceDocType findDocType = new FindInvoiceDocType((MBPartner) getC_BPartner(), get_ValueAsInt("C_POS_ID"),
                     getAD_Org_ID(), getC_DocTypeTarget().getDocBaseType(), this);
