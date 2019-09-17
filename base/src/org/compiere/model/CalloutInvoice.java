@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -110,6 +111,26 @@ public class CalloutInvoice extends CalloutEngine
 			DB.close(rs, pstmt);
 			rs = null; pstmt = null;
 		}
+
+		// @fchiappano Calcular la fecha de pago de la factura.
+		Integer c_BPartner_ID = (Integer) mTab.getValue("C_BPartner_ID");
+
+        if (c_BPartner_ID != null)
+        {
+            Timestamp fechaPago = (Timestamp) mTab.getValue("FechaPago");
+            Object diasPago = new MBPartner(ctx, c_BPartner_ID, mTab.getTrxInfo()).get_Value("DiasPagoFCE");
+            Timestamp dateInvoiced = (Timestamp) mTab.getValue("DateInvoiced");
+
+            if (MDocType.isElectronicDocType((Integer) C_DocType_ID)
+                    && (fechaPago == null || fechaPago.compareTo(dateInvoiced) < 0) && diasPago != null)
+            {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(dateInvoiced.getTime());
+                calendar.add(Calendar.DAY_OF_YEAR, (Integer) diasPago);
+                mTab.setValue("FechaPago", new Timestamp(calendar.getTimeInMillis()));
+            }
+        }// @fchiappano Fin calculo de fecha de pago.
+
 		return "";
 	}	//	docType
 
@@ -243,6 +264,21 @@ public class CalloutInvoice extends CalloutEngine
 					mTab.setValue("IsDiscountPrinted", s);
 				else
 					mTab.setValue("IsDiscountPrinted", "N");
+
+                // @fchiappano Calcular la fecha de pago de la factura.
+                Timestamp fechaPago = (Timestamp) mTab.getValue("FechaPago");
+                Object diasPago = new MBPartner(ctx, C_BPartner_ID, mTab.getTrxInfo()).get_Value("DiasPagoFCE");
+                Object c_DocTypeTarget_ID = mTab.getValue("C_DocTypeTarget_ID");
+                Timestamp dateInvoiced = (Timestamp) mTab.getValue("DateInvoiced");
+
+                if (c_DocTypeTarget_ID != null && MDocType.isElectronicDocType((Integer) c_DocTypeTarget_ID)
+                        && (fechaPago == null || fechaPago.compareTo(dateInvoiced) <= 0) && diasPago != null)
+                {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(dateInvoiced.getTime());
+                    calendar.add(Calendar.DAY_OF_YEAR, (Integer) diasPago);
+                    mTab.setValue("FechaPago", new Timestamp(calendar.getTimeInMillis()));
+                } // @fchiappano Fin calculo de fecha de pago.
 			}
 		}
 		catch (SQLException e)
