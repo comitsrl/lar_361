@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -1494,7 +1495,20 @@ public class MInvoice extends X_C_Invoice implements DocAction
             int c_DocType_ID = findDocType.getDocType().getC_DocType_ID();
             setC_DocType_ID(c_DocType_ID);
             setC_DocTypeTarget_ID(c_DocType_ID);
-        }
+        } // @fchiappano Fin chequeo de tipo de documento.
+
+        // @fchiappano Calcular la fecha de pago de la factura.
+        Timestamp fechaPago = (Timestamp) get_Value("FechaPago");
+        Object diasPago = ((MBPartner) getC_BPartner()).get_Value("DiasPagoFCE");
+
+        if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()) && fechaPago == null
+                && diasPago != null)
+        {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(getDateInvoiced().getTime());
+            calendar.add(Calendar.DAY_OF_YEAR, (Integer) diasPago);
+            set_ValueOfColumn("FechaPago", new Timestamp(calendar.getTimeInMillis()));
+        } // @fchiappano Fin calculo de fecha de pago.
 
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
 		if (m_processMsg != null)
