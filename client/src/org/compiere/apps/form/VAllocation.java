@@ -14,6 +14,7 @@
 package org.compiere.apps.form;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -33,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -40,6 +42,7 @@ import javax.swing.table.DefaultTableModel;
 import org.adempiere.plaf.AdempierePLAF;
 import org.compiere.apps.ADialog;
 import org.compiere.apps.StatusBar;
+import org.compiere.grid.ed.VCheckBox;
 import org.compiere.grid.ed.VDate;
 import org.compiere.grid.ed.VLookup;
 import org.compiere.minigrid.MiniTable;
@@ -104,8 +107,8 @@ public class VAllocation extends Allocation
 	private CPanel invoicePanel = new CPanel();
 	private JLabel paymentLabel = new JLabel();
 	private JLabel invoiceLabel = new JLabel();
-	private BorderLayout paymentLayout = new BorderLayout();
-	private BorderLayout invoiceLayout = new BorderLayout();
+	private GridBagLayout paymentLayout = new GridBagLayout();
+	private GridBagLayout invoiceLayout = new GridBagLayout();
 	private JLabel paymentInfo = new JLabel();
 	private JLabel invoiceInfo = new JLabel();
 	private JScrollPane paymentScrollPane = new JScrollPane();
@@ -114,6 +117,9 @@ public class VAllocation extends Allocation
 	private JLabel differenceLabel = new JLabel();
 	private CTextField differenceField = new CTextField();
 	private JButton allocateButton = new JButton();
+	// @mzuniga - Se agregan botones para Seleccionar Todo
+	private JButton selectAllInv = new JButton();
+	private JButton selectAllPay = new JButton();
 	private JLabel currencyLabel = new JLabel();
 	private VLookup currencyPick = null;
 	private JCheckBox multiCurrency = new JCheckBox();
@@ -124,6 +130,7 @@ public class VAllocation extends Allocation
 	private JCheckBox autoWriteOff = new JCheckBox();
 	private JLabel organizationLabel = new JLabel();
 	private VLookup organizationPick = null;
+    private VCheckBox isSOTrx = new VCheckBox("IsSOTrx", false, false, true, Msg.translate(Env.getCtx(), "IsSOTrx"), "", false);
 	
 	/**
 	 *  Static Init
@@ -144,9 +151,9 @@ public class VAllocation extends Allocation
 		allocationPanel.setLayout(allocationLayout);
 		bpartnerLabel.setText(Msg.translate(Env.getCtx(), "C_BPartner_ID"));
 		paymentLabel.setRequestFocusEnabled(false);
-		paymentLabel.setText(" " + Msg.translate(Env.getCtx(), "C_Payment_ID"));
+		paymentLabel.setText("Pagos");
 		invoiceLabel.setRequestFocusEnabled(false);
-		invoiceLabel.setText(" " + Msg.translate(Env.getCtx(), "C_Invoice_ID"));
+		invoiceLabel.setText("Facturas");
 		paymentPanel.setLayout(paymentLayout);
 		invoicePanel.setLayout(invoiceLayout);
 		invoiceInfo.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -166,7 +173,19 @@ public class VAllocation extends Allocation
 		currencyLabel.setText(Msg.translate(Env.getCtx(), "C_Currency_ID"));
 		multiCurrency.setText(Msg.getMsg(Env.getCtx(), "MultiCurrency"));
 		multiCurrency.addActionListener(this);
-		allocCurrencyLabel.setText(".");
+		// @emmie - Separar transacciones de venta y de compras
+		isSOTrx.setSelected(!"N".equals(Env.getContext(Env.getCtx(), m_WindowNo, "IsSOTrx")));
+		isSOTrx.addActionListener(this);
+		//
+	    // @mzuniga - Se agregan botones para Seleccionar Todos los Pagos/Cobros y Facturas
+        selectAllPay.setText("Seleccionar Pagos");
+        selectAllPay.setAlignmentX(SwingConstants.LEFT);
+        selectAllPay.addActionListener(this);
+        selectAllInv.setText("Seleccionar Facturas");
+        selectAllInv.setAlignmentX(SwingConstants.LEFT);
+        selectAllInv.addActionListener(this);
+		//
+        allocCurrencyLabel.setText(".");
 		invoiceScrollPane.setPreferredSize(new Dimension(200, 200));
 		paymentScrollPane.setPreferredSize(new Dimension(200, 200));
 		mainPanel.add(parameterPanel, BorderLayout.NORTH);
@@ -192,6 +211,8 @@ public class VAllocation extends Allocation
 			,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 0, 5, 5), 0, 0));
 		parameterPanel.add(multiCurrency, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0
 			,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 0, 5, 5), 0, 0));
+		parameterPanel.add(isSOTrx, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0
+		        ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 0, 5, 5), 0, 0));
 		parameterPanel.add(autoWriteOff, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0
 			,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 		mainPanel.add(allocationPanel, BorderLayout.SOUTH);
@@ -203,15 +224,123 @@ public class VAllocation extends Allocation
 			,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 0, 5, 5), 0, 0));
 		allocationPanel.add(allocCurrencyLabel, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0
 			,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-		paymentPanel.add(paymentLabel, BorderLayout.NORTH);
-		paymentPanel.add(paymentInfo, BorderLayout.SOUTH);
-		paymentPanel.add(paymentScrollPane, BorderLayout.CENTER);
+        // @mzuniga
+        final GridBagConstraints c = new GridBagConstraints();
+        // paymentLabel
+        paymentLabel.setHorizontalAlignment(JLabel.CENTER);
+        Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
+        paymentLabel.setBorder(border);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 1.0;
+        c.weighty = 0.0;
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = 0;
+        c.insets = new Insets(5, 0, 5, 5);
+        c.ipadx = 40;
+        c.ipady = 2;
+        paymentPanel.add(paymentLabel, c);
+        // selectAllPay
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = new Insets(0, 0, 0, 20);
+        c.ipadx = 0;
+        c.ipady = 0;
+        paymentPanel.add(selectAllPay, c);
+		// paymentScrollPane
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 6;
+        c.gridheight = 2;
+        c.weightx = 0.0;
+        c.weighty = 2.0;
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(0, 0, 0, 0);
+        c.ipadx = 0;
+        c.ipady = 0;
+		paymentPanel.add(paymentScrollPane, c);
+		// paymentInfo
+        c.gridx = 0;
+        c.gridy = 4;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 0.5;
+        c.weighty = 0.5;
+        c.anchor = GridBagConstraints.EAST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(0, 0, 0, 0);
+        c.ipadx = 0;
+        c.ipady = 0;
+        paymentPanel.add(paymentInfo, c);
 		paymentScrollPane.getViewport().add(paymentTable, null);
-		invoicePanel.add(invoiceLabel, BorderLayout.NORTH);
-		invoicePanel.add(invoiceInfo, BorderLayout.SOUTH);
-		invoicePanel.add(invoiceScrollPane, BorderLayout.CENTER);
-		invoiceScrollPane.getViewport().add(invoiceTable, null);
-		//
+
+        // invoiceLabel
+        invoiceLabel.setHorizontalAlignment(JLabel.CENTER);
+        border = BorderFactory.createLineBorder(Color.BLACK, 1);
+        invoiceLabel.setBorder(border);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 1.0;
+        c.weighty = 0.0;
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = 0;
+        c.insets = new Insets(5, 0, 5, 5);
+        c.ipadx = 25;
+        c.ipady = 3;
+        invoicePanel.add(invoiceLabel, c);
+        // selectAllInv
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = new Insets(0, 0, 0, 20);
+        c.ipadx = 0;
+        c.ipady = 0;
+        invoicePanel.add(selectAllInv, c);
+        // invoiceScrollPane
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 6;
+        c.gridheight = 2;
+        c.weightx = 0.0;
+        c.weighty = 2.0;
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(0, 0, 0, 0);
+        c.ipadx = 0;
+        c.ipady = 0;
+        invoicePanel.add(invoiceScrollPane, c);
+        // invoiceInfo
+        c.gridx = 0;
+        c.gridy = 4;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 0.5;
+        c.weighty = 0.5;
+        c.anchor = GridBagConstraints.EAST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(0, 0, 0, 0);
+        c.ipadx = 0;
+        c.ipady = 0;
+        invoicePanel.add(invoiceInfo, c);
+        invoiceScrollPane.getViewport().add(invoiceTable, null);
+        // @mzuniga
+
 		mainPanel.add(infoPanel, BorderLayout.CENTER);
 		infoPanel.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		infoPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -220,8 +349,8 @@ public class VAllocation extends Allocation
 		infoPanel.add(paymentPanel, JSplitPane.TOP);
 		infoPanel.add(invoicePanel, JSplitPane.BOTTOM);
 		infoPanel.setContinuousLayout(true);
-		infoPanel.setPreferredSize(new Dimension(800,250));
-		infoPanel.setDividerLocation(110);
+		infoPanel.setPreferredSize(new Dimension(800,310));
+		infoPanel.setDividerLocation(150);
 	}   //  jbInit
 
 	/**
@@ -251,7 +380,10 @@ public class VAllocation extends Allocation
 		AD_Column_ID = COLUMN_C_PERIOD_AD_ORG_ID; //C_Period.AD_Org_ID (needed to allow org 0)
 		MLookup lookupOrg = MLookupFactory.get(Env.getCtx(), m_WindowNo, 0, AD_Column_ID, DisplayType.TableDir);
 		organizationPick = new VLookup("AD_Org_ID", true, false, true, lookupOrg);
-		organizationPick.setValue(Env.getAD_Org_ID(Env.getCtx()));
+		organizationPick.setValue(0);
+		// Variable de instancia pública (usada en la superclase)
+		// Se fuerza a que tome "*" (0) como organizacion por defecto
+		m_AD_Org_ID = 0;
 		organizationPick.addVetoableChangeListener(this);
 
 		//  BPartner
@@ -278,9 +410,23 @@ public class VAllocation extends Allocation
 	public void actionPerformed(ActionEvent e)
 	{
 		log.config("");
-		if (e.getSource().equals(multiCurrency))
+		if (e.getSource().equals(multiCurrency) || e.getSource().equals(isSOTrx))
 			loadBPartner();
-		//	Allocate
+        // Seleccionar Pagos
+        else if (e.getSource().equals(selectAllPay))
+        {
+            int rows = paymentTable.getRowCount();
+            for (int i = 0; i < rows; i++)
+                paymentTable.setValueAt(true, i, 0);
+        }
+		//  Seleccionar Facturas
+        else if (e.getSource().equals(selectAllInv))
+        {
+            int rows = invoiceTable.getRowCount();
+            for (int i = 0; i < rows; i++)
+                invoiceTable.setValueAt(true, i, 0);
+        }
+            //	Allocate
 		else if (e.getSource().equals(allocateButton))
 		{
 			allocateButton.setEnabled(false);
@@ -366,7 +512,7 @@ public class VAllocation extends Allocation
 	{
 		checkBPartner();
 		
-		Vector<Vector<Object>> data = getPaymentData(multiCurrency.isSelected(), dateField.getValue(), paymentTable);
+		Vector<Vector<Object>> data = getPaymentData(multiCurrency.isSelected(), isSOTrx.isSelected(), dateField.getValue(), paymentTable);
 		Vector<String> columnNames = getPaymentColumnNames(multiCurrency.isSelected());
 		
 		//  Remove previous listeners
@@ -379,7 +525,7 @@ public class VAllocation extends Allocation
 		setPaymentColumnClass(paymentTable, multiCurrency.isSelected());
 		//
 
-		data = getInvoiceData(multiCurrency.isSelected(), dateField.getValue(), invoiceTable);
+		data = getInvoiceData(multiCurrency.isSelected(), isSOTrx.isSelected(), dateField.getValue(), invoiceTable);
 		columnNames = getInvoiceColumnNames(multiCurrency.isSelected());
 		
 		//  Remove previous listeners

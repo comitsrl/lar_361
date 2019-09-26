@@ -110,7 +110,7 @@ public class Allocation
 		}
 	}
 
-	public Vector<Vector<Object>> getPaymentData(boolean isMultiCurrency, Object date, IMiniTable paymentTable)
+	public Vector<Vector<Object>> getPaymentData(boolean isMultiCurrency, boolean isSOTrx, Object date, IMiniTable paymentTable)
 	{
 		/********************************
 		 *  Load unallocated Payments
@@ -161,6 +161,7 @@ public class Allocation
 			sql.append(" AND p.C_Currency_ID=?");				//      #6
 		if (m_AD_Org_ID != 0 )
 			sql.append(" AND p.AD_Org_ID=" + m_AD_Org_ID);
+		sql.append(" AND p.IsReceipt=?");                       //      #7
 		sql.append(" ORDER BY p.DateTrx,p.DocumentNo");
 
 		// role security
@@ -177,6 +178,7 @@ public class Allocation
 			pstmt.setInt(5, m_C_BPartner_ID);
 			if (!isMultiCurrency)
 				pstmt.setInt(6, m_C_Currency_ID);
+			pstmt.setString(7, isSOTrx ? "Y" : "N"); // @emmie - filtrar cobros/pagos
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next())
 			{
@@ -213,6 +215,110 @@ public class Allocation
 
 		return data;
 	}
+
+	   public Vector<Vector<Object>> getPaymentData(boolean isMultiCurrency, Object date, IMiniTable paymentTable)
+	    {
+	        /********************************
+	         *  Load unallocated Payments
+	         *      1-TrxDate, 2-DocumentNo, (3-Currency, 4-PayAmt,)
+	         *      5-ConvAmt, 6-ConvOpen, 7-Allocated
+	         */
+	        Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+	        StringBuffer sql = new StringBuffer("SELECT p.DateTrx,p.DocumentNo,p.C_Payment_ID,"  //  1..3
+	            + "c.ISO_Code,p.PayAmt,"                            //  4..5
+	            + "currencyConvert(p.PayAmt,p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"//  6   #1, #2
+	            //begin @emmie issue #17
+	            + "currencyConvert(paymentAvailable_LAR(C_Payment_ID),p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"  //  7   #3, #4
+	            //end @emmie issue #17
+	            + "p.MultiplierAP, "
+	        //TODO nuevo by German Wagner
+	        //{
+	            + "RLTT.name AS TenderType, "// Medio de Pago
+	            + "p.CheckNo, "// Nº Cheque
+	            + "RLCCT.name AS CreditCardType, "// Tipo Tarjeta
+	            + "p.CreditCardNumber "// Nº Tarjeta
+	        //}
+	            //begin @emmie issue #17
+	            + ", p.EsRetencionIIBB "      // 13
+	            //end @emmie issue #17
+	            + "FROM C_Payment_v p"      //  Corrected for AP/AR
+	            + " INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID) "
+	        //TODO nuevo by German Wagner
+	        //{
+	            + "INNER JOIN ad_ref_list RLTT "
+	            + "ON (RLTT.value =  P.tenderType) "
+	            + "INNER JOIN ad_reference REFTT "
+	            + "ON (REFTT.ad_reference_id = RLTT.ad_reference_id "
+	            + "AND REFTT.name='C_Payment Tender Type') "
+	            + "INNER JOIN ad_reference REFCCT "
+	            + "ON (REFCCT.name='C_Payment CreditCard Type') "
+	            + "LEFT JOIN ad_ref_list RLCCT "
+	            + "ON (RLCCT.value = P.CreditCardType "
+	            + "AND RLCCT.ad_reference_id = REFCCT.ad_reference_id) "
+	        //}
+	            + "WHERE p.IsAllocated='N' AND p.Processed='Y'"
+	            //begin @emmie issue #17
+	            + "  AND ((p.C_Charge_ID IS NULL AND p.EsRetencionIIBB='N') OR "        //  Prepayments OK
+	            + "      (p.C_Charge_ID IS NOT NULL AND p.EsRetencionIIBB='Y'))"
+	            //end @emmie issue #17}
+	            + "  AND p.C_BPartner_ID=?"                         //      #5
+	            );
+	        if (!isMultiCurrency)
+	            sql.append(" AND p.C_Currency_ID=?");               //      #6
+	        if (m_AD_Org_ID != 0 )
+	            sql.append(" AND p.AD_Org_ID=" + m_AD_Org_ID);
+	        sql.append(" ORDER BY p.DateTrx,p.DocumentNo");
+
+	        // role security
+	        sql = new StringBuffer( MRole.getDefault(Env.getCtx(), false).addAccessSQL( sql.toString(), "p", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO ) );
+
+	        log.fine("PaySQL=" + sql.toString());
+	        try
+	        {
+	            PreparedStatement pstmt = DB.prepareStatement(sql.toString(), null);
+	            pstmt.setInt(1, m_C_Currency_ID);
+	            pstmt.setTimestamp(2, (Timestamp)date);
+	            pstmt.setInt(3, m_C_Currency_ID);
+	            pstmt.setTimestamp(4, (Timestamp)date);
+	            pstmt.setInt(5, m_C_BPartner_ID);
+	            if (!isMultiCurrency)
+	                pstmt.setInt(6, m_C_Currency_ID);
+	            ResultSet rs = pstmt.executeQuery();
+	            while (rs.next())
+	            {
+	                Vector<Object> line = new Vector<Object>();
+	                line.add(new Boolean(false));       //  0-Selection
+	                line.add(rs.getTimestamp(1));       //  1-TrxDate
+	                KeyNamePair pp = new KeyNamePair(rs.getInt(3), rs.getString(2));
+	                line.add(pp);                       //  2-DocumentNo
+	                if (isMultiCurrency)
+	                {
+	                    line.add(rs.getString(4));      //  3-Currency
+	                    line.add(rs.getBigDecimal(5));  //  4-PayAmt
+	                }
+	                line.add(rs.getBigDecimal(6));      //  3/5-ConvAmt
+	                BigDecimal available = rs.getBigDecimal(7);
+	                //begin @emmie issue #17
+	                boolean esRetencion = rs.getString(13).equals("Y"); //  13-EsRetencionIIBB
+	                if (!esRetencion && (available == null || available.signum() == 0)) //  nothing available
+	                //end @emmie issue #17
+	                    continue;
+	                line.add(available);                //  4/6-ConvOpen/Available
+	                line.add(Env.ZERO);                 //  5/7-Payment
+//	              line.add(rs.getBigDecimal(8));      //  6/8-Multiplier
+	                //
+	                data.add(line);
+	            }
+	            rs.close();
+	            pstmt.close();
+	        }
+	        catch (SQLException e)
+	        {
+	            log.log(Level.SEVERE, sql.toString(), e);
+	        }
+
+	        return data;
+	    }
 
 	public Vector<String> getPaymentColumnNames(boolean isMultiCurrency)
 	{
@@ -272,7 +378,7 @@ public class Allocation
 		paymentTable.autoSize();
 	}
 
-	public Vector<Vector<Object>> getInvoiceData(boolean isMultiCurrency, Object date, IMiniTable invoiceTable)
+	public Vector<Vector<Object>> getInvoiceData(boolean isMultiCurrency, boolean isSOTrx, Object date, IMiniTable invoiceTable)
 	{
 		/********************************
 		 *  Load unpaid Invoices
@@ -306,6 +412,7 @@ public class Allocation
 			sql.append(" AND i.C_Currency_ID=?");                                   //  #8
 		if (m_AD_Org_ID != 0 )
 			sql.append(" AND i.AD_Org_ID=" + m_AD_Org_ID);
+		sql.append(" AND i.IsSOTrx=?");                                             //  #9
 		sql.append(" ORDER BY i.DateInvoiced, i.DocumentNo");
 		log.fine("InvSQL=" + sql.toString());
 
@@ -324,6 +431,7 @@ public class Allocation
 			pstmt.setInt(7, m_C_BPartner_ID);
 			if (!isMultiCurrency)
 				pstmt.setInt(8, m_C_Currency_ID);
+			pstmt.setString(9, isSOTrx ? "Y" : "N"); // @emmie - Filtra facturas venta/compra
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next())
 			{
@@ -365,6 +473,100 @@ public class Allocation
 
 		return data;
 	}
+
+	   public Vector<Vector<Object>> getInvoiceData(boolean isMultiCurrency, Object date, IMiniTable invoiceTable)
+	    {
+	        /********************************
+	         *  Load unpaid Invoices
+	         *      1-TrxDate, 2-Value, (3-Currency, 4-InvAmt,)
+	         *      5-ConvAmt, 6-ConvOpen, 7-ConvDisc, 8-WriteOff, 9-Applied
+	         *
+	         SELECT i.DateInvoiced,i.DocumentNo,i.C_Invoice_ID,c.ISO_Code,
+	         i.GrandTotal*i.MultiplierAP "GrandTotal",
+	         currencyConvert(i.GrandTotal*i.MultiplierAP,i.C_Currency_ID,i.C_Currency_ID,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID) "GrandTotal $",
+	         invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID) "Open",
+	         currencyConvert(invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID),i.C_Currency_ID,i.C_Currency_ID,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.MultiplierAP "Open $",
+	         invoiceDiscount(i.C_Invoice_ID,SysDate,C_InvoicePaySchedule_ID) "Discount",
+	         currencyConvert(invoiceDiscount(i.C_Invoice_ID,SysDate,C_InvoicePaySchedule_ID),i.C_Currency_ID,i.C_Currency_ID,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.Multiplier*i.MultiplierAP "Discount $",
+	         i.MultiplierAP, i.Multiplier
+	         FROM C_Invoice_v i INNER JOIN C_Currency c ON (i.C_Currency_ID=c.C_Currency_ID)
+	         WHERE -- i.IsPaid='N' AND i.Processed='Y' AND i.C_BPartner_ID=1000001
+	         */
+	        Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+	        StringBuffer sql = new StringBuffer("SELECT i.DateInvoiced,i.DocumentNo,i.C_Invoice_ID," //  1..3
+	            + "c.ISO_Code,i.GrandTotal*i.MultiplierAP, "                            //  4..5    Orig Currency
+	            + "currencyConvert(i.GrandTotal*i.MultiplierAP,i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID), " //  6   #1  Converted, #2 Date
+	            + "currencyConvert(invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.MultiplierAP, "  //  7   #3, #4  Converted Open
+	            + "currencyConvert(invoiceDiscount"                               //  8       AllowedDiscount
+	            + "(i.C_Invoice_ID,?,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.Multiplier*i.MultiplierAP,"               //  #5, #6
+	            + "i.MultiplierAP "
+	            + "FROM C_Invoice_v i"      //  corrected for CM/Split
+	            + " INNER JOIN C_Currency c ON (i.C_Currency_ID=c.C_Currency_ID) "
+	            + "WHERE i.IsPaid='N' AND i.Processed='Y'"
+	            + " AND i.C_BPartner_ID=?");                                            //  #7
+	        if (!isMultiCurrency)
+	            sql.append(" AND i.C_Currency_ID=?");                                   //  #8
+	        if (m_AD_Org_ID != 0 )
+	            sql.append(" AND i.AD_Org_ID=" + m_AD_Org_ID);
+	        sql.append(" ORDER BY i.DateInvoiced, i.DocumentNo");
+	        log.fine("InvSQL=" + sql.toString());
+
+	        // role security
+	        sql = new StringBuffer( MRole.getDefault(Env.getCtx(), false).addAccessSQL( sql.toString(), "i", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO ) );
+
+	        try
+	        {
+	            PreparedStatement pstmt = DB.prepareStatement(sql.toString(), null);
+	            pstmt.setInt(1, m_C_Currency_ID);
+	            pstmt.setTimestamp(2, (Timestamp)date);
+	            pstmt.setInt(3, m_C_Currency_ID);
+	            pstmt.setTimestamp(4, (Timestamp)date);
+	            pstmt.setTimestamp(5, (Timestamp)date);
+	            pstmt.setInt(6, m_C_Currency_ID);
+	            pstmt.setInt(7, m_C_BPartner_ID);
+	            if (!isMultiCurrency)
+	                pstmt.setInt(8, m_C_Currency_ID);
+	            ResultSet rs = pstmt.executeQuery();
+	            while (rs.next())
+	            {
+	                Vector<Object> line = new Vector<Object>();
+	                line.add(new Boolean(false));       //  0-Selection
+	                line.add(rs.getTimestamp(1));       //  1-TrxDate
+	                KeyNamePair pp = new KeyNamePair(rs.getInt(3), rs.getString(2));
+	                line.add(pp);                       //  2-Value
+	                if (isMultiCurrency)
+	                {
+	                    line.add(rs.getString(4));      //  3-Currency
+	                    line.add(rs.getBigDecimal(5));  //  4-Orig Amount
+	                }
+	                line.add(rs.getBigDecimal(6));      //  3/5-ConvAmt
+	                BigDecimal open = rs.getBigDecimal(7);
+	                if (open == null)       //  no conversion rate
+	                    open = Env.ZERO;
+	                line.add(open);                     //  4/6-ConvOpen
+	                BigDecimal discount = rs.getBigDecimal(8);
+	                if (discount == null)   //  no concersion rate
+	                    discount = Env.ZERO;
+	                line.add(discount);                 //  5/7-ConvAllowedDisc
+	                line.add(Env.ZERO);                 //  6/8-WriteOff
+	                line.add(Env.ZERO);                 // 7/9-Applied
+	                line.add(open);                 //  8/10-OverUnder
+
+//	              line.add(rs.getBigDecimal(9));      //  8/10-Multiplier
+	                //  Add when open <> 0 (i.e. not if no conversion rate)
+	                if (Env.ZERO.compareTo(open) != 0)
+	                    data.add(line);
+	            }
+	            rs.close();
+	            pstmt.close();
+	        }
+	        catch (SQLException e)
+	        {
+	            log.log(Level.SEVERE, sql.toString(), e);
+	        }
+
+	        return data;
+	    }
 
 	public Vector<String> getInvoiceColumnNames(boolean isMultiCurrency)
 	{
