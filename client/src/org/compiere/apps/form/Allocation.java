@@ -14,6 +14,7 @@
 package org.compiere.apps.form;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +24,10 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 
+import javax.swing.JDialog;
+
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.apps.ADialog;
 import org.compiere.minigrid.IMiniTable;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
@@ -39,7 +43,10 @@ import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
+import org.compiere.util.Trx;
 import org.compiere.util.Util;
+
+import ar.com.ergio.util.LAR_Utils;
 
 public class Allocation
 {
@@ -157,11 +164,13 @@ public class Allocation
 			//end @emmie issue #17}
 			+ "  AND p.C_BPartner_ID=?"                   		//      #5
 			);
-		if (!isMultiCurrency)
-			sql.append(" AND p.C_Currency_ID=?");				//      #6
-		if (m_AD_Org_ID != 0 )
-			sql.append(" AND p.AD_Org_ID=" + m_AD_Org_ID);
-		sql.append(" AND p.IsReceipt=?");                       //      #7
+        // @fchiappano Se cambio el orden de los criterios, para que los
+        // parametros no queden fuera de rango.
+        sql.append(" AND p.IsReceipt=?");                      //       #6
+        if (!isMultiCurrency)
+            sql.append(" AND p.C_Currency_ID=?");              //       #7
+        if (m_AD_Org_ID != 0)
+            sql.append(" AND p.AD_Org_ID=" + m_AD_Org_ID);                       
 		sql.append(" ORDER BY p.DateTrx,p.DocumentNo");
 
 		// role security
@@ -176,9 +185,13 @@ public class Allocation
 			pstmt.setInt(3, m_C_Currency_ID);
 			pstmt.setTimestamp(4, (Timestamp)date);
 			pstmt.setInt(5, m_C_BPartner_ID);
-			if (!isMultiCurrency)
-				pstmt.setInt(6, m_C_Currency_ID);
-			pstmt.setString(7, isSOTrx ? "Y" : "N"); // @emmie - filtrar cobros/pagos
+            // @fchiappano Se cambia el orden de los parametros, según el orden
+            // de criterios en el where de la consulta.
+            pstmt.setString(6, isSOTrx ? "Y" : "N"); // @emmie - filtrar cobros/pagos
+
+            if (!isMultiCurrency)
+                pstmt.setInt(7, m_C_Currency_ID);
+			
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next())
 			{
@@ -408,11 +421,14 @@ public class Allocation
 			+ " INNER JOIN C_Currency c ON (i.C_Currency_ID=c.C_Currency_ID) "
 			+ "WHERE i.IsPaid='N' AND i.Processed='Y'"
 			+ " AND i.C_BPartner_ID=?");                                            //  #7
-		if (!isMultiCurrency)
-			sql.append(" AND i.C_Currency_ID=?");                                   //  #8
+        // @fchiappano Se cambio el orden de los criterios, para que los
+        // parametros no queden fuera de rango.
+        sql.append(" AND i.IsSOTrx=?");                                             //  #8
+        if (!isMultiCurrency)
+            sql.append(" AND i.C_Currency_ID=?");                                   //  #9
 		if (m_AD_Org_ID != 0 )
 			sql.append(" AND i.AD_Org_ID=" + m_AD_Org_ID);
-		sql.append(" AND i.IsSOTrx=?");                                             //  #9
+		
 		sql.append(" ORDER BY i.DateInvoiced, i.DocumentNo");
 		log.fine("InvSQL=" + sql.toString());
 
@@ -429,9 +445,12 @@ public class Allocation
 			pstmt.setTimestamp(5, (Timestamp)date);
 			pstmt.setInt(6, m_C_Currency_ID);
 			pstmt.setInt(7, m_C_BPartner_ID);
-			if (!isMultiCurrency)
-				pstmt.setInt(8, m_C_Currency_ID);
-			pstmt.setString(9, isSOTrx ? "Y" : "N"); // @emmie - Filtra facturas venta/compra
+            // @fchiappano Se cambio el orden de los parametros, para que los mismos no queden fuera de rango.
+            pstmt.setString(8, isSOTrx ? "Y" : "N"); // @emmie - Filtra facturas venta/compra
+
+            if (!isMultiCurrency)
+                pstmt.setInt(9, m_C_Currency_ID);
+
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next())
 			{
@@ -896,6 +915,10 @@ public class Allocation
 		//	For all invoices
 		int invoiceLines = 0;
 		BigDecimal unmatchedApplied = Env.ZERO;
+
+        // @fchiappano variable para almacenar la moneda de las facturas.
+        int monedaFactura = 0;
+
 		for (int i = 0; i < iRows; i++)
 		{
 			//  Invoice line is selected
@@ -905,6 +928,22 @@ public class Allocation
 				KeyNamePair pp = (KeyNamePair)invoice.getValueAt(i, 2);    //  Value
 				//  Invoice variables
 				int C_Invoice_ID = pp.getKey();
+
+                // @fchiappano Almacenar moneda de la factura.
+                MInvoice factura = new MInvoice(Env.getCtx(), C_Invoice_ID, trxName);
+                if (monedaFactura == 0)
+                    monedaFactura = factura.getC_Currency_ID();
+
+                // @fchiappano Si la moneda de la factura, difiere de la
+                // anterior, advertir al usuario y revertir la transacción.
+                if (monedaFactura != factura.getC_Currency_ID())
+                {
+                    ADialog.error(m_WindowNo, new JDialog(),
+                            "No es posible, asignar movimientos a facturas con distintas monedas. Por favor, realice el procedimiento en dos pasos por separado.");
+                    Trx trx = Trx.get(trxName, false);
+                    trx.rollback();
+                }
+
 				BigDecimal AppliedAmt = (BigDecimal)invoice.getValueAt(i, i_applied);
 				//  semi-fixed fields (reset after first invoice)
 				BigDecimal DiscountAmt = (BigDecimal)invoice.getValueAt(i, i_discount);
@@ -928,8 +967,27 @@ public class Allocation
 						if (amount.abs().compareTo(PaymentAmt.abs()) > 0)  // if there's more open on the invoice
 							amount = PaymentAmt;							// than left in the payment
 
+                        // @fchiappano Si la factura es en moneda extrangera,
+                        // convertir los importes de asignacion a la misma moneda.
+						BigDecimal amountConvertido = amount;
+
+                        if (factura.getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(Env.getCtx(), AD_Client_ID,
+                                trxName))
+                        {
+                            BigDecimal tasaCambio = (BigDecimal) factura.get_Value("TasaDeCambio");
+                            amountConvertido = amountConvertido.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                            DiscountAmt = DiscountAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                            WriteOffAmt = WriteOffAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                            OverUnderAmt = OverUnderAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
+
+                            // @fchiappano Cambiar la moneda de la Asignación.
+                            alloc.setC_Currency_ID(factura.getC_Currency_ID());
+                            alloc.saveEx();
+
+                        } // @fchiappano Fin de Conversión de moneda.
+
 						//	Allocation Line
-						MAllocationLine aLine = new MAllocationLine (alloc, amount,
+                        MAllocationLine aLine = new MAllocationLine(alloc, amountConvertido, // @fchiappano Utilizar el amount convertido.
 							DiscountAmt, WriteOffAmt, OverUnderAmt);
 						aLine.setDocInfo(C_BPartner_ID, C_Order_ID, C_Invoice_ID);
 						aLine.setPaymentInfo(C_Payment_ID, C_CashLine_ID);
