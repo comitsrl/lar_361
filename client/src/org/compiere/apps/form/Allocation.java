@@ -412,10 +412,12 @@ public class Allocation
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		StringBuffer sql = new StringBuffer("SELECT i.DateInvoiced,i.DocumentNo,i.C_Invoice_ID," //  1..3
 			+ "c.ISO_Code,i.GrandTotal*i.MultiplierAP, "                            //  4..5    Orig Currency
-			+ "currencyConvert(i.GrandTotal*i.MultiplierAP,i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID), " //  6   #1  Converted, #2 Date
-			+ "currencyConvert(invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.MultiplierAP, "  //  7   #3, #4  Converted Open
-			+ "currencyConvert(invoiceDiscount"                               //  8       AllowedDiscount
-			+ "(i.C_Invoice_ID,?,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.Multiplier*i.MultiplierAP,"               //  #5, #6
+			// @fchiappano Utilizar nueva función de conversión de moneda.
+			+ "currencyConvertRate(i.GrandTotal*i.MultiplierAP, i.C_Currency_ID, ?, i.TasaDeCambio), " //  6   #1  Converted, #2 Date
+			+ "currencyConvertRate(invoiceOpen(C_Invoice_ID, C_InvoicePaySchedule_ID), i.C_Currency_ID, ?, i.TasaDeCambio) * i.MultiplierAP, "  //  7   #3, #4  Converted Open
+			+ "currencyConvertRate(invoiceDiscount"                               //  8       AllowedDiscount
+			+ "(i.C_Invoice_ID, ?,C_InvoicePaySchedule_ID), i.C_Currency_ID, ?, i.TasaDeCambio) * i.Multiplier * i.MultiplierAP,"               //  #5, #6
+			// @fchiappano Fin.
 			+ "i.MultiplierAP "
 			+ "FROM C_Invoice_v i"		//  corrected for CM/Split
 			+ " INNER JOIN C_Currency c ON (i.C_Currency_ID=c.C_Currency_ID) "
@@ -439,17 +441,15 @@ public class Allocation
 		{
 			PreparedStatement pstmt = DB.prepareStatement(sql.toString(), null);
 			pstmt.setInt(1, m_C_Currency_ID);
-			pstmt.setTimestamp(2, (Timestamp)date);
-			pstmt.setInt(3, m_C_Currency_ID);
-			pstmt.setTimestamp(4, (Timestamp)date);
-			pstmt.setTimestamp(5, (Timestamp)date);
-			pstmt.setInt(6, m_C_Currency_ID);
-			pstmt.setInt(7, m_C_BPartner_ID);
+			pstmt.setInt(2, m_C_Currency_ID);
+			pstmt.setTimestamp(3, (Timestamp)date);
+			pstmt.setInt(4, m_C_Currency_ID);
+			pstmt.setInt(5, m_C_BPartner_ID);
             // @fchiappano Se cambio el orden de los parametros, para que los mismos no queden fuera de rango.
-            pstmt.setString(8, isSOTrx ? "Y" : "N"); // @emmie - Filtra facturas venta/compra
+            pstmt.setString(6, isSOTrx ? "Y" : "N"); // @emmie - Filtra facturas venta/compra
 
             if (!isMultiCurrency)
-                pstmt.setInt(9, m_C_Currency_ID);
+                pstmt.setInt(7, m_C_Currency_ID);
 
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next())
@@ -514,10 +514,12 @@ public class Allocation
 	        Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 	        StringBuffer sql = new StringBuffer("SELECT i.DateInvoiced,i.DocumentNo,i.C_Invoice_ID," //  1..3
 	            + "c.ISO_Code,i.GrandTotal*i.MultiplierAP, "                            //  4..5    Orig Currency
-	            + "currencyConvert(i.GrandTotal*i.MultiplierAP,i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID), " //  6   #1  Converted, #2 Date
-	            + "currencyConvert(invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.MultiplierAP, "  //  7   #3, #4  Converted Open
-	            + "currencyConvert(invoiceDiscount"                               //  8       AllowedDiscount
-	            + "(i.C_Invoice_ID,?,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.Multiplier*i.MultiplierAP,"               //  #5, #6
+	            // @fchiappano Utilizar nueva funcion de conversion de moneda.
+	            + "currencyConvertRate(i.GrandTotal * i.MultiplierAP, i.C_Currency_ID, ?, i.TasaDeCambio), " //  6   #1  Converted, #2 Date
+	            + "currencyConvertRate(invoiceOpen(C_Invoice_ID, C_InvoicePaySchedule_ID), i.C_Currency_ID, ?, i.TasaDeCambio) * i.MultiplierAP, "  //  7   #3, #4  Converted Open
+	            + "currencyConvertRate(invoiceDiscount"                               //  8       AllowedDiscount
+	            + "(i.C_Invoice_ID, ?, C_InvoicePaySchedule_ID), i.C_Currency_ID, ?, i.TasaDeCambio) * i.Multiplier * i.MultiplierAP,"               //  #5, #6
+	            // @fchiappano Fin
 	            + "i.MultiplierAP "
 	            + "FROM C_Invoice_v i"      //  corrected for CM/Split
 	            + " INNER JOIN C_Currency c ON (i.C_Currency_ID=c.C_Currency_ID) "
@@ -537,9 +539,7 @@ public class Allocation
 	        {
 	            PreparedStatement pstmt = DB.prepareStatement(sql.toString(), null);
 	            pstmt.setInt(1, m_C_Currency_ID);
-	            pstmt.setTimestamp(2, (Timestamp)date);
 	            pstmt.setInt(3, m_C_Currency_ID);
-	            pstmt.setTimestamp(4, (Timestamp)date);
 	            pstmt.setTimestamp(5, (Timestamp)date);
 	            pstmt.setInt(6, m_C_Currency_ID);
 	            pstmt.setInt(7, m_C_BPartner_ID);
@@ -917,7 +917,7 @@ public class Allocation
 		BigDecimal unmatchedApplied = Env.ZERO;
 
         // @fchiappano variable para almacenar la moneda de las facturas.
-        int monedaFactura = 0;
+        int monedaFactura_ID = 0;
 
 		for (int i = 0; i < iRows; i++)
 		{
@@ -931,18 +931,23 @@ public class Allocation
 
                 // @fchiappano Almacenar moneda de la factura.
                 MInvoice factura = new MInvoice(Env.getCtx(), C_Invoice_ID, trxName);
-                if (monedaFactura == 0)
-                    monedaFactura = factura.getC_Currency_ID();
+                if (monedaFactura_ID == 0)
+                    monedaFactura_ID = factura.getC_Currency_ID();
 
                 // @fchiappano Si la moneda de la factura, difiere de la
                 // anterior, advertir al usuario y revertir la transacción.
-                if (monedaFactura != factura.getC_Currency_ID())
+                if (monedaFactura_ID != factura.getC_Currency_ID())
                 {
                     ADialog.error(m_WindowNo, new JDialog(),
                             "No es posible, asignar movimientos a facturas con distintas monedas. Por favor, realice el procedimiento en dos pasos por separado.");
                     Trx trx = Trx.get(trxName, false);
                     trx.rollback();
                 }
+
+                // @fchiappano Chequear si la moneda de la factura, es una moneda extranjera.
+                BigDecimal tasaCambio = Env.ZERO;
+                boolean esMonedaExtranjera = monedaFactura_ID != LAR_Utils.getMonedaPredeterminada(
+                        Env.getCtx(), AD_Client_ID, trxName) ? true : false;
 
 				BigDecimal AppliedAmt = (BigDecimal)invoice.getValueAt(i, i_applied);
 				//  semi-fixed fields (reset after first invoice)
@@ -951,6 +956,19 @@ public class Allocation
 				//	OverUnderAmt needs to be in Allocation Currency
 				BigDecimal OverUnderAmt = ((BigDecimal)invoice.getValueAt(i, i_open))
 					.subtract(AppliedAmt).subtract(DiscountAmt).subtract(WriteOffAmt);
+
+                // @fchiappano Convertir valores de la factura y setear la moneda correcta en la asignación.
+                if (esMonedaExtranjera)
+                {
+                    tasaCambio = (BigDecimal) factura.get_Value("TasaDeCambio");
+                    DiscountAmt = DiscountAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                    WriteOffAmt = WriteOffAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                    OverUnderAmt = OverUnderAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
+
+                    // @fchiappano Cambiar la moneda de la Asignación.
+                    alloc.setC_Currency_ID(factura.getC_Currency_ID());
+                    alloc.saveEx();
+                }
 
 				log.config("Invoice #" + i + " - AppliedAmt=" + AppliedAmt);// + " -> " + AppliedAbs);
 				//  loop through all payments until invoice applied
@@ -968,29 +986,20 @@ public class Allocation
 							amount = PaymentAmt;							// than left in the payment
 
                         // @fchiappano Si la factura es en moneda extrangera,
-                        // convertir los importes de asignacion a la misma moneda.
+                        // convertir el monto a asignar del cobro/pago.
 						BigDecimal amountConvertido = amount;
 
-                        if (factura.getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(Env.getCtx(), AD_Client_ID,
-                                trxName))
-                        {
-                            BigDecimal tasaCambio = (BigDecimal) factura.get_Value("TasaDeCambio");
+                        if (esMonedaExtranjera)
                             amountConvertido = amountConvertido.divide(tasaCambio, 4, RoundingMode.FLOOR);
-                            DiscountAmt = DiscountAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
-                            WriteOffAmt = WriteOffAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
-                            OverUnderAmt = OverUnderAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
-
-                            // @fchiappano Cambiar la moneda de la Asignación.
-                            alloc.setC_Currency_ID(factura.getC_Currency_ID());
-                            alloc.saveEx();
-
-                        } // @fchiappano Fin de Conversión de moneda.
+                        // @fchiappano Fin de Conversión de moneda.
 
 						//	Allocation Line
                         MAllocationLine aLine = new MAllocationLine(alloc, amountConvertido, // @fchiappano Utilizar el amount convertido.
 							DiscountAmt, WriteOffAmt, OverUnderAmt);
 						aLine.setDocInfo(C_BPartner_ID, C_Order_ID, C_Invoice_ID);
 						aLine.setPaymentInfo(C_Payment_ID, C_CashLine_ID);
+                        // @fchiappano Setear tasa de cambio en linea de asignacion.
+                        aLine.set_ValueOfColumn("TasaDeCambio", tasaCambio);
 
                         // @fchiappano Si se trata de una NC, Copio el
                         // C_Invoice_ID en la columna NotaCredito_ID.

@@ -1252,6 +1252,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             , pa.getWriteOffAmt().negate(), alineOUAmt);
                 aLine.setDocInfo(pa.getC_BPartner_ID(), 0, pa.getC_Invoice_ID());
                 aLine.setPaymentInfo(pays[p].getC_Payment_ID(), 0);
+
+                // @fchiappano setear la tasa de cambio de la cabecera del recibo, en la linea de asignación.
+                aLine.set_ValueOfColumn("TasaDeCambio", get_Value("TasaDeCambio"));
+
                 if (!aLine.save(get_TrxName()))
                     log.warning("Asignación: No se pudo guradar la línea");
                 else
