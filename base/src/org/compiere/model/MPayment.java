@@ -755,7 +755,7 @@ public final class MPayment extends X_C_Payment
 		// @mzuniga Se agrega COALESCE (Evita Null Pointer Exception cuando
 		// no se trabaja en una Cabecera)
 		String sql = "SELECT COALESCE(SUM(currencyConvertRate(al.Amount,"
-				+ "ah.C_Currency_ID, p.C_Currency_ID, ph.TasaDeCambio)), 0) "
+				+ "ah.C_Currency_ID, p.C_Currency_ID, al.TasaDeCambio)), 0) "
 			+ "FROM C_AllocationLine al"
 			+ " INNER JOIN C_AllocationHdr ah ON (al.C_AllocationHdr_ID=ah.C_AllocationHdr_ID) "
 			+ " INNER JOIN C_Payment p ON (al.C_Payment_ID=p.C_Payment_ID) "
