@@ -271,11 +271,13 @@ import ar.com.ergio.util.LAR_Utils;
     			if(msg!=null)
     				return msg;
     			}
-    			
+
+                /* @fchiappano Se comenta codigo, ya que se define si debe quedar conciliado el pago/cobro,
+                               en cada uno de los procesos que intervienen en la funcionalidad de cajas.
     			msg=setReconciled(pay.getC_Payment_ID(),"N", pay.get_TrxName());
     			if(msg!=null)
     				return msg;
-
+                */
     		}
 
     		if

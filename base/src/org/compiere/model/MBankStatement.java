@@ -620,7 +620,9 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 					{
 					    final String sql = "SELECT C_Payment_ID"
 					                     + "  FROM C_Payment"
-					                     + " WHERE LAR_PaymentSource_ID=? AND DocStatus NOT IN ('RE','VO')";
+					                     + " WHERE LAR_PaymentSource_ID=?"
+					                     +   " AND DocStatus NOT IN ('RE','VO')"
+					                     +   " AND LAR_PaymentHeader_ID IS NULL"; // @fchiappano Si el cobro/pago tiene cabecera, quiere decir que no corresponde a una transferencia.
 					    PreparedStatement pstmt = null;
 				        ResultSet rs = null;
 				        try
