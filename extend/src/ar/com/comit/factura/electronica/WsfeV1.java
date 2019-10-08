@@ -20,7 +20,7 @@ import org.compiere.model.MTax;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
-import org.globalqss.model.X_LCO_TaxPayerType;
+import org.globalqss.model.X_LCO_TaxIdType;
 
 import ar.com.ergio.util.LAR_Utils;
 
@@ -65,22 +65,21 @@ public class WsfeV1 extends Wsfe{
 			
 			//*****TIPO DOC: 80 CUIT / 96 DNI
 			MBPartner partner = new MBPartner(this.getM_ctx(),this.getInvoice().getC_BPartner_ID(),getTrxName());
-			final X_LCO_TaxPayerType taxPayerType = new X_LCO_TaxPayerType(getM_ctx(), partner.get_ValueAsInt("LCO_TaxPayerType_ID"), getTrxName());
-			if(taxPayerType.getName().equals("ConsumidorFinal"))
-			{
-				line.append("96"+"\n");
-				line.append("1"+"\n");
-			}
-			else{
-				line.append("80"+"\n");
-				if(partner.getTaxID() == null || partner.getTaxID().equals("")){
-					this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoCUIT"));
-					return;
-				}
-				
-				line.append(partner.getTaxID().replaceAll("-", "")+"\n");
-			}
-			
+
+			// @fchiappano Recuperar el tipo de identificación, desde el Socio del Negocio.
+			final X_LCO_TaxIdType tipoIdentificacion = new X_LCO_TaxIdType(getM_ctx(),
+                    partner.get_ValueAsInt("LCO_TaxIdType_ID"), getTrxName());
+
+            line.append(tipoIdentificacion.getLCO_TaxCodeDian() + "\n");
+
+            if (partner.getTaxID() == null || partner.getTaxID().equals(""))
+            {
+                this.setMessageError(Msg.translate(this.getM_ctx(), "CaeNoCUIT"));
+                return;
+            }
+
+            line.append(partner.getTaxID().replaceAll("-", "") + "\n");
+
 			//*****IMPORTE TOTAL
 			//line.append(this.getInvoice().getGrandTotal().toString().replace(".", "")+"\n");
 			line.append(this.getInvoice().getGrandTotal().setScale(2, BigDecimal.ROUND_HALF_UP) + "\n");
