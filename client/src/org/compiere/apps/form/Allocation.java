@@ -46,6 +46,7 @@ import org.compiere.util.TimeUtil;
 import org.compiere.util.Trx;
 import org.compiere.util.Util;
 
+import ar.com.ergio.model.MLARPaymentHeader;
 import ar.com.ergio.util.LAR_Utils;
 
 public class Allocation
@@ -990,7 +991,20 @@ public class Allocation
 						BigDecimal amountConvertido = amount;
 
                         if (esMonedaExtranjera)
+                        {
                             amountConvertido = amountConvertido.divide(tasaCambio, 4, RoundingMode.FLOOR);
+
+                            // @fchiappano Setear tasa de cambio en la cabecera del recibo,
+                            // para evitar errores en la posterior validación de la asignación.
+                            MPayment cobro = new MPayment(Env.getCtx(), C_Payment_ID, trxName);
+                            if (cobro.get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
+                            {
+                                MLARPaymentHeader cabecera = new MLARPaymentHeader(Env.getCtx(),
+                                        cobro.get_ValueAsInt("LAR_PaymentHeader_ID"), trxName);
+                                cabecera.set_ValueOfColumn("TasaDeCambio", tasaCambio);
+                                cabecera.saveEx(trxName);
+                            }
+                        }
                         // @fchiappano Fin de Conversión de moneda.
 
 						//	Allocation Line
