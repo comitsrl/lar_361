@@ -2989,7 +2989,7 @@ public final class MPayment extends X_C_Payment
         if (lar_PaymentHeader_ID <= 0)
             return despreciable;
 
-        MLARPaymentHeader recibo = new MLARPaymentHeader(p_ctx, lar_PaymentHeader_ID, getTrxType());
+        MLARPaymentHeader recibo = new MLARPaymentHeader(p_ctx, lar_PaymentHeader_ID, get_TrxName());
         BigDecimal tasaCambio = (BigDecimal) recibo.get_Value("TasaDeCambio");
 
         BigDecimal convertido = diferencia.divide(tasaCambio, 8, RoundingMode.FLOOR).abs();
