@@ -445,7 +445,7 @@ public class CalloutPayment extends CalloutEngine
                                 InvoiceOpenAmt = Env.ZERO;
 
                             sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
-                            sumaDescuento = facturas[i].getDiscountAmt();
+                            sumaDescuento = sumaDescuento.add(facturas[i].getDiscountAmt());
                         }
                     } catch (SQLException e)
                     {

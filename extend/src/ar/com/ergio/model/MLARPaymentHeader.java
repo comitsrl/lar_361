@@ -53,6 +53,7 @@ import org.compiere.model.MTax;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.Query;
+import org.compiere.model.Tax;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
@@ -100,6 +101,11 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     final static private int responsableInscripto = 1000000;
     // C_SalesRegion_ID para Río Negro
     final static private int regionRioNegroID = 224;
+
+    // @fchiappano variables necesarias para la generación automatica de NC.
+    private MInvoice notaCredito = null;
+    private List<MAllocationHdr> asignacionesNC = new ArrayList<MAllocationHdr>();
+    private String generarNC = MSysConfig.getValue("LAR_GenerarNC_EnRecibos", "D", getAD_Client_ID());
 
     /**
      * Recupera la cabecera de pagos relacionada con el id de la factura dada
@@ -1170,6 +1176,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         if (m_processMsg != null)
             return DocAction.STATUS_Invalid;
 
+        // @fchiappano variable para acumular los descuentos en los cobros/pagos.
+        BigDecimal descuento = Env.ZERO;
+        BigDecimal montoAsignadoNC = Env.ZERO;
+
         MPayment[] pays = getPayments(get_TrxName());
         int p = 0;
         for (; p < pays.length; p++)
@@ -1184,11 +1194,25 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 m_processMsg = "@C_Payment_ID@: " + pays[p].getProcessMsg();
                 return DocAction.STATUS_Invalid;
             }
+
+            // @fchiappano Acumular el descuento, para posteriormente generar la NC correspondiente.
+            descuento = descuento.add(pays[p].getDiscountAmt());
         }
         // Asigna los cobros/pagos a las facturas
         MPaymentAllocate[] invoices = getInvoices(get_TrxName());
         if (invoices.length != 0)
         {
+            // @fchiappano Generar Nota de Crédito, por los descuentos por pago en termino.
+            if (descuento.compareTo(Env.ZERO) > 0 && isReceipt() && !generarNC.equals("D"))
+            {
+                String mensaje = generarNotaCredito(descuento, invoices[0].getInvoice());
+                if (!mensaje.equals("") && !mensaje.equals(null))
+                {
+                    m_processMsg = mensaje;
+                    return DocAction.STATUS_Invalid;
+                }
+            } // @fchiappano Fin de generación de NC.
+
             p = 0;
             // Asignaciones
             for (int i = 0; (i < invoices.length && p < pays.length);)
@@ -1265,6 +1289,23 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 }
                 if (comp >= 0)
                 {
+                    // @fchiappano Antes de pasar a la siguiente factura,
+                    // chequear si existe un descuento por pago en termino y
+                    // generar la asignación de la NC correspondiente.
+                    if (pa.getDiscountAmt().compareTo(Env.ZERO) > 0 && notaCredito != null && generarNC.equals("A"))
+                    {
+                        String mensaje = generarAsignacionNC(pa.getDiscountAmt(), montoAsignadoNC, notaCredito, pa.getInvoice());
+                        if (!mensaje.equals("") && !mensaje.equals(null))
+                        {
+                            log.severe(mensaje);
+                            m_processMsg = mensaje;
+                            return DocAction.STATUS_Invalid;
+                        }
+
+                        // @fchiappano acumular monto asignado.
+                        montoAsignadoNC = montoAsignadoNC.add(pa.getDiscountAmt());
+                    }
+
                     i = i + 1;
                     if (comp == 0)
                         p = p + 1;
@@ -1277,6 +1318,23 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 log.fine(m_processMsg);
             }
         }
+
+        // @fchiappano Recorrer y procesar asignaciones de NC.
+        for (MAllocationHdr asignacion : asignacionesNC)
+        {
+            if (!asignacion.processIt(DocAction.ACTION_Complete))
+                return "Error al procesar Asginación de Nota de Crédito: " + asignacion.getProcessMsg();
+
+            if (!asignacion.save(get_TrxName()))
+                return "Error al actualizar Asignación de Nota de Crédito.";
+
+            // @fchiappano activar cabecera de asignacion.
+            DB.executeUpdate("UPDATE C_AllocationHdr SET IsActive = 'Y' WHERE C_AllocationHdr_ID = ?", asignacion.getC_AllocationHdr_ID(), get_TrxName());
+        }
+
+        // @fchiappano vaciar lista.
+        asignacionesNC.removeAll(asignacionesNC);
+
         // setC_BankAccount_ID(C_BankAccount_ID);
         // Dispara la validación del documento
         m_processMsg = ModelValidationEngine.get().fireDocValidate(this,
@@ -1838,5 +1896,129 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         }
         return letra;
     } // recuperaLetra
+
+    /**
+     * Generar nota de crédito, por pago en termino.
+     *
+     * @author fchiappano
+     * @param descuento
+     * @param facturaOrigen
+     * @return notaCredito
+     */
+    private String generarNotaCredito(final BigDecimal descuento, final MInvoice facturaOrigen)
+    {
+        if (facturaOrigen == null)
+            return "No fue posible, recuperar una Factura Origen.";
+
+        // @fchiappano Recuperar cargo a utilizar.
+        int cargo_ID = MSysConfig.getIntValue("LAR_CargoNCAutomatica_Recibo", 0, getAD_Client_ID());
+        if (cargo_ID <= 0)
+            return "No fue posible recuperar el cargo a utilizar en Nota de Crédito.";
+
+        // @fchiappano Recuperar el impuesto del cargo.
+        int impuesto_ID = Tax.getCharge(p_ctx, cargo_ID, getDateTrx(), getDateTrx(), getAD_Org_ID(),
+                Env.getContextAsInt(getCtx(), "#M_Warehouse_ID"), facturaOrigen.getC_BPartner_Location_ID(),
+                facturaOrigen.getC_BPartner_Location_ID(), true);
+        if (impuesto_ID <= 0)
+            return "No fue posible recuperar el impuesto a utilizar en Nota de Crédito.";
+
+        // @fchiappano Recuperar el tipo de documento a utilizar.
+        final FindInvoiceDocType findDocType = new FindInvoiceDocType((MBPartner) getC_BPartner(),
+                facturaOrigen.get_ValueAsInt("C_Pos_ID"), facturaOrigen.getAD_Org_ID(),
+                MDocType.DOCBASETYPE_ARCreditMemo);
+
+        // @fchiappano Crear cabecera de nota de crédito.
+        notaCredito = new MInvoice(p_ctx, 0, get_TrxName());
+        notaCredito.setAD_Org_ID(getAD_Org_ID());
+        notaCredito.setDescription(get_ValueAsString("Description"));
+        notaCredito.setC_BPartner_ID(getC_BPartner_ID());
+        notaCredito.setGrandTotal(descuento);
+        notaCredito.setIsSOTrx(true);
+        notaCredito.setC_DocTypeTarget_ID(findDocType.getDocType().getC_DocType_ID());
+        notaCredito.set_ValueOfColumn("C_Pos_ID", facturaOrigen.get_ValueAsInt("C_Pos_ID"));
+
+        // @fchiappano datos a recuperar desde la factura origen.
+        notaCredito.setSalesRep_ID(facturaOrigen.getSalesRep_ID());
+        notaCredito.setC_BPartner_Location_ID(facturaOrigen.getC_BPartner_Location_ID());
+        notaCredito.setAD_User_ID(facturaOrigen.getAD_User_ID());
+        notaCredito.setC_Currency_ID(facturaOrigen.getC_Currency_ID());
+        notaCredito.setIsTaxIncluded(facturaOrigen.isTaxIncluded());
+        notaCredito.setM_PriceList_ID(facturaOrigen.getM_PriceList_ID());
+        notaCredito.setC_Project_ID(facturaOrigen.getC_Project_ID());
+        notaCredito.setC_Activity_ID(facturaOrigen.getC_Activity_ID());
+        notaCredito.setC_Campaign_ID(facturaOrigen.getC_Campaign_ID());
+        notaCredito.setUser1_ID(facturaOrigen.getUser1_ID());
+        notaCredito.setUser2_ID(facturaOrigen.getUser2_ID());
+        notaCredito.setPaymentRule(facturaOrigen.getPaymentRule());
+
+        if (!notaCredito.save(get_TrxName()))
+            return "No fue posible crear la Nota de Crédito por pago en termino.";
+
+        // @fchiappano Crear línea de Nota de Credito.
+        MInvoiceLine linea = new MInvoiceLine(notaCredito);
+        linea.setC_Charge_ID(cargo_ID);
+        linea.setC_Tax_ID(impuesto_ID);
+        linea.setQty(Env.ONE);
+        BigDecimal impuesto = new MTax(p_ctx, impuesto_ID, get_TrxName()).getRate();
+        impuesto = impuesto.divide(Env.ONEHUNDRED, 3, RoundingMode.HALF_UP).add(Env.ONE);
+        linea.setPrice(descuento.divide(impuesto, 2, RoundingMode.HALF_UP));
+
+        if (!linea.save(get_TrxName()))
+            return "No fue posible crear la línea de Nota de Crédito por pago en termino.";
+
+        // @fchiappano Completar la nota de credito.
+        if (generarNC.equals("P") || generarNC.equals("A") && !notaCredito.processIt(DOCACTION_Complete))
+            return "Error al procesar Nota de Crédito: " + notaCredito.getProcessMsg();
+
+        // @fchippano Actualizar Nota de Credito.
+        if (!notaCredito.save(get_TrxName()))
+            return "No fue posible actualizar Nota de Crédito por pago en termino.";
+
+        return "";
+    } // generarNotaCredito
+
+    /**
+     * Generar Asignación para nota de crédito.
+     *
+     * @author fchiappano
+     * @param amt
+     * @param montoAsignado
+     * @param notaCredito
+     * @param factura
+     * @return mensaje.
+     */
+    private String generarAsignacionNC(final BigDecimal amt, final BigDecimal montoAsignado, final MInvoice notaCredito, final MInvoice factura)
+    {
+        // @fchiappano si el monto asignado ya igualo al total de la NC, cortar el proceso.
+        if (montoAsignado.compareTo(notaCredito.getGrandTotal()) >= 0)
+            return "";
+
+        // @fchiappano generar cabecera de asignación.
+        MAllocationHdr alloc = new MAllocationHdr(getCtx(), false, getDateTrx(), factura.getC_Currency_ID(),
+                "Asignación Nota de Crédito a Facturas - Cabecera: " + getDocumentNo(), get_TrxName());
+        alloc.setAD_Org_ID(getAD_Org_ID());
+        // @fchiappano dejar la asignación inactiva, de manera que no se tome en cuenta en el testAllocation() de la MInvoice.
+        alloc.setIsActive(false);
+        if (!alloc.save())
+            return "La Cabecera de Asignación de Nota de Crédito no pudo crearse";
+
+        // @fchiappano línea de asignación de nota de crédito
+        final MAllocationLine lineNC = new MAllocationLine(alloc);
+        lineNC.setAmount(amt.negate());
+        lineNC.setDocInfo(getC_BPartner_ID(), 0, notaCredito.getC_Invoice_ID());
+        lineNC.set_ValueOfColumn("NotaCredito_ID", notaCredito.getC_Invoice_ID());
+        lineNC.saveEx();
+
+        // @fchiappano línea de asignación de la factura.
+        final MAllocationLine lineF = new MAllocationLine(alloc);
+        lineF.setAmount(amt);
+        lineF.setDocInfo(getC_BPartner_ID(), 0, factura.getC_Invoice_ID());
+        lineF.saveEx();
+
+        // @fchiappano agregar asignación a la lista de asignaciones de NC.
+        asignacionesNC.add(alloc);
+
+        return "";
+    } // generarAsignacionNC
 
 }	//	MLARPaymentHeader
