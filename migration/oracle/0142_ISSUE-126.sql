@@ -33,6 +33,105 @@ UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2019-10-31 18:03:30','YYYY-M
 UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2019-10-31 18:04:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000813
 ;
 
+ALTER TABLE LAR_PaymentHeader ADD COLUMN LAR_NotaCredito_ID numeric(10,0);
+ALTER TABLE LAR_PaymentHeader ADD CONSTRAINT notacredito_payheader FOREIGN KEY (LAR_NotaCredito_ID)
+      REFERENCES C_Invoice (C_Invoice_ID) MATCH SIMPLE;
+
+-- 31/10/2019 18:25:49 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001047,'lar_notacredito_id','LAR','lar_notacredito_id','lar_notacredito_id',0,TO_DATE('2019-10-31 18:25:49','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2019-10-31 18:25:49','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 31/10/2019 18:25:49 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, PO_Description,Help,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.PO_Description,t.Help,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001047 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 31/10/2019 18:25:50 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,IsMandatory,Version,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003532,3000010,'LAR','N',0,'N','N','N',10,'N',19,'N',3001047,'N','Y','N','lar_notacredito_id','lar_notacredito_id',TO_DATE('2019-10-31 18:25:49','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2019-10-31 18:25:49','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 31/10/2019 18:25:50 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003532 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 31/10/2019 18:26:59 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+INSERT INTO AD_Reference (AD_Reference_ID,ValidationType,EntityType,IsOrderByValue,Name,AD_Client_ID,AD_Org_ID,CreatedBy,Updated,IsActive,Created,UpdatedBy) VALUES (3000113,'T','LAR','N','Nota de Crédito',0,0,100,TO_DATE('2019-10-31 18:26:59','YYYY-MM-DD HH24:MI:SS'),'Y',TO_DATE('2019-10-31 18:26:59','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 31/10/2019 18:26:59 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+INSERT INTO AD_Reference_Trl (AD_Language,AD_Reference_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Reference_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Reference t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Reference_ID=3000113 AND NOT EXISTS (SELECT * FROM AD_Reference_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Reference_ID=t.AD_Reference_ID)
+;
+
+-- 31/10/2019 18:28:10 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+INSERT INTO AD_Ref_Table (IsValueDisplayed,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,CreatedBy,Updated,Created,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N',318,3000113,3484,3492,'LAR',100,TO_DATE('2019-10-31 18:28:10','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2019-10-31 18:28:10','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
+;
+
+-- 31/10/2019 18:28:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Column SET AD_Reference_Value_ID=3000113, AD_Reference_ID=18, Name='Nota de Crédito', ColumnName='LAR_NotaCredito_ID',Updated=TO_DATE('2019-10-31 18:28:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003532
+;
+
+-- 31/10/2019 18:28:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003532
+;
+
+-- 31/10/2019 18:28:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Field SET Name='Nota de Crédito', Description=NULL, Help=NULL WHERE AD_Column_ID=3003532 AND IsCentrallyMaintained='Y'
+;
+
+-- 31/10/2019 18:29:00 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Column_Trl SET Name='Nota de Crédito',Updated=TO_DATE('2019-10-31 18:29:00','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003532 AND AD_Language='es_AR'
+;
+
+-- 31/10/2019 18:29:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Element SET ColumnName='LAR_NotaCredito_ID', Name='Nota de Crédito', PrintName='Nota de Crédito',Updated=TO_DATE('2019-10-31 18:29:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001047
+;
+
+-- 31/10/2019 18:29:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001047
+;
+
+-- 31/10/2019 18:29:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Column SET ColumnName='LAR_NotaCredito_ID', Name='Nota de Crédito', Description=NULL, Help=NULL WHERE AD_Element_ID=3001047
+;
+
+-- 31/10/2019 18:29:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Process_Para SET ColumnName='LAR_NotaCredito_ID', Name='Nota de Crédito', Description=NULL, Help=NULL, AD_Element_ID=3001047 WHERE UPPER(ColumnName)='LAR_NOTACREDITO_ID' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 31/10/2019 18:29:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Process_Para SET ColumnName='LAR_NotaCredito_ID', Name='Nota de Crédito', Description=NULL, Help=NULL WHERE AD_Element_ID=3001047 AND IsCentrallyMaintained='Y'
+;
+
+-- 31/10/2019 18:29:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Field SET Name='Nota de Crédito', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001047) AND IsCentrallyMaintained='Y'
+;
+
+-- 31/10/2019 18:29:30 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_PrintFormatItem pi SET PrintName='Nota de Crédito', Name='Nota de Crédito' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001047)
+;
+
+-- 31/10/2019 18:29:35 ART
+-- ISSUE #126: Generar Nota de Crédito automatica, al completar recibo con descuento.
+UPDATE AD_Element_Trl SET Name='Nota de Crédito',PrintName='Nota de Crédito',Updated=TO_DATE('2019-10-31 18:29:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001047 AND AD_Language='es_AR'
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0142_ISSUE-126.sql', 'LAR', '') FROM dual
 ;

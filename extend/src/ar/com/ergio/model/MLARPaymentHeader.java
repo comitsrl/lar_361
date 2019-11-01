@@ -1211,6 +1211,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     m_processMsg = mensaje;
                     return DocAction.STATUS_Invalid;
                 }
+
+                // @fchiappano Vincular la NC generada a la cabecera del recibo.
+                set_ValueOfColumn("LAR_NotaCredito_ID", notaCredito.getC_Invoice_ID());
+
             } // @fchiappano Fin de generación de NC.
 
             p = 0;
@@ -1408,6 +1412,21 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 return false;
             }
         }
+
+        // @fchiappano Anular Nota de Crédito generada por pago en termino.
+        int notaCredito_ID = get_ValueAsInt("LAR_NotaCredito_ID");
+
+        if (notaCredito_ID > 0)
+        {
+            MInvoice notaCredito = new MInvoice(p_ctx, notaCredito_ID, get_TrxName());
+
+            if (!notaCredito.processIt(DOCACTION_Void))
+            {
+                m_processMsg = "Error al anular Nota de Crédito por pago en termino: " + notaCredito.getProcessMsg();
+                return false;
+            }
+        }
+        // @fchiappano Fin anulación de nota de crédito.
 
         // Dispara la validación del documento
         m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
