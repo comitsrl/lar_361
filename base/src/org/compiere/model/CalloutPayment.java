@@ -485,6 +485,7 @@ public class CalloutPayment extends CalloutEngine
                 }
 
                 mTab.setValue("PayAmt", sumaFacturas.subtract(sumaPagos).subtract(sumaDescuento));
+                mTab.setValue("DiscountAmt", sumaDescuento);
                 mTab.setValue("OverUnderAmt", Env.ZERO);
                 return "";
             }
@@ -644,6 +645,18 @@ public class CalloutPayment extends CalloutEngine
                     for (MPaymentAllocate factura : facturas)
                     {
                         saldoImpago = factura.getAmount();
+
+                        // @fchiappano aplicar conversion de moneda de ser necesario.
+                        boolean aplicarConversion = false;
+                        BigDecimal tasaCambio = Env.ZERO;
+
+                        if (factura.getInvoice().getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(ctx, Env.getAD_Client_ID(ctx), mTab.getTrxInfo()))
+                        {
+                            tasaCambio = ((BigDecimal) factura.getInvoice().get_Value("TasaDeCambio")).setScale(2, RoundingMode.HALF_UP);
+                            saldoImpago = saldoImpago.multiply(tasaCambio).setScale(2, RoundingMode.HALF_UP);
+                            aplicarConversion = true;
+                        }
+
                         for (int x = pagoNro; x < pagos.size(); x++)
                         {
                             MPayment pago = pagos.get(x);
@@ -678,6 +691,10 @@ public class CalloutPayment extends CalloutEngine
                                 resto = Env.ZERO;
                             }
 
+                            // @fchiappano convertir el descuento, antes de setearlo en el pago/cobro.
+                            if (aplicarConversion)
+                                descuento = descuento.multiply(tasaCambio).setScale(2, RoundingMode.HALF_UP);
+
                             if (Env.getContextAsInt(ctx, WindowNo, "C_Payment_ID") == pago.getC_Payment_ID())
                                 mTab.setValue("DiscountAmt", descuento);
                             else
@@ -704,8 +721,13 @@ public class CalloutPayment extends CalloutEngine
                             {
                                 resto = resto.subtract(saldoImpago);
                                 saldoImpago = Env.ZERO;
-                                mTab.setValue("DiscountAmt", ((BigDecimal) mTab.getValue("DiscountAmt")).add(
-                                        factura.getDiscountAmt()));
+
+                                // @fchippano Convertir el descuento de la factura, antes de sumarlo al del pago/cobro.
+                                BigDecimal descuentoFactura = factura.getDiscountAmt();
+                                if (aplicarConversion)
+                                    descuentoFactura = descuentoFactura.multiply(tasaCambio).setScale(2, RoundingMode.HALF_UP);
+
+                                mTab.setValue("DiscountAmt", ((BigDecimal) mTab.getValue("DiscountAmt")).add(descuentoFactura));
                             }
                             else
                             {

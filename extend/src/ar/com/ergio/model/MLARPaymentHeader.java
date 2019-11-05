@@ -1291,6 +1291,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     pa.setC_AllocationLine_ID(aLine.getC_AllocationLine_ID());
                     pa.saveEx();
                 }
+
+                // @fchiappano si la diferencia entre el pago y el saldo abierto de la factura,
+                // esta por debajo del minimo, pasar la siguiente factura igualmente.
+                BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
+                min = min.pow(MCurrency.getStdPrecision(p_ctx, getC_Currency_ID()));
+                if (impPago.subtract(importeFactura).abs().compareTo(min) <= 0)
+                    comp = 0;
+
                 if (comp >= 0)
                 {
                     // @fchiappano Antes de pasar a la siguiente factura,
@@ -1946,12 +1954,22 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 facturaOrigen.get_ValueAsInt("C_Pos_ID"), facturaOrigen.getAD_Org_ID(),
                 MDocType.DOCBASETYPE_ARCreditMemo);
 
+        BigDecimal amt = descuento;
+        int redondeo = facturaOrigen.getC_Currency().getStdPrecision();
+
+        // @fchiappano Si la moneda de la factura origen es distinta de la predeterminada, realizar conversion de moneda.
+        if (facturaOrigen.getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+        {
+            BigDecimal tasaCambio = (BigDecimal) facturaOrigen.get_Value("TasaDeCambio");
+            amt = amt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
+        }
+
         // @fchiappano Crear cabecera de nota de crédito.
         notaCredito = new MInvoice(p_ctx, 0, get_TrxName());
         notaCredito.setAD_Org_ID(getAD_Org_ID());
         notaCredito.setDescription(get_ValueAsString("Description"));
         notaCredito.setC_BPartner_ID(getC_BPartner_ID());
-        notaCredito.setGrandTotal(descuento);
+        notaCredito.setGrandTotal(amt);
         notaCredito.setIsSOTrx(true);
         notaCredito.setC_DocTypeTarget_ID(findDocType.getDocType().getC_DocType_ID());
         notaCredito.set_ValueOfColumn("C_Pos_ID", facturaOrigen.get_ValueAsInt("C_Pos_ID"));
@@ -1969,6 +1987,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         notaCredito.setUser1_ID(facturaOrigen.getUser1_ID());
         notaCredito.setUser2_ID(facturaOrigen.getUser2_ID());
         notaCredito.setPaymentRule(facturaOrigen.getPaymentRule());
+        notaCredito.set_ValueOfColumn("TasaDeCambio", facturaOrigen.get_Value("TasaDeCambio"));
 
         if (!notaCredito.save(get_TrxName()))
             return "No fue posible crear la Nota de Crédito por pago en termino.";
@@ -1980,7 +1999,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         linea.setQty(Env.ONE);
         BigDecimal impuesto = new MTax(p_ctx, impuesto_ID, get_TrxName()).getRate();
         impuesto = impuesto.divide(Env.ONEHUNDRED, 3, RoundingMode.HALF_UP).add(Env.ONE);
-        linea.setPrice(descuento.divide(impuesto, 2, RoundingMode.HALF_UP));
+        linea.setPrice(amt.divide(impuesto, redondeo, RoundingMode.HALF_UP));
 
         if (!linea.save(get_TrxName()))
             return "No fue posible crear la línea de Nota de Crédito por pago en termino.";
@@ -2016,6 +2035,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         MAllocationHdr alloc = new MAllocationHdr(getCtx(), false, getDateTrx(), factura.getC_Currency_ID(),
                 "Asignación Nota de Crédito a Facturas - Cabecera: " + getDocumentNo(), get_TrxName());
         alloc.setAD_Org_ID(getAD_Org_ID());
+        alloc.setC_Currency_ID(notaCredito.getC_Currency_ID());
         // @fchiappano dejar la asignación inactiva, de manera que no se tome en cuenta en el testAllocation() de la MInvoice.
         alloc.setIsActive(false);
         if (!alloc.save())
@@ -2026,12 +2046,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         lineNC.setAmount(amt.negate());
         lineNC.setDocInfo(getC_BPartner_ID(), 0, notaCredito.getC_Invoice_ID());
         lineNC.set_ValueOfColumn("NotaCredito_ID", notaCredito.getC_Invoice_ID());
+        lineNC.set_ValueOfColumn("TasaDeCambio", notaCredito.get_Value("TasaDeCambio"));
         lineNC.saveEx();
 
         // @fchiappano línea de asignación de la factura.
         final MAllocationLine lineF = new MAllocationLine(alloc);
         lineF.setAmount(amt);
         lineF.setDocInfo(getC_BPartner_ID(), 0, factura.getC_Invoice_ID());
+        lineF.set_ValueOfColumn("TasaDeCambio", notaCredito.get_Value("TasaDeCambio"));
         lineF.saveEx();
 
         // @fchiappano agregar asignación a la lista de asignaciones de NC.
