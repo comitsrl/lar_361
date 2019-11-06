@@ -274,6 +274,7 @@ public class TransaccionCuentaBancaria
                     paymentBankTo.setCheckNo(pago.getCheckNo());
                     paymentBankTo.setAccountNo(pago.getAccountNo());
                     paymentBankTo.setA_Name(pago.getA_Name());
+                    paymentBankTo.set_ValueOfColumn("Fecha_Venc_Cheque", pago.get_Value("Fecha_Venc_Cheque"));
 
                     final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
                     paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
@@ -287,7 +288,7 @@ public class TransaccionCuentaBancaria
             if (pago.getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
             {
                 totalAmt = totalAmt.add(pago.getPayAmt());
-                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
+                paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
 
@@ -308,7 +309,7 @@ public class TransaccionCuentaBancaria
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDebit))
             {
                 totalAmt = totalAmt.add(pago.getPayAmt());
-                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
+                paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
 
@@ -325,8 +326,8 @@ public class TransaccionCuentaBancaria
             {
                 totalAmt = totalAmt.add(pago.getPayAmt());
                 paymentBankTo = crearPago(
-                        p_DateAcct,
-                        p_StatementDate,
+                        pago.getDateAcct(),
+                        pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Deposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
 
@@ -342,12 +343,20 @@ public class TransaccionCuentaBancaria
                     !pago.isReceipt() && pago.get_ValueAsInt("LAR_Cheque_Emitido_ID") > 0)
             {
                 totalAmt = totalAmt.add(pago.getPayAmt());
-                paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
+                paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Cheque_Emitido_ID", pago.get_ValueAsInt("LAR_Cheque_Emitido_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
 
                 paymentBankTo.set_ValueOfColumn("LAR_Cheque_Emitido_ID",
                         pago.get_ValueAsInt("LAR_Cheque_Emitido_ID"));
+
+                // Copio los datos propios del cheque en el cobro destino.
+                paymentBankTo.setTenderType(pago.getTenderType());
+                paymentBankTo.setRoutingNo(pago.getRoutingNo());
+                paymentBankTo.setCheckNo(pago.getCheckNo());
+                paymentBankTo.setAccountNo(pago.getAccountNo());
+                paymentBankTo.setA_Name(pago.getA_Name());
+                paymentBankTo.set_ValueOfColumn("Fecha_Venc_Cheque", pago.get_Value("Fecha_Venc_Cheque"));
 
                 // Creo el pago en negativo, que debita el cheque emitido.
                 debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
@@ -391,7 +400,7 @@ public class TransaccionCuentaBancaria
         }
 
         if (m_chequeTransferido > 0 || m_creditoTransferido > 0 || m_debitoTransferido > 0 || m_depositoTransferido > 0
-                || m_efectivoTransferido > 0)
+                || m_efectivoTransferido > 0 || m_chequeEmitido > 0)
         {
             statement.set_ValueOfColumn("Transferido", true);
             statement.saveEx();
@@ -403,7 +412,7 @@ public class TransaccionCuentaBancaria
         }
 
         m_informe.add(new KeyNamePair(m_chequeTransferido + m_creditoTransferido + m_debitoTransferido
-                + m_depositoTransferido + m_efectivoTransferido, "Total"));
+                + m_depositoTransferido + m_efectivoTransferido + m_chequeEmitido, "Total"));
         m_informe.add(new KeyNamePair(m_efectivoTransferido, "Efectivo"));
         m_informe.add(new KeyNamePair(m_chequeTransferido, "Cheques"));
         m_informe.add(new KeyNamePair(m_creditoTransferido, "Tarjetas de Credito"));
