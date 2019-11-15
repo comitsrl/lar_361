@@ -299,6 +299,22 @@ import ar.com.ergio.util.LAR_Utils;
     		}
     	//}
 
+        // @fchiappano Validar formato de nro de documento, para facturas de compra.
+        if (po.get_TableName().equals(MInvoice.Table_Name) && (type == TYPE_BEFORE_NEW || type == TYPE_BEFORE_CHANGE))
+        {
+            MInvoice invoice = (MInvoice) po;
+
+            if (!invoice.isSOTrx() && invoice.getC_DocTypeTarget_ID() >= 0
+                    && (type == TYPE_BEFORE_NEW || invoice.is_ValueChanged("DocumentNo") || invoice.is_ValueChanged("C_DocTypeTarget_ID")))
+            {
+                msg = validarNroDocumento(invoice, type);
+                if (msg != null)
+                {
+                    return msg;
+                }
+            }
+        }
+
         return null;
      }
 
@@ -981,5 +997,87 @@ import ar.com.ergio.util.LAR_Utils;
 	 		return null;
 	 	}
 	 	//Marcos Zúñiga -end
+
+    /**
+     * Validar nro de documento, según el formato requerido para city compras.
+     *
+     * @author fchiappano
+     * @param nroDocumento
+     * @return mensaje.
+     */
+    private String validarNroDocumento(final MInvoice factura, final int type)
+    {
+        String nroDocumento = factura.getDocumentNo();
+
+        // @fchiappano si no se ingreso número de documento, no permitir continuar.
+        if (nroDocumento == null || nroDocumento.equals(""))
+            return "Número de Documento: \n Ingrese un número de Documento valido.";
+
+        // @fchiappano Asignar letra al documento, ya que se utilizara luego.
+        if (factura.get_ValueAsInt("LAR_DocumentLetter_ID") <= 0 || factura.is_ValueChanged("C_DocTypeTarget_ID"))
+            factura.set_ValueOfColumn("LAR_DocumentLetter_ID",
+                    ((MDocType) factura.getC_DocTypeTarget()).get_ValueAsInt("LAR_DocumentLetter_ID"));
+
+        String letraDocumento = LAR_Utils.getLetter(factura);
+
+        // @fchiappano validar si se ingreso la letra de la factura, caso
+        // contrario, agregarla.
+        if (!Character.isLetter(nroDocumento.charAt(0)))
+        {
+            nroDocumento =  letraDocumento + nroDocumento;
+            factura.setDocumentNo(nroDocumento);
+        }
+
+        // @fchiappano si la letra ingresada en el nroDocumento, es distinta de la letra del documento, reemplazarla.
+        if (nroDocumento.charAt(0) != letraDocumento.charAt(0))
+        {
+            nroDocumento = letraDocumento + nroDocumento.substring(1);
+            factura.setDocumentNo(nroDocumento);
+        }
+
+        // @fchiappano chequear que se haya ingresado el guion medio.
+        if (nroDocumento.indexOf("-") <= 0)
+            return "Número de Documento: \n Ingresar el guión medio (-), entre el punto de venta y el número de factura.";
+
+        nroDocumento = nroDocumento.substring(1);
+        String[] numeros = nroDocumento.split("-", 2);
+
+        // @fchiappano validar que no se hayan ingresado mas de un guion.
+        if (numeros.length > 2)
+            return "Número de Documento: \n Se ingresaron guiones medios (-), fuera de lugar. \n Solo debe ingresarse un guion medio (-), entre el punto de venta y el número de factura.";
+        else if (numeros.length < 2)
+            return "Número de Documento: \n No se ingreso el guion medio (-), entre el PDV y el número de Factura o faltan datos.";
+
+        // @fchiappano validar la cantidad de caracteres, del punto de venta.
+        if (numeros[0].length() < 1 || numeros[0].length() > 5)
+            return "Número de Documento: \n El número de punto de venta, debe constar de un digito como minimo y cinco digitos como maximo.";
+
+        // @fchiappano validar la cantidad de carateres, del número de factura.
+        if (numeros[1].length() < 1 || numeros[1].length() > 8)
+            return "Número de Documento: \n El número de factura, debe constar de un digito como minimo y ocho digitos como maximo.";
+
+        // @fchiappano validar que los caracteres del pdv y nro de factura, sean
+        // todos digitos.
+        for (int x = 0; x < numeros.length; x++)
+        {
+            for (int i = 0; i < numeros[x].length(); i++)
+            {
+                if (!Character.isDigit(numeros[x].charAt(i)))
+                    return "Número de Documento: \n Los números de PDV y Factura, solo deben contener digitos.";
+            }
+        }
+
+        // @fchiappano validar que el número de PDV, sea mayor a cero.
+        int numeroPDV = Integer.parseInt(numeros[0]);
+        if (numeroPDV <= 0)
+            return "Número de Documento: \n El número de PDV debe ser mayor a cero.";
+
+        // @fchiappano validar que el número de factura, sea mayor a cero.
+        int numeroFactura = Integer.parseInt(numeros[1]);
+        if (numeroFactura <= 0)
+            return "Número de Documento: \n El número de Factura, debe ser mayor a cero.";
+
+        return null;
+    } // validarNroDocumento
 
  }   //  LAR_Validator
