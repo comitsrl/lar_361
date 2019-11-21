@@ -175,7 +175,11 @@ public class WsfeV1 extends Wsfe{
 			line.append(this.getInvoice().getC_Invoice_ID()+"\n");
 
             // @fchiappano Agregar Fecha de Vencimiento de Pago.
-            line.append(formatTime((Timestamp) this.getInvoice().get_Value("FechaPago"), "yyyyMMdd") + "\n");
+            Timestamp fechaPago = (Timestamp) this.getInvoice().get_Value("FechaPago");
+            if (fechaPago != null)
+                line.append(formatTime(fechaPago, "yyyyMMdd") + "\n");
+            else
+                line.append(formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd") + "\n");
 
             // @fchiappano Agregar datos opcionales (CBU y Alias).
             int c_BankAccount_ID = MOrgInfo.get(this.getM_ctx(), this.getInvoice().getAD_Org_ID()).get_ValueAsInt(
