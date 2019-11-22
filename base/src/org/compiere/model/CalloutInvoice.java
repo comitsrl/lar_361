@@ -113,7 +113,7 @@ public class CalloutInvoice extends CalloutEngine
 		}
 
 		// @fchiappano Calcular la fecha de pago de la factura.
-		Integer c_BPartner_ID = (Integer) mTab.getValue("C_BPartner_ID");
+		/* Integer c_BPartner_ID = (Integer) mTab.getValue("C_BPartner_ID");
 
         if (c_BPartner_ID != null)
         {
@@ -129,7 +129,7 @@ public class CalloutInvoice extends CalloutEngine
                 calendar.add(Calendar.DAY_OF_YEAR, (Integer) diasPago);
                 mTab.setValue("FechaPago", new Timestamp(calendar.getTimeInMillis()));
             }
-        }// @fchiappano Fin calculo de fecha de pago.
+        }// @fchiappano Fin calculo de fecha de pago. */
 
 		return "";
 	}	//	docType
