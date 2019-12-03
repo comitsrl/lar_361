@@ -1218,7 +1218,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
                     if (tasaCambio != null)
                     {
-                        impPago = impPago.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                        impPago = impPago.divide(tasaCambio, invoice.getC_Currency().getStdPrecision() + 2, RoundingMode.FLOOR);
 
                         BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
                         min = min.pow(invoice.getC_Currency().getStdPrecision());
