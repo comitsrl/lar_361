@@ -947,6 +947,7 @@ public class Allocation
 
                 // @fchiappano Chequear si la moneda de la factura, es una moneda extranjera.
                 BigDecimal tasaCambio = Env.ZERO;
+                int redondeo = factura.getC_Currency().getStdPrecision() + 2;
                 boolean esMonedaExtranjera = monedaFactura_ID != LAR_Utils.getMonedaPredeterminada(
                         Env.getCtx(), AD_Client_ID, trxName) ? true : false;
 
@@ -962,9 +963,9 @@ public class Allocation
                 if (esMonedaExtranjera)
                 {
                     tasaCambio = (BigDecimal) factura.get_Value("TasaDeCambio");
-                    DiscountAmt = DiscountAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
-                    WriteOffAmt = WriteOffAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
-                    OverUnderAmt = OverUnderAmt.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                    DiscountAmt = DiscountAmt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
+                    WriteOffAmt = WriteOffAmt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
+                    OverUnderAmt = OverUnderAmt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
 
                     // @fchiappano Cambiar la moneda de la Asignación.
                     alloc.setC_Currency_ID(factura.getC_Currency_ID());
@@ -992,7 +993,7 @@ public class Allocation
 
                         if (esMonedaExtranjera)
                         {
-                            amountConvertido = amountConvertido.divide(tasaCambio, 4, RoundingMode.FLOOR);
+                            amountConvertido = amountConvertido.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
 
                             // @fchiappano Setear tasa de cambio en la cabecera del recibo,
                             // para evitar errores en la posterior validación de la asignación.
