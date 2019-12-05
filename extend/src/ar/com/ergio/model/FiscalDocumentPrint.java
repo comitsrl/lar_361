@@ -42,6 +42,7 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MProduct;
@@ -630,7 +631,8 @@ public class FiscalDocumentPrint {
 		loadDocumentLines(mInvoice, invoice);
 		// Agrega los pagos correspondientes de la factura partir de las imputaciones
 		loadInvoicePayments(invoice, mInvoice);
-
+		// @emmie: determina si se ejecuta la apertura del cajón de dinero
+		setAperturaCajon(mInvoice, invoice);
 		// Se asignan los descuentos de la factura
 		//loadDocumentDiscounts(invoice, mInvoice.getDiscounts());
 		return invoice;
@@ -701,6 +703,8 @@ public class FiscalDocumentPrint {
 
 		// Se agregan las líneas de la nota de crédito al documento.
 		loadDocumentLines(mInvoice, creditNote);
+		// @emmie: determina si se ejecuta la apertura del cajón de dinero
+		setAperturaCajon(mInvoice, creditNote);
 		return creditNote;
 	}
 
@@ -740,6 +744,13 @@ public class FiscalDocumentPrint {
 
         return dnfh;
 	} // createDNFH
+
+	private void setAperturaCajon(final MInvoice mInvoice, final Document document)
+	{
+	    final MDocType docType = new MDocType(mInvoice.getCtx(), mInvoice.getC_DocType_ID(), mInvoice.get_TrxName());
+	    final MPOS pos = new MPOS(mInvoice.getCtx(), docType.get_ValueAsInt("C_POS_ID"), mInvoice.get_TrxName());
+	    document.setAperturaCajon(pos.get_ValueAsBoolean("AperturaCajon"));
+	}
 
 	private void saveShipmentData(final MInOut shipment, final DNFH dnfh)
 	{
