@@ -72,6 +72,8 @@ public abstract class Document implements Serializable{
 	private String letter;
 	/** Descuentos a nivel documento */
 	private List<DiscountLine> documentDiscounts = null;
+	/** Apertura de cajón de dinero */
+	protected boolean aperturaCajon;
 		
 	public Document() {
 		super();
@@ -79,6 +81,8 @@ public abstract class Document implements Serializable{
 		lines = new ArrayList<DocumentLine>();
 		observations = new ArrayList<String>();
 		documentDiscounts = new ArrayList<DiscountLine>();
+		// por defecto, no se ejecuta el comando de apertura de cajón
+		aperturaCajon = false;
 	}
 	
 	/**
@@ -350,6 +354,30 @@ public abstract class Document implements Serializable{
 		getDocumentDiscounts().add(discount);
 	}
 
+    /**
+     * Determina si es necesario ejecutar el comando de apertura del cajón de
+     * dinero.
+     *
+     */
+    public void setAperturaCajon(final boolean aperturaCajon)
+    {
+        this.aperturaCajon = aperturaCajon;
+    }
+
+    /**
+     * Determina si es necesario ejecutar el comando de apertura del cajón de
+     * dinero.
+     * <p/>
+     * Es necesario sobreescribir este método en los documentos que necesiten
+     * ejecutar este comando (por defecto es false).
+     *
+     * @return true si es necesario ejecutar el comando; false en caso contrario
+     */
+    public boolean isAperturaCajon()
+    {
+        return aperturaCajon;
+    }
+
     @Override
     public String toString()
     {
@@ -361,6 +389,7 @@ public abstract class Document implements Serializable{
                 .append(",perception=").append(perceptionLine)
                 .append(",gd=").append(generalDiscount)
                 .append(",dd=").append(documentDiscounts)
+                .append(",aperturaCajon=").append(aperturaCajon)
                 .append(",lines=").append(lines);
         return sb.toString();
     }

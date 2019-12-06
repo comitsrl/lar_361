@@ -316,6 +316,11 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		return cmd;
 	}
 
+	public FiscalPacket cmdOpenDrawer() {
+		FiscalPacket cmd = createFiscalPacket(CMD_OPEN_DRAWER);
+		return cmd;
+	}
+
 	public FiscalPacket cmdOpenFiscalReceipt(String docType) {
 		FiscalPacket cmd = createFiscalPacket(CMD_OPEN_FISCAL_RECEIPT);
 		int i = 1;
@@ -746,6 +751,12 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		return printerStatusCodes;
 	}
 
+	/*
+	 * FIXME - @emmie
+	 * Es necesario refactorizar los métodos printDocument(), ya que en los mismos hay mucho código
+	 * duplicado. Pensar en un TemplateMethod o un mecanismo similar que permita evitar esta duplicidad
+	 * y obtener un diseño más limpio.
+	 */
 	public void printDocument(Invoice invoice) throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException {
 		Customer customer = invoice.getCustomer();
 		FiscalPacket response;
@@ -806,6 +817,12 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
                 execute(cmdTotalTender(payment.getDescription(), payment.getAmount(), false, null));
 				setCancelAllowed(false);
 			}
+
+			//////////////////////////////////////////////////////////////
+			// Apertura de cajón de dinero
+			// Comando: @OpenDrawer
+			if (invoice.isAperturaCajon())
+			    execute(cmdOpenDrawer());
 
 			//////////////////////////////////////////////////////////////
 			// Se cierra el comprobante fiscal.
@@ -883,6 +900,12 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
             //////////////////////////////////////////////////////////////
             // Se carga la percepción de la note de crédito
             loadDocumentPerception(creditNote);
+
+			//////////////////////////////////////////////////////////////
+			// Apertura de cajón de dinero
+			// Comando: @OpenDrawer
+			if (creditNote.isAperturaCajon())
+			    execute(cmdOpenDrawer());
 
 			//////////////////////////////////////////////////////////////
 			// Se cierra el comprobante no fiscal homologado.
