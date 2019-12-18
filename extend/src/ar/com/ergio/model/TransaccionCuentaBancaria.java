@@ -275,6 +275,7 @@ public class TransaccionCuentaBancaria
                     paymentBankTo.setAccountNo(pago.getAccountNo());
                     paymentBankTo.setA_Name(pago.getA_Name());
                     paymentBankTo.set_ValueOfColumn("Fecha_Venc_Cheque", pago.get_Value("Fecha_Venc_Cheque"));
+                    paymentBankTo.set_ValueOfColumn("EsElectronico", pago.get_Value("EsElectronico"));
 
                     final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
                     paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
