@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 import org.compiere.model.MConversionRate;
+import org.compiere.model.MCurrency;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
@@ -123,12 +124,13 @@ public class LAR_ObtenerCotizaciones extends SvrProcess
         if (tasaDivisa == null)
             throw new AdempiereUserError("No fue posible recuperar, una tasa de cambio BNA Divisa vigente.");
 
+        int precision = MCurrency.getStdPrecision(getCtx(), monedaExtranjera);
         // @fchiappano Actualizar tasa billete.
-        tasaBillete.setMultiplyRate(bnaBillete.setScale(2, RoundingMode.HALF_UP));
+        tasaBillete.setMultiplyRate(bnaBillete.setScale(precision, RoundingMode.HALF_UP));
         tasaBillete.saveEx();
 
         // @fchiappano Actualizar tasa divisa.
-        tasaDivisa.setMultiplyRate(bnaDivisa.setScale(2, RoundingMode.HALF_UP));
+        tasaDivisa.setMultiplyRate(bnaDivisa.setScale(precision, RoundingMode.HALF_UP));
         tasaDivisa.saveEx();
 
         return null;
