@@ -1498,7 +1498,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
         } // @fchiappano Fin chequeo de tipo de documento.
 
         // @fchiappano Calcular la fecha de pago de la factura.
-        /* Timestamp fechaPago = (Timestamp) get_Value("FechaPago");
+        Timestamp fechaPago = (Timestamp) get_Value("FechaPago");
         Object diasPago = ((MBPartner) getC_BPartner()).get_Value("DiasPagoFCE");
 
         if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()) && fechaPago == null
@@ -1508,7 +1508,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
             calendar.setTimeInMillis(getDateInvoiced().getTime());
             calendar.add(Calendar.DAY_OF_YEAR, (Integer) diasPago);
             set_ValueOfColumn("FechaPago", new Timestamp(calendar.getTimeInMillis()));
-        } // @fchiappano Fin calculo de fecha de pago. */
+        } // @fchiappano Fin calculo de fecha de pago.
 
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
 		if (m_processMsg != null)
