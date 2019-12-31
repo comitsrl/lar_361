@@ -405,7 +405,7 @@ public class MMovement extends X_M_Movement implements DocAction
 								ma.getM_AttributeSetInstance_ID(), 0, 
 								ma.getMovementQty().negate(), Env.ZERO ,  Env.ZERO , get_TrxName()))
 						{
-							m_processMsg = "Cannot correct Inventory (MA)";
+						    m_processMsg = "No fue posible actualizar el inventario(MA). Producto: " + line.getM_Product().getName();
 							return DocAction.STATUS_Invalid;
 						}
 
@@ -422,7 +422,7 @@ public class MMovement extends X_M_Movement implements DocAction
 								M_AttributeSetInstanceTo_ID, 0, 
 								ma.getMovementQty(), Env.ZERO ,  Env.ZERO , get_TrxName()))
 						{
-							m_processMsg = "Cannot correct Inventory (MA)";
+						    m_processMsg = "No fue posible actualizar el inventario(MA). Producto: " + line.getM_Product().getName();
 							return DocAction.STATUS_Invalid;
 						}
 
@@ -434,7 +434,7 @@ public class MMovement extends X_M_Movement implements DocAction
 						trxFrom.setM_MovementLine_ID(line.getM_MovementLine_ID());
 						if (!trxFrom.save())
 						{
-							m_processMsg = "Transaction From not inserted (MA)";
+						    m_processMsg = "Error de transacción en depósito origen (MA). Producto: " + line.getM_Product().getName();
 							return DocAction.STATUS_Invalid;
 						}
 						//
@@ -445,7 +445,7 @@ public class MMovement extends X_M_Movement implements DocAction
 						trxTo.setM_MovementLine_ID(line.getM_MovementLine_ID());
 						if (!trxTo.save())
 						{
-							m_processMsg = "Transaction To not inserted (MA)";
+						    m_processMsg = "Error de transacción en depósito destino (MA). Producto: " + line.getM_Product().getName();
 							return DocAction.STATUS_Invalid;
 						}
 					}
@@ -461,7 +461,7 @@ public class MMovement extends X_M_Movement implements DocAction
 							line.getM_AttributeSetInstance_ID(), 0, 
 							line.getMovementQty().negate(), Env.ZERO ,  Env.ZERO , get_TrxName()))
 					{
-						m_processMsg = "Cannot correct Inventory (MA)";
+					    m_processMsg = "No fue posible actualizar el inventario(MA). Producto: " + line.getM_Product().getName();
 						return DocAction.STATUS_Invalid;
 					}
 
@@ -472,7 +472,7 @@ public class MMovement extends X_M_Movement implements DocAction
 							line.getM_AttributeSetInstanceTo_ID(), 0, 
 							line.getMovementQty(), Env.ZERO ,  Env.ZERO , get_TrxName()))
 					{
-						m_processMsg = "Cannot correct Inventory (MA)";
+					    m_processMsg = "No fue posible actualizar el inventario(MA). Producto: " + line.getM_Product().getName();
 						return DocAction.STATUS_Invalid;
 					}
 
@@ -484,7 +484,7 @@ public class MMovement extends X_M_Movement implements DocAction
 					trxFrom.setM_MovementLine_ID(line.getM_MovementLine_ID());
 					if (!trxFrom.save())
 					{
-						m_processMsg = "Transaction From not inserted";
+					    m_processMsg = "Error de transacción en depósito origen. Producto: " + line.getM_Product().getName();
 						return DocAction.STATUS_Invalid;
 					}
 					//
@@ -495,7 +495,7 @@ public class MMovement extends X_M_Movement implements DocAction
 					trxTo.setM_MovementLine_ID(line.getM_MovementLine_ID());
 					if (!trxTo.save())
 					{
-						m_processMsg = "Transaction To not inserted";
+					    m_processMsg = "Error de transacción en depósito destino. Producto: " + line.getM_Product().getName();
 						return DocAction.STATUS_Invalid;
 					}
 				}	//	Fallback
