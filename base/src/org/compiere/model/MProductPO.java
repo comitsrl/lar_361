@@ -20,6 +20,8 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Properties;
 
+import org.compiere.util.DB;
+
 /**
  *	Product PO Model
  *	
@@ -83,5 +85,19 @@ public class MProductPO extends X_M_Product_PO
 	{
 		super(ctx, rs, trxName);
 	}	//	MProductPO
+
+    @Override
+    protected boolean afterSave(boolean newRecord, boolean success)
+    {
+        // @fchiappano Desmarcar demas proveedores como proveedor actual.
+        if (isCurrentVendor())
+        {
+            String sql = "UPDATE M_Product_PO SET IsCurrentVendor = 'N' WHERE M_Product_ID = ? AND C_BPartner_ID != ?";
+            Object[] parametros = {getM_Product_ID(), getC_BPartner_ID()};
+            DB.executeUpdateEx(sql, parametros, get_TrxName());
+        }
+
+        return true;
+    } // afterSave
 
 }	//	MProductPO
