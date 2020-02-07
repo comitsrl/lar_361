@@ -308,9 +308,23 @@ import ar.com.ergio.util.LAR_Utils;
         {
             log.info("Changing doctype for " + invoice);
             final MBPartner bp = new MBPartner(invoice.getCtx(), invoice.getC_BPartner_ID(), invoice.get_TrxName());
-            // Utiliza la Organización del entorno, esto posibilita determinar correctamente el
-            // tipo de documento cuando se factura una orden creada en otra organización
-            int ad_Org_ID = Env.getAD_Org_ID(bp.getCtx());
+
+            // @emmie: Funcionalidad de sincronización con SymmetricDS
+            // Si la factura tiene la marca de "sincronizada", entonces se
+            // mantiene esa organización
+            int ad_Org_ID;
+            if (invoice.get_ValueAsBoolean("Sincronizada") ||
+                            // @fchiappano Si la factura proviene del pos, utilizar igualmente
+                            // la org de la factura, por mas que no sea importada.
+                            invoice.getC_Order().getC_DocTypeTarget().getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder))
+                ad_Org_ID = invoice.getAD_Org_ID();
+            else
+                // Utiliza la Organización del entorno, esto posibilita
+                // determinar correctamente el
+                // tipo de documento cuando se factura una orden creada en otra
+                // organización
+                ad_Org_ID = Env.getAD_Org_ID(bp.getCtx());
+
             /*
              * @emmie - Siempre se recupera el ID del POS desde la factura, ya que el mismo o se
              *          asigna en las ventanas correspondientes, o se asigna en el contructor de
