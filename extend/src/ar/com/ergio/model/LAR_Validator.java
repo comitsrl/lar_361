@@ -316,7 +316,7 @@ import ar.com.ergio.util.LAR_Utils;
             if (invoice.get_ValueAsBoolean("Sincronizada") ||
                             // @fchiappano Si la factura proviene del pos, utilizar igualmente
                             // la org de la factura, por mas que no sea importada.
-                            invoice.getC_Order().getC_DocTypeTarget().getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder))
+                            (invoice.getC_Order_ID() > 0 && invoice.getC_Order().getC_DocTypeTarget().getDocSubTypeSO().equals(MDocType.DOCSUBTYPESO_POSOrder)))
                 ad_Org_ID = invoice.getAD_Org_ID();
             else
                 // Utiliza la Organización del entorno, esto posibilita
