@@ -152,6 +152,8 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
     @Override
     public String completeIt()
     {
+        Timestamp fechaMovimiento = (Timestamp) get_Value("Fecha");
+
         for (X_LAR_RetiroCajaLine linea : obtenerLineas())
         {
             // Verifico que el importe ingresado, sea mayor a 0.
@@ -173,8 +175,8 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             paymentBankFrom.setAD_Org_ID(cobro.getAD_Org_ID());
             paymentBankFrom.set_ValueOfColumn("AD_Client_ID", cobro.getAD_Client_ID());
-            paymentBankFrom.setDateAcct(new Timestamp(System.currentTimeMillis()));
-            paymentBankFrom.setDateTrx(new Timestamp(System.currentTimeMillis()));
+            paymentBankFrom.setDateAcct(fechaMovimiento);
+            paymentBankFrom.setDateTrx(fechaMovimiento);
             paymentBankFrom.setDescription(getDescription());
             paymentBankFrom.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, Env.getAD_Client_ID(getCtx())));
             paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
@@ -261,8 +263,8 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 paymentBankTo.set_ValueOfColumn("AD_Client_ID", cobro.getAD_Client_ID());
                 paymentBankTo.setPosted(true);
                 paymentBankTo.setC_BankAccount_ID(destino.getC_BankAccount_ID());
-                paymentBankTo.setDateAcct(new Timestamp(System.currentTimeMillis()));
-                paymentBankTo.setDateTrx(new Timestamp(System.currentTimeMillis()));
+                paymentBankTo.setDateAcct(fechaMovimiento);
+                paymentBankTo.setDateTrx(fechaMovimiento);
                 paymentBankTo.setDescription(getDescription());
                 paymentBankTo.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0,
                         Env.getAD_Client_ID(getCtx())));
