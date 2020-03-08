@@ -259,7 +259,8 @@ public class CalloutOrder extends CalloutEngine
 			+ " lship.C_BPartner_Location_ID,c.AD_User_ID,"
 			+ " COALESCE(p.PO_PriceList_ID,g.PO_PriceList_ID) AS PO_PriceList_ID, p.PaymentRulePO,p.PO_PaymentTerm_ID," 
 			+ " lbill.C_BPartner_Location_ID AS Bill_Location_ID, p.SOCreditStatus, "
-			+ " p.SalesRep_ID "
+			+ " p.SalesRep_ID, "
+	        + " lbill.M_Shipper_ID "
 			+ "FROM C_BPartner p"
 			+ " INNER JOIN C_BP_Group g ON (p.C_BP_Group_ID=g.C_BP_Group_ID)"			
 			+ " LEFT OUTER JOIN C_BPartner_Location lbill ON (p.C_BPartner_ID=lbill.C_BPartner_ID AND lbill.IsBillTo='Y' AND lbill.IsActive='Y')"
@@ -294,6 +295,11 @@ public class CalloutOrder extends CalloutEngine
 					if (i != 0)
 						mTab.setValue("M_PriceList_ID", new Integer(i));
 				}
+
+                // Transportista según dirección
+                ii = new Integer(rs.getInt("M_Shipper_ID"));
+                if (!rs.wasNull())
+                    mTab.setValue("M_Shipper_ID", ii);
 
 				//	Bill-To
 				mTab.setValue("Bill_BPartner_ID", C_BPartner_ID);
@@ -593,6 +599,60 @@ public class CalloutOrder extends CalloutEngine
 		}
 		return "";
 	}	//	bPartnerBill
+
+	   /**
+     *  Order Header
+     *      - M_Shipper_ID
+     *      - Bill_Location_ID
+     *  @param ctx      Context
+     *  @param WindowNo current Window No
+     *  @param mTab     Model Tab
+     *  @param mField   Model Field
+     *  @param value    The new value
+     *  @return Error message or ""
+     */
+    public String bPartnerBillChange (Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value)
+    {
+        if (isCalloutActive())
+            return "";
+        Integer bill_BPartner_ID = (Integer) value;
+        if (bill_BPartner_ID == null || bill_BPartner_ID.intValue() == 0)
+            return "";
+
+        String sql = "SELECT "
+            + "M_Shipper_ID "
+            + "FROM C_BPartner_Location "
+            + "WHERE IsBillTo='Y' "
+            + "AND IsActive='Y' "
+            + "AND C_BPartner_Location_ID=?"; //  #1
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, null);
+            pstmt.setInt(1, bill_BPartner_ID.intValue());
+            rs = pstmt.executeQuery();
+            if (rs.next())
+            {
+                // Transportista según dirección
+                Integer ii = new Integer(rs.getInt("M_Shipper_ID"));
+                if (!rs.wasNull())
+                    mTab.setValue("M_Shipper_ID", ii);
+            }
+
+        } catch (SQLException e)
+        {
+            log.log(Level.SEVERE, "bPartnerBillChange", e);
+            return e.getLocalizedMessage();
+        } finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+        return "";
+    }   //  bPartnerBillChange
 
 	/**
 	 *  Set Delivery Rule if Warehouse is changed.
