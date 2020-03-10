@@ -11,10 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.apps.ADialog;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MPOS;
 import org.compiere.model.MPreference;
+import org.compiere.swing.CDialog;
+import org.compiere.util.AdempiereUserError;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -125,6 +128,10 @@ public abstract class Wsfe {
                 atributo = "WSFE";
                 preference = MPreference.getOrgPreference(Env.getAD_Client_ID(getM_ctx()),
                         Env.getAD_Org_ID(getM_ctx()), atributo, getM_ctx(), getTrxName());
+
+                // @fchiappano Si la preferencia continua siendo nula, enviar mensaje al usuario.
+                if (preference == null)
+                    ADialog.error(0, new CDialog(), "No fue posible, recuperar directorio de comunicación con AFIP.");
             }
 
             path = preference.getValue();

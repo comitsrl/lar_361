@@ -55,6 +55,16 @@ UPDATE AD_Field SET DisplayLogic='@DocSubTypeCAE@ = 203 | @DocSubTypeCAE@ = 208 
 UPDATE AD_Field SET DisplayLogic='1=2',Updated=TO_DATE('2020-03-09 18:39:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006683
 ;
 
+-- 10/03/2020 15:55:48 ART
+-- ISSUE #77: Corrección de despliegue logico para campos FCE.
+UPDATE AD_Column SET MandatoryLogic='@DocSubTypeCAE@=202 | @DocSubTypeCAE@=203 | @DocSubTypeCAE@=207 | @DocSubTypeCAE@=208 | @DocSubTypeCAE@=212 | @DocSubTypeCAE@=213',Updated=TO_DATE('2020-03-10 15:55:48','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000265
+;
+
+-- 10/03/2020 15:59:59 ART
+-- ISSUE #77: Corrección de despliegue logico para campos FCE.
+UPDATE AD_Field SET DisplayLogic='@TargetDocBaseType@=''ARC'' | @DocSubTypeCAE@=202 | @DocSubTypeCAE@=203 | @DocSubTypeCAE@=207 | @DocSubTypeCAE@=208 | @DocSubTypeCAE@=212 | @DocSubTypeCAE@=213',Updated=TO_DATE('2020-03-10 15:59:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000603
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0151_ISSUE-77.sql', 'LAR', '') FROM dual
 ;
