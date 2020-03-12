@@ -93,6 +93,7 @@ public class CalloutInvoice extends CalloutEngine
 
                 // @fchiappano Setear en el contexto el DocSubTypeCAE.
                 Env.setContext(ctx, WindowNo, "DocSubTypeCAE", rs.getString("DocSubTypeCAE"));
+                mTab.setValue("DocSubTypeCAE", rs.getString("DocSubTypeCAE"));
 
 				//  AP Check & AR Credit Memo
 				if (s.startsWith("AP"))
