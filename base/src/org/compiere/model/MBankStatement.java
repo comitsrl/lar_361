@@ -593,30 +593,9 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 					boolean originalConciliado = false;
 					boolean enCartera = false;
 
-					// @fchiappano Si es un cierre de caja y el LAR_Cierre_Origen_ID es mayor a 0,
-					// quiere decir que se trata de un cierre de compensacion, por lo que anulo el pago de la linea.
-					if (get_ValueAsBoolean("EsCierreCaja") && get_ValueAsInt("LAR_CierreCaja_Origen_ID") > 0)
-					{
-					    originalConciliado = true;
-					    // @fchiappano Chequear que el pago no se haya anulado antes (Esto puede ser, producto de la anulacion en cascada).
-                        if (!payment.getDocStatus().equals(MPayment.DOCSTATUS_Reversed)
-                                && !payment.getDocStatus().equals(MPayment.DOCSTATUS_Voided))
-                        {
-                            if (!payment.voidIt())
-                            {
-                                m_processMsg = payment.getProcessMsg();
-                                return false;
-                            }
-                            MPayment reverso = (MPayment) payment.getReversal();
-                            reverso.setIsReconciled(true);
-                            reverso.saveEx();
-                            payment.setIsReconciled(true);
-                            payment.saveEx();
-                        }
-					}
 					// @fchiappano Anular cobro que acredita en cuenta destino,
 					// si es que se trata de un cierre de cajas.
-					else if (get_ValueAsBoolean("EsCierreCaja"))
+					if (get_ValueAsBoolean("EsCierreCaja"))
 					{
 					    final String sql = "SELECT C_Payment_ID"
 					                     + "  FROM C_Payment"
@@ -676,41 +655,6 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				line.saveEx();
 			}
 		}
-
-        // @fchiappano Busco el cierre de compensacion y lo anulo.
-        final String sql = "SELECT C_BankStatement_ID"
-                         + "  FROM C_BankStatement"
-                         + " WHERE LAR_CierreCaja_Origen_ID=? AND DocStatus NOT IN ('RE','VO')";
-
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        try
-        {
-            pstmt = DB.prepareStatement(sql, get_TrxName());
-            pstmt.setInt(1, getC_BankStatement_ID());
-            rs = pstmt.executeQuery();
-
-            if (rs.next())
-            {
-                MBankStatement stmCompensacion = new MBankStatement(p_ctx, rs.getInt("C_BankStatement_ID"), get_TrxName());
-                if (!stmCompensacion.voidIt())
-                {
-                    m_processMsg = stmCompensacion.m_processMsg;
-                    return false;
-                }
-                stmCompensacion.saveEx();
-            }
-        }
-        catch (SQLException e)
-        {
-            log.log(Level.SEVERE, sql, e);
-        }
-        finally
-        {
-            DB.close(rs, pstmt);
-            rs = null;
-            pstmt = null;
-        }
 
 		addDescription(Msg.getMsg(getCtx(), "Voided"));
 		setStatementDifference(Env.ZERO);

@@ -268,18 +268,6 @@ public class TransaccionCuentaBancaria
                     pago.set_ValueOfColumn("IsOnDrawer", false);
                     pago.saveEx();
 
-                    // Copio los datos propios del cheque en el cobro destino.
-                    paymentBankTo.setTenderType(pago.getTenderType());
-                    paymentBankTo.setRoutingNo(pago.getRoutingNo());
-                    paymentBankTo.setCheckNo(pago.getCheckNo());
-                    paymentBankTo.setAccountNo(pago.getAccountNo());
-                    paymentBankTo.setA_Name(pago.getA_Name());
-                    paymentBankTo.set_ValueOfColumn("Fecha_Venc_Cheque", pago.get_Value("Fecha_Venc_Cheque"));
-                    paymentBankTo.set_ValueOfColumn("EsElectronico", pago.get_Value("EsElectronico"));
-
-                    final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
-                    paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
-
                     // Creo el pago que debita el cheque.
                     debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
 
@@ -293,15 +281,6 @@ public class TransaccionCuentaBancaria
                         getCuentaPorFormaPago("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
 
-                paymentBankTo
-                        .set_ValueOfColumn("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID"));
-                paymentBankTo.setA_Name(pago.getA_Name());
-                paymentBankTo.setCreditCardNumber(pago.getCreditCardNumber());
-                paymentBankTo.setCreditCardExpMM(pago.getCreditCardExpMM());
-                paymentBankTo.setCreditCardExpYY(pago.getCreditCardExpYY());
-                final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
-                paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
-
                 // Creo el pago que debita el cupon de tarjeta de credito.
                 debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
 
@@ -313,10 +292,6 @@ public class TransaccionCuentaBancaria
                 paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
-
-                paymentBankTo.set_ValueOfColumn("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID"));
-                final int lar_Plan_Pago_ID = pago.get_ValueAsInt("LAR_Plan_Pago_ID");
-                paymentBankTo.set_ValueOfColumn("LAR_Plan_Pago_ID", lar_Plan_Pago_ID > 0 ? lar_Plan_Pago_ID : null);
 
                 // Creo el pago que debita el cupon de tarjeta de debito.
                 debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
@@ -332,9 +307,6 @@ public class TransaccionCuentaBancaria
                         getCuentaPorFormaPago("LAR_Deposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
 
-                paymentBankTo.set_ValueOfColumn("LAR_Deposito_Directo_ID",
-                        pago.get_ValueAsInt("LAR_Deposito_Directo_ID"));
-
                 // Creo el pago que debita el deposito directo.
                 debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
 
@@ -348,22 +320,12 @@ public class TransaccionCuentaBancaria
                         getCuentaPorFormaPago("LAR_Cheque_Emitido_ID", pago.get_ValueAsInt("LAR_Cheque_Emitido_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
 
-                paymentBankTo.set_ValueOfColumn("LAR_Cheque_Emitido_ID",
-                        pago.get_ValueAsInt("LAR_Cheque_Emitido_ID"));
-
-                // Copio los datos propios del cheque en el cobro destino.
-                paymentBankTo.setTenderType(pago.getTenderType());
-                paymentBankTo.setRoutingNo(pago.getRoutingNo());
-                paymentBankTo.setCheckNo(pago.getCheckNo());
-                paymentBankTo.setAccountNo(pago.getAccountNo());
-                paymentBankTo.setA_Name(pago.getA_Name());
-                paymentBankTo.set_ValueOfColumn("Fecha_Venc_Cheque", pago.get_Value("Fecha_Venc_Cheque"));
-
                 // Creo el pago en negativo, que debita el cheque emitido.
                 debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
 
                 m_chequeEmitido ++;
             }
+
             // Guardo y completo el cobro en la caja destino.
             if (paymentBankTo != null)
             {
@@ -480,22 +442,15 @@ public class TransaccionCuentaBancaria
             final String p_Description, final Properties ctx, final String trxName)
     {
         final MPayment payment = new MPayment(ctx, 0, trxName);
+        MPayment.copyValues(paymentFrom, payment);
         final MBankAccount destino = new MBankAccount(ctx, bankAccount_ID, trxName);
-        payment.setAD_Org_ID(paymentFrom.getAD_Org_ID());
-        payment.set_ValueOfColumn("AD_Client_ID", paymentFrom.getAD_Client_ID());
         payment.setC_BankAccount_ID(bankAccount_ID);
         payment.setDateAcct(p_DateAcct);
         payment.setDateTrx(p_StatementDate);
-        payment.setTenderType(paymentFrom.getTenderType());
         payment.setDescription(p_Description);
         payment.setC_BPartner_ID(p_C_BPartner_ID);
-        payment.setC_Currency_ID(paymentFrom.getC_Currency_ID());
-        payment.setPayAmt(paymentFrom.getPayAmt());
-        payment.setOverUnderAmt(Env.ZERO);
         payment.setPosted(true);
         payment.setLAR_C_DoctType_ID(paymentFrom.isReceipt(), destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(ctx));
-        payment.setIsReceipt(paymentFrom.isReceipt());
-        payment.set_ValueOfColumn("IsOnDrawer", paymentFrom.get_ValueAsBoolean("IsOnDrawer"));
         payment.set_ValueOfColumn("LAR_PaymentSource_ID", paymentFrom.getC_Payment_ID());
         payment.saveEx();
 
@@ -516,20 +471,14 @@ public class TransaccionCuentaBancaria
     {
         // Pago que debita los valores transferidos de la cuenta.
         final MPayment paymentBankFrom = new MPayment(ctx, 0, trxName);
-        paymentBankFrom.setAD_Org_ID(cobro.getAD_Org_ID());
-        paymentBankFrom.set_ValueOfColumn("AD_Client_ID", cobro.getAD_Client_ID());
+        MPayment.copyValues(cobro, paymentBankFrom);
         paymentBankFrom.setC_BankAccount_ID(statement.getC_BankAccount_ID());
         paymentBankFrom.setDateAcct(statement.getStatementDate());
         paymentBankFrom.setDateTrx(statement.getStatementDate());
-        paymentBankFrom.setTenderType(cobro.getTenderType());
         paymentBankFrom.setDescription("Pago en concepto de Transferencia de valores.");
         paymentBankFrom.setC_BPartner_ID(p_C_BPartner_ID);
-        paymentBankFrom.setC_Currency_ID(cobro.getC_Currency_ID());
-        if (cobro.isReceipt())
-            paymentBankFrom.setPayAmt(cobro.getPayAmt());
-        else
+        if (!cobro.isReceipt())
             paymentBankFrom.setPayAmt(cobro.getPayAmt().negate());
-        paymentBankFrom.setOverUnderAmt(cobro.getOverUnderAmt());
         paymentBankFrom.setIsReconciled(true);
         paymentBankFrom.setPosted(true);
         paymentBankFrom.set_ValueOfColumn("LAR_PaymentSource_ID", cobro.getC_Payment_ID());
