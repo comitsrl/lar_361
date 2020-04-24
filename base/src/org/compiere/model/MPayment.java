@@ -2671,7 +2671,8 @@ public final class MPayment extends X_C_Payment
 		info.append(" - @C_AllocationHdr_ID@: ").append(alloc.getDocumentNo());
 		
 		//	Update BPartner
-		if (getC_BPartner_ID() != 0)
+		// @fchiappano Si se trata del SdN interno, no actualizar saldos.
+		if (getC_BPartner_ID() != 0 && getC_BPartner_ID() != MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, getAD_Client_ID()))
 		{
 			MBPartner bp = new MBPartner (getCtx(), getC_BPartner_ID(), get_TrxName());
 			bp.setTotalOpenBalance();
@@ -2857,7 +2858,8 @@ public final class MPayment extends X_C_Payment
 	{
         String sql = "SELECT C_Payment_ID"
                    + "  FROM C_Payment"
-                   + " WHERE LAR_PaymentSource_ID=?";
+                   + " WHERE LAR_PaymentSource_ID = ?"
+                   +   " AND DocStatus IN ('CO', 'CL')";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -2871,19 +2873,19 @@ public final class MPayment extends X_C_Payment
             {
                 MPayment paymentCopia = new MPayment(p_ctx, rs.getInt("C_Payment_ID"), get_TrxName());
 
-                // @fchiappano si la copia esta en estado revertido o anulado,
-                // continuar con la siguiente (evita que se corte el proceso)
-                if (paymentCopia.getDocStatus().equals(DOCSTATUS_Reversed)
-                        || paymentCopia.getDocStatus().equals(DOCSTATUS_Voided))
-                    continue;
-
                 // @fchiappano si el cobro/pago copia, ya fue conciliado en
                 // cuenta bancaria, no se puede anular.
                 final int C_BankStatementLine_ID = paymentCopia.getC_BankStatementLine_ID();
                 if (C_BankStatementLine_ID > 0)
                 {
-                    MBankStatementLine stmtLine = new MBankStatementLine(p_ctx, C_BankStatementLine_ID, get_TrxName());
-                    if (!((MBankStatement) stmtLine.getC_BankStatement()).get_ValueAsBoolean("EsCierreCaja"))
+                    // @fchiappano Validar via SQL, para mejorar el rendimiento.
+                    sql = "SELECT stm.EsCierreCaja"
+                        +  " FROM C_BankStatementLine stml"
+                        +  " JOIN C_BankStatement stm ON stml.C_BankStatement_ID = stm.C_BankStatement_ID"
+                        + " WHERE C_BankStatementLine_ID = ?";
+
+                    String esCierreCaja = DB.getSQLValueString(get_TrxName(), sql, C_BankStatementLine_ID);
+                    if (esCierreCaja.equals("N"))
                     {
                         m_processMsg = "No se puede anular el cobro, ya que el mismo ya fue conciliado en una cuenta bancaria.";
                         return false;
@@ -2905,16 +2907,19 @@ public final class MPayment extends X_C_Payment
                 }
 
                 // Anulo la copia del cobro/pago.
-                if (!paymentCopia.voidIt())
+                if (!paymentCopia.processIt(DOCACTION_Void))
                 {
                     m_processMsg = paymentCopia.getProcessMsg();
                     return false;
                 }
+
                 // @fchiappano Marco el cobro reverso, como conciliado.
-                MPayment reverso = (MPayment) paymentCopia.getReversal();
-                reverso.setIsReconciled(true);
-                reverso.saveEx();
-                paymentCopia.saveEx();
+                // @fchiappano Realizar la actualizacion via sql, ya que evita
+                // instanciar el objeto y pasar todas las validaciones implicadas al guardar.
+                sql = "UPDATE C_Payment"
+                    +   " SET IsReconciled = 'Y'"
+                    + " WHERE C_Payment_ID = ?";
+                DB.executeUpdate(sql, paymentCopia.getReversal_ID(), get_TrxName());
             }
         }
         catch (SQLException e)

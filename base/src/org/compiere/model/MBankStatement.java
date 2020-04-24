@@ -588,26 +588,25 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				line.setInterestAmt(Env.ZERO);
 				if (line.getC_Payment_ID() != 0)
 				{
-					MPayment payment = new MPayment (getCtx(), line.getC_Payment_ID(), get_TrxName());
+					int c_Payment_ID = line.getC_Payment_ID();
 					line.setC_Payment_ID(0);
-					boolean originalConciliado = false;
-					boolean enCartera = false;
+					String enCartera = "'N'";
 
 					// @fchiappano Anular cobro que acredita en cuenta destino,
 					// si es que se trata de un cierre de cajas.
 					if (get_ValueAsBoolean("EsCierreCaja"))
 					{
-					    final String sql = "SELECT C_Payment_ID"
-					                     + "  FROM C_Payment"
-					                     + " WHERE LAR_PaymentSource_ID=?"
-					                     +   " AND DocStatus NOT IN ('RE','VO')"
-					                     +   " AND LAR_PaymentHeader_ID IS NULL"; // @fchiappano Si el cobro/pago tiene cabecera, quiere decir que no corresponde a una transferencia.
+					    String sql = "SELECT C_Payment_ID"
+					               + "  FROM C_Payment"
+					               + " WHERE LAR_PaymentSource_ID=?"
+					               +   " AND DocStatus NOT IN ('RE','VO')"
+					               +   " AND LAR_PaymentHeader_ID IS NULL"; // @fchiappano Si el cobro/pago tiene cabecera, quiere decir que no corresponde a una transferencia.
 					    PreparedStatement pstmt = null;
 				        ResultSet rs = null;
 				        try
 				        {
 				            pstmt = DB.prepareStatement(sql, get_TrxName());
-				            pstmt.setInt(1, payment.getC_Payment_ID());
+				            pstmt.setInt(1, c_Payment_ID);
 				            rs = pstmt.executeQuery();
 
 				            while (rs.next())
@@ -615,23 +614,23 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				                MPayment paymentTransferencia = new MPayment(p_ctx, rs.getInt("C_Payment_ID"), get_TrxName());
                                 if ((paymentTransferencia.getTenderType().equals(MPayment.TENDERTYPE_Check) || paymentTransferencia.getTenderType().equals("Z"))
                                         && paymentTransferencia.isReceipt()
-                                        && paymentTransferencia.get_ValueAsBoolean("IsOnDrawer")
-                                        && (!paymentTransferencia.getDocStatus().equals(MPayment.DOCSTATUS_Reversed)
-                                        || !paymentTransferencia.getDocStatus().equals(MPayment.DOCSTATUS_Voided)))
+                                        && paymentTransferencia.get_ValueAsBoolean("IsOnDrawer"))
                                 {
-                                    enCartera = true;
+                                    enCartera = "'Y'";
                                 }
 
-				                if (!paymentTransferencia.voidIt())
+				                if (!paymentTransferencia.processIt(MPayment.DOCACTION_Void))
 				                {
 				                    m_processMsg = paymentTransferencia.getProcessMsg();
 				                    return false;
 				                }
-				                MPayment reverso = (MPayment) paymentTransferencia.getReversal();
-				                reverso.setIsReconciled(true);
-				                reverso.saveEx();
-				                paymentTransferencia.setIsReconciled(true);
-				                paymentTransferencia.saveEx();
+
+				                // @fchiappano Marcar payment transferencia y reverso, como conciliados.
+				                sql = "UPDATE C_Payment"
+				                    +   " SET IsReconciled = 'Y'"
+				                    + " WHERE C_Payment_ID = ?";
+				                DB.executeUpdate(sql, paymentTransferencia.getC_Payment_ID(), get_TrxName());
+				                DB.executeUpdate(sql, paymentTransferencia.getReversal_ID(), get_TrxName());
 				            }
 				        }
 				        catch (SQLException e)
@@ -646,11 +645,12 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				        }
 					}
 
-					// @fchiappano Marcar cobro original como conciliado.
-	                payment.setIsReconciled(originalConciliado);
-	                // @ficahiappno Marcar el cobro original como en cartera.
-	                payment.set_ValueOfColumn("IsOnDrawer", enCartera);
-	                payment.saveEx();
+					// @fchiappano Marcar cobro original como conciliado y en cartera.
+					String sql = "UPDATE C_Payment"
+					           +   " SET IsOnDrawer = " + enCartera
+					           +      ", IsReconciled = 'N'"
+					           + " WHERE C_Payment_ID = ?";
+	                DB.executeUpdate(sql, c_Payment_ID, get_TrxName());
 				}
 				line.saveEx();
 			}
