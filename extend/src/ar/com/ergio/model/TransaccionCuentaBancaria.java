@@ -38,6 +38,9 @@ public class TransaccionCuentaBancaria
     /** Logger */
     private static CLogger log = CLogger.getCLogger(TransaccionCuentaBancaria.class);
 
+    // @fchiappano Lista que contiene, los valores a retornar al usuario.
+    private static List<KeyNamePair> m_informe;
+
     /**
      * Constructor para evitar instanciación
      */
@@ -146,7 +149,7 @@ public class TransaccionCuentaBancaria
             final int p_C_BPartner_ID, final Timestamp p_StatementDate, final Timestamp p_DateAcct,
             final Properties ctx, final String trxName)
     {
-        List<KeyNamePair> m_informe = new ArrayList<KeyNamePair>();
+        m_informe = new ArrayList<KeyNamePair>();
         int m_efectivoTransferido = 0;
         int m_chequeTransferido = 0;
         int m_debitoTransferido = 0;
@@ -160,8 +163,7 @@ public class TransaccionCuentaBancaria
         if (tipoPago > 0)
         {
             final MLARTarjetaCredito debito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
-            setError(m_informe, "La tarjeta de debito " + debito.getDescription() + ", no posee una cuenta bancaria configurada.");
-            return m_informe.toArray(new KeyNamePair[m_informe.size()]);
+            return setError(m_informe, "La tarjeta de debito " + debito.getDescription() + ", no posee una cuenta bancaria configurada.");
         }
 
         // Chequeo si hay tarjetas de Credito y si las mismas tienen una cuenta bancaria configurada.
@@ -169,8 +171,7 @@ public class TransaccionCuentaBancaria
         if (tipoPago > 0)
         {
             final MLARTarjetaCredito credito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
-            setError(m_informe, "La tarjeta de credito " + credito.getDescription() + ", no posee una cuenta bancaria configurada.");
-            return m_informe.toArray(new KeyNamePair[m_informe.size()]);
+            return setError(m_informe, "La tarjeta de credito " + credito.getDescription() + ", no posee una cuenta bancaria configurada.");
         }
 
         // Chequeo si hay Tipos de Deposito y si los mismos tienen una cuenta bancaria configurada.
@@ -178,8 +179,7 @@ public class TransaccionCuentaBancaria
         if (tipoPago > 0)
         {
             final MLARTarjetaCredito deposito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
-            setError(m_informe, "El tipo de deposito directo " + deposito.getName() + ", no posee una cuenta bancaria configurada.");
-            return m_informe.toArray(new KeyNamePair[m_informe.size()]);
+            return setError(m_informe, "El tipo de deposito directo " + deposito.getName() + ", no posee una cuenta bancaria configurada.");
         }
 
         final MBankStatement statement = new MBankStatement(ctx, p_BankStatement_ID, trxName);
@@ -188,11 +188,9 @@ public class TransaccionCuentaBancaria
         if (!statement.getBankAccount().get_ValueAsBoolean("EsCajaPrincipal")
                 && statement.getBankAccount().get_ValueAsInt("CajaPrincipal_ID") == 0)
         {
-            setError(m_informe, "La caja de Ventas seleccionada, no posee una caja del tipo Principal/General asignada.");
-            return m_informe.toArray(new KeyNamePair[m_informe.size()]);
+            return setError(m_informe, "La caja de Ventas seleccionada, no posee una caja del tipo Principal/General asignada.");
         }
 
-        BigDecimal totalAmt = Env.ZERO;
         BigDecimal cashAmt = BigDecimal.ZERO;
         int p_C_Currency_ID = 0;
 
@@ -268,60 +266,41 @@ public class TransaccionCuentaBancaria
                     pago.set_ValueOfColumn("IsOnDrawer", false);
                     pago.saveEx();
 
-                    // Creo el pago que debita el cheque.
-                    debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
-
                     m_chequeTransferido ++;
                 }
             }
             if (pago.getTenderType().equals(MPayment.TENDERTYPE_CreditCard))
             {
-                totalAmt = totalAmt.add(pago.getPayAmt());
                 paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
-
-                // Creo el pago que debita el cupon de tarjeta de credito.
-                debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
 
                 m_creditoTransferido++;
             }
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDebit))
             {
-                totalAmt = totalAmt.add(pago.getPayAmt());
                 paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
-
-                // Creo el pago que debita el cupon de tarjeta de debito.
-                debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
 
                 m_debitoTransferido++;
             }
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_DirectDeposit))
             {
-                totalAmt = totalAmt.add(pago.getPayAmt());
                 paymentBankTo = crearPago(
                         pago.getDateAcct(),
                         pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Deposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
 
-                // Creo el pago que debita el deposito directo.
-                debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
-
                 m_depositoTransferido++;
             }
             else if (pago.getTenderType().equals(MPayment.TENDERTYPE_Check) &&
                     !pago.isReceipt() && pago.get_ValueAsInt("LAR_Cheque_Emitido_ID") > 0)
             {
-                totalAmt = totalAmt.add(pago.getPayAmt());
                 paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Cheque_Emitido_ID", pago.get_ValueAsInt("LAR_Cheque_Emitido_ID")),
                         pago, p_C_BPartner_ID, p_Description, ctx, trxName);
-
-                // Creo el pago en negativo, que debita el cheque emitido.
-                debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
 
                 m_chequeEmitido ++;
             }
@@ -332,7 +311,16 @@ public class TransaccionCuentaBancaria
                 paymentBankTo.saveEx();
                 paymentBankTo.processIt(MPayment.DOCACTION_Complete);
                 paymentBankTo.saveEx();
+
+                // @fchiappano debitar valor de la caja.
+                String mensaje = debitarValores(statement, p_C_BPartner_ID, ctx, trxName, pago);
+
+                if (mensaje != null)
+                    return setError(m_informe, mensaje);
             }
+            // @fchiappano Si no se genero el cobro transferencia, verificar que no haya errores.
+            else if (m_informe.size() > 0)
+                return m_informe.toArray(new KeyNamePair[m_informe.size()]);
         }
 
         if (cashAmt.compareTo(BigDecimal.ZERO) > 0)
@@ -349,14 +337,18 @@ public class TransaccionCuentaBancaria
             cashBankTo.setPayAmt(cashAmt);
             cashBankTo.setPosted(true);
             cashBankTo.setOverUnderAmt(Env.ZERO);
-            cashBankTo.setLAR_C_DoctType_ID(true, cuentaBancaria.getAD_Org_ID());
+            if (!cashBankTo.setLAR_C_DoctType_ID(true, cuentaBancaria.getAD_Org_ID()))
+                return setError(m_informe, "No fue posible, recuperar un tipo de documento valido para cobros.");
             cashBankTo.setIsReceipt(true);
             cashBankTo.saveEx();
             cashBankTo.processIt(MPayment.DOCACTION_Complete);
             cashBankTo.saveEx();
 
             // Creo el pago, que debita todo el efectivo transferido.
-            debitarValores(statement, p_C_BPartner_ID, ctx, trxName, cashBankTo);
+            String mensaje = debitarValores(statement, p_C_BPartner_ID, ctx, trxName, cashBankTo);
+
+            if (mensaje != null)
+                return setError(m_informe, mensaje);
 
             // Sumo el cashAmt al totalAmt para debitar el total de los valores posteriormente.
             // totalAmt = totalAmt.add(cashAmt);
@@ -451,9 +443,14 @@ public class TransaccionCuentaBancaria
         payment.setDescription(p_Description);
         payment.setC_BPartner_ID(p_C_BPartner_ID);
         payment.setPosted(true);
-        payment.setLAR_C_DoctType_ID(paymentFrom.isReceipt(), destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(ctx));
+
+        if (!payment.setLAR_C_DoctType_ID(paymentFrom.isReceipt(),
+                destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(ctx)))
+        {
+            setError(m_informe, "No fue posible recuperar un tipo de documento valido para Movimientos de Transferencias.");
+            return null;
+        }
         payment.set_ValueOfColumn("LAR_PaymentSource_ID", paymentFrom.getC_Payment_ID());
-        payment.saveEx();
 
         return payment;
     } // crearPago
@@ -467,7 +464,7 @@ public class TransaccionCuentaBancaria
      * @param ctx
      * @param trxName
      */
-    private static void debitarValores(final MBankStatement statement, final int p_C_BPartner_ID,
+    private static String debitarValores(final MBankStatement statement, final int p_C_BPartner_ID,
             final Properties ctx, final String trxName, final MPayment cobro)
     {
         // Pago que debita los valores transferidos de la cuenta.
@@ -484,13 +481,18 @@ public class TransaccionCuentaBancaria
         paymentBankFrom.setIsReconciled(true);
         paymentBankFrom.setPosted(true);
         paymentBankFrom.set_ValueOfColumn("LAR_PaymentSource_ID", cobro.getC_Payment_ID());
-        paymentBankFrom.setLAR_C_DoctType_ID(false, statement.getC_BankAccount().getAD_Org_ID());
+
+        if (!paymentBankFrom.setLAR_C_DoctType_ID(false, statement.getC_BankAccount().getAD_Org_ID()))
+            return "No fue posible recuperar un tipo de documento valido para pagos.";
+
         paymentBankFrom.saveEx();
         paymentBankFrom.processIt(MPayment.DOCACTION_Complete);
         paymentBankFrom.saveEx();
 
         // Setear el pago como IsReconciled.
         setReconciled(paymentBankFrom.getC_Payment_ID(), trxName);
+
+        return null;
 
         /* @fchiappano Se evita generar un nuevo cierre, ya que no es necesario para rastrear el cierre original.
         final MBankStatementLine newLine = new MBankStatementLine(newStmt);
@@ -530,8 +532,8 @@ public class TransaccionCuentaBancaria
                 if (rs.getInt(1) != 0)
                 {
                     final int tipoPago_ID = rs.getInt(1);
-                    pstmt = null;
-                    rs = null;
+                    PreparedStatement pstmt2 = null;
+                    ResultSet rs2 = null;
 
                     sql = "SELECT LAR_TenderType_BankAccount_ID"
                         + "  FROM LAR_TenderType_BankAccount"
@@ -539,10 +541,12 @@ public class TransaccionCuentaBancaria
 
                     pstmt = DB.prepareStatement(sql, null);
                     pstmt.setInt(1, tipoPago_ID);
-                    rs = pstmt.executeQuery();
+                    rs2 = pstmt.executeQuery();
 
-                    if (!rs.next())
+                    if (!rs2.next())
                         return tipoPago_ID;
+
+                    DB.close(rs2, pstmt2);
                 }
             }
         }
@@ -562,11 +566,13 @@ public class TransaccionCuentaBancaria
 
     /**
      * Guardar mensaje de error.
+     * @return 
      */
-    private static void setError(List<KeyNamePair> lista, final String mensaje)
+    private static KeyNamePair[] setError(List<KeyNamePair> lista, final String mensaje)
     {
         lista.add(new KeyNamePair(0, "Error"));
         lista.add(new KeyNamePair(0, mensaje));
+        return lista.toArray(new KeyNamePair[lista.size()]);
     } // setError
 
     /**

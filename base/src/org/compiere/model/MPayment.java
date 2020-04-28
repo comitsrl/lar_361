@@ -1441,8 +1441,10 @@ public final class MPayment extends X_C_Payment
 	 * @param esRecibo
 	 * @author fchiappano
 	 */
-	public void setLAR_C_DoctType_ID (final boolean esRecibo, final int AD_Org_ID)
+	public boolean setLAR_C_DoctType_ID (final boolean esRecibo, final int AD_Org_ID)
 	{
+        boolean confirmacion = false;
+
         setIsReceipt(esRecibo);
         String sql = "SELECT C_DocType_ID"
                    + "  FROM C_DocType"
@@ -1463,9 +1465,16 @@ public final class MPayment extends X_C_Payment
                 pstmt.setString(3, X_C_DocType.DOCBASETYPE_APPayment);
             rs = pstmt.executeQuery();
             if (rs.next())
+            {
                 setC_DocType_ID(rs.getInt(1));
+                confirmacion = true;
+            }
             else
-                log.warning("setDocType - NOT found - isReceipt=" + esRecibo);
+            {
+                setC_DocType_ID(0);
+                log.saveError("Error", "setDocType - NOT found - isReceipt=" + esRecibo);
+                confirmacion = false;
+            }
         }
         catch (SQLException e)
         {
@@ -1477,6 +1486,8 @@ public final class MPayment extends X_C_Payment
             rs = null;
             pstmt = null;
         }
+
+        return confirmacion;
 	} // setLAR_C_DoctType_ID
 
 	/**
