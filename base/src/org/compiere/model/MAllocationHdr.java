@@ -790,6 +790,11 @@ public final class MAllocationHdr extends X_C_AllocationHdr implements DocAction
 		while (it.hasNext())
 		{
 			int C_BPartner_ID = it.next();
+
+            // @fchiappano Si el bp es el interno (Mov. de caja), no actualizar saldos.
+            if (C_BPartner_ID == MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, getAD_Client_ID()))
+                continue;
+
 			MBPartner bp = new MBPartner(getCtx(), C_BPartner_ID, get_TrxName());
 			bp.setTotalOpenBalance();		//	recalculates from scratch
 		//	bp.setSOCreditStatus();			//	called automatically
