@@ -485,7 +485,7 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 		        final Timestamp fecha = getStatementDate();
 		        final int C_BPartner_ID = MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, Env.getAD_Client_ID(getCtx()));
                 final String descripcion = "Pago en concepto de transferencia de valores.";
-                m_transferred = TransaccionCuentaBancaria.transferirValoresPorFormaPago(getC_BankStatement_ID(),
+                m_transferred = TransaccionCuentaBancaria.transferirValoresPorFormaPago(this,
                         descripcion, C_BPartner_ID, fecha, fecha, getCtx(), get_TrxName());
 
                 if (m_transferred[0].getName().equals("Error"))
@@ -619,18 +619,9 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
                                     enCartera = "'Y'";
                                 }
 
-				                if (!paymentTransferencia.processIt(MPayment.DOCACTION_Void))
-				                {
-				                    m_processMsg = paymentTransferencia.getProcessMsg();
-				                    return false;
-				                }
-
-				                // @fchiappano Marcar payment transferencia y reverso, como conciliados.
-				                sql = "UPDATE C_Payment"
-				                    +   " SET IsReconciled = 'Y'"
-				                    + " WHERE C_Payment_ID = ?";
-				                DB.executeUpdate(sql, paymentTransferencia.getC_Payment_ID(), get_TrxName());
-				                DB.executeUpdate(sql, paymentTransferencia.getReversal_ID(), get_TrxName());
+                                // @fchiappano anular movimiento de transferecia.
+                                if (!anularMovimiento(paymentTransferencia))
+                                    return false;
 				            }
 				        }
 				        catch (SQLException e)
@@ -655,6 +646,11 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 				line.saveEx();
 			}
 		}
+
+        // @fchippano Si hay algun movimiento de transferencia vinculado a la cabecera, anularlo.
+        int cobroTransferencia_ID = get_ValueAsInt("CobroEfectivo_ID");
+        if (cobroTransferencia_ID > 0 && !anularMovimiento(new MPayment(p_ctx, cobroTransferencia_ID, get_TrxName())))
+            return false;
 
 		addDescription(Msg.getMsg(getCtx(), "Voided"));
 		setStatementDifference(Env.ZERO);
@@ -923,5 +919,30 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
         DB.executeUpdate(sql, get_TrxName());
 
 	} // actualizarColumnasCheques
-	
+
+    /**
+     * Anular Movimiento de Transferencia.
+     * @author fchiappano
+     * @param paymentTransferencia
+     * @return confirmación.
+     */
+    private boolean anularMovimiento(final MPayment paymentTransferencia)
+    {
+        if (!paymentTransferencia.processIt(MPayment.DOCACTION_Void))
+        {
+            m_processMsg = paymentTransferencia.getProcessMsg();
+            return false;
+        }
+        paymentTransferencia.saveEx();
+
+        // @fchiappano Marcar payment transferencia y reverso, como conciliados.
+        String sql = "UPDATE C_Payment"
+                   +   " SET IsReconciled = 'Y'"
+                   + " WHERE C_Payment_ID = ?";
+        DB.executeUpdate(sql, paymentTransferencia.getC_Payment_ID(), get_TrxName());
+        DB.executeUpdate(sql, paymentTransferencia.getReversal_ID(), get_TrxName());
+
+        return true;
+    } // anularMovimiento
+
 }	//	MBankStatement

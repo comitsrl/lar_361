@@ -145,11 +145,12 @@ public class TransaccionCuentaBancaria
      * @param trxName
      * @return
      */
-    public static KeyNamePair[] transferirValoresPorFormaPago(final int p_BankStatement_ID, final String p_Description,
+    public static KeyNamePair[] transferirValoresPorFormaPago(final MBankStatement statement, final String p_Description,
             final int p_C_BPartner_ID, final Timestamp p_StatementDate, final Timestamp p_DateAcct,
             final Properties ctx, final String trxName)
     {
         m_informe = new ArrayList<KeyNamePair>();
+        int p_BankStatement_ID = statement.getC_BankStatement_ID();
         int m_efectivoTransferido = 0;
         int m_chequeTransferido = 0;
         int m_debitoTransferido = 0;
@@ -181,8 +182,6 @@ public class TransaccionCuentaBancaria
             final MLARTarjetaCredito deposito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
             return setError(m_informe, "El tipo de deposito directo " + deposito.getName() + ", no posee una cuenta bancaria configurada.");
         }
-
-        final MBankStatement statement = new MBankStatement(ctx, p_BankStatement_ID, trxName);
 
         // Valido que si es una caja de tipo VENTAS, tenga si o si una caja PRINCIPAL asignada.
         if (!statement.getBankAccount().get_ValueAsBoolean("EsCajaPrincipal")
@@ -349,6 +348,9 @@ public class TransaccionCuentaBancaria
 
             if (mensaje != null)
                 return setError(m_informe, mensaje);
+
+            // @fchiappano vincular el mov. de transferencia en efectivo, al cierre de caja.
+            statement.set_ValueOfColumn("CobroEfectivo_ID", cashBankTo.getC_Payment_ID());
 
             // Sumo el cashAmt al totalAmt para debitar el total de los valores posteriormente.
             // totalAmt = totalAmt.add(cashAmt);

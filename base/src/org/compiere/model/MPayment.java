@@ -2923,6 +2923,7 @@ public final class MPayment extends X_C_Payment
                     m_processMsg = paymentCopia.getProcessMsg();
                     return false;
                 }
+                paymentCopia.saveEx();
 
                 // @fchiappano Marco el cobro reverso, como conciliado.
                 // @fchiappano Realizar la actualizacion via sql, ya que evita
