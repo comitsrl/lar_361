@@ -47,6 +47,8 @@ import org.compiere.util.Util;
 import org.eevolution.model.MPPProductBOM;
 import org.eevolution.model.MPPProductBOMLine;
 
+import ar.com.comit.factura.electronica.ElectronicInvoiceInterface;
+import ar.com.comit.factura.electronica.ElectronicInvoiceProvider;
 import ar.com.comit.factura.electronica.ProcessorWSFE;
 import ar.com.ergio.model.FindInvoiceDocType;
 import ar.com.ergio.print.fiscal.view.InvoiceFiscalDocumentPrintManager;
@@ -2029,7 +2031,13 @@ public class MInvoice extends X_C_Invoice implements DocAction
                 // === Si tiene CAE asignado, no debe generarlo nuevamente
                 if ((getcae() == null || getcae().length() == 0) && getcaecbte() != getNumeroComprobante())
                 {
-                    ProcessorWSFE processor = new ProcessorWSFE(this);
+                    // Se intenta obtener un proveedor de WSFE, en caso de no
+                    // encontrarlo se utiliza la vieja version (via pyafipws)
+                    ElectronicInvoiceInterface processor = ElectronicInvoiceProvider.getImplementation(this);
+
+                    if (processor == null)
+                        processor = new ProcessorWSFE(this);
+
                     String errorMsg = processor.generateCAE();
                     if (Util.isEmpty(processor.getCAE()))
                     {
