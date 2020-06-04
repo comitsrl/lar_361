@@ -16,29 +16,18 @@
  *****************************************************************************/
 package ar.com.comit.factura.electronica;
 
-import java.io.File;
-import java.io.Reader;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.sql.Date;
-
-/**
- * @author Franco Chiappano
- * Procesa el pedido de autorización electronica CAE, mediante el WS de Afip.
- */
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import org.apache.axis.AxisFault;
-import org.compiere.model.MAttachment;
-import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MCurrency;
@@ -49,13 +38,9 @@ import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPOS;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
-import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
-import org.dom4j.Document;
-import org.dom4j.io.SAXReader;
 import org.globalqss.model.X_LCO_TaxIdType;
-import org.python.antlr.PythonParser.return_stmt_return;
 
 import ar.com.comit.wsfe.AlicIva;
 import ar.com.comit.wsfe.CbteAsoc;
@@ -71,25 +56,19 @@ import ar.com.comit.wsfe.Obs;
 import ar.com.comit.wsfe.Opcional;
 import ar.com.comit.wsfe.ServiceSoap12Stub;
 import ar.com.comit.wsfe.Tributo;
-import ar.com.comit.wsfe.Wsaa;
 import ar.com.ergio.util.LAR_Utils;
 
+/**
+ * @author Franco Chiappano
+ * Procesa el pedido de autorización electronica CAE, mediante el WS de Afip.
+ */
 public class ProcesadorWSFE implements ElectronicInvoiceInterface
 {
     private final Properties ctx = Env.getCtx();
-    private CLogger log = CLogger.getCLogger(ProcesadorWSFE.class);
 
     /** @fchiappano Determinar si se deben parametrizar estas variables */
     // private final String WSDL = "https://servicios1.afip.gov.ar/wsfev1/service.asmx?WSDL";
     private final String WSDL = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL";
-    private final String CMS = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms";
-    // private final String CMS = "https://wsaa.afip.gov.ar/ws/services/LoginCms";
-    private final String servicio = "wsfe";
-    private final long ticketTime = 3600000;
-    private final String signer = "Emiliano";
-    private final String claveCifrado = "emmie";
-    private String dstDN = "CN=wsaahomo, O=AFIP, C=AR, SERIALNUMBER=CUIT 33693450239";
-    private final String certificado_name = "emiliano";
 
     private final MInvoice factura;
     private List<AlicIva> impuestos = new ArrayList<AlicIva>();
@@ -169,7 +148,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             return null;
         }
 
-        nroDoc = Long.parseLong(cliente.getTaxID().replaceAll("-", ""));
+        nroDoc = Long.parseLong(cliente.getTaxID().replaceAll("-", "").replaceAll(" ", ""));
 
         int tipoCbte = getDocSubTypeCAE(factura);
         String fechaVecPago = getFechaVencPago();
@@ -405,86 +384,16 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
     } // getPuntoVenta
 
     /**
-     * Obtener un timestamp a partir de un string.
-     * @author fchiappano
-     * @param value
-     * @param format
-     * @return timestamp
-     */
-    private Timestamp getTimestamp(String value, String format)
-    {
-        Timestamp time = null;
-        try
-        {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-            java.util.Date date = dateFormat.parse(value);
-            time = new Timestamp(date.getTime());
-        }
-        catch (Exception ex)
-        {
-            log.log(Level.SEVERE, "Error getTimestamp():" + ex);
-        }
-        return time;
-    } // getTimestamp
-
-    /**
-     * Obtener el certificado necesario para conectar con el WS Afip. Si no existe, crear el archivo temporal.
-     * @author fchiappano
-     * @return archivo crt.
-     */
-    private File getCertificado()
-    {
-        String name = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + certificado_name + ".p12";
-        File certificado = new File(name);
-
-        if (certificado.exists())
-            return certificado;
-        else
-        {
-            String url = "emiliano.p12";
-            MAttachment adjunto = MAttachment.get(ctx, 318, 4063528);
-            MAttachmentEntry[] archivos = adjunto.getEntries();
-            MAttachmentEntry entry = null;
-            for (int i = 0; i < archivos.length; i++) {
-                if (archivos[i].getName().equals(url)) {
-                    entry = archivos[i];
-                    break;
-                }
-            }
-            // @fchiappano Recupero el certificado.
-            certificado = entry.getFile();
-
-            return certificado;
-        }
-    } // getCertificado
-
-    /**
      * Solicitar Codigo de Aurización Electronico (CAE).
      *
      * @author fchiappano
      */
     public String generateCAE()
     {
-        String token = "";
-        String sign = "";
-
-        // @fchiappano Obtener el certificado.
-        File certificado = getCertificado();
-
-        if (certificado == null)
-            return msgError;
-
         try
         {
-            // @fchiappano solicitar Ticket de Acceso.
-            byte[] LoginTicketRequest_xml_cms = Wsaa.create_cms(certificado, claveCifrado, signer, dstDN, servicio, ticketTime);
-
-            String loginTicketResponse = Wsaa.invoke_wsaa(LoginTicketRequest_xml_cms, CMS);
-            Reader tokenReader = new StringReader(loginTicketResponse);
-            Document tokenDoc = new SAXReader(false).read(tokenReader);
-
-            token = tokenDoc.valueOf("/loginTicketResponse/credentials/token");
-            sign = tokenDoc.valueOf("/loginTicketResponse/credentials/sign");
+            // @fchiappano Recuperar Ticket de Acceso.
+            String[] tokenSign = ProcesadorWSAA.getTicketAcceso();
 
             // @fchiappano Instanciar el servicio, que interactuara con el WS.
             soap = new ServiceSoap12Stub(new URL(WSDL), null);
@@ -496,7 +405,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
                 return msgError;
 
             // @fchiappano Generar Detalle del documento.
-            FECAEDetRequest detRequest = getFECAEDetRequest(getUltimoAutorizado(token, sign));
+            FECAEDetRequest detRequest = getFECAEDetRequest(getUltimoAutorizado(tokenSign[0], tokenSign[1]));
 
             if (detRequest == null)
                 return msgError;
@@ -507,7 +416,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             FECAERequest request = new FECAERequest(cabRequest, detalles);
 
             // @fchiappano Genero el authentication request.
-            FEAuthRequest autRequest = new FEAuthRequest(token, sign, cuitOrg);
+            FEAuthRequest autRequest = new FEAuthRequest(tokenSign[0], tokenSign[1], cuitOrg);
 
             // @fchiappano Solicitar CAE.
             FECAEResponse response = soap.FECAESolicitar(autRequest, request);
@@ -516,6 +425,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             FECAEDetResponse[] detalleRespuesta = response.getFeDetResp();
             Obs[] observaciones = detalleRespuesta[0].getObservaciones();
             Err[] errores = response.getErrors();
+            aceptado = detalleRespuesta[0].getResultado();
 
             if (observaciones != null)
             {
@@ -528,9 +438,8 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
                 return msgError;
             }
 
-            aceptado = detalleRespuesta[0].getResultado();
             cae = detalleRespuesta[0].getCAE();
-            fechaVencCae = getTimestamp(detalleRespuesta[0].getCAEFchVto(), "yyyyMMdd");
+            fechaVencCae = ProcesadorWSAA.getTimestamp(detalleRespuesta[0].getCAEFchVto(), "yyyyMMdd");
             nroCbte = String.valueOf(detalleRespuesta[0].getCbteDesde());
         }
         catch (AxisFault e)
