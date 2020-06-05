@@ -19,6 +19,9 @@ package ar.com.comit.factura.electronica;
 import java.io.File;
 import java.io.Reader;
 import java.io.StringReader;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
@@ -27,6 +30,7 @@ import java.util.logging.Level;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
 import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
@@ -53,16 +57,18 @@ public class ProcesadorWSAA
 
     private static Properties ctx = Env.getCtx();
 
-    // @fchiappano Variables de configuración (pasar a ventana de config).
-    private final static String CMS = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms";
-    // private final String CMS =
-    // "https://wsaa.afip.gov.ar/ws/services/LoginCms";
-    private final static String servicio = "wsfe";
-    private final static long ticketTime = 3600000;
-    private final static String signer = "Emiliano";
-    private final static String claveCifrado = "emmie";
-    private final static String dstDN = "CN=wsaahomo, O=AFIP, C=AR, SERIALNUMBER=CUIT 33693450239";
-    private final static String certificado_name = "emiliano.p12";
+    // @fchiappano Variables de configuración.
+    private static String CMS;
+    private static String servicio;
+    private static long ticketTime;
+    private static String signer;
+    private static String claveCifrado;
+    private static String dstDN;
+    private static String certificado_name;
+    private static String WSDL;
+    private static int concepto;
+    private static int table_ID;
+    private static int config_ID = 0;
 
     /**
      * Constructor que evita la instanciación de la clase.
@@ -93,6 +99,10 @@ public class ProcesadorWSAA
      */
     private static boolean obtenerTA()
     {
+        // @fchiappano Obtener parametros de configuración.
+        if (config_ID <= 0)
+            getConfiguracion();
+
         // @fchiappano Obtener el certificado.
         File certificado = getCertificado();
 
@@ -108,6 +118,12 @@ public class ProcesadorWSAA
             byte[] loginTicketRequest_xml_cms = Wsaa.create_cms(certificado, claveCifrado, signer, dstDN, servicio, ticketTime);
 
             String loginTicketResponse = Wsaa.invoke_wsaa(loginTicketRequest_xml_cms, CMS);
+
+            if (loginTicketResponse == null)
+            {
+                msgError = Wsaa.getMsgError();
+                return false;
+            }
 
             Reader tokenReader = new StringReader(loginTicketResponse);
             Document tokenDoc = new SAXReader(false).read(tokenReader);
@@ -141,7 +157,7 @@ public class ProcesadorWSAA
             return certificado;
 
         // @fchiappano Recuperar el certificado adjunto en la configuración.
-        MAttachment adjunto = MAttachment.get(ctx, 318, 4063528);
+        MAttachment adjunto = MAttachment.get(ctx, table_ID, config_ID);
         MAttachmentEntry[] archivos = adjunto.getEntries();
         MAttachmentEntry entry = null;
         for (int i = 0; i < archivos.length; i++)
@@ -189,5 +205,64 @@ public class ProcesadorWSAA
         }
         return time;
     } // getTimestamp
+
+    /**
+     * Obtener los parametros necesarios, desde la ventana de configuracion.
+     */
+    private static void getConfiguracion()
+    {
+        String sql = "SELECT *"
+                   +  " FROM LAR_ConfiguracionFE"
+                   + " WHERE AD_Client_ID = 1000000 AND IsActive = 'Y'"
+                   + " ORDER BY IsDefault DESC";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, null);
+            rs = pstmt.executeQuery();
+
+            if (rs.next())
+            {
+                signer = rs.getString("Signer");
+                CMS = rs.getString("CMS");
+                certificado_name = rs.getString("Certificado");
+                claveCifrado = rs.getString("ClaveCifrado");
+                servicio = rs.getString("Servicio");
+                dstDN = rs.getString("DstDN");
+                ticketTime = rs.getLong("TiempoVidaTicket");
+                WSDL = rs.getString("WSDL");
+                concepto = rs.getInt("Concepto");
+                config_ID = rs.getInt("LAR_ConfiguracionFE_ID");
+            }
+
+            sql = "SELECT AD_Table_ID"
+                +  " FROM AD_Table"
+                + " WHERE TableName = ?";
+
+            table_ID = DB.getSQLValue(null, sql, "LAR_ConfiguracionFE");
+        }
+        catch (SQLException eSql)
+        {
+            log.log(Level.SEVERE, sql, eSql);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+    } // getConfiguracion
+
+    public static int getConcepto()
+    {
+        return concepto;
+    } // getConcepto
+
+    public static String getWSDL()
+    {
+        return WSDL;
+    } // getWSDL
 
 } // ProcesadorWSAA

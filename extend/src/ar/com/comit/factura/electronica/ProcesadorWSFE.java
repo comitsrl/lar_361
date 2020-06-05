@@ -36,7 +36,6 @@ import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPOS;
-import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -66,10 +65,6 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 {
     private final Properties ctx = Env.getCtx();
 
-    /** @fchiappano Determinar si se deben parametrizar estas variables */
-    // private final String WSDL = "https://servicios1.afip.gov.ar/wsfev1/service.asmx?WSDL";
-    private final String WSDL = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL";
-
     private final MInvoice factura;
     private List<AlicIva> impuestos = new ArrayList<AlicIva>();
     private List<Tributo> tributos = new ArrayList<Tributo>();
@@ -79,8 +74,8 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
     private Tributo[] array_trib = null;
     private Opcional[] array_opc = null;
     private CbteAsoc[] array_asoc = null;
-    private int concepto = MSysConfig.getIntValue("LAR_PrestaServicios_FE", 0, Env.getAD_Client_ID(Env.getCtx()));
     private long cuitOrg;
+    private ServiceSoap12Stub soap = null;
 
     // @fchiappano variable de retorno.
     private String msgError = "";
@@ -89,7 +84,6 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
     private Timestamp fechaVencCae = null;
     private String aceptado = "";
     private String mensaje = "";
-    private ServiceSoap12Stub soap = null;
 
     public ProcesadorWSFE(MInvoice inv)
     {
@@ -173,7 +167,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         convertirArray();
 
         // @fchiappano Creo el archivo xml Request.
-        FECAEDetRequest detRequest = new FECAEDetRequest(concepto, tipoDoc, nroDoc, nroComprobante + 1,
+        FECAEDetRequest detRequest = new FECAEDetRequest(ProcesadorWSAA.getConcepto(), tipoDoc, nroDoc, nroComprobante + 1,
                 nroComprobante + 1, fechaComprobante, factura.getGrandTotal().doubleValue(), Env.ZERO.doubleValue(),
                 factura.getTotalLines().doubleValue(), Env.ZERO.doubleValue(), total_Tributos.doubleValue(),
                 total_Impuesto.doubleValue(), fechaActual, fechaActual, fechaVecPago, getCodMoneda(), getCotizacion(),
@@ -395,8 +389,14 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             // @fchiappano Recuperar Ticket de Acceso.
             String[] tokenSign = ProcesadorWSAA.getTicketAcceso();
 
+            if (tokenSign == null)
+            {
+                msgError = ProcesadorWSAA.getMsgError();
+                return msgError;
+            }
+
             // @fchiappano Instanciar el servicio, que interactuara con el WS.
-            soap = new ServiceSoap12Stub(new URL(WSDL), null);
+            soap = new ServiceSoap12Stub(new URL(ProcesadorWSAA.getWSDL()), null);
 
             // @fchiappano Generar Encabezado del documento.
             FECAECabRequest cabRequest = getFECAECabRequest();
@@ -429,12 +429,12 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 
             if (observaciones != null)
             {
-                msgError = observaciones[0].getMsg();
+                msgError = observaciones[0].getCode() + " " + observaciones[0].getMsg();
                 return msgError;
             }
             if (errores != null)
             {
-                msgError = errores[0].getMsg();
+                msgError = errores[0].getCode() + " " + errores[0].getMsg();
                 return msgError;
             }
 

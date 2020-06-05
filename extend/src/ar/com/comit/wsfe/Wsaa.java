@@ -44,6 +44,8 @@ import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl
 
 public class Wsaa
 {
+    private static String msgError;
+
     public static String invoke_wsaa(byte[] LoginTicketRequest_xml_cms, String endpoint) throws Exception
     {
 
@@ -71,6 +73,7 @@ public class Wsaa
         catch (Exception e)
         {
             e.printStackTrace();
+            msgError = e.getMessage();
         }
         return (LoginTicketResponse);
     }
@@ -186,4 +189,10 @@ public class Wsaa
 
         return (LoginTicketRequest_xml);
     }
+
+    public static String getMsgError()
+    {
+        return msgError;
+    } // getMsgError
+
 } // Wsaa
