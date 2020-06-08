@@ -423,9 +423,15 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 
             // @fchiappano obtener datos desde la respuesta.
             FECAEDetResponse[] detalleRespuesta = response.getFeDetResp();
-            Obs[] observaciones = detalleRespuesta[0].getObservaciones();
+            Obs[] observaciones = null;
+
+            if (detalleRespuesta != null)
+            {
+                observaciones = detalleRespuesta[0].getObservaciones();
+                aceptado = detalleRespuesta[0].getResultado();
+            }
+
             Err[] errores = response.getErrors();
-            aceptado = detalleRespuesta[0].getResultado();
 
             if (observaciones != null)
             {
