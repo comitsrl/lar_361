@@ -120,7 +120,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
                 total_Tributos = total_Tributos.add(taxes[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
                 MTax taxPerc = MTax.get(ctx, taxes[i].getC_Tax_ID());
                 double alic = (taxPerc.getRate().negate().doubleValue());
-                Tributo tributo = new Tributo(Short.parseShort(tax.get_ValueAsString("WSFECode")), "", taxes[i].getTaxBaseAmt().doubleValue(), alic, taxes[i].getTaxAmt().doubleValue());
+                Tributo tributo = new Tributo(Short.parseShort(tax.get_ValueAsString("WSFECode")), tax.getTaxIndicator(), taxes[i].getTaxBaseAmt().doubleValue(), alic, taxes[i].getTaxAmt().doubleValue());
                 tributos.add(tributo);
             }
         }
