@@ -145,7 +145,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         nroDoc = Long.parseLong(cliente.getTaxID().replaceAll("-", "").replaceAll(" ", ""));
 
         int tipoCbte = getDocSubTypeCAE(factura);
-        String fechaVecPago = getFechaVencPago();
+        String fechaVecPago = getFecha((Timestamp) factura.get_Value("FechaPago"));
 
         // @fchiappano Si el tipo de doc es NC o ND FCE, no informar fecha de pago y agregar comprobante asociado.
         if (tipoCbte == 202 || tipoCbte == 203 || tipoCbte == 207 || tipoCbte == 208 || tipoCbte == 212 || tipoCbte == 213)
@@ -280,12 +280,10 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
      * @author fchiappano
      * @return
      */
-    private String getFechaVencPago()
+    private String getFecha(final Timestamp fecha)
     {
-        Timestamp fechaPago = (Timestamp) factura.get_Value("FechaPago");
-
-        if (fechaPago != null)
-            return formatTime(fechaPago, "yyyyMMdd");
+        if (fecha != null)
+            return formatTime(fecha, "yyyyMMdd");
         else
             return formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
     } // getFechaVencPago
@@ -333,7 +331,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 
         // @fchiappano Agreagar comprobante asociado para NC o ND MiPyme.
         MInvoice facturaOrigen = new MInvoice(ctx, factura.get_ValueAsInt("Source_Invoice_ID"), factura.get_TrxName());
-        CbteAsoc asociado = new CbteAsoc(getDocSubTypeCAE(facturaOrigen), getPuntoVenta(facturaOrigen), Long.parseLong(facturaOrigen.getDocumentNo()));
+        CbteAsoc asociado = new CbteAsoc(getDocSubTypeCAE(facturaOrigen), getPuntoVenta(facturaOrigen), facturaOrigen.getNumeroComprobante(), cuitOrg, getFecha(facturaOrigen.getDateInvoiced()));
         asociados.add(asociado);
 
         // @fchiappano Agregar parametro opcional EsCancelación.

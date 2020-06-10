@@ -31,16 +31,26 @@ public class CbteAsoc  implements java.io.Serializable {
 
     private long nro;
 
+    // @fchiappano cuit del comrobante asociado.
+    private long cuit;
+
+    // @fchiappano fecha del comprobante asociado.
+    private String cbteFch;
+
     public CbteAsoc() {
     }
 
     public CbteAsoc(
            int tipo,
            int ptoVta,
-           long nro) {
+           long nro,
+           long cuit,
+           String cbteFch) {
            this.tipo = tipo;
            this.ptoVta = ptoVta;
            this.nro = nro;
+           this.cuit = cuit;
+           this.cbteFch = cbteFch;
     }
 
 
@@ -103,6 +113,27 @@ public class CbteAsoc  implements java.io.Serializable {
         this.nro = nro;
     }
 
+    // @fchiappano Getters y Setters para las variables Cuit y CbteFecha.
+    public long getCuit()
+    {
+        return cuit;
+    }
+
+    public void setCuit(long cuit)
+    {
+        this.cuit = cuit;
+    }
+
+    public String getCbteFch()
+    {
+        return cbteFch;
+    }
+
+    public void setCbteFch(String cbteFch)
+    {
+        this.cbteFch = cbteFch;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof CbteAsoc)) return false;
@@ -117,7 +148,9 @@ public class CbteAsoc  implements java.io.Serializable {
         _equals = true &&
             this.tipo == other.getTipo() &&
             this.ptoVta == other.getPtoVta() &&
-            this.nro == other.getNro();
+            this.nro == other.getNro() &&
+            this.cuit == other.getCuit() &&
+            this.cbteFch == other.getCbteFch();
         __equalsCalc = null;
         return _equals;
     }
@@ -132,6 +165,9 @@ public class CbteAsoc  implements java.io.Serializable {
         _hashCode += getTipo();
         _hashCode += getPtoVta();
         _hashCode += new Long(getNro()).hashCode();
+        // @fchiappano Agregar el cuit del comprobante asociado.
+        _hashCode += new Long(getCuit()).hashCode();
+        _hashCode += getCbteFch().hashCode();
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -158,6 +194,20 @@ public class CbteAsoc  implements java.io.Serializable {
         elemField.setFieldName("nro");
         elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Nro"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        // @fchiappano Agregar Cuit de documento origen.
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("cuit");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Cuit"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        // @fchiappano Agregar fecha del documento origen.
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("cbteFch");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "CbteFch"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }
