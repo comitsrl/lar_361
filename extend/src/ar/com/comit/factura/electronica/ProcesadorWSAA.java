@@ -16,7 +16,12 @@
  *****************************************************************************/
 package ar.com.comit.factura.electronica;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.sql.PreparedStatement;
@@ -103,6 +108,16 @@ public class ProcesadorWSAA
         if (config_ID <= 0)
             getConfiguracion();
 
+        // @fchiappano leer archivo TA.
+        File ta = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "TA.txt");
+        if (ta.exists())
+        {
+            if (!leerTA(ta))
+                return false;
+            else if (new Timestamp(System.currentTimeMillis()).before(fechaExpiracion))
+                return true;
+        }
+
         // @fchiappano Obtener el certificado.
         File certificado = getCertificado();
 
@@ -133,6 +148,10 @@ public class ProcesadorWSAA
             String expiracion = tokenDoc.valueOf("/loginTicketResponse/header/expirationTime");
             expiracion = expiracion.replace("T", " ");
             fechaExpiracion = getTimestamp(expiracion, "yyyy-MM-dd hh:mm:ss.SSS");
+
+            // @fchiappano escribir TA en directorio temporal.
+            if (!escribirTA(token, sign, expiracion))
+                return false;
         }
         catch (Exception e)
         {
@@ -143,6 +162,69 @@ public class ProcesadorWSAA
 
         return true;
     } // obtenerTA
+
+    /**
+     * Guardar datos de ticket de acceso, en archivo temporal, por si se cierra la aplicación.
+     * @author fchiappano
+     * @param token
+     * @param sign
+     * @param expiracion
+     * @return confirmación.
+     */
+    private static boolean escribirTA(final String token, final String sign, final String expiracion)
+    {
+        File ta = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "TA.txt");
+
+        try
+        {
+            PrintWriter escritor = new PrintWriter(ta);
+            escritor.println(token);
+            escritor.println(sign);
+            escritor.println(expiracion);
+            escritor.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            msgError = e.getMessage();
+            return false;
+        }
+        return true;
+    } // escribirTA
+
+    /**
+     * Recuperar datos del ticket de acceso, desde el archivo temporal.
+     * @author fchiappano
+     * @param ta
+     * @return confirmación.
+     */
+    private static boolean leerTA(final File ta)
+    {
+        try
+        {
+            FileReader fr = new FileReader(ta);
+            BufferedReader br = new BufferedReader(fr);
+            token = br.readLine();
+            sign = br.readLine();
+            String expiracion = br.readLine();
+            fechaExpiracion = getTimestamp(expiracion, "yyyy-MM-dd hh:mm:ss.SSS");
+            fr.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+            msgError = e.getMessage();
+            return false;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            msgError = e.getMessage();
+            return false;
+        }
+
+        return true;
+    } // leerTA
 
     /**
      * Obtener el certificado necesario para conectar con el WS Afip. Si no existe, crear el archivo temporal.
