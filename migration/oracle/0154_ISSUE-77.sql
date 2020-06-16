@@ -1302,6 +1302,71 @@ UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3006877
 UPDATE AD_Field SET DisplayLength=20, IsSameLine='Y',Updated=TO_DATE('2020-06-04 19:10:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006891
 ;
 
+-- 16/06/2020 18:24:04 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+INSERT INTO AD_Menu (AD_Menu_ID,IsSummary,IsSOTrx,IsReadOnly,EntityType,IsCentrallyMaintained,Name,Created,IsActive,UpdatedBy,AD_Client_ID,CreatedBy,Updated,AD_Org_ID) VALUES (3000369,'Y','N','N','LAR','Y','Factura Electrónica',TO_DATE('2020-06-16 18:24:04','YYYY-MM-DD HH24:MI:SS'),'Y',100,0,100,TO_DATE('2020-06-16 18:24:04','YYYY-MM-DD HH24:MI:SS'),0)
+;
+
+-- 16/06/2020 18:24:04 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+INSERT INTO AD_Menu_Trl (AD_Language,AD_Menu_ID, Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Menu_ID, t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Menu t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Menu_ID=3000369 AND NOT EXISTS (SELECT * FROM AD_Menu_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Menu_ID=t.AD_Menu_ID)
+;
+
+-- 16/06/2020 18:24:04 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+INSERT INTO AD_TreeNodeMM (AD_Client_ID,AD_Org_ID, IsActive,Created,CreatedBy,Updated,UpdatedBy, AD_Tree_ID, Node_ID, Parent_ID, SeqNo) SELECT t.AD_Client_ID, 0, 'Y', SysDate, 100, SysDate, 100,t.AD_Tree_ID, 3000369, 0, 999 FROM AD_Tree t WHERE t.AD_Client_ID=0 AND t.IsActive='Y' AND t.IsAllNodes='Y' AND t.TreeType='MM' AND NOT EXISTS (SELECT * FROM AD_TreeNodeMM e WHERE e.AD_Tree_ID=t.AD_Tree_ID AND Node_ID=3000369)
+;
+
+-- 16/06/2020 18:24:10 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=0, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000008
+;
+
+-- 16/06/2020 18:24:10 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=1, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000002
+;
+
+-- 16/06/2020 18:24:10 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=2, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000369
+;
+
+-- 16/06/2020 18:24:10 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=3, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000001
+;
+
+-- 16/06/2020 18:24:21 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=0, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000008
+;
+
+-- 16/06/2020 18:24:21 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=1, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000002
+;
+
+-- 16/06/2020 18:24:21 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=2, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000369
+;
+
+-- 16/06/2020 18:24:21 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=3, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000367
+;
+
+-- 16/06/2020 18:24:21 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=4, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000001
+;
+
+-- 16/06/2020 18:24:25 ART
+-- ISSUE #77: Configuración Facturación Electronica.
+UPDATE AD_TreeNodeMM SET Parent_ID=3000369, SeqNo=0, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000367
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0154_ISSUE-77.sql', 'LAR', '') FROM dual
 ;
