@@ -39,12 +39,12 @@ public class ElectronicInvoiceProvider
     public static String PREFERENCE_WSFEX_PROVIDER = "WSFEX_PROVIDER_CLASS";
 
     /** Nombre de la clase que provee el servicio de FE (si es que existe) */
-    public static MPreference wsfeProviderClass = MPreference.getOrgPreference(Env.getAD_Client_ID(ctx),
-            Env.getAD_Org_ID(ctx), PREFERENCE_WSFE_PROVIDER, ctx, null);
+    public static MPreference wsfeProviderClass = MPreference.getClientPreference(Env.getAD_Client_ID(ctx),
+            PREFERENCE_WSFE_PROVIDER, ctx, null);
 
     /** Nombre de la clase que provee el servicio de FEX (si es que existe) */
-    public static MPreference wsfexProviderClass = MPreference.getOrgPreference(Env.getAD_Client_ID(ctx),
-            Env.getAD_Org_ID(ctx), PREFERENCE_WSFEX_PROVIDER, ctx, null);
+    public static MPreference wsfexProviderClass = MPreference.getClientPreference(Env.getAD_Client_ID(ctx),
+            PREFERENCE_WSFEX_PROVIDER, ctx, null);
 
     /**
      * Listado de tipos de documento de exportacion segun definicion de FE de

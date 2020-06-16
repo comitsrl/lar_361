@@ -156,5 +156,49 @@ public class MPreference extends X_AD_Preference
         }
         return preference;
     } // getOrgPreference
-	
+
+    /**
+     * Obtener Preferencia a nivel de Compañia, mediante el campo Attribute.
+     * @author fchiappano
+     *
+     * @param AD_Client_ID
+     * @param atributo
+     * @param ctx
+     * @param trx
+     * @return MPreference
+     */
+    public static MPreference getClientPreference(final int AD_Client_ID, final String atributo,
+                                                final Properties ctx, final String trx)
+    {
+        String sql = "SELECT AD_Preference_ID"
+                   + "  FROM AD_Preference "
+                   + " WHERE AD_Client_ID=? AND Attribute=?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        MPreference preference = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, null);
+            pstmt.setInt(1, AD_Client_ID);
+            pstmt.setString(2, atributo);
+            rs = pstmt.executeQuery();
+            if (rs.next())
+            {
+                preference = new MPreference(ctx, rs.getInt("AD_Preference_ID"), trx);
+            }
+        }
+        catch (SQLException eSql)
+        {
+            log.log(Level.SEVERE, sql, eSql);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+        return preference;
+    } // getClientPreference
+
 }	//	MPreference
