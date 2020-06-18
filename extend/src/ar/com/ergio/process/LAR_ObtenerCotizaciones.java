@@ -22,6 +22,8 @@ import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.logging.Level;
 
 import org.compiere.model.MConversionRate;
@@ -49,6 +51,7 @@ public class LAR_ObtenerCotizaciones extends SvrProcess
     private int monedaExtranjera = 100;
     private int tipoCambioDivisa = 4000001;
     private int tipoCambioBillete = 4000002;
+    private int diasVigencia = 7;
 
     @Override
     protected void prepare()
@@ -113,25 +116,21 @@ public class LAR_ObtenerCotizaciones extends SvrProcess
         else
             throw new AdempiereUserError("No fue posible recuperar tasa de cambio BNA Divisa");
 
+        // @fchiappano Redondear tasas, según la precisión de la moneda.
+        int precision = MCurrency.getStdPrecision(getCtx(), monedaExtranjera);
+        bnaBillete.setScale(precision, RoundingMode.HALF_UP);
+        bnaDivisa.setScale(precision, RoundingMode.HALF_UP);
+
         // @fchiappano Recuperar y actualizar tasas de cambio de Adempiere.
         MConversionRate tasaBillete = getTasaCambio(tipoCambioBillete);
 
-        if (tasaBillete == null)
-            throw new AdempiereUserError("No fue posible recuperar, una tasa de cambio BNA Billete vigente.");
+        if (tasaBillete == null || bnaBillete.compareTo(tasaBillete.getMultiplyRate()) != 0)
+            generarTasacambio(bnaBillete, tipoCambioBillete);
 
         MConversionRate tasaDivisa = getTasaCambio(tipoCambioDivisa);
 
-        if (tasaDivisa == null)
-            throw new AdempiereUserError("No fue posible recuperar, una tasa de cambio BNA Divisa vigente.");
-
-        int precision = MCurrency.getStdPrecision(getCtx(), monedaExtranjera);
-        // @fchiappano Actualizar tasa billete.
-        tasaBillete.setMultiplyRate(bnaBillete.setScale(precision, RoundingMode.HALF_UP));
-        tasaBillete.saveEx();
-
-        // @fchiappano Actualizar tasa divisa.
-        tasaDivisa.setMultiplyRate(bnaDivisa.setScale(precision, RoundingMode.HALF_UP));
-        tasaDivisa.saveEx();
+        if (tasaDivisa == null || bnaDivisa.compareTo(tasaDivisa.getMultiplyRate()) != 0)
+            generarTasacambio(bnaDivisa, tipoCambioDivisa);
 
         return null;
     } // doIt
@@ -185,5 +184,41 @@ public class LAR_ObtenerCotizaciones extends SvrProcess
 
         return tasa;
     } // getTasaCambio
+
+    /**
+     * Obtener fecha de vigencia, sumando la cantidad de dias especificados a la fecha actual.
+     * @author fchiappano
+     * @return fecha de vigencia.
+     */
+    private Timestamp getFechaVigencia()
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DAY_OF_YEAR, diasVigencia);
+
+        Timestamp fechaVigencia = new Timestamp(calendar.getTimeInMillis());
+
+        return fechaVigencia;
+    } // getFechaVigencia
+
+    /**
+     * Crear una nueva tasa de cambio, para el tipo de cambio especificado.
+     * @author fchiappano
+     * @param tasaMultiplicadora
+     * @param tipoCambio
+     */
+    private void generarTasacambio(final BigDecimal tasaMultiplicadora, final int tipoCambio)
+    {
+        int monedaLocal = LAR_Utils.getMonedaPredeterminada(getCtx(), getAD_Client_ID(), get_TrxName());
+        MConversionRate nuevaTasa = new MConversionRate(Env.getCtx(), 0, get_TrxName());
+        nuevaTasa.set_ValueOfColumn("AD_Client_ID", 1000000);
+        nuevaTasa.setAD_Org_ID(0);
+        nuevaTasa.setMultiplyRate(tasaMultiplicadora);
+        nuevaTasa.setC_ConversionType_ID(tipoCambio);
+        nuevaTasa.setValidTo(getFechaVigencia());
+        nuevaTasa.setC_Currency_ID(monedaExtranjera);
+        nuevaTasa.setC_Currency_ID_To(monedaLocal);
+        nuevaTasa.saveEx(get_TrxName());
+    } // generarTasacambio
 
 } // LAR_ChequeEnCarteraPorCaja
