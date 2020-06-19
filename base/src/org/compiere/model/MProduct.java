@@ -630,6 +630,38 @@ public class MProduct extends X_M_Product
 			}
 		}
 
+        // Si se modifica la categoría actualizar en M_ProductPrice
+        if ((!newRecord) && is_ValueChanged("M_Product_Category_ID"))
+        {
+            int product_ID = getM_Product_ID();
+            int productCategory_ID = getM_Product_Category_ID();
+            String sql = "UPDATE M_ProductPrice AS pp"
+                    + "   SET M_Product_Category_ID = ?" //1
+                    + "   WHERE pp.M_Product_ID = ?" // 2
+                    + "   AND pp.M_PriceList_Version_ID IN"
+                    + "      (SELECT M_PriceList_Version_ID FROM M_PriceList_Version"
+                    + "       WHERE IsActive='Y' AND AD_Client_ID=?)"; // 3
+
+            PreparedStatement pstmt = null;
+
+            try
+            {
+                pstmt = DB.prepareStatement(sql, get_TrxName());
+                pstmt.setInt(1, productCategory_ID);
+                pstmt.setInt(2, product_ID);
+                pstmt.setInt(3, getAD_Client_ID());
+                pstmt.executeUpdate();
+                pstmt.close();
+                log.fine("Categoría del Producto actualizada en M_ProductPrice: ");
+            } catch (Exception e)
+            {
+                log.log(Level.SEVERE, "Actualizar M_ProductCategory en M_ProductPrice", e);
+            } finally
+            {
+                pstmt = null;
+            }
+        }
+
 		return true;
 	}	//	beforeSave
 

@@ -1062,7 +1062,7 @@ public class MOrder extends X_C_Order implements DocAction
                 }
 
                 BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(), LAR_Utils.getMonedaPredeterminada(p_ctx,
-                        getAD_Client_ID(), get_TrxName()), new Timestamp(System.currentTimeMillis()),
+                        getAD_Client_ID(), get_TrxName()), getDateOrdered(),
                         getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
 
                 if (rate != null)

@@ -165,7 +165,26 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             // Pago que debita los valores transferidos de la cuenta.
             final MPayment paymentBankFrom = new MPayment(getCtx(), 0, get_TrxName());
-            final MPayment cobro = new MPayment(getCtx(), linea.get_ValueAsInt("C_Payment_ID"), get_TrxName());
+            int cobro_ID = linea.get_ValueAsInt("C_Payment_ID");
+
+            // Si el TenderType es cheque, cambio la marca IsOnDrawer a false.
+            if (linea.getTenderType().equals("Z"))
+            {
+                final String sql = "UPDATE C_Payment"
+                                 + "   SET IsOnDrawer='N'"
+                                 + " WHERE C_Payment_ID='" + cobro_ID + "'";
+                DB.executeUpdate(sql, get_TrxName());
+
+                final MPayment cobro = new MPayment(getCtx(), cobro_ID, get_TrxName());
+                MPayment.copyValues(cobro, paymentBankFrom);
+                paymentBankFrom.set_ValueOfColumn("LAR_PaymentSource_ID", cobro_ID);
+            }
+            else
+            {
+                paymentBankFrom.setPayAmt(linea.getMonto());
+                paymentBankFrom.setTenderType(MPayment.TENDERTYPE_Cash);
+                paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
+            }
 
             // Si se trata de una Extaccion Bancaria, tomo la cuenta bancaria origen.
             if (get_ValueAsBoolean("ExtraccionBancaria") || get_ValueAsBoolean("TransferenciaBancaria"))
@@ -173,39 +192,19 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             else
                 paymentBankFrom.setC_BankAccount_ID(getC_BankAccountFrom_ID());
 
-            paymentBankFrom.setAD_Org_ID(cobro.getAD_Org_ID());
-            paymentBankFrom.set_ValueOfColumn("AD_Client_ID", cobro.getAD_Client_ID());
             paymentBankFrom.setDateAcct(fechaMovimiento);
             paymentBankFrom.setDateTrx(fechaMovimiento);
             paymentBankFrom.setDescription(getDescription());
             paymentBankFrom.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, Env.getAD_Client_ID(getCtx())));
-            paymentBankFrom.setC_Currency_ID(getC_Currency_ID());
-            paymentBankFrom.setPayAmt(linea.getMonto());
-            paymentBankFrom.setOverUnderAmt(Env.ZERO);
             paymentBankFrom.setPosted(true);
-            paymentBankFrom.setLAR_C_DoctType_ID(false,((MBankAccount) paymentBankFrom.getC_BankAccount()).get_ValueAsBoolean("IsDrawer") ?
-                    paymentBankFrom.getC_BankAccount().getAD_Org_ID() : Env.getAD_Org_ID(p_ctx));
 
-            // Si el TenderType es cheque, cambio la marca IsOnDrawer a false.
-            if (linea.getTenderType().equals("Z"))
+            // @fchiappano verificar que exista un tipo de doc valido.
+            if (!paymentBankFrom.setLAR_C_DoctType_ID(false,
+                    ((MBankAccount) paymentBankFrom.getC_BankAccount()).get_ValueAsBoolean("IsDrawer")
+                            ? paymentBankFrom.getC_BankAccount().getAD_Org_ID() : Env.getAD_Org_ID(p_ctx)))
             {
-                paymentBankFrom.setTenderType(cobro.getTenderType());
-                paymentBankFrom.setRoutingNo(cobro.getRoutingNo());
-                paymentBankFrom.setCheckNo(cobro.getCheckNo());
-                paymentBankFrom.setAccountNo(cobro.getAccountNo());
-                paymentBankFrom.setA_Name(cobro.getA_Name());
-                paymentBankFrom.set_ValueOfColumn("EsElectronico", cobro.get_Value("EsElectronico"));
-                paymentBankFrom.set_ValueOfColumn("LAR_PaymentSource_ID", cobro.getC_Payment_ID());
-
-                final String sql = "UPDATE C_Payment"
-                                 + "   SET IsOnDrawer='N'"
-                                 + " WHERE C_Payment_ID='" + cobro.getC_Payment_ID() + "'";
-                DB.executeUpdate(sql, get_TrxName());
-            }
-            else
-            {
-                paymentBankFrom.setTenderType(MPayment.TENDERTYPE_Cash);
-                paymentBankFrom.set_ValueOfColumn("IsOnDrawer", false);
+                m_processMsg = "No fue posible recuperar, un tipo de documento válido para débito de valores.";
+                return STATUS_Drafted;
             }
 
             paymentBankFrom.saveEx();
@@ -226,30 +225,20 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                     get_ValueAsBoolean("ExtraccionBancaria") || get_ValueAsBoolean("TransferenciaBancaria"))
             {
                 final MPayment paymentBankTo = new MPayment(getCtx(), 0, get_TrxName());
+                MPayment.copyValues(paymentBankFrom, paymentBankTo);
                 // Si el tenderType es cheque, copio los campos pertinentes al mismo.
                 if (linea.getTenderType().equals("Z"))
                 {
-                    paymentBankTo.setTenderType(linea.getTenderType());
-                    paymentBankTo.setRoutingNo(cobro.getRoutingNo());
-                    paymentBankTo.setCheckNo(cobro.getCheckNo());
-                    paymentBankTo.setAccountNo(cobro.getAccountNo());
-                    paymentBankTo.setA_Name(cobro.getA_Name());
-                    paymentBankTo.set_ValueOfColumn("EsElectronico", cobro.get_Value("EsElectronico"));
-                    paymentBankTo.set_ValueOfColumn("LAR_PaymentSource_ID", cobro.getC_Payment_ID());
-
                     if (isTransferencia())
                         paymentBankTo.set_ValueOfColumn("IsOnDrawer", true);
                     else
                     {
                         paymentBankTo.set_ValueOfColumn("IsOnDrawer", false);
-                        cobro.set_ValueOfColumn("IsDeposited", true);
-                        cobro.saveEx();
+                        final String sql = "UPDATE C_Payment"
+                                         + "   SET IsDeposited = 'Y'"
+                                         + " WHERE C_Payment_ID = " + cobro_ID;
+                        DB.executeUpdate(sql, get_TrxName());
                     }
-                }
-                else
-                {
-                    paymentBankTo.setTenderType(MPayment.TENDERTYPE_Cash);
-                    paymentBankTo.set_ValueOfColumn("IsOnDrawer", false);
                 }
 
                 // Si es una trasferencia o una extraccion bancaria, seteo la caja destino. Si no, seteo la cuenta bancaria destino.
@@ -259,8 +248,6 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 else
                     destino = new MBankAccount(p_ctx, get_ValueAsInt("CuentaDestino_ID"), get_TrxName());
 
-                paymentBankTo.setAD_Org_ID(cobro.getAD_Org_ID());
-                paymentBankTo.set_ValueOfColumn("AD_Client_ID", cobro.getAD_Client_ID());
                 paymentBankTo.setPosted(true);
                 paymentBankTo.setC_BankAccount_ID(destino.getC_BankAccount_ID());
                 paymentBankTo.setDateAcct(fechaMovimiento);
@@ -268,11 +255,15 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 paymentBankTo.setDescription(getDescription());
                 paymentBankTo.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0,
                         Env.getAD_Client_ID(getCtx())));
-                paymentBankTo.setC_Currency_ID(getC_Currency_ID());
-                paymentBankTo.setPayAmt(linea.getMonto());
-                paymentBankTo.setOverUnderAmt(Env.ZERO);
-                paymentBankTo.setLAR_C_DoctType_ID(true, destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(p_ctx));
-                paymentBankTo.setIsReceipt(true);
+                // @fchiappano Validar que se pueda recuperar un tipo de doc
+                // valido para acreditacion.
+                if (!paymentBankTo.setLAR_C_DoctType_ID(true,
+                        destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(p_ctx)))
+                {
+                    m_processMsg = "No fue posible recuperar, un tipo de documento válido para acreditación de valores.";
+                    return STATUS_Drafted;
+                }
+
                 paymentBankTo.saveEx();
                 if (paymentBankTo.processIt(MPayment.DOCACTION_Complete))
                 {

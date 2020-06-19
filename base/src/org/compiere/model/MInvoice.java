@@ -2781,7 +2781,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
         {
             BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(),
                     LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()),
-                    new Timestamp(System.currentTimeMillis()), conversionType_ID, getAD_Client_ID(), getAD_Org_ID());
+                    getDateInvoiced(), conversionType_ID, getAD_Client_ID(), getAD_Org_ID());
 
             if (rate != null)
                 set_ValueOfColumn("TasaDeCambio", rate);
