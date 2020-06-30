@@ -197,6 +197,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             paymentBankFrom.setDescription(getDescription());
             paymentBankFrom.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, Env.getAD_Client_ID(getCtx())));
             paymentBankFrom.setPosted(true);
+            paymentBankFrom.set_ValueOfColumn("LAR_PaymentHeader_ID", null);
 
             // @fchiappano verificar que exista un tipo de doc valido.
             if (!paymentBankFrom.setLAR_C_DoctType_ID(false,
@@ -255,6 +256,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 paymentBankTo.setDescription(getDescription());
                 paymentBankTo.setC_BPartner_ID(MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0,
                         Env.getAD_Client_ID(getCtx())));
+                paymentBankTo.set_ValueOfColumn("LAR_PaymentHeader_ID", null);
                 // @fchiappano Validar que se pueda recuperar un tipo de doc
                 // valido para acreditacion.
                 if (!paymentBankTo.setLAR_C_DoctType_ID(true,
