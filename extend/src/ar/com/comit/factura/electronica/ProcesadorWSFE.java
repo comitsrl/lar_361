@@ -107,21 +107,24 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         for (int i = 0; i < taxes.length; i++)
         {
             tax = MTax.get(ctx, taxes[i].getC_Tax_ID());
-            // @fchiappano Impuesto.
-            if (!tax.get_ValueAsBoolean("IsPerception"))
-            {
-                total_Impuesto = total_Impuesto.add(taxes[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
-                AlicIva impuesto = new AlicIva(tax.get_ValueAsInt("WSFECode"), taxes[i].getTaxBaseAmt().doubleValue(), taxes[i].getTaxAmt().doubleValue());
-                impuestos.add(impuesto);
-            }
             // @fchiappano Tributo.
-            else
+            if (tax.get_ValueAsBoolean("IsPerception") || tax.get_ValueAsBoolean("EsImpuestoInterno"))
             {
                 total_Tributos = total_Tributos.add(taxes[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
                 MTax taxPerc = MTax.get(ctx, taxes[i].getC_Tax_ID());
                 double alic = (taxPerc.getRate().negate().doubleValue());
-                Tributo tributo = new Tributo(Short.parseShort(tax.get_ValueAsString("WSFECode")), tax.getTaxIndicator(), taxes[i].getTaxBaseAmt().doubleValue(), alic, taxes[i].getTaxAmt().doubleValue());
+                Tributo tributo = new Tributo(Short.parseShort(tax.get_ValueAsString("WSFECode")),
+                        tax.getTaxIndicator(), taxes[i].getTaxBaseAmt().doubleValue(), alic,
+                        taxes[i].getTaxAmt().doubleValue());
                 tributos.add(tributo);
+            }
+            // @fchiappano Impuesto.
+            else
+            {
+                total_Impuesto = total_Impuesto.add(taxes[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
+                AlicIva impuesto = new AlicIva(tax.get_ValueAsInt("WSFECode"), taxes[i].getTaxBaseAmt().doubleValue(),
+                        taxes[i].getTaxAmt().doubleValue());
+                impuestos.add(impuesto);
             }
         }
 

@@ -36,6 +36,10 @@ WITH (
 ALTER TABLE LAR_ConfiguracionFE
   OWNER TO ADempiere;
 
+-- Marca que indentifica a los impuestos internos.
+ALTER TABLE C_Tax ADD COLUMN EsImpuestoInterno character(1) NOT NULL DEFAULT 'N'::bpchar;
+ALTER TABLE C_Tax ADD CONSTRAINT c_tax_esimpuestoinerno_check CHECK (EsImpuestoInterno = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
+
 -- 28/05/2020 19:33:58 ART
 -- ISSUE #77: Configuración Facturación Electronica.
 INSERT INTO AD_Table (IsSecurityEnabled,AccessLevel,LoadSeq,AD_Table_ID,ImportTable,IsHighVolume,IsView,IsChangeLog,CopyColumnsFromTable,EntityType,IsCentrallyMaintained,IsDeleteable,ReplicationType,TableName,Name,AD_Client_ID,IsActive,AD_Org_ID,CreatedBy,Updated,UpdatedBy,Created) VALUES ('N','3',0,3000137,'N','N','N','N','N','LAR','Y','Y','L','LAR_ConfiguracionFE','Configuración de Facturación Eléctronica',0,'Y',0,100,TO_DATE('2020-05-28 19:33:58','YYYY-MM-DD HH24:MI:SS'),100,TO_DATE('2020-05-28 19:33:58','YYYY-MM-DD HH24:MI:SS'))
@@ -1365,6 +1369,96 @@ UPDATE AD_TreeNodeMM SET Parent_ID=3000000, SeqNo=4, Updated=SysDate WHERE AD_Tr
 -- 16/06/2020 18:24:25 ART
 -- ISSUE #77: Configuración Facturación Electronica.
 UPDATE AD_TreeNodeMM SET Parent_ID=3000369, SeqNo=0, Updated=SysDate WHERE AD_Tree_ID=10 AND Node_ID=3000367
+;
+
+-- 13/07/2020 21:12:28 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001082,'esimpuestointerno','LAR','esimpuestointerno','esimpuestointerno',0,TO_DATE('2020-07-13 21:12:28','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2020-07-13 21:12:28','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 13/07/2020 21:12:28 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, PO_Description,Help,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.PO_Description,t.Help,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001082 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 13/07/2020 21:12:29 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,IsMandatory,Version,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003672,261,'LAR','Y',0,'N','N','N',1,'N',20,'N',3001082,'N','Y','N','esimpuestointerno','esimpuestointerno',TO_DATE('2020-07-13 21:12:28','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2020-07-13 21:12:28','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 13/07/2020 21:12:29 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003672 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 13/07/2020 21:13:28 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Column SET Name='Es Impuesto Interno', ColumnName='EsImpuestoInterno',Updated=TO_DATE('2020-07-13 21:13:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003672
+;
+
+-- 13/07/2020 21:13:28 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003672
+;
+
+-- 13/07/2020 21:13:28 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Field SET Name='Es Impuesto Interno', Description=NULL, Help=NULL WHERE AD_Column_ID=3003672 AND IsCentrallyMaintained='Y'
+;
+
+-- 13/07/2020 21:13:33 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Column_Trl SET Name='Es Impuesto Interno',Updated=TO_DATE('2020-07-13 21:13:33','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003672 AND AD_Language='es_AR'
+;
+
+-- 13/07/2020 21:13:50 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Element SET ColumnName='EsImpuestoInterno', Name='Es Impuesto Interno', PrintName='Es Impuesto Interno',Updated=TO_DATE('2020-07-13 21:13:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001082
+;
+
+-- 13/07/2020 21:13:50 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001082
+;
+
+-- 13/07/2020 21:13:50 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Column SET ColumnName='EsImpuestoInterno', Name='Es Impuesto Interno', Description=NULL, Help=NULL WHERE AD_Element_ID=3001082
+;
+
+-- 13/07/2020 21:13:50 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Process_Para SET ColumnName='EsImpuestoInterno', Name='Es Impuesto Interno', Description=NULL, Help=NULL, AD_Element_ID=3001082 WHERE UPPER(ColumnName)='ESIMPUESTOINTERNO' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 13/07/2020 21:13:50 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Process_Para SET ColumnName='EsImpuestoInterno', Name='Es Impuesto Interno', Description=NULL, Help=NULL WHERE AD_Element_ID=3001082 AND IsCentrallyMaintained='Y'
+;
+
+-- 13/07/2020 21:13:50 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Field SET Name='Es Impuesto Interno', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001082) AND IsCentrallyMaintained='Y'
+;
+
+-- 13/07/2020 21:13:50 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_PrintFormatItem pi SET PrintName='Es Impuesto Interno', Name='Es Impuesto Interno' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001082)
+;
+
+-- 13/07/2020 21:13:56 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+UPDATE AD_Element_Trl SET Name='Es Impuesto Interno',PrintName='Es Impuesto Interno',Updated=TO_DATE('2020-07-13 21:13:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001082 AND AD_Language='es_AR'
+;
+
+-- 13/07/2020 21:15:03 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3006893,1,'Y','N','N',3003672,'N','Y',174,'N','LAR','Es Impuesto Interno',100,0,'Y',TO_DATE('2020-07-13 21:15:03','YYYY-MM-DD HH24:MI:SS'),0,100,TO_DATE('2020-07-13 21:15:03','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 13/07/2020 21:15:03 ART
+-- ISSUE #77: Marca identificatoria, para impuestos internos.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3006893 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- Registración de script
