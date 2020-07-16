@@ -240,6 +240,11 @@ public class ProcesadorWSAA
 
         // @fchiappano Recuperar el certificado adjunto en la configuración.
         MAttachment adjunto = MAttachment.get(ctx, table_ID, config_ID);
+
+        // @fchiappano Si no hay archivos adjuntos en la config, retornar null.
+        if (adjunto == null)
+            return null;
+
         MAttachmentEntry[] archivos = adjunto.getEntries();
         MAttachmentEntry entry = null;
         for (int i = 0; i < archivos.length; i++)
@@ -250,6 +255,11 @@ public class ProcesadorWSAA
                 break;
             }
         }
+
+        // @fchiappano Verificar que se haya recuperado el certificado correctamente.
+        if (entry == null)
+            return null;
+
         // @fchiappano Recupero el certificado.
         certificado = entry.getFile();
 
