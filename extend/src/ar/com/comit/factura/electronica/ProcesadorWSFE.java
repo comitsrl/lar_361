@@ -150,12 +150,13 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         int tipoCbte = getDocSubTypeCAE(factura);
         String fechaVecPago = getFecha((Timestamp) factura.get_Value("FechaPago"));
 
-        // @fchiappano Si el tipo de doc es NC o ND FCE, no informar fecha de pago y agregar comprobante asociado.
-        if (tipoCbte == 202 || tipoCbte == 203 || tipoCbte == 207 || tipoCbte == 208 || tipoCbte == 212 || tipoCbte == 213)
+        // @fchiappano Si el tipo de doc es NC o ND, no informar fecha de pago y agregar comprobante asociado.
+        if (factura.getC_DocTypeTarget().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo) || // @fchiappano Notas de Creditoo
+                tipoCbte == 2 || tipoCbte == 7 || tipoCbte == 52 || tipoCbte == 202 || tipoCbte == 207 || tipoCbte == 212) // @fchiappano Tipos de Nota de Debito
         {
             fechaVecPago = "";
 
-            if (!agregarDocAsociado())
+            if (!agregarDocAsociado(tipoCbte))
                 return null;
         }
 
@@ -166,11 +167,22 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         String fechaComprobante = formatTime(factura.getDateAcct(), "yyyyMMdd");
         String fechaActual = formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
 
+        // @fchiappano Si el concepto es 1, no es necesario informar fecha de servicio.
+        int concepto = ProcesadorWSAA.getConcepto();
+        if (concepto == 1)
+        {
+            fechaActual = "";
+
+            // @fchiappano Si ademas no se trata de una factura MiPyme, no informar fecha de pago.
+            if (tipoCbte != 201 && tipoCbte != 206 && tipoCbte != 211)
+                fechaVecPago = "";
+        }
+
         // @fchiappano Convertir las listas en arreglos.
         convertirArray();
 
         // @fchiappano Creo el archivo xml Request.
-        FECAEDetRequest detRequest = new FECAEDetRequest(ProcesadorWSAA.getConcepto(), tipoDoc, nroDoc, nroComprobante + 1,
+        FECAEDetRequest detRequest = new FECAEDetRequest(concepto, tipoDoc, nroDoc, nroComprobante + 1,
                 nroComprobante + 1, fechaComprobante, factura.getGrandTotal().doubleValue(), Env.ZERO.doubleValue(),
                 factura.getTotalLines().doubleValue(), Env.ZERO.doubleValue(), total_Tributos.doubleValue(),
                 total_Impuesto.doubleValue(), fechaActual, fechaActual, fechaVecPago, getCodMoneda(), getCotizacion(),
@@ -324,11 +336,11 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
      * @author fchiappano
      * @return confirmación.
      */
-    private boolean agregarDocAsociado()
+    private boolean agregarDocAsociado(final int tipoCbte)
     {
         if (factura.get_ValueAsInt("Source_Invoice_ID") <= 0)
         {
-            msgError = "Es obligatorio, informar un documento asociado, para Notas de Crédito o Notas de Débito MiPyme.";
+            msgError = "Es obligatorio, informar un documento asociado, para Notas de Crédito o Notas de Débito.";
             return false;
         }
 
@@ -337,15 +349,19 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         CbteAsoc asociado = new CbteAsoc(getDocSubTypeCAE(facturaOrigen), getPuntoVenta(facturaOrigen), facturaOrigen.getNumeroComprobante(), cuitOrg, getFecha(facturaOrigen.getDateInvoiced()));
         asociados.add(asociado);
 
-        // @fchiappano Agregar parametro opcional EsCancelación.
-        String cancelacion = "";
-        if (factura.get_ValueAsBoolean("Cancelacion"))
-            cancelacion = "S";
-        else
-            cancelacion = "N";
+        // @fchiappano Agregar parametro opcional EsCancelación solo si es MiPyme.
+        if (tipoCbte == 202 || tipoCbte == 203 || tipoCbte == 207 || tipoCbte == 208 || tipoCbte == 212
+                || tipoCbte == 213)
+        {
+            String cancelacion = "";
+            if (factura.get_ValueAsBoolean("Cancelacion"))
+                cancelacion = "S";
+            else
+                cancelacion = "N";
 
-        Opcional opcional = new Opcional("22", cancelacion);
-        opcionales.add(opcional);
+            Opcional opcional = new Opcional("22", cancelacion);
+            opcionales.add(opcional);
+        }
 
         return true;
     } // agregarDocAsociado
