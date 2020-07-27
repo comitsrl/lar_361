@@ -1106,11 +1106,12 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     // @fchiappano Si se trata de una factura en moneda
                     // extranjera, realizar conversión de moneda.
                     MCurrency moneda = (MCurrency) invoices[i].getC_Invoice().getC_Currency();
-                    if (moneda.getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(),
-                            get_TrxName()))
+                    MCurrency monedaPredeterminada = new MCurrency(p_ctx,
+                            LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), get_TrxName());
+                    if (moneda.getC_Currency_ID() != monedaPredeterminada.getC_Currency_ID())
                     {
                         BigDecimal tasaCambio = (BigDecimal) get_Value("TasaDeCambio");
-                        sumaFacturas = sumaFacturas.add(invoices[i].getAmount().multiply(tasaCambio).setScale(moneda.getStdPrecision(), RoundingMode.HALF_UP));
+                        sumaFacturas = sumaFacturas.add(invoices[i].getAmount().multiply(tasaCambio).setScale(monedaPredeterminada.getStdPrecision(), RoundingMode.HALF_UP));
                     }
                     else
                         sumaFacturas = sumaFacturas.add(invoices[i].getAmount());
