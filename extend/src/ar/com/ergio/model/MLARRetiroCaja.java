@@ -208,6 +208,17 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 return STATUS_Drafted;
             }
 
+            // @fchiappano Verificar si se debe utilizar el c_charge_id
+            // configurado en el concepto de caja.
+            if (isRetiro() && getLAR_ConceptoCaja_ID() > 0)
+            {
+                String sql = "SELECT C_Charge_ID FROM LAR_ConceptoCaja WHERE LAR_ConceptoCaja_ID = ?";
+                int c_Charge_ID = DB.getSQLValue(get_TrxName(), sql, getLAR_ConceptoCaja_ID());
+
+                if (c_Charge_ID > 0)
+                    paymentBankFrom.setC_Charge_ID(c_Charge_ID);
+            }
+
             paymentBankFrom.saveEx();
 
             if (paymentBankFrom.processIt(MPayment.DOCACTION_Complete))
