@@ -670,7 +670,7 @@ public class InfoProduct extends Info implements ActionListener, ChangeListener
 			+ "WHERE pl.M_PriceList_ID=plv.M_PriceList_ID"
 			+ " AND plv.IsActive='Y'"
 			+ " AND pl.M_PriceList_ID=? "					//	1
-			+ "ORDER BY plv.ValidFrom DESC";
+            + "ORDER BY plv.ValidFrom DESC, plv.M_PriceList_Version_ID DESC";
 		//	find newest one
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;

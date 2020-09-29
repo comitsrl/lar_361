@@ -248,7 +248,9 @@ public class MPriceList extends X_M_PriceList
 		m_plv = new Query(getCtx(), I_M_PriceList_Version.Table_Name, whereClause, get_TrxName())
 					.setParameters(getM_PriceList_ID(), valid)
 					.setOnlyActiveRecords(true)
-					.setOrderBy("ValidFrom DESC")
+                    // @fchiappano Agregar ordenamiento descendente de ID, por si
+                    // hay mas de una version con la misma fecha de vigencia.
+                    .setOrderBy("ValidFrom DESC, M_PriceList_Version_ID DESC")
 					.first();
 		if (m_plv == null)
 			log.warning("None found M_PriceList_ID=" + getM_PriceList_ID() + " - " + valid);
