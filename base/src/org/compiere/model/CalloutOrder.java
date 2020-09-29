@@ -712,7 +712,7 @@ public class CalloutOrder extends CalloutEngine
 			+ " AND pl.M_PriceList_ID=plv.M_PriceList_ID"
 			+ " AND pl.M_PriceList_ID=? "						//	1
 			+ " AND plv.ValidFrom <= ? "
-			+ "ORDER BY plv.ValidFrom DESC";
+			+ "ORDER BY plv.ValidFrom DESC, plv.M_PriceList_Version_ID DESC";
 		//	Use newest price list - may not be future
 		try
 		{
@@ -830,7 +830,7 @@ public class CalloutOrder extends CalloutEngine
 				+ "FROM M_PriceList_Version plv "
 				+ "WHERE plv.M_PriceList_ID=? "						//	1
 				+ " AND plv.ValidFrom <= ? "
-				+ "ORDER BY plv.ValidFrom DESC";
+				+ "ORDER BY plv.ValidFrom DESC, plv.M_PriceList_Version_ID DESC";
 			//	Use newest price list - may not be future
 			
 			M_PriceList_Version_ID = DB.getSQLValueEx(null, sql, M_PriceList_ID, orderDate);
