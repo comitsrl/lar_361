@@ -31,6 +31,7 @@ import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
 import org.compiere.model.MOrder;
 import org.compiere.model.MRMA;
+import org.compiere.model.MSysConfig;
 import org.compiere.process.DocAction;
 import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
@@ -60,6 +61,10 @@ public class WInvoiceGen extends InvoiceGen implements IFormController, EventLis
 	private Listbox  cmbDocType = ListboxFactory.newDropdownListbox();
 	private Label   lDocAction = new Label();
 	private WTableDirEditor docAction;
+
+    // @fchiappano Parametro Punto de Venta.
+    private Label lPOS = new Label();
+    private WTableDirEditor fPOS;
 	
 	public WInvoiceGen()
 	{
@@ -102,6 +107,9 @@ public class WInvoiceGen extends InvoiceGen implements IFormController, EventLis
 		row.appendChild(lOrg.rightAlign());
 		row.appendChild(fOrg.getComponent());
 		row.appendChild(new Space());
+        row.appendChild(lPOS.rightAlign());
+        row.appendChild(fPOS.getComponent());
+        row.appendChild(new Space());
 		row.appendChild(lBPartner.rightAlign());
 		row.appendChild(fBPartner.getComponent());
 		row.appendChild(new Space());
@@ -114,6 +122,9 @@ public class WInvoiceGen extends InvoiceGen implements IFormController, EventLis
 		row.appendChild(lDocAction.rightAlign());
 		row.appendChild(docAction.getComponent());
 		row.appendChild(new Space());
+
+        // @fchiappano Se agrega nueva linea de parametros con el parametro PDV.
+
 	}	//	jbInit
 
 	/**
@@ -140,7 +151,24 @@ public class WInvoiceGen extends InvoiceGen implements IFormController, EventLis
 		docAction = new WTableDirEditor("DocAction", true, false, true,docActionL);
 		docAction.setValue(DocAction.ACTION_Complete);
 		docAction.addValueChangeListener(this);
-        
+
+        // @fchiappano Iniciación del parametro punto de venta.
+        if (MSysConfig.getBooleanValue("ERGIO_InvoiceGen_Login_ORG_and_PDV", true, Env.getAD_Client_ID(Env.getCtx())))
+        {
+            // Muestra PDVS disponibles para la Organización con que se logueó
+            MLookup posL = MLookupFactory.get(Env.getCtx(), form.getWindowNo(),
+                    3000068 /* C_Invoice.C_POS_ID */, DisplayType.Table, Env.getLanguage(Env.getCtx()), "C_POS_ID",
+                    3000022 /* LAR_POS_ID Login Org */, false, "");
+
+            fPOS = new WTableDirEditor("C_POS_ID", true, false, true, posL);
+        }
+        else
+        {
+            MLookup posL = MLookupFactory.get(Env.getCtx(), form.getWindowNo(), 0, 3000068, DisplayType.Table);
+            fPOS = new WTableDirEditor("C_POS_ID", true, false, true, posL);
+        }
+        lPOS.setText("PDV");
+
 //      Document Type Sales Order/Vendor RMA
         lDocType.setText(Msg.translate(Env.getCtx(), "C_DocType_ID"));
         cmbDocType.addItem(new KeyNamePair(MOrder.Table_ID, Msg.translate(Env.getCtx(), "Order")));
@@ -214,8 +242,16 @@ public class WInvoiceGen extends InvoiceGen implements IFormController, EventLis
 	public String generate()
 	{
 		KeyNamePair docTypeKNPair = (KeyNamePair)cmbDocType.getSelectedItem().toKeyNamePair();
-		String docActionSelected = (String)docAction.getValue();	
-		return generate(form.getStatusBar(), docTypeKNPair, docActionSelected);
+		String docActionSelected = (String)docAction.getValue();
+
+        // @fchiappano Validar que se ingrese un PDV.
+        int C_POS_ID = 0;
+        if (fPOS.getValue() != null)
+            C_POS_ID = (Integer) fPOS.getValue();
+        else
+            throw new IllegalStateException("Punto de Venta invalido.");
+
+        return generate(form.getStatusBar(), docTypeKNPair, C_POS_ID, docActionSelected);
 	}	//	generateShipments
 	
 	public ADForm getForm()
