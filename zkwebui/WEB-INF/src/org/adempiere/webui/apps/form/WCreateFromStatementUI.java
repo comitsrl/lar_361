@@ -56,6 +56,8 @@ import org.zkoss.zkex.zul.Borderlayout;
 import org.zkoss.zkex.zul.Center;
 import org.zkoss.zul.Hbox;
 
+import ar.com.ergio.model.MLARTarjetaCredito;
+
 public class WCreateFromStatementUI extends CreateFromStatement implements EventListener, SystemIDs
 {
 	private static final long serialVersionUID = 1L;
@@ -106,7 +108,11 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 
 	protected Label tenderTypeLabel = new Label();
 	protected WTableDirEditor tenderTypeField;
-	
+
+    // @fchiappano nuevo filtro Tipo de Tarjeta.
+    protected Label tipoTarjetaLabel = new Label();
+    protected WTableDirEditor tipoTarjetaField;
+
 	protected Label amtFromLabel = new Label(Msg.translate(Env.getCtx(), "PayAmt"));
 	protected WNumberEditor amtFromField = new WNumberEditor("AmtFrom", false, false, true, DisplayType.Amount, Msg.translate(Env.getCtx(), "AmtFrom"));
 	protected Label amtToLabel = new Label("-");
@@ -146,7 +152,7 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 		
 		int AD_Column_ID = COLUMN_C_BANKSTATEMENT_C_BANKACCOUNT_ID;        //  C_BankStatement.C_BankAccount_ID
 		MLookup lookup = MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, AD_Column_ID, DisplayType.TableDir);
-		bankAccountField = new WTableDirEditor ("C_BankAccount_ID", true, false, true, lookup);
+        bankAccountField = new WTableDirEditor("C_BankAccount_ID", true, true, true, lookup);
 		//  Set Default
 		int C_BankAccount_ID = Env.getContextAsInt(Env.getCtx(), p_WindowNo, "C_BankAccount_ID");
 		bankAccountField.setValue(new Integer(C_BankAccount_ID));
@@ -161,7 +167,13 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 		lookup = MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, MColumn.getColumn_ID(MPayment.Table_Name, MPayment.COLUMNNAME_TenderType), DisplayType.List);
 		tenderTypeField = new WTableDirEditor (MPayment.COLUMNNAME_TenderType,false,false,true,lookup);
 		tenderTypeField.getComponent().addEventListener(Events.ON_CHANGE, this);
-		
+
+        // @fchiappano filtro tipo de tarjeta.
+        lookup = MLookupFactory.get(Env.getCtx(), p_WindowNo, 0,
+                MColumn.getColumn_ID(MLARTarjetaCredito.Table_Name, "CreditCardType"), DisplayType.List);
+        tipoTarjetaField = new WTableDirEditor("CreditCardType", false, false, true, lookup);
+        tipoTarjetaField.getComponent().addEventListener(Events.ON_CHANGE, this);
+
 		lookup = MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, 3499, DisplayType.Search);
 		bPartnerLookup = new WSearchEditor ("C_BPartner_ID", false, false, true, lookup);
 		
@@ -188,9 +200,12 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
     	
     	amtFromField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "AmtFrom"));
     	amtToField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "AmtTo"));
-    	
+
+        // @fchiappano Label tipo de tarjeta.
+        tipoTarjetaLabel.setText("Tipo de Tarjeta");
+
     	Borderlayout parameterLayout = new Borderlayout();
-		parameterLayout.setHeight("110px");
+        parameterLayout.setHeight("130px");
 		parameterLayout.setWidth("100%");
     	Panel parameterPanel = window.getParameterPanel();
 		parameterPanel.appendChild(parameterLayout);
@@ -213,19 +228,18 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 		row = rows.newRow();
 		row.appendChild(documentTypeLabel.rightAlign());
 		row.appendChild(documentTypeField.getComponent());
-		row.appendChild(authorizationLabel.rightAlign());
-		row.appendChild(authorizationField.getComponent());
+        row.appendChild(amtFromLabel.rightAlign());
+        Hbox hbox = new Hbox();
+        hbox.appendChild(amtFromField.getComponent());
+        hbox.appendChild(amtToLabel.rightAlign());
+        hbox.appendChild(amtToField.getComponent());
+        row.appendChild(hbox);
 		
 		row = rows.newRow();
 		row.appendChild(tenderTypeLabel.rightAlign());
 		row.appendChild(tenderTypeField.getComponent());
-
-		row.appendChild(amtFromLabel.rightAlign());
-		Hbox hbox = new Hbox();
-		hbox.appendChild(amtFromField.getComponent());
-		hbox.appendChild(amtToLabel.rightAlign());
-		hbox.appendChild(amtToField.getComponent());
-		row.appendChild(hbox);
+        row.appendChild(tipoTarjetaLabel.rightAlign());
+        row.appendChild(tipoTarjetaField.getComponent());
 		
 		row = rows.newRow();
 		row.appendChild(BPartner_idLabel.rightAlign());
@@ -258,7 +272,7 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 	{
 		loadTableOIS(getBankData(documentNoField.getValue().toString(), bPartnerLookup.getValue(), dateFromField.getValue(), dateToField.getValue(),
 				amtFromField.getValue(), amtToField.getValue(), documentTypeField.getValue(), tenderTypeField.getValue(), 
-				authorizationField.getValue().toString()));
+                tipoTarjetaField.getValue(), authorizationField.getValue().toString()));
 	}
 	
 	protected void loadTableOIS (Vector<?> data)
