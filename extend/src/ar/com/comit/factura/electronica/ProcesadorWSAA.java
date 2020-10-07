@@ -261,7 +261,7 @@ public class ProcesadorWSAA
             return null;
 
         // @fchiappano Recupero el certificado.
-        certificado = entry.getFile();
+        certificado = entry.getFile(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + entry.getName());
 
         return certificado;
     } // getCertificado
