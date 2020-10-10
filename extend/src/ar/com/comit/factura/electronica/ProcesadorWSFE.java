@@ -17,6 +17,7 @@
 package ar.com.comit.factura.electronica;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.sql.Date;
@@ -114,16 +115,16 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
                 MTax taxPerc = MTax.get(ctx, taxes[i].getC_Tax_ID());
                 double alic = (taxPerc.getRate().negate().doubleValue());
                 Tributo tributo = new Tributo(Short.parseShort(tax.get_ValueAsString("WSFECode")),
-                        tax.getTaxIndicator(), taxes[i].getTaxBaseAmt().doubleValue(), alic,
-                        taxes[i].getTaxAmt().doubleValue());
+                        tax.getTaxIndicator(), taxes[i].getTaxBaseAmt().setScale(2, RoundingMode.HALF_UP).doubleValue(), alic,
+                        taxes[i].getTaxAmt().setScale(2, RoundingMode.HALF_UP).doubleValue());
                 tributos.add(tributo);
             }
             // @fchiappano Impuesto.
             else
             {
                 total_Impuesto = total_Impuesto.add(taxes[i].getTaxAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
-                AlicIva impuesto = new AlicIva(tax.get_ValueAsInt("WSFECode"), taxes[i].getTaxBaseAmt().doubleValue(),
-                        taxes[i].getTaxAmt().doubleValue());
+                AlicIva impuesto = new AlicIva(tax.get_ValueAsInt("WSFECode"), taxes[i].getTaxBaseAmt().setScale(2, RoundingMode.HALF_UP).doubleValue(),
+                        taxes[i].getTaxAmt().setScale(2, RoundingMode.HALF_UP).doubleValue());
                 impuestos.add(impuesto);
             }
         }
@@ -154,8 +155,6 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         if (factura.getC_DocTypeTarget().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo) || // @fchiappano Notas de Creditoo
                 tipoCbte == 2 || tipoCbte == 7 || tipoCbte == 52 || tipoCbte == 202 || tipoCbte == 207 || tipoCbte == 212) // @fchiappano Tipos de Nota de Debito
         {
-            fechaVecPago = "";
-
             if (!agregarDocAsociado(tipoCbte))
                 return null;
         }
@@ -177,15 +176,19 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             if (tipoCbte != 201 && tipoCbte != 206 && tipoCbte != 211)
                 fechaVecPago = "";
         }
+        // @fchiappano si el concepto es 2 o 3, en el unico caso que no se debe infomar fecha de pago, es en ND y NC MiPyme.
+        else if (tipoCbte == 202 || tipoCbte == 207 || tipoCbte == 212 || // @fchiappano ND MiPyme
+                tipoCbte == 203 || tipoCbte == 208 || tipoCbte == 213) // @fchiappano NC MiPyme
+            fechaVecPago = "";
 
         // @fchiappano Convertir las listas en arreglos.
         convertirArray();
 
         // @fchiappano Creo el archivo xml Request.
         FECAEDetRequest detRequest = new FECAEDetRequest(concepto, tipoDoc, nroDoc, nroComprobante + 1,
-                nroComprobante + 1, fechaComprobante, factura.getGrandTotal().doubleValue(), Env.ZERO.doubleValue(),
-                factura.getTotalLines().doubleValue(), Env.ZERO.doubleValue(), total_Tributos.doubleValue(),
-                total_Impuesto.doubleValue(), fechaActual, fechaActual, fechaVecPago, getCodMoneda(), getCotizacion(),
+                nroComprobante + 1, fechaComprobante, factura.getGrandTotal().setScale(2, RoundingMode.HALF_UP).doubleValue(), Env.ZERO.doubleValue(),
+                factura.getTotalLines().setScale(2, RoundingMode.HALF_UP).doubleValue(), Env.ZERO.doubleValue(), total_Tributos.setScale(2, RoundingMode.HALF_UP).doubleValue(),
+                total_Impuesto.setScale(2, RoundingMode.HALF_UP).doubleValue(), fechaActual, fechaActual, fechaVecPago, getCodMoneda(), getCotizacion(),
                 array_asoc, array_trib, array_imp, array_opc);
 
         return detRequest;
