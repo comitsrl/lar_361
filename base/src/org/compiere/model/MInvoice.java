@@ -2122,6 +2122,16 @@ public class MInvoice extends X_C_Invoice implements DocAction
             String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
             if (value != null)
                 setDocumentNo(value);
+
+            // @fchiappano Si luego de actualizar el numero de doc. no se puede
+            // guardar la factura, agregar un sufijo para evitar conflictos, ya
+            // que en esta instancia la factura ya fue aprobada.
+            if (!save(get_TrxName()))
+            {
+                ADialog.warn(1, new JDialog(), "El Nro. de Doc.: " + getDocumentNo()
+                        + " ya existe, se agregara un sufijo para continuar con el proceso.");
+                setDocumentNo(getDocumentNo() + "-" + getC_Invoice_ID());
+            }
 		}
 	}
 
