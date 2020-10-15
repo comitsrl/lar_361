@@ -877,7 +877,18 @@ public class InfoProduct extends Info implements ActionListener, ChangeListener
 		if ((e.getSource() == pickWarehouse || e.getSource() == pickPriceList)
 			&& (fieldValue.getText().length() == 0 && fieldName.getText().length() == 0))
 			return;
-			
+        // @fchiappano Si se escribio parcialmente en el combo categoria de
+        // producto, no realizar la busqueda aun.
+        if (e.getSource() == pickProductCategory && pickProductCategory.getValue() == null)
+            return;
+        // @fchiappano Si se escribio parcialmente en el combo deposito,
+        // no realizar la busqueda aun.
+        if (e.getSource() == pickWarehouse && pickWarehouse.getValue() == null)
+            return;
+        // @fchiappano Si se escribio parcialmente en el combo lista de precios,
+        // no realizar la busqueda aun.
+        if (e.getSource() == pickPriceList && pickPriceList.getValue() == null)
+            return;
 		//	Product Attribute Search
 		if (e.getSource().equals(m_InfoPAttributeButton))
 		{
