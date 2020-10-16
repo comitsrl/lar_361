@@ -35,7 +35,9 @@ import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoAddressException;
 import org.adempiere.exceptions.DBException;
 import org.compiere.apps.ADialog;
+import org.compiere.print.ReportCtl;
 import org.compiere.print.ReportEngine;
+import org.compiere.print.SwingViewerProvider;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
 import org.compiere.util.CCache;
@@ -2128,8 +2130,12 @@ public class MInvoice extends X_C_Invoice implements DocAction
             // que en esta instancia la factura ya fue aprobada.
             if (!save(get_TrxName()))
             {
-                ADialog.warn(1, new JDialog(), "El Nro. de Doc.: " + getDocumentNo()
-                        + " ya existe, se agregara un sufijo para continuar con el proceso.");
+                // @fchiappano Si se esta ejecutando la versión de escritorio,
+                // mostrar mensaje al usuario.
+                if (ReportCtl.getReportViewerProvider() instanceof SwingViewerProvider)
+                    ADialog.warn(1, new JDialog(), "El Nro. de Doc.: " + getDocumentNo()
+                            + " ya existe, se agregara un sufijo para continuar con el proceso.");
+
                 setDocumentNo(getDocumentNo() + "-" + getC_Invoice_ID());
             }
 		}
