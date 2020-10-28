@@ -30,6 +30,8 @@ import javax.swing.JFrame;
 
 import org.compiere.Adempiere;
 import org.compiere.apps.ADialog;
+import org.compiere.print.ReportCtl;
+import org.compiere.print.SwingViewerProvider;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
 import org.compiere.util.DB;
@@ -498,7 +500,9 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 		    // @fchiappano actualizar columnas "fisicas" de cheques.
 		    actualizarColumnasCheques();
 
-            if (m_transferred != null)
+            // @fchiappano Mostrar informe, solo si esta ejecutando la versión
+            // de escritorio.
+            if (m_transferred != null && ReportCtl.getReportViewerProvider() instanceof SwingViewerProvider)
             {
                 String mensaje = m_transferred[0].getKey() + " Líneas Transferidas. \n Detalle: \n ";
 
