@@ -66,6 +66,9 @@ public class CalloutOrder extends CalloutEngine
 		if (C_DocType_ID == null || C_DocType_ID.intValue() == 0)
 			return "";
 
+        // @fchiappano Recuperar parametro que determina si se debe actualizar el payment rule y payment termn.
+        boolean actualizaPaymentRule = MSysConfig.getBooleanValue("LAR_PaymentRule_PaymentTerm_Automatico", true, Env.getAD_Client_ID(ctx));
+
 		//	Re-Create new DocNo, if there is a doc number already
 		//	and the existing source used a different Sequence number
 		String oldDocNo = (String)mTab.getValue("DocumentNo");
@@ -130,16 +133,20 @@ public class CalloutOrder extends CalloutEngine
 					mTab.setValue ("InvoiceRule", X_C_Order.INVOICERULE_Immediate);
 				else
 					mTab.setValue ("InvoiceRule", X_C_Order.INVOICERULE_AfterDelivery);
-				
-				//	Payment Rule - POS Order
-				if (DocSubTypeSO.equals(MOrder.DocSubTypeSO_POS))
-					mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_Cash);
-				else
-					mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_OnCredit);
 
 				//	IsSOTrx
 				if ("N".equals(rs.getString("IsSOTrx")))
 					IsSOTrx = false;
+
+                // Payment Rule - POS Order
+                // @fchiappano Solo modificar el payment rule, si el parametro asi lo establece.
+                if (!IsSOTrx || actualizaPaymentRule)
+                {
+                    if (DocSubTypeSO.equals(MOrder.DocSubTypeSO_POS))
+                        mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_Cash);
+                    else
+                        mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_OnCredit);
+                }
 
 				//	Set Context:
 				Env.setContext(ctx, WindowNo, "HasCharges", rs.getString("HasCharges"));
@@ -181,20 +188,26 @@ public class CalloutOrder extends CalloutEngine
 				rs = pstmt.executeQuery();
 				if (rs.next())
 				{
+				    String s = "";
 					//	PaymentRule
-					String s = rs.getString(IsSOTrx ? "PaymentRule" : "PaymentRulePO");
-					if (s != null && s.length() != 0)
-					{
-						if (IsSOTrx && (s.equals("B") || s.equals("S") || s.equals("U")))	//	No Cash/Check/Transfer for SO_Trx
-							s = "P";										//  Payment Term
-						if (!IsSOTrx && (s.equals("B")))					//	No Cash for PO_Trx
-							s = "P";										//  Payment Term
-						mTab.setValue("PaymentRule", s);
-					}
-					//	Payment Term
-					Integer ii =new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
-					if (!rs.wasNull())
-						mTab.setValue("C_PaymentTerm_ID", ii);
+                    // @fchiappano Modificar el paymentRule y paymentTerm en el caso de la venta, solo si el parametro asi lo establece.
+                    if (!IsSOTrx || actualizaPaymentRule)
+                    {
+                        s = rs.getString(IsSOTrx ? "PaymentRule" : "PaymentRulePO");
+                        if (s != null && s.length() != 0)
+                        {
+                            if (IsSOTrx && (s.equals("B") || s.equals("S") || s.equals("U"))) // No Cash/Check/Transfer
+                                                                                              // for SO_Trx
+                                s = "P"; // Payment Term
+                            if (!IsSOTrx && (s.equals("B"))) // No Cash for PO_Trx
+                                s = "P"; // Payment Term
+                            mTab.setValue("PaymentRule", s);
+                        }
+                        // Payment Term
+                        Integer ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
+                        if (!rs.wasNull())
+                            mTab.setValue("C_PaymentTerm_ID", ii);
+                    }
 					//	InvoiceRule
 					s = rs.getString(3);
 					if (s != null && s.length() != 0)
@@ -251,6 +264,10 @@ public class CalloutOrder extends CalloutEngine
 		Integer C_BPartner_ID = (Integer)value;
 		if (C_BPartner_ID == null || C_BPartner_ID.intValue() == 0)
 			return "";
+
+        // @fchiappano Recuperar parametro que determina si se debe actualizar el payment rule y payment termn.
+        boolean actualizaPaymentRule = MSysConfig.getBooleanValue("LAR_PaymentRule_PaymentTerm_Automatico", true, Env.getAD_Client_ID(ctx));
+
 		String sql = "SELECT p.AD_Language,p.C_PaymentTerm_ID,"
 			+ " COALESCE(p.M_PriceList_ID,g.M_PriceList_ID) AS M_PriceList_ID, p.PaymentRule,p.POReference,"
 			+ " p.SO_Description,p.IsDiscountPrinted,"
@@ -383,30 +400,43 @@ public class CalloutOrder extends CalloutEngine
 				String OrderType = Env.getContext(ctx, WindowNo, "OrderType");
 				mTab.setValue("InvoiceRule", X_C_Order.INVOICERULE_AfterDelivery);
 				mTab.setValue("DeliveryRule", X_C_Order.DELIVERYRULE_Availability);
-				mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_OnCredit);
+
+                if (!IsSOTrx || actualizaPaymentRule)
+                    mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_OnCredit);
+
 				if (OrderType.equals(MOrder.DocSubTypeSO_Prepay))
 				{
 					mTab.setValue("InvoiceRule", X_C_Order.INVOICERULE_Immediate);
 					mTab.setValue("DeliveryRule", X_C_Order.DELIVERYRULE_AfterReceipt);
 				}
 				else if (OrderType.equals(MOrder.DocSubTypeSO_POS))	//  for POS
-					mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_Cash);
+				{
+                    // @fchiappano Modificar el paymentRule y paymentTerm en el
+                    // caso de la venta, solo si el parametro asi lo establece.
+                    if (!IsSOTrx || actualizaPaymentRule)
+                        mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_Cash);
+				}
 				else
 				{
 					//	PaymentRule
-					s = rs.getString(IsSOTrx ? "PaymentRule" : "PaymentRulePO");
-					if (s != null && s.length() != 0)
-					{
-						if (s.equals("B"))				//	No Cache in Non POS
-							s = "P";
-						if (IsSOTrx && (s.equals("S") || s.equals("U")))	//	No Check/Transfer for SO_Trx
-							s = "P";										//  Payment Term
-						mTab.setValue("PaymentRule", s);
-					}
-					//	Payment Term
-					ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
-					if (!rs.wasNull())
-						mTab.setValue("C_PaymentTerm_ID", ii);
+                    // @fchiappano Modificar el paymentRule y paymentTerm en el
+                    // caso de la venta, solo si el parametro asi lo establece.
+                    if (!IsSOTrx || actualizaPaymentRule)
+                    {
+                        s = rs.getString(IsSOTrx ? "PaymentRule" : "PaymentRulePO");
+                        if (s != null && s.length() != 0)
+                        {
+                            if (s.equals("B")) // No Cache in Non POS
+                                s = "P";
+                            if (IsSOTrx && (s.equals("S") || s.equals("U"))) // No Check/Transfer for SO_Trx
+                                s = "P"; // Payment Term
+                            mTab.setValue("PaymentRule", s);
+                        }
+                        // Payment Term
+                        ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
+                        if (!rs.wasNull())
+                            mTab.setValue("C_PaymentTerm_ID", ii);
+                    }
 					//	InvoiceRule
 					s = rs.getString("InvoiceRule");
 					if (s != null && s.length() != 0)
@@ -463,6 +493,9 @@ public class CalloutOrder extends CalloutEngine
 		Integer bill_BPartner_ID = (Integer)value;
 		if (bill_BPartner_ID == null || bill_BPartner_ID.intValue() == 0)
 			return "";
+
+        // @fchiappano Recuperar parametro que determina si se debe actualizar el payment rule y payment termn.
+        boolean actualizaPaymentRule = MSysConfig.getBooleanValue("LAR_PaymentRule_PaymentTerm_Automatico", true, Env.getAD_Client_ID(ctx));
 
 		String sql = "SELECT p.AD_Language,p.C_PaymentTerm_ID,"
 			+ "p.M_PriceList_ID,p.PaymentRule,p.POReference,"
@@ -559,27 +592,43 @@ public class CalloutOrder extends CalloutEngine
 				//	Defaults, if not Walkin Receipt or Walkin Invoice
 				String OrderType = Env.getContext(ctx, WindowNo, "OrderType");
 				mTab.setValue("InvoiceRule", X_C_Order.INVOICERULE_AfterDelivery);
-				mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_OnCredit);
+
+                // @fchiappano Modificar el paymentRule y paymentTerm en el caso
+                // de la venta, solo si el parametro asi lo establece.
+                if (!IsSOTrx || actualizaPaymentRule)
+                    mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_OnCredit);
+
 				if (OrderType.equals(MOrder.DocSubTypeSO_Prepay))
 					mTab.setValue("InvoiceRule", X_C_Order.INVOICERULE_Immediate);
-				else if (OrderType.equals(MOrder.DocSubTypeSO_POS))	//  for POS
-					mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_Cash);
+				else if (OrderType.equals(MOrder.DocSubTypeSO_POS)) //  for POS
+				{
+                    // @fchiappano Modificar el paymentRule y paymentTerm en el
+                    // caso de la venta, solo si el parametro asi lo establece.
+                    if (!IsSOTrx || actualizaPaymentRule)
+                        mTab.setValue("PaymentRule", X_C_Order.PAYMENTRULE_Cash);
+				}
 				else
 				{
 					//	PaymentRule
-					s = rs.getString(IsSOTrx ? "PaymentRule" : "PaymentRulePO");
-					if (s != null && s.length() != 0)
-					{
-						if (s.equals("B"))				//	No Cache in Non POS
-							s = "P";
-						if (IsSOTrx && (s.equals("S") || s.equals("U")))	//	No Check/Transfer for SO_Trx
-							s = "P";										//  Payment Term
-						mTab.setValue("PaymentRule", s);
-					}
-					//	Payment Term
-					ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
-					if (!rs.wasNull())
-						mTab.setValue("C_PaymentTerm_ID", ii);
+                    // @fchiappano Modificar el paymentRule y paymentTerm en
+                    // el caso de la venta, solo si el parametro asi lo
+                    // establece.
+                    if (!IsSOTrx || actualizaPaymentRule)
+                    {
+                        s = rs.getString(IsSOTrx ? "PaymentRule" : "PaymentRulePO");
+                        if (s != null && s.length() != 0)
+                        {
+                            if (s.equals("B")) // No Cache in Non POS
+                                s = "P";
+                            if (IsSOTrx && (s.equals("S") || s.equals("U"))) // No Check/Transfer for SO_Trx
+                                s = "P"; // Payment Term
+                            mTab.setValue("PaymentRule", s);
+                        }
+                        // Payment Term
+                        ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
+                        if (!rs.wasNull())
+                            mTab.setValue("C_PaymentTerm_ID", ii);
+                    }
 					//	InvoiceRule
 					s = rs.getString("InvoiceRule");
 					if (s != null && s.length() != 0)
