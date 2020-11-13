@@ -604,13 +604,37 @@ public class InfoProductPanel extends InfoPanel implements EventListener
 		//	Pick init
 		fillPicks(M_PriceList_ID);
 		int M_PriceList_Version_ID = findPLV (M_PriceList_ID);
-		//	Set Value
-		if (value != null && value.length() > 0 && value.startsWith("@") && value.endsWith("@")) {
-			String values[] = value.substring(1,value.length()-1).split("_");
-			fieldValue.setText(values[0]);
-		}
-		else
-			fieldValue.setText(value);
+
+        // @fchiappano, imitar comportamiento de busqueda de la InfoBPartner
+        // Set Value
+        if (value != null && value.length() > 0 && value.startsWith("@") && value.endsWith("@"))
+        {
+            String values[] = value.substring(1, value.length() - 1).split("_");
+            value = values[0];
+        }
+        if (value == null)
+            value = "%";
+        if (!value.endsWith("%"))
+            value += "%";
+
+        // Put query string in Name if not numeric
+        if (value.equals("%"))
+            fieldName.setText(value);
+        // No Numbers entered
+        if ((value.indexOf('0') + value.indexOf('1') + value.indexOf('2') + value.indexOf('3') + value.indexOf('4')
+                + value.indexOf('5') + value.indexOf('6') + value.indexOf('7') + value.indexOf('8')
+                + value.indexOf('9')) == -10)
+        {
+            if (value.startsWith("%"))
+                fieldName.setText(value);
+            else
+                fieldName.setText("%" + value);
+        }
+        // Number entered
+        else
+            fieldValue.setText(value);
+        // @fchiappano fin.
+
 		//	Set Warehouse
 		if (M_Warehouse_ID == 0)
 			M_Warehouse_ID = Env.getContextAsInt(Env.getCtx(), "#M_Warehouse_ID");
