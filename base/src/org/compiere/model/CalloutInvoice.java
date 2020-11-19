@@ -158,6 +158,9 @@ public class CalloutInvoice extends CalloutEngine
 		if (C_BPartner_ID == null || C_BPartner_ID.intValue() == 0)
 			return "";
 
+        // @fchiappano Recuperar parametro que determina si se debe actualizar el payment rule y payment termn.
+        boolean actualizaPaymentRule = MSysConfig.getBooleanValue("LAR_PaymentRule_PaymentTerm_Automatico", true, Env.getAD_Client_ID(ctx));
+
 		String sql = "SELECT p.AD_Language,p.C_PaymentTerm_ID,"
 			+ " COALESCE(p.M_PriceList_ID,g.M_PriceList_ID) AS M_PriceList_ID, p.PaymentRule,p.POReference,"
 			+ " p.SO_Description,p.IsDiscountPrinted,"
@@ -193,20 +196,24 @@ public class CalloutInvoice extends CalloutEngine
 				}
 
 				//	PaymentRule
-				String s = rs.getString(IsSOTrx ? "PaymentRule" : "PaymentRulePO");
-				if (s != null && s.length() != 0)
-				{
-					if (Env.getContext(ctx, WindowNo, "DocBaseType").endsWith("C"))	//	Credits are Payment Term
-						s = "P";
-					else if (IsSOTrx && (s.equals("S") || s.equals("U")))	//	No Check/Transfer for SO_Trx
-						s = "P";											//  Payment Term
-					mTab.setValue("PaymentRule", s);
-				}
-				//  Payment Term
-				ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
-				if (!rs.wasNull())
-					mTab.setValue("C_PaymentTerm_ID", ii);
-
+				String s = "";
+                if (!IsSOTrx || actualizaPaymentRule)
+                {
+                    s = rs.getString(IsSOTrx ? "PaymentRule" : "PaymentRulePO");
+                    if (s != null && s.length() != 0)
+                    {
+                        if (Env.getContext(ctx, WindowNo, "DocBaseType").endsWith("C")) // Credits are Payment Term
+                            s = "P";
+                        else if (IsSOTrx && (s.equals("S") || s.equals("U"))) // No Check/Transfer
+                                                                              // for SO_Trx
+                            s = "P"; // Payment Term
+                        mTab.setValue("PaymentRule", s);
+                    }
+                    // Payment Term
+                    ii = new Integer(rs.getInt(IsSOTrx ? "C_PaymentTerm_ID" : "PO_PaymentTerm_ID"));
+                    if (!rs.wasNull())
+                        mTab.setValue("C_PaymentTerm_ID", ii);
+                }
 				//	Location
 				int locID = rs.getInt("C_BPartner_Location_ID");
 				//	overwritten by InfoBP selection - works only if InfoWindow
