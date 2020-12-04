@@ -202,7 +202,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
             // @fchiappano verificar que exista un tipo de doc valido.
             if (!paymentBankFrom.setLAR_C_DoctType_ID(false,
                     ((MBankAccount) paymentBankFrom.getC_BankAccount()).get_ValueAsBoolean("IsDrawer")
-                            ? paymentBankFrom.getC_BankAccount().getAD_Org_ID() : Env.getAD_Org_ID(p_ctx)))
+                            ? paymentBankFrom.getC_BankAccount().getAD_Org_ID() : getAD_Org_ID()))
             {
                 m_processMsg = "No fue posible recuperar, un tipo de documento válido para débito de valores.";
                 return STATUS_Drafted;
@@ -271,7 +271,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 // @fchiappano Validar que se pueda recuperar un tipo de doc
                 // valido para acreditacion.
                 if (!paymentBankTo.setLAR_C_DoctType_ID(true,
-                        destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(p_ctx)))
+                        destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : getAD_Org_ID()))
                 {
                     m_processMsg = "No fue posible recuperar, un tipo de documento válido para acreditación de valores.";
                     return STATUS_Drafted;

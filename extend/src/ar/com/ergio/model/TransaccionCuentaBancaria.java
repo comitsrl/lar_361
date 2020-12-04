@@ -102,7 +102,7 @@ public class TransaccionCuentaBancaria
             }
             // Transfer other payments
             crearPago(p_DateAcct, p_StatementDate, mBankTo.getC_BankAccount_ID(), paymentFrom, p_C_BPartner_ID, p_Description,
-                    ctx, trxName);
+                    ctx, trxName, statement.getC_BankAccount().getAD_Org_ID());
 
             // Mark bank statement line as transferred
             line.set_ValueOfColumn("IsTransferred", true);
@@ -259,7 +259,7 @@ public class TransaccionCuentaBancaria
 
                     paymentBankTo = crearPago(p_DateAcct, p_StatementDate,
                             cuentaBancaria.get_ValueAsInt("CajaPrincipal_ID"), pago, p_C_BPartner_ID, p_Description,
-                            ctx, trxName);
+                            ctx, trxName, statement.getC_BankAccount().getAD_Org_ID());
 
                     // Desmarco el pago como en cartera.
                     pago.set_ValueOfColumn("IsOnDrawer", false);
@@ -272,7 +272,7 @@ public class TransaccionCuentaBancaria
             {
                 paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Tarjeta_Credito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Credito_ID")),
-                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName, statement.getC_BankAccount().getAD_Org_ID());
 
                 m_creditoTransferido++;
             }
@@ -280,7 +280,7 @@ public class TransaccionCuentaBancaria
             {
                 paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Tarjeta_Debito_ID", pago.get_ValueAsInt("LAR_Tarjeta_Debito_ID")),
-                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName, statement.getC_BankAccount().getAD_Org_ID());
 
                 m_debitoTransferido++;
             }
@@ -290,7 +290,7 @@ public class TransaccionCuentaBancaria
                         pago.getDateAcct(),
                         pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Deposito_Directo_ID", pago.get_ValueAsInt("LAR_Deposito_Directo_ID")),
-                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName, statement.getC_BankAccount().getAD_Org_ID());
 
                 m_depositoTransferido++;
             }
@@ -299,7 +299,7 @@ public class TransaccionCuentaBancaria
             {
                 paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
                         getCuentaPorFormaPago("LAR_Cheque_Emitido_ID", pago.get_ValueAsInt("LAR_Cheque_Emitido_ID")),
-                        pago, p_C_BPartner_ID, p_Description, ctx, trxName);
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName, statement.getC_BankAccount().getAD_Org_ID());
 
                 m_chequeEmitido ++;
             }
@@ -433,7 +433,7 @@ public class TransaccionCuentaBancaria
      */
     private static MPayment crearPago(final Timestamp p_DateAcct, final Timestamp p_StatementDate,
             final int bankAccount_ID, final MPayment paymentFrom, final int p_C_BPartner_ID,
-            final String p_Description, final Properties ctx, final String trxName)
+            final String p_Description, final Properties ctx, final String trxName, final int ad_Org_ID)
     {
         final MPayment payment = new MPayment(ctx, 0, trxName);
         MPayment.copyValues(paymentFrom, payment);
@@ -447,7 +447,7 @@ public class TransaccionCuentaBancaria
         payment.setPosted(true);
 
         if (!payment.setLAR_C_DoctType_ID(paymentFrom.isReceipt(),
-                destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : Env.getAD_Org_ID(ctx)))
+                destino.get_ValueAsBoolean("IsDrawer") ? destino.getAD_Org_ID() : ad_Org_ID))
         {
             setError(m_informe, "No fue posible recuperar un tipo de documento valido para Movimientos de Transferencias.");
             return null;
