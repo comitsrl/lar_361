@@ -733,6 +733,26 @@ UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2021-01-05 21:20:43','YYYY-M
 UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_DATE('2021-01-05 21:20:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006919
 ;
 
+-- 06/01/2021 18:52:33 ART
+-- ISSUE #80: Modificaciones en ventana Estado de Cuentas.
+INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('C_BankAccount.IsDrawer=''Y'' AND C_BankAccount.IsActive=''Y'' AND C_BankAccount.AD_Org_ID = #@AD_Org_ID@','S',3000085,'LAR','Cajas por Org',100,100,TO_DATE('2021-01-06 18:52:32','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_DATE('2021-01-06 18:52:32','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 06/01/2021 18:54:37 ART
+-- ISSUE #80: Modificaciones en ventana Estado de Cuentas.
+UPDATE AD_Field SET AD_Val_Rule_ID=3000085,Updated=TO_DATE('2021-01-06 18:54:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000154
+;
+
+-- 06/01/2021 18:57:28 ART
+-- ISSUE #80: Modificaciones en ventana Estado de Cuentas.
+UPDATE AD_Val_Rule SET Code='C_BankAccount.IsDrawer=''Y'' AND C_BankAccount.IsActive=''Y'' AND C_BankAccount.AD_Org_ID=#@AD_Org_ID@',Updated=TO_DATE('2021-01-06 18:57:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000085
+;
+
+-- 06/01/2021 18:58:07 ART
+-- ISSUE #80: Modificaciones en ventana Estado de Cuentas.
+UPDATE AD_Val_Rule SET Code='C_BankAccount.IsDrawer=''Y'' AND C_BankAccount.IsActive=''Y'' AND C_BankAccount.AD_Org_ID=@#AD_Org_ID@',Updated=TO_DATE('2021-01-06 18:58:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000085
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0160_ISSUE-80.sql', 'LAR', '') FROM dual
 ;
