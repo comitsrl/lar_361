@@ -277,6 +277,14 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                     return STATUS_Drafted;
                 }
 
+                // @fchiappano Si es un deposito y hay configurado un tipo de documento especifico,
+                // pisar el tipo de doc del recibo que acredita en la cuenta bancaria.
+                int tipoDocDeposito_ID = MSysConfig.getIntValue("LAR_TipoDocDeposito_ID", 0, getAD_Client_ID());
+                if (get_ValueAsBoolean("Deposito") && tipoDocDeposito_ID > 0)
+                {
+                    paymentBankTo.setC_DocType_ID(tipoDocDeposito_ID);
+                }
+
                 paymentBankTo.saveEx();
                 if (paymentBankTo.processIt(MPayment.DOCACTION_Complete))
                 {
