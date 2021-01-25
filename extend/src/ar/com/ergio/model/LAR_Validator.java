@@ -446,6 +446,24 @@ import ar.com.ergio.util.LAR_Utils;
                  return msg;
 
          }
+        // @fchiappano Despues de anular un cobro/pago (payment), agregar
+        // prefijo y sufijo de anulación en nro de doc.
+        if (po.get_TableName().equals(MPayment.Table_Name)
+                && (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
+        {
+            msg = changeVoidDocumentNo(po);
+            if (msg != null)
+                return msg;
+        }
+        // @fchiappano Despues de anular una orden agregar
+        // prefijo y sufijo de anulación en nro de doc.
+        if (po.get_TableName().equals(MOrder.Table_Name)
+                && (timing == TIMING_AFTER_REVERSECORRECT || timing == TIMING_AFTER_VOID))
+        {
+            msg = changeVoidDocumentNo(po);
+            if (msg != null)
+                return msg;
+        }
          // before posting the allocation - post the payment withholdings vs writeoff amount
          if (po.get_TableName().equals(MAllocationHdr.Table_Name) && timing == TIMING_BEFORE_POST) {
              msg = accountingForWithholdingOnPayment((MAllocationHdr) po);
@@ -794,6 +812,71 @@ import ar.com.ergio.util.LAR_Utils;
             shipment.setDescription("(" + revDocumentNo + "<-)");
 
             // Si encontró una secuencia, y la misma es automática, retrocede la numeración
+            if (seq != null && seq.isAutoSequence())
+                seq.setCurrentNext(seq.getCurrentNext() - 1);
+        }
+        // @fchiappano Corrije el nro de documento del cobro/pago y su reverso asociado.
+        if (po.get_TableName().equals(MPayment.Table_Name))
+        {
+            final MPayment payment = (MPayment) po;
+            // Si no se tiene la referencia a la reversión, no se procesa
+            if (payment.getReversal_ID() == 0)
+                return null;
+
+            revPo = new MPayment(ctx, payment.getReversal_ID(), payment.get_TrxName());
+            final MPayment revPayment = (MPayment) revPo;
+            log.info("Change DocumentNo of " + revPayment);
+
+            // Intenta recuperar la secuencia "definitiva". Si no tiene, intenta
+            // recupera la secuencia "normal". Si no tiene, no sea hace nada
+            // debido
+            // a que le documento NO tiene secuencia configurada
+            int ad_Sequence_ID = payment.getC_DocType().getDefiniteSequence_ID();
+            if (ad_Sequence_ID == 0)
+                ad_Sequence_ID = payment.getC_DocType().getDocNoSequence_ID();
+
+            if (ad_Sequence_ID != 0)
+                seq = new MSequence(ctx, ad_Sequence_ID, payment.get_TrxName());
+
+            // @fchiappano recuperar solo el nro de documento del cobro/pago.
+            String documentno = payment.getDocumentNo().replaceAll("[^\\d.]", "");
+
+            // Redefine los nros de documento y las descripciones
+            String revDocumentNo = "Rev-" + documentno + "-" + payment.getC_Payment_ID();
+            String voidDocumentNo = "Anu-" + documentno + "-" + payment.getC_Payment_ID();
+            revPayment.setDocumentNo(revDocumentNo);
+            revPayment.setDescription("(" + voidDocumentNo + "<-)");
+            payment.setDocumentNo(voidDocumentNo);
+            payment.setDescription("(" + revDocumentNo + "<-)");
+
+            // Si la secuencia es automática, retrocede la numeración
+            if (seq != null && seq.isAutoSequence())
+                seq.setCurrentNext(seq.getCurrentNext() - 1);
+        }
+        // @fchiappano Corrije el nro de documento de la orden (no tiene reverso).
+        if (po.get_TableName().equals(MOrder.Table_Name))
+        {
+            final MOrder order = (MOrder) po;
+
+            // Intenta recuperar la secuencia "definitiva". Si no tiene, intenta
+            // recupera la secuencia "normal". Si no tiene, no sea hace nada
+            // debido
+            // a que le documento NO tiene secuencia configurada
+            int ad_Sequence_ID = order.getC_DocType().getDefiniteSequence_ID();
+            if (ad_Sequence_ID == 0)
+                ad_Sequence_ID = order.getC_DocType().getDocNoSequence_ID();
+
+            if (ad_Sequence_ID != 0)
+                seq = new MSequence(ctx, ad_Sequence_ID, order.get_TrxName());
+
+            // @fchiappano recuperar solo el nro de documento del cobro/pago.
+            String documentno = order.getDocumentNo().replaceAll("[^\\d.]", "");
+
+            // Redefine los nros de documento y las descripciones
+            String voidDocumentNo = "Anu-" + documentno + "-" + order.getC_Order_ID();
+            order.setDocumentNo(voidDocumentNo);
+
+            // Si la secuencia es automática, retrocede la numeración
             if (seq != null && seq.isAutoSequence())
                 seq.setCurrentNext(seq.getCurrentNext() - 1);
         }
