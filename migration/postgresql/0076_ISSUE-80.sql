@@ -486,16 +486,6 @@ UPDATE AD_Field SET DisplayLogic='@TenderType@=K | @TenderType@=Z',Updated=TO_TI
 UPDATE AD_Field SET DisplayLogic='@TenderType@=A',Updated=TO_TIMESTAMP('2016-09-07 19:18:31','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002806
 ;
 
--- 07/09/2016 19:37:05 ART
--- ISSUE #80: Cierre de Cajas.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3002807,10,'Y','N','N',3001865,'N','Y',3000031,'N','LAR','Tipos de Depósito Directo',100,0,TO_TIMESTAMP('2016-09-07 19:37:05','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2016-09-07 19:37:05','YYYY-MM-DD HH24:MI:SS'))
-;
-
--- 07/09/2016 19:37:05 ART
--- ISSUE #80: Cierre de Cajas.
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3002807 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
 -- 07/09/2016 19:37:32 ART
 -- ISSUE #80: Cierre de Cajas.
 UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3001225
