@@ -41,4 +41,7 @@ public interface ElectronicInvoiceInterface
 
     /** Retorna Error(es) al obtener el CAE */
     public String getErrorMsg();
+
+    /** @fchiappano retorna mensajes, como por ejemplo las observaciones. */
+    public String getMsg();
 } // ElectronicInvoiceInterface

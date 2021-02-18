@@ -98,4 +98,10 @@ public class ProcessorWSFE implements ElectronicInvoiceInterface
     {
         return this.getWsfe().getMessageError();
     }
+
+    @Override
+    public String getMsg()
+    {
+        return null;
+    }
 }

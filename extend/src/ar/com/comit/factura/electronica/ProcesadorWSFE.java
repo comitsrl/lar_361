@@ -455,8 +455,15 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 
             if (observaciones != null)
             {
-                msgError = observaciones[0].getCode() + " " + observaciones[0].getMsg();
-                return msgError;
+                mensaje = observaciones[0].getCode() + " " + observaciones[0].getMsg();
+
+                // @fchiappano Si el documento no fue aprobado, considerar la
+                // observación como un error.
+                if (!aceptado.equals("A"))
+                {
+                    msgError = mensaje;
+                    return msgError;
+                }
             }
             if (errores != null)
             {
@@ -510,14 +517,15 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         return fechaVencCae;
     }
 
-    public String getMensaje()
-    {
-        return mensaje;
-    }
-
     @Override
     public String getErrorMsg()
     {
         return msgError;
+    }
+
+    @Override
+    public String getMsg()
+    {
+        return mensaje;
     }
 } // ProcesadorWSFE
