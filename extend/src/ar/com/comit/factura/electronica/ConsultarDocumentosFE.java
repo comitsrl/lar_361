@@ -111,7 +111,9 @@ public class ConsultarDocumentosFE extends SvrProcess
                      + "Neto: " + comprobante.getImpNeto() + " \n "
                      + "Total: " + comprobante.getImpTotal() + " \n "
                      + "Moneda: " + comprobante.getMonId() + " \n "
-                     + "Vto Cae: " + comprobante.getFchVto();
+                     + "Vto Cae: " + comprobante.getFchVto() + "\n"
+                     + "IVA: " + comprobante.getImpIVA() + "\n"
+                     + "Percepción " + comprobante.getImpTrib();
 
         return datos;
     } // doIt

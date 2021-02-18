@@ -2043,7 +2043,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
                     String errorMsg = processor.generateCAE();
                     if (Util.isEmpty(processor.getCAE()))
                     {
-                        setcaeerror(errorMsg);
+                        setcaeerror("Error: " + errorMsg);
                         m_processMsg = errorMsg;
                         log.log(Level.SEVERE, "CAE Error: " + errorMsg);
                         return DocAction.STATUS_Invalid;
@@ -2052,7 +2052,18 @@ public class MInvoice extends X_C_Invoice implements DocAction
                     {
                         setcae(processor.getCAE());
                         setvtocae(processor.getDateCae());
-                        setcaeerror(errorMsg);
+
+                        // @fchiappano Determinar si no hay un mensaje devuelto
+                        // por afip, por ejemplo una observación sobre el documento.
+                        String mensaje = processor.getMsg();
+
+                        if (mensaje != null && !mensaje.equals(""))
+                        {
+                            setcaeerror("Observación: " + mensaje);
+                            setDescription((getDescription() == null ? " " : getDescription() + " ||") + " AFIP Obs: " + mensaje);
+                            info.append("Aprobado con Observaciones: " + mensaje);
+                        }
+
                         int nroCbte = Integer.parseInt(processor.getNroCbte());
                         this.setNumeroComprobante(nroCbte);
 
