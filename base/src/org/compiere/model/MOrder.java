@@ -2682,6 +2682,16 @@ public class MOrder extends X_C_Order implements DocAction
 
         if (warehousePrice != null)
         {
+            // @fchiappano Actualizar las variables dependientes de la cabecera
+            // de la orden (Ej: Lista de Precios). Esto evita errores en calculo
+            // de impuestos al cambiar de lista de precios en una orden en
+            // borrador.
+            line.setHeaderInfo(this);
+            MOrderTax oTax = MOrderTax.get (line, getPrecision(), 
+                    false, get_TrxName());
+            oTax.setIsTaxIncluded(isTaxIncluded());
+            oTax.saveEx(get_TrxName());
+
             line.setPrice(warehousePrice.getPriceStd().setScale(getM_PriceList().getPricePrecision(),
                     RoundingMode.HALF_UP));
             line.setPriceList(warehousePrice.getPriceList().setScale(getM_PriceList().getPricePrecision(),

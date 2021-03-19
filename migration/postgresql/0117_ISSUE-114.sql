@@ -122,16 +122,6 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 
 -- 04/10/2018 17:23:51 ART
 -- ISSUE #114: Configuración de Recibos (Venta en Dolares).
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3005764,1,'Y','N','N',3002278,'N','Y',3000023,'N','LAR','Recibo_EOS',100,0,TO_TIMESTAMP('2018-10-04 17:23:51','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2018-10-04 17:23:51','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 04/10/2018 17:23:51 ART
--- ISSUE #114: Configuración de Recibos (Venta en Dolares).
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3005764 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 04/10/2018 17:23:51 ART
--- ISSUE #114: Configuración de Recibos (Venta en Dolares).
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3005765,131089,'Y','N','N',3003017,'N','Y',3000023,'N','LAR','Tasa de Cambio',100,0,TO_TIMESTAMP('2018-10-04 17:23:51','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2018-10-04 17:23:51','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
