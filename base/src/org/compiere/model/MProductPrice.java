@@ -219,31 +219,63 @@ public class MProductPrice extends X_M_ProductPrice
             BigDecimal alic = Env.ONE.add(new MTax(getCtx(), c_Tax_ID, get_TrxName()).getRate().divide(
                     new BigDecimal(100), 3, RoundingMode.HALF_UP));
 
+            // @fchiappano Determinar si la lista de precios tiene impuestos incluidos en el precio.
+            boolean isTaxIncluded = getM_PriceList_Version().getM_PriceList().isTaxIncluded();
+
             // Actualizar precio Standart
             if (is_ValueChanged("PrecioStd_Final") && (!newRecord || (newRecord && ((BigDecimal) get_Value("PrecioStd_Final")).compareTo(Env.ZERO) != 0)))
             {
-                setPriceStd(((BigDecimal) get_Value("PrecioStd_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+                if (isTaxIncluded)
+                    setPriceStd((BigDecimal) get_Value("PrecioStd_Final"));
+                else
+                    setPriceStd(((BigDecimal) get_Value("PrecioStd_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+
                 // @fchiappano copiar precio estandar en precio de lista.
                 set_ValueOfColumn("PrecioLista_Final", get_Value("PrecioStd_Final"));
             }
             else if (is_ValueChanged("PriceStd"))
             {
-                set_ValueOfColumn("PrecioStd_Final", getPriceStd().multiply(alic));
+                if (isTaxIncluded)
+                    set_ValueOfColumn("PrecioStd_Final", getPriceStd());
+                else
+                    set_ValueOfColumn("PrecioStd_Final", getPriceStd().multiply(alic));
+
                 // @fchiappano copiar precio estandar en precio de lista.
                 setPriceList(getPriceStd());
             }
 
             // Actualizar precio de Lista
             if (is_ValueChanged("PrecioLista_Final") && (!newRecord || (newRecord && ((BigDecimal) get_Value("PrecioLista_Final")).compareTo(Env.ZERO) != 0)))
-                setPriceList(((BigDecimal) get_Value("PrecioLista_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+            {
+                if (isTaxIncluded)
+                    setPriceList(((BigDecimal) get_Value("PrecioLista_Final")));
+                else
+                    setPriceList(((BigDecimal) get_Value("PrecioLista_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+            }
             else if (is_ValueChanged("PriceList"))
-                set_ValueOfColumn("PrecioLista_Final", getPriceList().multiply(alic));
+            {
+                if (isTaxIncluded)
+                    set_ValueOfColumn("PrecioLista_Final", getPriceList());
+                else
+                    set_ValueOfColumn("PrecioLista_Final", getPriceList().multiply(alic));
+            }
 
             // Actualizar precio Limite
             if (is_ValueChanged("PrecioLimite_Final") && (!newRecord || (newRecord && ((BigDecimal) get_Value("PrecioLimite_Final")).compareTo(Env.ZERO) != 0)))
-                setPriceLimit(((BigDecimal) get_Value("PrecioLimite_Final")).divide(alic, precision, RoundingMode.HALF_UP));
+            {
+                if (isTaxIncluded)
+                    setPriceLimit((BigDecimal) get_Value("PrecioLimite_Final"));
+                else
+                    setPriceLimit(((BigDecimal) get_Value("PrecioLimite_Final")).divide(alic, precision,
+                            RoundingMode.HALF_UP));
+            }
             else if (is_ValueChanged("PriceLimit"))
-                set_ValueOfColumn("PrecioLimite_Final", getPriceLimit().multiply(alic));
+            {
+                if (isTaxIncluded)
+                    set_ValueOfColumn("PrecioLimite_Final", getPriceLimit());
+                else
+                    set_ValueOfColumn("PrecioLimite_Final", getPriceLimit().multiply(alic));
+            }
         }
         else
         {
