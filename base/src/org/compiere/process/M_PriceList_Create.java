@@ -810,18 +810,40 @@ public class M_PriceList_Create extends SvrProcess {
         curgen.close();
         curgen = null;
 
-        // @fchiappano Actualizar precios finales
-        sql = "UPDATE M_ProductPrice AS pp"
-            +   " SET PrecioStd_Final = ROUND(PriceStd * (t.Rate / 100 + 1), pl.PricePrecision),"
-            +       " PrecioLista_Final = ROUND(PriceList * (t.Rate / 100 + 1), pl.PricePrecision),"
-            +       " M_Product_Category_ID = p.M_Product_Category_ID" // @mzuniga Se registra la categoría del producto
-            +  " FROM M_Product p, M_PriceList_Version plv, C_Tax t, M_PriceList pl"
-            + " WHERE pp.M_PriceList_Version_ID = ?"
-            +   " AND pp.M_Product_ID = p.M_Product_ID"
-            +   " AND pp.M_PriceList_Version_ID = plv.M_PriceList_Version_ID"
-            +   " AND p.C_TaxCategory_ID = t.C_TaxCategory_ID"
-            +   " AND t.IsDefault = 'Y'"
-            +   " AND plv.M_PriceList_ID = pl.M_PriceList_ID";
+        // @fchiappano Determinar si la lista posee impuestos incluidos.
+        sql = "SELECT pl.IsTaxIncluded"
+            +  " FROM M_PriceList_Version plv"
+            +  " JOIN M_PriceList pl ON plv.M_PriceList_ID = pl.M_PriceList_ID"
+            + " WHERE M_PriceList_Version_ID = ?";
+
+        String isTaxIncluded = DB.getSQLValueString(trx, sql, m_PriceListVersion_ID);
+
+        if (isTaxIncluded.equals("Y"))
+        {
+            // @fchiappano Actualizar precios finales
+            sql = "UPDATE M_ProductPrice AS pp"
+                +   " SET PrecioStd_Final = ROUND(PriceStd, pl.PricePrecision),"
+                +       " PrecioLista_Final = ROUND(PriceList, pl.PricePrecision),"
+                +       " M_Product_Category_ID = p.M_Product_Category_ID" // @mzuniga Se registra la categoría del producto
+                +  " FROM M_Product p, M_PriceList_Version plv, C_Tax t, M_PriceList pl"
+                + " WHERE pp.M_PriceList_Version_ID = ?" + " AND pp.M_Product_ID = p.M_Product_ID"
+                +   " AND pp.M_PriceList_Version_ID = plv.M_PriceList_Version_ID"
+                +   " AND p.C_TaxCategory_ID = t.C_TaxCategory_ID" + " AND t.IsDefault = 'Y'"
+                +   " AND plv.M_PriceList_ID = pl.M_PriceList_ID";
+        }
+        else
+        {
+            // @fchiappano Actualizar precios finales
+            sql = "UPDATE M_ProductPrice AS pp"
+                +   " SET PrecioStd_Final = ROUND(PriceStd * (t.Rate / 100 + 1), pl.PricePrecision),"
+                +       " PrecioLista_Final = ROUND(PriceList * (t.Rate / 100 + 1), pl.PricePrecision),"
+                +       " M_Product_Category_ID = p.M_Product_Category_ID" // @mzuniga Se registra la categoría del producto
+                +  " FROM M_Product p, M_PriceList_Version plv, C_Tax t, M_PriceList pl"
+                + " WHERE pp.M_PriceList_Version_ID = ?" + " AND pp.M_Product_ID = p.M_Product_ID"
+                +   " AND pp.M_PriceList_Version_ID = plv.M_PriceList_Version_ID"
+                +   " AND p.C_TaxCategory_ID = t.C_TaxCategory_ID" + " AND t.IsDefault = 'Y'"
+                +   " AND plv.M_PriceList_ID = pl.M_PriceList_ID";
+        }
 
         int cant = DB.executeUpdate(sql, m_PriceListVersion_ID, trx);
         if (cant == -1)
