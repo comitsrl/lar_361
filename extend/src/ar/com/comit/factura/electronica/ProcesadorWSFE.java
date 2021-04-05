@@ -159,9 +159,13 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
                 return null;
         }
 
-        // @fchiappano Si es FCE, agregar CBU
+        // @fchiappano Si es FCE, agregar CBU y OpcionTransferenciaFCE.
         if (tipoCbte == 201 || tipoCbte == 206 || tipoCbte == 211)
+        {
             agregarCBU();
+            Opcional opcional = new Opcional("27", factura.get_ValueAsString("OpcionTransferenciaFCE"));
+            opcionales.add(opcional);
+        }
 
         String fechaComprobante = formatTime(factura.getDateAcct(), "yyyyMMdd");
         String fechaActual = formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
