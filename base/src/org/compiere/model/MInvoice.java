@@ -1022,6 +1022,13 @@ public class MInvoice extends X_C_Invoice implements DocAction
                 return false;
         }
 
+        // @fchiappano Recuperar el campo OpcionTransferenciaFCE desde el socio del negocio.
+        if (getC_BPartner_ID() > 0 && (newRecord || is_ValueChanged(COLUMNNAME_C_BPartner_ID)))
+        {
+            MBPartner bpartner = (MBPartner) getC_BPartner();
+            set_Value("OpcionTransferenciaFCE", bpartner.get_Value("OpcionTransferenciaFCE"));
+        }
+
 		return true;
 	}	//	beforeSave
 
