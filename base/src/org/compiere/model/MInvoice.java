@@ -1029,6 +1029,21 @@ public class MInvoice extends X_C_Invoice implements DocAction
             set_Value("OpcionTransferenciaFCE", bpartner.get_Value("OpcionTransferenciaFCE"));
         }
 
+        // @fchiappano Si no es una factura nueva y se modifica la fecha de la
+        // factura, recalcular fecha de pago.
+        if (!newRecord && is_ValueChanged(COLUMNNAME_DateInvoiced))
+        {
+            Object diasPago = ((MBPartner) getC_BPartner()).get_Value("DiasPagoFCE");
+
+            if (MDocType.isElectronicDocType(getC_DocTypeTarget_ID()) && diasPago != null)
+            {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(getDateInvoiced().getTime());
+                calendar.add(Calendar.DAY_OF_YEAR, (Integer) diasPago);
+                set_ValueOfColumn("FechaPago", new Timestamp(calendar.getTimeInMillis()));
+            }
+        }
+
 		return true;
 	}	//	beforeSave
 
