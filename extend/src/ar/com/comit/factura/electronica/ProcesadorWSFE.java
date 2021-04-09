@@ -20,10 +20,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.sql.Date;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -148,7 +146,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 
         nroDoc = Long.parseLong(cliente.getTaxID().replaceAll("-", "").replaceAll(" ", ""));
 
-        int tipoCbte = getDocSubTypeCAE(factura);
+        int tipoCbte = UtilidadesFE.getDocSubTypeCAE(factura);
         String fechaVecPago = getFecha((Timestamp) factura.get_Value("FechaPago"));
 
         // @fchiappano Si el tipo de doc es NC o ND, no informar fecha de pago y agregar comprobante asociado.
@@ -167,8 +165,8 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             opcionales.add(opcional);
         }
 
-        String fechaComprobante = formatTime(factura.getDateAcct(), "yyyyMMdd");
-        String fechaActual = formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
+        String fechaComprobante = UtilidadesFE.formatTime(factura.getDateAcct(), "yyyyMMdd");
+        String fechaActual = UtilidadesFE.formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
 
         // @fchiappano Si el concepto es 1, no es necesario informar fecha de servicio.
         int concepto = ProcesadorWSAA.getConcepto();
@@ -211,7 +209,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         try
         {
             FERecuperaLastCbteResponse ultimoCbte = soap.FECompUltimoAutorizado(authRequest, getPuntoVenta(factura),
-                    getDocSubTypeCAE(factura));
+                    UtilidadesFE.getDocSubTypeCAE(factura));
             ultimoAuto = ultimoCbte.getCbteNro();
         }
         catch (RemoteException e)
@@ -235,26 +233,12 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         if (pdv <= 0)
             return null;
 
-        int tipoCbte = getDocSubTypeCAE(factura);
+        int tipoCbte = UtilidadesFE.getDocSubTypeCAE(factura);
 
         FECAECabRequest cabRequest = new FECAECabRequest(1, pdv, tipoCbte);
 
         return cabRequest;
     } // getFECAECabRequest
-
-    /**
-     * Formatear fecha a tipo String.
-     * @author fchiappano
-     * @param time
-     * @param format
-     * @return
-     */
-    private String formatTime(Timestamp time, String format)
-    {
-        SimpleDateFormat simpleformat = new SimpleDateFormat(format);
-        Date date = new Date(time.getTime());
-        return simpleformat.format(date);
-    } // formatTime
 
     /**
      * Obtener Codigo WSFE de la moneda.
@@ -287,17 +271,6 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
     } // getCotizacion
 
     /**
-     * Obtener el tipo de documento electronico.
-     * @author fchiappano
-     * @return
-     */
-    private int getDocSubTypeCAE(final MInvoice invoice)
-    {
-        MDocType tipoDoc = (MDocType) invoice.getC_DocType();
-        return tipoDoc.get_ValueAsInt("docsubtypecae");
-    } // getDocSubTypeCAE
-
-    /**
      * Obtener Fecha de Vencimiento de Pago.
      * @author fchiappano
      * @return
@@ -305,9 +278,9 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
     private String getFecha(final Timestamp fecha)
     {
         if (fecha != null)
-            return formatTime(fecha, "yyyyMMdd");
+            return UtilidadesFE.formatTime(fecha, "yyyyMMdd");
         else
-            return formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
+            return UtilidadesFE.formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
     } // getFechaVencPago
 
     /**
@@ -353,7 +326,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 
         // @fchiappano Agreagar comprobante asociado para NC o ND MiPyme.
         MInvoice facturaOrigen = new MInvoice(ctx, factura.get_ValueAsInt("Source_Invoice_ID"), factura.get_TrxName());
-        CbteAsoc asociado = new CbteAsoc(getDocSubTypeCAE(facturaOrigen), getPuntoVenta(facturaOrigen), facturaOrigen.getNumeroComprobante(), cuitOrg, getFecha(facturaOrigen.getDateInvoiced()));
+        CbteAsoc asociado = new CbteAsoc(UtilidadesFE.getDocSubTypeCAE(facturaOrigen), getPuntoVenta(facturaOrigen), facturaOrigen.getNumeroComprobante(), cuitOrg, getFecha(facturaOrigen.getDateInvoiced()));
         asociados.add(asociado);
 
         // @fchiappano Agregar parametro opcional EsCancelación solo si es MiPyme.
