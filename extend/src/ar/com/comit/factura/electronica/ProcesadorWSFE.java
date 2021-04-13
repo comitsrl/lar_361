@@ -29,7 +29,6 @@ import java.util.Properties;
 import org.apache.axis.AxisFault;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBankAccount;
-import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceTax;
@@ -54,7 +53,6 @@ import ar.com.comit.wsfe.Obs;
 import ar.com.comit.wsfe.Opcional;
 import ar.com.comit.wsfe.ServiceSoap12Stub;
 import ar.com.comit.wsfe.Tributo;
-import ar.com.ergio.util.LAR_Utils;
 
 /**
  * @author Franco Chiappano
@@ -190,7 +188,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         FECAEDetRequest detRequest = new FECAEDetRequest(concepto, tipoDoc, nroDoc, nroComprobante + 1,
                 nroComprobante + 1, fechaComprobante, factura.getGrandTotal().setScale(2, RoundingMode.HALF_UP).doubleValue(), Env.ZERO.doubleValue(),
                 factura.getTotalLines().setScale(2, RoundingMode.HALF_UP).doubleValue(), Env.ZERO.doubleValue(), total_Tributos.setScale(2, RoundingMode.HALF_UP).doubleValue(),
-                total_Impuesto.setScale(2, RoundingMode.HALF_UP).doubleValue(), fechaActual, fechaActual, fechaVecPago, getCodMoneda(), getCotizacion(),
+                total_Impuesto.setScale(2, RoundingMode.HALF_UP).doubleValue(), fechaActual, fechaActual, fechaVecPago, UtilidadesFE.getCodMoneda(factura), UtilidadesFE.getCotizacion(factura).doubleValue(),
                 array_asoc, array_trib, array_imp, array_opc);
 
         return detRequest;
@@ -239,36 +237,6 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 
         return cabRequest;
     } // getFECAECabRequest
-
-    /**
-     * Obtener Codigo WSFE de la moneda.
-     * @author fchiappano
-     * @return WSFE CODE
-     */
-    private String getCodMoneda()
-    {
-        MCurrency moneda = (MCurrency) factura.getC_Currency();
-        return moneda.get_ValueAsString("WSFECode");
-    } // getCodMoneda
-
-    /**
-     * Obtener cotización de moneda extrajera.
-     * @author fchiappano
-     * @return cotización.
-     */
-    private double getCotizacion()
-    {
-        BigDecimal cotizacion = Env.ZERO;
-        MCurrency moneda = (MCurrency) factura.getC_Currency();
-
-        if (moneda.getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(ctx, factura.getAD_Client_ID(), factura.get_TrxName()))
-            cotizacion = (BigDecimal) factura.get_Value("TasaDeCambio");
-        else
-            cotizacion = MCurrency.currencyConvert(Env.ONE, Env.getContextAsInt(ctx, "$C_Currency_ID"),
-                    factura.getC_Currency_ID(), factura.getDateInvoiced(), 0, ctx);
-
-        return cotizacion.doubleValue();
-    } // getCotizacion
 
     /**
      * Obtener Fecha de Vencimiento de Pago.
@@ -384,7 +352,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         try
         {
             // @fchiappano Recuperar Ticket de Acceso.
-            String[] tokenSign = ProcesadorWSAA.getTicketAcceso();
+            String[] tokenSign = ProcesadorWSAA.getTicketAcceso("WSFE");
 
             if (tokenSign == null)
             {
@@ -449,7 +417,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             }
 
             cae = detalleRespuesta[0].getCAE();
-            fechaVencCae = ProcesadorWSAA.getTimestamp(detalleRespuesta[0].getCAEFchVto(), "yyyyMMdd");
+            fechaVencCae = UtilidadesFE.getTimestamp(detalleRespuesta[0].getCAEFchVto(), "yyyyMMdd");
             nroCbte = String.valueOf(detalleRespuesta[0].getCbteDesde());
         }
         catch (AxisFault e)

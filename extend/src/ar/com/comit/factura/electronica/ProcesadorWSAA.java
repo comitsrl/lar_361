@@ -28,7 +28,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -52,28 +51,47 @@ public class ProcesadorWSAA
     private static CLogger log = CLogger.getCLogger(ProcesadorWSAA.class);
 
     // @fchiappano Constante que almacenara el certificado adjunto en la BD.
-    private static File certificado = null;
-    // @fchiappano Constantes que almacenaran los datos relevantes del ticket de acceso, provisto por afip.
-    private static String token = "";
-    private static String sign = "";
-    private static Timestamp fechaExpiracion = null;
+    private static File certificadoFE = null;
+    // @fchiappano Constantes que almacenaran los datos relevantes del ticket de acceso, provisto por afip, para el servicio WSFE.
+    private static String tokenFE = "";
+    private static String signFE = "";
+    private static Timestamp fechaExpiracionFE = null;
+    private static int configFE_ID = 0;
+    // @fchiappano Constantes que almacenaran los datos relevantes del ticket de
+    // acceso, provisto por afip, para el servicio WSFEX.
+    private static File certificadoFEX = null;
+    private static String tokenFEX = "";
+    private static String signFEX = "";
+    private static Timestamp fechaExpiracionFEX = null;
+    private static int configFEX_ID = 0;
     // @fchiappano variable que almacenara los mensajes de error.
     private static String msgError = "";
 
     private static Properties ctx = Env.getCtx();
 
-    // @fchiappano Variables de configuración.
-    private static String CMS;
-    private static String servicio;
-    private static long ticketTime;
-    private static String signer;
-    private static String claveCifrado;
-    private static String dstDN;
-    private static String certificado_name;
-    private static String WSDL;
-    private static int concepto;
+    // @fchiappano Variables de configuración para WSFE.
+    private static String CMS_FE;
+    private static String servicioFE;
+    private static long ticketTimeFE;
+    private static String signerFE;
+    private static String claveCifradoFE;
+    private static String dstDN_FE;
+    private static String certificado_nameFE;
+    private static String WSDL_FE;
+    private static int conceptoFE;
+
+    // @fchiappano Variables de configuración para WSFEX.
+    private static String CMS_FEX;
+    private static String servicioFEX;
+    private static long ticketTimeFEX;
+    private static String signerFEX;
+    private static String claveCifradoFEX;
+    private static String dstDN_FEX;
+    private static String certificado_nameFEX;
+    private static String WSDL_FEX;
+    private static int conceptoFEX;
+
     private static int table_ID;
-    private static int config_ID = 0;
 
     /**
      * Constructor que evita la instanciación de la clase.
@@ -84,17 +102,34 @@ public class ProcesadorWSAA
      * Recuperar ticket de acceso, solicitado al WS de Afip.
      * @return
      */
-    public static String[] getTicketAcceso()
+    public static String[] getTicketAcceso(final String servicio)
     {
-        // @fchiappano Si no existe aún el TA o esta vencido, se solicita uno nuevo.
-        if ((token == null || token.equals("")) || (sign == null || sign.equals(""))
-                || fechaExpiracion.before(new Timestamp(System.currentTimeMillis())))
-            if (!obtenerTA())
-                return null;
+        if (servicio.equals("WSFE"))
+        {
+            // @fchiappano Si no existe aún el TA o esta vencido, se solicita
+            // uno nuevo.
+            if ((tokenFE == null || tokenFE.equals("")) || (signFE == null || signFE.equals(""))
+                    || fechaExpiracionFE.before(new Timestamp(System.currentTimeMillis())))
+                if (!obtenerTAFE())
+                    return null;
 
-        String[] tokenSign = {token, sign};
+            String[] tokenSign = { tokenFE, signFE };
 
-        return tokenSign;
+            return tokenSign;
+        }
+        else
+        {
+            // @fchiappano Si no existe aún el TA o esta vencido, se solicita
+            // uno nuevo.
+            if ((tokenFEX == null || tokenFEX.equals("")) || (signFEX == null || signFEX.equals(""))
+                    || fechaExpiracionFEX.before(new Timestamp(System.currentTimeMillis())))
+                if (!obtenerTAFEX())
+                    return null;
+
+            String[] tokenSign = { tokenFEX, signFEX };
+
+            return tokenSign;
+        }
     } // getTicketAcceso
 
     /**
@@ -102,24 +137,24 @@ public class ProcesadorWSAA
      * @author fchiappano
      * @return confirmación
      */
-    private static boolean obtenerTA()
+    private static boolean obtenerTAFEX()
     {
         // @fchiappano Obtener parametros de configuración.
-        if (config_ID <= 0)
-            getConfiguracion();
+        if (configFEX_ID <= 0)
+            getConfiguracion("WSFEX");
 
         // @fchiappano leer archivo TA.
-        File ta = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "TA.txt");
+        File ta = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "TAFEX.txt");
         if (ta.exists())
         {
-            if (!leerTA(ta))
+            if (!leerTA(ta, "WSFEX"))
                 return false;
-            else if (new Timestamp(System.currentTimeMillis()).before(fechaExpiracion))
+            else if (new Timestamp(System.currentTimeMillis()).before(fechaExpiracionFEX))
                 return true;
         }
 
         // @fchiappano Obtener el certificado.
-        File certificado = getCertificado();
+        File certificado = getCertificado("WSFEX");
 
         if (certificado == null)
         {
@@ -130,9 +165,9 @@ public class ProcesadorWSAA
         try
         {
             // @fchiappano solicitar Ticket de Acceso.
-            byte[] loginTicketRequest_xml_cms = Wsaa.create_cms(certificado, claveCifrado, signer, dstDN, servicio, ticketTime);
+            byte[] loginTicketRequest_xml_cms = Wsaa.create_cms(certificado, claveCifradoFEX, signerFEX, dstDN_FEX, servicioFEX, ticketTimeFEX);
 
-            String loginTicketResponse = Wsaa.invoke_wsaa(loginTicketRequest_xml_cms, CMS);
+            String loginTicketResponse = Wsaa.invoke_wsaa(loginTicketRequest_xml_cms, CMS_FEX);
 
             if (loginTicketResponse == null)
             {
@@ -143,14 +178,14 @@ public class ProcesadorWSAA
             Reader tokenReader = new StringReader(loginTicketResponse);
             Document tokenDoc = new SAXReader(false).read(tokenReader);
 
-            token = tokenDoc.valueOf("/loginTicketResponse/credentials/token");
-            sign = tokenDoc.valueOf("/loginTicketResponse/credentials/sign");
+            tokenFEX = tokenDoc.valueOf("/loginTicketResponse/credentials/token");
+            signFEX = tokenDoc.valueOf("/loginTicketResponse/credentials/sign");
             String expiracion = tokenDoc.valueOf("/loginTicketResponse/header/expirationTime");
             expiracion = expiracion.replace("T", " ");
-            fechaExpiracion = getTimestamp(expiracion, "yyyy-MM-dd hh:mm:ss.SSS");
+            fechaExpiracionFEX = UtilidadesFE.getTimestamp(expiracion, "yyyy-MM-dd hh:mm:ss.SSS");
 
             // @fchiappano escribir TA en directorio temporal.
-            if (!escribirTA(token, sign, expiracion))
+            if (!escribirTA(tokenFEX, signFEX, expiracion, "TAFEX.txt"))
                 return false;
         }
         catch (Exception e)
@@ -161,7 +196,73 @@ public class ProcesadorWSAA
         }
 
         return true;
-    } // obtenerTA
+    } // obtenerTAFEX
+
+    /**
+     * Solicitar el ticket de acceso, al WS de afip.
+     * @author fchiappano
+     * @return confirmación
+     */
+    private static boolean obtenerTAFE()
+    {
+        // @fchiappano Obtener parametros de configuración.
+        if (configFE_ID <= 0)
+            getConfiguracion("WSFE");
+
+        // @fchiappano leer archivo TA.
+        File ta = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "TAFE.txt");
+        if (ta.exists())
+        {
+            if (!leerTA(ta, "WSFE"))
+                return false;
+            else if (new Timestamp(System.currentTimeMillis()).before(fechaExpiracionFE))
+                return true;
+        }
+
+        // @fchiappano Obtener el certificado.
+        File certificado = getCertificado("WSFE");
+
+        if (certificado == null)
+        {
+            msgError = "Error al recuperar certificado de cliente.";
+            return false;
+        }
+
+        try
+        {
+            // @fchiappano solicitar Ticket de Acceso.
+            byte[] loginTicketRequest_xml_cms = Wsaa.create_cms(certificado, claveCifradoFE, signerFE, dstDN_FE, servicioFE, ticketTimeFE);
+
+            String loginTicketResponse = Wsaa.invoke_wsaa(loginTicketRequest_xml_cms, CMS_FE);
+
+            if (loginTicketResponse == null)
+            {
+                msgError = Wsaa.getMsgError();
+                return false;
+            }
+
+            Reader tokenReader = new StringReader(loginTicketResponse);
+            Document tokenDoc = new SAXReader(false).read(tokenReader);
+
+            tokenFE = tokenDoc.valueOf("/loginTicketResponse/credentials/token");
+            signFE = tokenDoc.valueOf("/loginTicketResponse/credentials/sign");
+            String expiracion = tokenDoc.valueOf("/loginTicketResponse/header/expirationTime");
+            expiracion = expiracion.replace("T", " ");
+            fechaExpiracionFE = UtilidadesFE.getTimestamp(expiracion, "yyyy-MM-dd hh:mm:ss.SSS");
+
+            // @fchiappano escribir TA en directorio temporal.
+            if (!escribirTA(tokenFE, signFE, expiracion, "TAFE.txt"))
+                return false;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            msgError = e.getMessage();
+            return false;
+        }
+
+        return true;
+    } // obtenerTAFE
 
     /**
      * Guardar datos de ticket de acceso, en archivo temporal, por si se cierra la aplicación.
@@ -171,9 +272,9 @@ public class ProcesadorWSAA
      * @param expiracion
      * @return confirmación.
      */
-    private static boolean escribirTA(final String token, final String sign, final String expiracion)
+    private static boolean escribirTA(final String token, final String sign, final String expiracion, final String taName)
     {
-        File ta = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "TA.txt");
+        File ta = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + taName);
 
         try
         {
@@ -198,16 +299,28 @@ public class ProcesadorWSAA
      * @param ta
      * @return confirmación.
      */
-    private static boolean leerTA(final File ta)
+    private static boolean leerTA(final File ta, final String servicio)
     {
         try
         {
             FileReader fr = new FileReader(ta);
             BufferedReader br = new BufferedReader(fr);
-            token = br.readLine();
-            sign = br.readLine();
-            String expiracion = br.readLine();
-            fechaExpiracion = getTimestamp(expiracion, "yyyy-MM-dd hh:mm:ss.SSS");
+
+            // @fchiappano Determinar que TA se esta leyendo.
+            if (servicio.equals("WSFE"))
+            {
+                tokenFE = br.readLine();
+                signFE = br.readLine();
+                String expiracion = br.readLine();
+                fechaExpiracionFE = UtilidadesFE.getTimestamp(expiracion, "yyyy-MM-dd hh:mm:ss.SSS");
+            }
+            else
+            {
+                tokenFEX = br.readLine();
+                signFEX = br.readLine();
+                String expiracion = br.readLine();
+                fechaExpiracionFEX = UtilidadesFE.getTimestamp(expiracion, "yyyy-MM-dd hh:mm:ss.SSS");
+            }
             fr.close();
         }
         catch (FileNotFoundException e)
@@ -231,15 +344,33 @@ public class ProcesadorWSAA
      * @author fchiappano
      * @return archivo p12.
      */
-    private static File getCertificado()
+    private static File getCertificado(final String servicio)
     {
-        // @fchiappano si el certificado adjunto en la config, ya fue
-        // recuperado, retornar el mismo.
-        if (certificado != null)
-            return certificado;
+        MAttachment adjunto = null;
+        String nombre = "";
 
-        // @fchiappano Recuperar el certificado adjunto en la configuración.
-        MAttachment adjunto = MAttachment.get(ctx, table_ID, config_ID);
+        if (servicio.equals("WSFE"))
+        {
+            // @fchiappano si el certificado adjunto en la config, ya fue
+            // recuperado, retornar el mismo.
+            if (certificadoFE != null)
+                return certificadoFE;
+
+            // @fchiappano Recuperar el certificado adjunto en la configuración.
+            adjunto = MAttachment.get(ctx, table_ID, configFE_ID);
+            nombre = certificado_nameFE;
+        }
+        else
+        {
+            // @fchiappano si el certificado adjunto en la config, ya fue
+            // recuperado, retornar el mismo.
+            if (certificadoFEX != null)
+                return certificadoFEX;
+
+            // @fchiappano Recuperar el certificado adjunto en la configuración.
+            adjunto = MAttachment.get(ctx, table_ID, configFEX_ID);
+            nombre = certificado_nameFEX;
+        }
 
         // @fchiappano Si no hay archivos adjuntos en la config, retornar null.
         if (adjunto == null)
@@ -249,7 +380,7 @@ public class ProcesadorWSAA
         MAttachmentEntry entry = null;
         for (int i = 0; i < archivos.length; i++)
         {
-            if (archivos[i].getName().equals(certificado_name))
+            if (archivos[i].getName().equals(nombre))
             {
                 entry = archivos[i];
                 break;
@@ -261,9 +392,9 @@ public class ProcesadorWSAA
             return null;
 
         // @fchiappano Recupero el certificado.
-        certificado = entry.getFile(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + entry.getName());
+        certificadoFE = entry.getFile(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + entry.getName());
 
-        return certificado;
+        return certificadoFE;
     } // getCertificado
 
     /**
@@ -276,36 +407,13 @@ public class ProcesadorWSAA
     } // getMsgError
 
     /**
-     * Obtener un timestamp a partir de un string.
-     * @author fchiappano
-     * @param value
-     * @param format
-     * @return timestamp
-     */
-    public static Timestamp getTimestamp(String value, String format)
-    {
-        Timestamp time = null;
-        try
-        {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-            java.util.Date date = dateFormat.parse(value);
-            time = new Timestamp(date.getTime());
-        }
-        catch (Exception ex)
-        {
-            log.log(Level.SEVERE, "Error getTimestamp():" + ex);
-        }
-        return time;
-    } // getTimestamp
-
-    /**
      * Obtener los parametros necesarios, desde la ventana de configuracion.
      */
-    private static void getConfiguracion()
+    private static void getConfiguracion(final String servicio)
     {
         String sql = "SELECT *"
                    +  " FROM LAR_ConfiguracionFE"
-                   + " WHERE AD_Client_ID = 1000000 AND IsActive = 'Y'"
+                   + " WHERE AD_Client_ID = 1000000 AND IsActive = 'Y' AND Servicio = ?"
                    + " ORDER BY IsDefault DESC";
 
         PreparedStatement pstmt = null;
@@ -313,20 +421,37 @@ public class ProcesadorWSAA
         try
         {
             pstmt = DB.prepareStatement(sql, null);
+            pstmt.setString(1, servicio.toLowerCase());
             rs = pstmt.executeQuery();
 
             if (rs.next())
             {
-                signer = rs.getString("Signer");
-                CMS = rs.getString("CMS");
-                certificado_name = rs.getString("Certificado");
-                claveCifrado = rs.getString("ClaveCifrado");
-                servicio = rs.getString("Servicio");
-                dstDN = rs.getString("DstDN");
-                ticketTime = rs.getLong("TiempoVidaTicket");
-                WSDL = rs.getString("WSDL");
-                concepto = rs.getInt("Concepto");
-                config_ID = rs.getInt("LAR_ConfiguracionFE_ID");
+                if (servicio.equals("WSFE"))
+                {
+                    signerFE = rs.getString("Signer");
+                    CMS_FE = rs.getString("CMS");
+                    certificado_nameFE = rs.getString("Certificado");
+                    claveCifradoFE = rs.getString("ClaveCifrado");
+                    servicioFE = rs.getString("Servicio");
+                    dstDN_FE = rs.getString("DstDN");
+                    ticketTimeFE = rs.getLong("TiempoVidaTicket");
+                    WSDL_FE = rs.getString("WSDL");
+                    conceptoFE = rs.getInt("Concepto");
+                    configFE_ID = rs.getInt("LAR_ConfiguracionFE_ID");
+                }
+                else
+                {
+                    signerFEX = rs.getString("Signer");
+                    CMS_FEX = rs.getString("CMS");
+                    certificado_nameFEX = rs.getString("Certificado");
+                    claveCifradoFEX = rs.getString("ClaveCifrado");
+                    servicioFEX = rs.getString("Servicio");
+                    dstDN_FEX = rs.getString("DstDN");
+                    ticketTimeFEX = rs.getLong("TiempoVidaTicket");
+                    WSDL_FEX = rs.getString("WSDL");
+                    conceptoFEX = rs.getInt("Concepto");
+                    configFEX_ID = rs.getInt("LAR_ConfiguracionFE_ID");
+                }
             }
 
             sql = "SELECT AD_Table_ID"
@@ -349,12 +474,17 @@ public class ProcesadorWSAA
 
     public static int getConcepto()
     {
-        return concepto;
+        return conceptoFE;
     } // getConcepto
 
     public static String getWSDL()
     {
-        return WSDL;
+        return WSDL_FE;
     } // getWSDL
+
+    public static String getWSDL_FEX()
+    {
+        return WSDL_FEX;
+    } // getWSDL_FEX
 
 } // ProcesadorWSAA

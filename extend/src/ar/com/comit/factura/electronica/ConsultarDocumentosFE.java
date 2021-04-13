@@ -84,7 +84,7 @@ public class ConsultarDocumentosFE extends SvrProcess
         long cuitOrg = Long.parseLong(cuit);
 
         // @fchiappano Recuperar Ticket de Acceso.
-        String[] tokenSign = ProcesadorWSAA.getTicketAcceso();
+        String[] tokenSign = ProcesadorWSAA.getTicketAcceso("WSFE");
 
         // @fchiappano Instanciar el servicio, que interactuara con el WS.
         ServiceSoap12Stub soap = new ServiceSoap12Stub(new URL(ProcesadorWSAA.getWSDL()), null);
