@@ -65,11 +65,11 @@ public class MDocType extends X_C_DocType
     /** Notas de Venta al contado B = 10 */
     public static final String DOCSUBTYPECAE_NotasDeVentaAlContadoB = "10";
     /** Nota de Débito por Operaciones en el Exterior = 20 */
-    public static final String DOCSUBTYPECAE_NotaDeDébitoPorOperacionesEnElExterior = "20";
+    public static final String DOCSUBTYPECAE_NotaDeDébitoPorOperacionesEnElExterior = "020";
     /** Factura de Exportación E = 19 */
-    public static final String DOCSUBTYPECAE_FacturaDeExportaciónE = "19";
+    public static final String DOCSUBTYPECAE_FacturaDeExportaciónE = "019";
     /** Nota de Crédito por Operaciones en el Exterior = 21 */
-    public static final String DOCSUBTYPECAE_NotaDeCréditoPorOperacionesEnElExterior = "21";
+    public static final String DOCSUBTYPECAE_NotaDeCréditoPorOperacionesEnElExterior = "021";
 
     /** Set docsubtypecae */
     public void setDocSubTypeCae(String docsubtypecae)

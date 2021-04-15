@@ -16,6 +16,8 @@
  *****************************************************************************/
 package ar.com.comit.factura.electronica;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
@@ -92,8 +94,8 @@ public class ProcesadorWSFEX implements ElectronicInvoiceInterface
     private ClsFEXRequest getClsFEXRequest(final long nroComprobante)
     {
         // FIXME @fchiappano Variables a resolver desde donde recuperarlas.
-        short tipo_export = 3;
-        String permiso_existente = "N";
+        short tipo_export = 2;
+        String permiso_existente = "";
         short paisDestino = 203;
         long cuit_pais = Long.parseLong("50000000059");
         String formaPago = "Efectivo";
@@ -130,7 +132,7 @@ public class ProcesadorWSFEX implements ElectronicInvoiceInterface
         // @fchiappano Convertir todas las listas en arreglos.
         convertirArray();
 
-        ClsFEXRequest request = new ClsFEXRequest(id, fechaComprobante, tipoCbte, pdv, nroComprobante, tipo_export,
+        ClsFEXRequest request = new ClsFEXRequest(id, fechaComprobante, tipoCbte, pdv, nroComprobante + 1, tipo_export,
                 permiso_existente, array_permisos, paisDestino, cliente.getName(), cuit_pais, direccion, cuit_cliente,
                 UtilidadesFE.getCodMoneda(factura), UtilidadesFE.getCotizacion(factura), factura.getDescription(),
                 factura.getGrandTotal(), factura.getDescription(), array_cmp_asoc, formaPago, incoterms, incoterms_Ds, idioma,
@@ -152,7 +154,8 @@ public class ProcesadorWSFEX implements ElectronicInvoiceInterface
             MInvoiceLine linea = lineas[x];
             // FIXME Recuperar Codigo de UM desde la UM.
             int codigo_UM = 7;
-            Item item = new Item("", linea.getM_Product().getName(), linea.getQtyEntered(), codigo_UM, linea.getPriceActual(), Env.ZERO, linea.getPriceActual().multiply(linea.getQtyEntered()));
+            BigDecimal totalLinea = linea.getLineNetAmt().add(linea.getTaxAmt());
+            Item item = new Item("", linea.getM_Product().getName(), linea.getQtyEntered(), codigo_UM, totalLinea.divide(linea.getQtyEntered(), RoundingMode.HALF_UP), Env.ZERO, totalLinea);
             items.add(item);
         }
     } // cargarItems
