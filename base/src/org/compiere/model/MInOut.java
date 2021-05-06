@@ -409,6 +409,15 @@ public class MInOut extends X_M_InOut implements DocAction
 		setDropShip_BPartner_ID(order.getDropShip_BPartner_ID());
 		setDropShip_Location_ID(order.getDropShip_Location_ID());
 		setDropShip_User_ID(order.getDropShip_User_ID());
+
+        // @fchiappano Copiar campos propios del transporte.
+        set_Value("Chofer", order.get_Value("Chofer"));
+        set_Value("Patente", order.get_Value("Patente"));
+        set_Value("Patente_Acoplado", order.get_Value("Patente_Acoplado"));
+        set_Value("Condicion_Flete", order.get_Value("Condicion_Flete"));
+        set_Value("Domicilio_Transporte", order.get_Value("Domicilio_Transporte"));
+        set_Value("Identificacion_Transporte", order.get_Value("Identificacion_Transporte"));
+        set_Value("Tipo_Ident_Transporte_ID", order.get_Value("Tipo_Ident_Transporte_ID"));
 	}	//	MInOut
 
 	/**
