@@ -23,6 +23,7 @@ import java.math.RoundingMode;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -37,6 +38,7 @@ import org.compiere.model.MRegion;
 import org.compiere.model.MUOM;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
+import org.compiere.util.ValueNamePair;
 import org.globalqss.model.X_LCO_TaxIdType;
 
 import ar.com.ergio.model.LAR_TaxPayerType;
@@ -88,9 +90,28 @@ public class ProcesadorCOT
      */
     public String solcitarCOT()
     {
+        // @fchiappano Generar el archivo txt que se enviara al WS.
         File informe = generarTXT();
 
-        String respuesta = COTWebServiceCliente.solicitarCOT(informe);
+        // @fchiappano Realizar la solicitud de COT.
+        if (!COTWebServiceCliente.solicitarCOT(informe))
+        {
+            String errorMsg = COTWebServiceCliente.getMsgError();
+            remito.set_ValueOfColumn("ErrorCOT", errorMsg);
+            remito.saveEx(remito.get_TrxName());
+            log.log(Level.SEVERE, "Error al solicitar COT: " + errorMsg);
+            return errorMsg;
+        }
+
+        // @fchiappano Recuperar datos de autorización y setearlos en el remito.
+        List<ValueNamePair> datosCOT = COTWebServiceCliente.getDatosCOT();
+
+        for (ValueNamePair dato : datosCOT)
+            remito.set_ValueOfColumn(dato.getName(), dato.getValue());
+
+        if(!remito.save(remito.get_TrxName()))
+            return "Error al actualizar el Remito";
+
         return "";
     } // solcitarCOT
 

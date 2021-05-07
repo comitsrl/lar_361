@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import org.compiere.model.MInOut;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
+import org.compiere.util.AdempiereUserError;
 
 import ar.com.comit.remito.electronico.ProcesadorCOT;
 
@@ -61,6 +62,11 @@ public class LAR_SolicitarCOT extends SvrProcess
     protected String doIt() throws Exception
     {
         String mensaje = procesador.solcitarCOT();
+
+        if (mensaje != null && !mensaje.equals(""))
+            throw new AdempiereUserError("Error al solicitar COT: " + mensaje);
+
+        mensaje = "Solicitud COT realizada con exito";
 
         return mensaje;
     } // doIt

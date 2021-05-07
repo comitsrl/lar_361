@@ -19,12 +19,20 @@ package ar.com.comit.remito.electronico;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -34,7 +42,9 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.compiere.util.ValueNamePair;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -44,7 +54,10 @@ import org.xml.sax.SAXException;
 public class COTWebServiceCliente
 {
     // @fchiappano variable de error.
-    private static String msgError;
+    private static String msgError = "";
+
+    // @fchiappano Valores de retorno
+    private static List<ValueNamePair> datosCOT;
 
     // @fchiappano Parametros a evaluar si deben pasarse a una ventana de config.
 //    private static String url = "https://cot.arba.gov.ar/TransporteBienes/SeguridadCliente/presentarRemitos.do";
@@ -58,36 +71,40 @@ public class COTWebServiceCliente
      * @param informe
      * @return respuesta.
      */
-    public static String solicitarCOT(final File informe)
+    public static boolean solicitarCOT(final File informe)
     {
-        String respuesta = "";
         try
         {
             final HttpPost httppost = new HttpPost(url);
 
+            // @fchiappano instanciar el constructor del "formulario" multipart.
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.setLaxMode(); // @emmie: Setea por defecto el modo BROWSER_COMPATIBLE.
 
+            // @fchiappano agregar cada una de las partes, con sus respectivos bodys y el Contentype correspondiente.
             builder.addPart("user", new StringBody(usuario, ContentType.APPLICATION_FORM_URLENCODED.withCharset("UTF-8")));
             builder.addPart("password", new StringBody(pass, ContentType.APPLICATION_FORM_URLENCODED.withCharset("UTF-8")));
             builder.addPart("file", new FileBody(informe, ContentType.APPLICATION_OCTET_STREAM.withCharset("UTF-8"), informe.getName()));
-//            byte[] bytes = Files.readAllBytes(informe.toPath());
-//            builder.addPart("file", new ByteArrayBody(bytes, ContentType.TEXT_PLAIN, informe.getName()));
+
+            // @fchiappano utilizando un entity de tipo multipart, no es necesario agregar el header Content-type: Multipart form/data.
             HttpEntity multipart = builder.build();
             httppost.setEntity(multipart);
-            httppost.addHeader("Cookie", "JSESSIONID=0000XgY-FTL7K-J-2yuPYz6J3_T:-1");
-            long contentLentgth = httppost.getEntity().getContentLength();
-            Header[] headers = httppost.getAllHeaders();
+
             CloseableHttpClient httpclient = HttpClientBuilder.create().build();
             CloseableHttpResponse response = httpclient.execute(httppost);
+
             final HttpEntity httpEntity = response.getEntity();
             final Document doc = parseXML((InputStream) httpEntity.getContent());
 
-            // @fchiappano Recuperar Errores.
-            msgError = doc.getElementsByTagName("codigoError").item(0).getTextContent() + "_"
-                     + doc.getElementsByTagName("tipoError").item(0).getTextContent() + "_"
-                     + doc.getElementsByTagName("mensajeError").item(0).getTextContent();
+            //System.out.println(documentToString(doc));
 
-            respuesta = "COT Generado con exito";
+            // @fchiappano Recuperar errores (si es que existen).
+            msgError = getErrores(doc);
+            if (!msgError.equals(""))
+                return false;
+
+            // @fchiappano Recuperar los datos de la transacción y codigo COT.
+            getDatosCOT(doc);
         }
         catch (Exception e)
         {
@@ -95,7 +112,7 @@ public class COTWebServiceCliente
             msgError = e.getMessage();
         }
 
-        return respuesta;
+        return true;
     } // solicitarCOT
 
     /**
@@ -119,5 +136,77 @@ public class COTWebServiceCliente
     {
         return msgError;
     } // getMsgError
+
+    public static List<ValueNamePair> getDatosCOT()
+    {
+        return datosCOT;
+    } // getDatosCOT
+
+    /**
+     * Recuperar mensajes de error, contenidos en el xml response.
+     * @return mensaje de error o "".
+     */
+    private static String getErrores(final Document doc)
+    {
+        String mensajeError = "";
+
+        // @fchiappano Recuperar error de comunicación con el web service y/o
+        // errores de formato de datos.
+        NodeList tags = doc.getElementsByTagName("codigoError");
+        if (tags.getLength() > 0)
+        {
+            mensajeError = doc.getElementsByTagName("codigoError").item(0).getTextContent() + "_"
+                         + doc.getElementsByTagName("tipoError").item(0).getTextContent() + "_"
+                         + doc.getElementsByTagName("mensajeError").item(0).getTextContent();
+        }
+
+        // @fchiappano Recorrer errores de datos (informado en el archivo).
+        tags = doc.getElementsByTagName("error");
+        if (tags.getLength() > 0)
+        {
+            NodeList tagsCodigo = doc.getElementsByTagName("codigo");
+            NodeList tagsDescripcion = doc.getElementsByTagName("descripcion");
+
+            for (int x = 0; x < tags.getLength(); x++)
+            {
+                mensajeError = mensajeError
+                             + tagsCodigo.item(x).getTextContent() + "_"
+                             + tagsDescripcion.item(x).getTextContent() + " | ";
+            }
+        }
+
+        return mensajeError;
+    } // getErrores
+
+    /**
+     * Recuperar los datos de transacción y COT, del xml response.
+     * @author fchiappano
+     */
+    private static void getDatosCOT(final Document doc)
+    {
+        datosCOT = new ArrayList<ValueNamePair>();
+
+        datosCOT.add(new ValueNamePair(doc.getElementsByTagName("codigoIntegridad").item(0).getTextContent(), "CodigoIntegridadCOT"));
+        datosCOT.add(new ValueNamePair(doc.getElementsByTagName("numeroComprobante").item(0).getTextContent(), "NumeroComprobanteCOT"));
+        datosCOT.add(new ValueNamePair(doc.getElementsByTagName("cot").item(0).getTextContent(), "COT"));
+    } // getDatosCOT
+
+    private static String documentToString(final Document doc) throws TransformerException
+    {
+        final TransformerFactory transfac = TransformerFactory.newInstance();
+        final Transformer trans = transfac.newTransformer();
+        trans.setOutputProperty(OutputKeys.METHOD, "xml");
+        trans.setOutputProperty(OutputKeys.INDENT, "yes");
+        trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", Integer.toString(2));
+
+        final StringWriter sw = new StringWriter();
+        final StreamResult result = new StreamResult(sw);
+        final DOMSource source = new DOMSource(doc.getDocumentElement());
+
+        trans.transform(source, result);
+        final String xmlString = sw.toString();
+
+        return xmlString;
+    } // DocumentToString
 
 } // COTWebServiceCliente

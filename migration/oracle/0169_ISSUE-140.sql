@@ -2214,6 +2214,266 @@ UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:29:12','
 UPDATE AD_Field SET IsSameLine='N',Updated=TO_DATE('2021-04-27 19:29:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=1109
 ;
 
+-- 07/05/2021 16:52:51 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001109,'codigointegridadcot','LAR','codigointegridadcot','codigointegridadcot',0,TO_DATE('2021-05-07 16:52:51','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-07 16:52:51','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 07/05/2021 16:52:52 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001109 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 07/05/2021 16:52:52 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003728,319,'LAR',0,'N','N','N','N',60,'N',10,'N',3001109,'N','Y','N','codigointegridadcot','codigointegridadcot',TO_DATE('2021-05-07 16:52:51','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-07 16:52:51','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 07/05/2021 16:52:52 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003728 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 07/05/2021 16:52:52 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001110,'numerocomprobantecot','LAR','numerocomprobantecot','numerocomprobantecot',0,TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 07/05/2021 16:52:52 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001110 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 07/05/2021 16:52:52 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003729,319,'LAR',0,'N','N','N','N',30,'N',10,'N',3001110,'N','Y','N','numerocomprobantecot','numerocomprobantecot',TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 07/05/2021 16:52:52 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003729 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 07/05/2021 16:52:53 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001111,'errorcot','LAR','errorcot','errorcot',0,TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 07/05/2021 16:52:53 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001111 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 07/05/2021 16:52:53 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003730,319,'LAR',0,'N','N','N','N',255,'N',10,'N',3001111,'N','Y','N','errorcot','errorcot',TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 07/05/2021 16:52:53 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003730 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 07/05/2021 16:53:45 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column SET Name='Codigo de Integridad COT', ColumnName='CodigoIntegridadCOT',Updated=TO_DATE('2021-05-07 16:53:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003728
+;
+
+-- 07/05/2021 16:53:45 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003728
+;
+
+-- 07/05/2021 16:53:45 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Field SET Name='Codigo de Integridad COT', Description=NULL, Help=NULL WHERE AD_Column_ID=3003728 AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:54:03 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column_Trl SET Name='Codigo de Integridad COT',Updated=TO_DATE('2021-05-07 16:54:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003728 AND AD_Language='es_AR'
+;
+
+-- 07/05/2021 16:54:44 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element SET ColumnName='CodigoIntegridadCOT', Name='Codigo de Integridad COT', PrintName='Codigo de Integridad COT',Updated=TO_DATE('2021-05-07 16:54:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001109
+;
+
+-- 07/05/2021 16:54:44 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001109
+;
+
+-- 07/05/2021 16:54:44 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column SET ColumnName='CodigoIntegridadCOT', Name='Codigo de Integridad COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001109
+;
+
+-- 07/05/2021 16:54:44 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Process_Para SET ColumnName='CodigoIntegridadCOT', Name='Codigo de Integridad COT', Description=NULL, Help=NULL, AD_Element_ID=3001109 WHERE UPPER(ColumnName)='CODIGOINTEGRIDADCOT' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 07/05/2021 16:54:44 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Process_Para SET ColumnName='CodigoIntegridadCOT', Name='Codigo de Integridad COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001109 AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:54:44 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Field SET Name='Codigo de Integridad COT', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001109) AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:54:44 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_PrintFormatItem pi SET PrintName='Codigo de Integridad COT', Name='Codigo de Integridad COT' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001109)
+;
+
+-- 07/05/2021 16:54:52 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element_Trl SET Name='Codigo de Integridad COT',PrintName='Codigo de Integridad COT',Updated=TO_DATE('2021-05-07 16:54:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001109 AND AD_Language='es_AR'
+;
+
+-- 07/05/2021 16:55:21 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column SET ColumnName='ErrorCOT',Updated=TO_DATE('2021-05-07 16:55:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003730
+;
+
+-- 07/05/2021 16:55:25 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column SET Name='ErrorCOT',Updated=TO_DATE('2021-05-07 16:55:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003730
+;
+
+-- 07/05/2021 16:55:25 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003730
+;
+
+-- 07/05/2021 16:55:25 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Field SET Name='ErrorCOT', Description=NULL, Help=NULL WHERE AD_Column_ID=3003730 AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:55:29 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column_Trl SET Name='ErrorCOT',Updated=TO_DATE('2021-05-07 16:55:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003730 AND AD_Language='es_AR'
+;
+
+-- 07/05/2021 16:55:38 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column SET Name='Error COT',Updated=TO_DATE('2021-05-07 16:55:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003730
+;
+
+-- 07/05/2021 16:55:38 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003730
+;
+
+-- 07/05/2021 16:55:38 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Field SET Name='Error COT', Description=NULL, Help=NULL WHERE AD_Column_ID=3003730 AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:55:50 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element SET ColumnName='ErrorCOT', Name='Error COT', PrintName='Error COT',Updated=TO_DATE('2021-05-07 16:55:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001111
+;
+
+-- 07/05/2021 16:55:50 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001111
+;
+
+-- 07/05/2021 16:55:50 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column SET ColumnName='ErrorCOT', Name='Error COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001111
+;
+
+-- 07/05/2021 16:55:50 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Process_Para SET ColumnName='ErrorCOT', Name='Error COT', Description=NULL, Help=NULL, AD_Element_ID=3001111 WHERE UPPER(ColumnName)='ERRORCOT' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 07/05/2021 16:55:50 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Process_Para SET ColumnName='ErrorCOT', Name='Error COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001111 AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:55:50 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Field SET Name='Error COT', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001111) AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:55:50 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_PrintFormatItem pi SET PrintName='Error COT', Name='Error COT' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001111)
+;
+
+-- 07/05/2021 16:56:02 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element_Trl SET Name='Error COT',PrintName='Error COT',Updated=TO_DATE('2021-05-07 16:56:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001111 AND AD_Language='es_AR'
+;
+
+-- 07/05/2021 16:57:36 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column SET Name='Número de Comprobante COT', ColumnName='NumeroComprobanteCOT',Updated=TO_DATE('2021-05-07 16:57:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003729
+;
+
+-- 07/05/2021 16:57:36 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003729
+;
+
+-- 07/05/2021 16:57:36 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Field SET Name='Número de Comprobante COT', Description=NULL, Help=NULL WHERE AD_Column_ID=3003729 AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:57:40 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column_Trl SET Name='Número de Comprobante COT',Updated=TO_DATE('2021-05-07 16:57:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003729 AND AD_Language='es_AR'
+;
+
+-- 07/05/2021 16:58:02 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element SET ColumnName='NumeroComprobanteCOT', Name='Número de Comprobante COT', PrintName='Número de Comprobante COT',Updated=TO_DATE('2021-05-07 16:58:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001110
+;
+
+-- 07/05/2021 16:58:02 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001110
+;
+
+-- 07/05/2021 16:58:02 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Column SET ColumnName='NumeroComprobanteCOT', Name='Número de Comprobante COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001110
+;
+
+-- 07/05/2021 16:58:02 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Process_Para SET ColumnName='NumeroComprobanteCOT', Name='Número de Comprobante COT', Description=NULL, Help=NULL, AD_Element_ID=3001110 WHERE UPPER(ColumnName)='NUMEROCOMPROBANTECOT' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 07/05/2021 16:58:02 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Process_Para SET ColumnName='NumeroComprobanteCOT', Name='Número de Comprobante COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001110 AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:58:02 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Field SET Name='Número de Comprobante COT', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001110) AND IsCentrallyMaintained='Y'
+;
+
+-- 07/05/2021 16:58:02 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_PrintFormatItem pi SET PrintName='Número de Comprobante COT', Name='Número de Comprobante COT' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001110)
+;
+
+-- 07/05/2021 16:58:06 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+UPDATE AD_Element_Trl SET Name='Número de Comprobante COT',PrintName='Número de Comprobante COT',Updated=TO_DATE('2021-05-07 16:58:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001110 AND AD_Language='es_AR'
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0169_ISSUE-140.sql', 'LAR', '') FROM dual
 ;
