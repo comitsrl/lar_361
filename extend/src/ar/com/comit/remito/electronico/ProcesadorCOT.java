@@ -17,12 +17,9 @@
 package ar.com.comit.remito.electronico;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -61,6 +58,7 @@ public class ProcesadorCOT
     private final Properties ctx = Env.getCtx();
     private final String separador = "|";
     private final String separadorNombre = "_";
+    private final String finalLinea = "\r\n";
 
     // @fchiappano parametros fijos.
     private final String sujetoGenerador = "E";
@@ -123,7 +121,7 @@ public class ProcesadorCOT
             agregarLineas(cuerpoTxt);
 
             // @fchiappano Agregar final del TXT.
-            cuerpoTxt.append("04" + separador + "1");
+            cuerpoTxt.append("04" + separador + "1" + finalLinea);
 
             // @fchiappano Escribir el archivo.
             FileWriter escritor = new FileWriter(archivo);
@@ -150,7 +148,7 @@ public class ProcesadorCOT
         StringBuffer cabecera = new StringBuffer();
 
         // @fchiappano linea cabecera.
-        cabecera.append("01" + separador + cuitOrg + "\n");
+        cabecera.append("01" + separador + cuitOrg + finalLinea);
 
         MBPartner cliente = remito.getBPartner();
 
@@ -281,7 +279,7 @@ public class ProcesadorCOT
         cabecera.append(separador + formatearBigDecimal(remito.getC_Order().getTotalLines()));
 
         // @fchiappano Agregar final de Linea.
-        cabecera.append("\n");
+        cabecera.append(finalLinea);
 
         return cabecera;
     } // cargarDatosCabecera
@@ -323,7 +321,7 @@ public class ProcesadorCOT
             cuerpoTxt.append(separador + formatearBigDecimal(linea.getQtyEntered()));
 
             // @fchiappano Final de Linea.
-            cuerpoTxt.append("\n");
+            cuerpoTxt.append(finalLinea);
         }
     } // agregarLineas
 
