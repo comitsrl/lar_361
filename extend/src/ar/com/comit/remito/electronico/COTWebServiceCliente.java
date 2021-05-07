@@ -29,7 +29,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.w3c.dom.Document;
@@ -45,12 +47,10 @@ public class COTWebServiceCliente
     private static String msgError;
 
     // @fchiappano Parametros a evaluar si deben pasarse a una ventana de config.
-    private static String url = "http://cot.test.arba.gov.ar/TransporteBienes/SeguridadCliente/";
+//    private static String url = "https://cot.arba.gov.ar/TransporteBienes/SeguridadCliente/presentarRemitos.do";
+    private static String url = "http://cot.test.arba.gov.ar/TransporteBienes/SeguridadCliente/presentarRemitos.do";
     private static String usuario = "30716879867";
     private static String pass = "Blumos3071";
-
-    private static CloseableHttpClient httpclient;
-    private static CloseableHttpResponse response;
 
     /**
      * Conectar al WebService y realizar la solicitud del COT.
@@ -63,16 +63,26 @@ public class COTWebServiceCliente
         String respuesta = "";
         try
         {
-            final FileEntity entity = new FileEntity(informe, ContentType.create("text/txt"));
-            final HttpPost httppost = new HttpPost(agregarParametros(url));
-            httppost.setEntity(entity);
-            httppost.addHeader("Connection", "close");
-            httpclient = HttpClientBuilder.create().build();
-            response = httpclient.execute(httppost);
-            final Header[] headers = response.getAllHeaders();
+            final HttpPost httppost = new HttpPost(url);
+
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+
+            builder.addPart("user", new StringBody(usuario, ContentType.APPLICATION_FORM_URLENCODED.withCharset("UTF-8")));
+            builder.addPart("password", new StringBody(pass, ContentType.APPLICATION_FORM_URLENCODED.withCharset("UTF-8")));
+            builder.addPart("file", new FileBody(informe, ContentType.APPLICATION_OCTET_STREAM.withCharset("UTF-8"), informe.getName()));
+//            byte[] bytes = Files.readAllBytes(informe.toPath());
+//            builder.addPart("file", new ByteArrayBody(bytes, ContentType.TEXT_PLAIN, informe.getName()));
+            HttpEntity multipart = builder.build();
+            httppost.setEntity(multipart);
+            httppost.addHeader("Cookie", "JSESSIONID=0000XgY-FTL7K-J-2yuPYz6J3_T:-1");
+            long contentLentgth = httppost.getEntity().getContentLength();
+            Header[] headers = httppost.getAllHeaders();
+            CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+            CloseableHttpResponse response = httpclient.execute(httppost);
             final HttpEntity httpEntity = response.getEntity();
             final Document doc = parseXML((InputStream) httpEntity.getContent());
 
+            // @fchiappano Recuperar Errores.
             msgError = doc.getElementsByTagName("codigoError").item(0).getTextContent() + "_"
                      + doc.getElementsByTagName("tipoError").item(0).getTextContent() + "_"
                      + doc.getElementsByTagName("mensajeError").item(0).getTextContent();
@@ -87,16 +97,6 @@ public class COTWebServiceCliente
 
         return respuesta;
     } // solicitarCOT
-
-    /**
-     * Agregar parametros a la URL, requeridos por el WS (Usuario y Password).
-     * @author fchiappano
-     */
-    private static String agregarParametros(final String url)
-    {
-        String urlCompleta = url + "?user=" + usuario + "&password=" + pass;
-        return urlCompleta;
-    } // agregarParametros
 
     /**
      * Load XML from string. Can throw exception
