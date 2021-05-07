@@ -9,6 +9,9 @@ ALTER TABLE M_InOut ADD COLUMN Tipo_Ident_Transporte_ID numeric(10,0);
 ALTER TABLE M_InOut ADD CONSTRAINT tipoidenttransporte_minout FOREIGN KEY (Tipo_Ident_Transporte_ID)
       REFERENCES adempiere.LCO_TaxIDType (LCO_TaxIDType_ID) MATCH SIMPLE;
 ALTER TABLE M_InOut ADD COLUMN COT character varying(60);
+ALTER TABLE M_InOut ADD COLUMN CodigoIntegridadCOT character varying(60);
+ALTER TABLE M_InOut ADD COLUMN NumeroComprobanteCOT character varying(30);
+ALTER TABLE M_InOut ADD COLUMN ErrorCOT character varying(255);
 
 ALTER TABLE C_UOM ADD COLUMN CodigoCOT character(1);
 
