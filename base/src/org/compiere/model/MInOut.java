@@ -1110,7 +1110,20 @@ public class MInOut extends X_M_InOut implements DocAction
 			m_processMsg = "@PeriodClosed@";
 			return DocAction.STATUS_Invalid;
 		}
+        // Validez de CAI
+        if (dt.get_ValueAsBoolean("EsAutoimpresor"))
+        {
+            m_processMsg = validarCAI(dt);
+            if (m_processMsg != null)
+                return DocAction.STATUS_Invalid;
 
+            // Se recupera el número de CAI
+            String sql = "SELECT CAI FROM C_DocType_CAI "
+                    + "WHERE C_DocType_ID = ? "
+                    + "ORDER BY Fecha_Vencimiento DESC ";
+            String cai = DB.getSQLValueString(null, sql, dt.getC_DocType_ID());
+            set_CustomColumn("CAI", cai);
+        }
 		//	Credit Check
 		if (isSOTrx() && !isReversal())
 		{
@@ -1193,7 +1206,35 @@ public class MInOut extends X_M_InOut implements DocAction
 		return DocAction.STATUS_InProgress;
 	}	//	prepareIt
 
-	/**
+    /**
+     *  Valida CAI
+     *  @return mensaje de error
+     */
+	private String validarCAI(MDocType dt)
+    {
+        /*
+         * Se controla fecha de vencimiento. Si el documento tiene la marca
+         * sobreescribir fecha al completar, se valida con la fecha de sistema.
+         * Caso contrario se valida con la fecha del documento.
+         */
+        Timestamp fecha = (dt.get_ValueAsBoolean("IsOverwriteDateOnComplete")) ? new Timestamp(System.currentTimeMillis()) : getMovementDate();
+        String sql = "SELECT Fecha_Vencimiento FROM C_DocType_CAI "
+                + "WHERE C_DocType_ID = ? "
+                + "ORDER BY Fecha_Vencimiento DESC ";
+        Timestamp fecha_vencimiento = DB.getSQLValueTS(null, sql, dt.getC_DocType_ID());
+        String mensaje = null;
+        if (fecha_vencimiento == null)
+        {
+            mensaje = "No existe configuración de CAI válida para " + dt.getName();
+            return mensaje;
+        }
+        if (0 < fecha.compareTo(fecha_vencimiento))
+            mensaje = "CAI del Remito Vencido";
+
+        return mensaje;
+    }
+
+    /**
 	 * 	Approve Document
 	 * 	@return true if success
 	 */
