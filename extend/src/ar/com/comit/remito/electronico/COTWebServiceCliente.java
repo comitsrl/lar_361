@@ -48,8 +48,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Clase de servicio, que se encargara efectivamente de conectar con WS de ARBA y solicitar el COT.
- * @author fchiappano
+ * Clase de servicio, que se encargará efectivamente de conectar con WS de ARBA y solicitar el
+ * COT. Las bilbiotecas necesarias para esta funcionalidad se dejaron en el directorio de
+ * instalación de Adempiere. Se encuentran también en el directorio lib de LAR para fines de
+ * desarrollo, pero no se incluyen en el customization.
+ *
+ * @author fchiappano - http://www.comit.com.ar
+ * @author Marcos Zúñiga - http://www.comit.com.ar
  */
 public class COTWebServiceCliente
 {

@@ -16,10 +16,8 @@
  *****************************************************************************/
 package ar.com.ergio.process;
 
-import java.util.logging.Level;
 
 import org.compiere.model.MInOut;
-import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
 
@@ -34,33 +32,23 @@ public class LAR_SolicitarCOT extends SvrProcess
 {
     // @fchiappano Procesador COT.
     private ProcesadorCOT procesador;
+    /** Remito (Shipment)          */
+    private int     p_M_InOut_ID = 0;
 
     @Override
     protected void prepare()
     {
-        final ProcessInfoParameter[] para = getParameter();
-        int m_InOut_ID = 0;
-
-        for (int i = 0; i < para.length; i++)
-        {
-            String name = para[i].getParameterName();
-            if (para[i].getParameter() == null)
-                ;
-            else if (name.equals("M_InOut_ID"))
-            {
-                m_InOut_ID = para[i].getParameterAsInt();
-            }
-            else
-                log.log(Level.SEVERE, "Par\u00e1metro desconocido: " + name);
-        }
-
-        // @fchiappano instanciar el procesador que solicitara el COT.
-        procesador = new ProcesadorCOT(new MInOut(getCtx(), m_InOut_ID, get_TrxName()));
+        // Se recupera la clave primaria del Remito
+        p_M_InOut_ID = getRecord_ID();
+        log.info("M_InOut_ID=" + p_M_InOut_ID);
     } // prepare
 
     @Override
     protected String doIt() throws Exception
     {
+        // @fchiappano instanciar el procesador que solicitara el COT.
+        MInOut remito = new MInOut(getCtx(), p_M_InOut_ID, get_TrxName());
+        procesador = new ProcesadorCOT(remito);
         String mensaje = procesador.solcitarCOT();
 
         if (mensaje != null && !mensaje.equals(""))
