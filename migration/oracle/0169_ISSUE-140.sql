@@ -1573,909 +1573,911 @@ UPDATE AD_Field SET DisplayLength=20,Updated=TO_DATE('2021-04-26 20:54:04','YYYY
 ;
 
 -- 26/04/2021 22:15:27 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET IsSameLine='N',Updated=TO_DATE('2021-04-26 22:15:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007007
 ;
 
 -- 27/04/2021 19:12:25 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003718,259,'LAR',0,'N','N','N','N',60,'N',10,'N',3001095,'N','Y','N','Chofer','Chofer',TO_DATE('2021-04-27 19:12:24','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-04-27 19:12:24','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:12:25 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003718 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 27/04/2021 19:12:25 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003719,259,'LAR',0,'N','N','N','N',10,'N',10,'N',3001096,'N','Y','N','Patente','Patente',TO_DATE('2021-04-27 19:12:25','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-04-27 19:12:25','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:12:25 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003719 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 27/04/2021 19:12:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003720,259,'LAR',0,'N','N','N','N',10,'N',10,'N',3001097,'N','Y','N','Patente Acoplado','Patente_Acoplado',TO_DATE('2021-04-27 19:12:25','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-04-27 19:12:25','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:12:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003720 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 27/04/2021 19:12:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003721,259,'LAR',0,'N','N','N','N',60,'N',10,'N',3001098,'N','Y','N','Condición del Flete','Condicion_Flete',TO_DATE('2021-04-27 19:12:26','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-04-27 19:12:26','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:12:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003721 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 27/04/2021 19:12:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003722,259,'LAR',0,'N','N','N','N',60,'N',10,'N',3001099,'N','Y','N','Domicilio del Transporte','Domicilio_Transporte',TO_DATE('2021-04-27 19:12:26','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-04-27 19:12:26','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:12:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003722 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 27/04/2021 19:12:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003723,259,'LAR',0,'N','N','N','N',15,'N',10,'N',3001100,'N','Y','N','Nro. Identificación','Identificacion_Transporte',TO_DATE('2021-04-27 19:12:26','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-04-27 19:12:26','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:12:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003723 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 27/04/2021 19:12:27 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003724,259,'LAR',0,'N','N','N','N',10,'N',19,'N',3001101,'N','Y','N','Tipo de Identificación','Tipo_Ident_Transporte_ID',TO_DATE('2021-04-27 19:12:26','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-04-27 19:12:26','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:12:27 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003724 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 27/04/2021 19:12:27 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003725,259,'LAR',0,'N','N','N','N',60,'N',10,'N',3001102,'N','Y','N','COT','COT',TO_DATE('2021-04-27 19:12:27','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-04-27 19:12:27','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:12:27 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003725 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 27/04/2021 19:13:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007026,60,'Y','N','N',3003718,'N','Y',186,'N','LAR','Chofer',100,0,TO_DATE('2021-04-27 19:13:02','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-27 19:13:02','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:13:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007026 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 27/04/2021 19:13:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007027,60,'Y','N','N',3003721,'N','Y',186,'N','LAR','Condición del Flete',100,0,TO_DATE('2021-04-27 19:13:02','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-27 19:13:02','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:13:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007027 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 27/04/2021 19:13:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007028,60,'Y','N','N',3003725,'N','Y',186,'N','LAR','COT',100,0,TO_DATE('2021-04-27 19:13:03','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-27 19:13:03','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:13:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007028 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 27/04/2021 19:13:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007029,60,'Y','N','N',3003722,'N','Y',186,'N','LAR','Domicilio del Transporte',100,0,TO_DATE('2021-04-27 19:13:03','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-27 19:13:03','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:13:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007029 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 27/04/2021 19:13:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007030,15,'Y','N','N',3003723,'N','Y',186,'N','LAR','Nro. Identificación',100,0,TO_DATE('2021-04-27 19:13:03','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-27 19:13:03','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:13:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007030 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 27/04/2021 19:13:04 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007031,10,'Y','N','N',3003719,'N','Y',186,'N','LAR','Patente',100,0,TO_DATE('2021-04-27 19:13:03','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-27 19:13:03','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:13:04 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007031 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 27/04/2021 19:13:04 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007032,10,'Y','N','N',3003720,'N','Y',186,'N','LAR','Patente Acoplado',100,0,TO_DATE('2021-04-27 19:13:04','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-27 19:13:04','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:13:04 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007032 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 27/04/2021 19:13:04 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007033,10,'Y','N','N',3003724,'N','Y',186,'N','LAR','Tipo de Identificación',100,0,TO_DATE('2021-04-27 19:13:04','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-27 19:13:04','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 27/04/2021 19:13:04 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007033 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 27/04/2021 19:13:42 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 DELETE  FROM  AD_Field_Trl WHERE AD_Field_ID=3007028
 ;
 
 -- 27/04/2021 19:13:43 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 DELETE FROM AD_Field WHERE AD_Field_ID=3007028
 ;
 
 -- 27/04/2021 19:14:01 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 DELETE  FROM  AD_Column_Trl WHERE AD_Column_ID=3003725
 ;
 
 -- 27/04/2021 19:14:01 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 DELETE FROM AD_Column WHERE AD_Column_ID=3003725
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3007026
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3007027
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3007030
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3007031
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3007032
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3007033
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=1104
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3006998
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=1077
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=1103
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=8653
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3005559
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=1098
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3272
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=2112
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=2109
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3113
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=1099
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=56906
 ;
 
 -- 27/04/2021 19:15:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3001993
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=2593
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=2589
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=1324
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=7038
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=7826
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=7825
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=2594
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=1112
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=1113
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=1082
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=60972
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=1084
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=630,IsDisplayed='Y' WHERE AD_Field_ID=60922
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=6560
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=1083
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=660,IsDisplayed='Y' WHERE AD_Field_ID=3660
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=670,IsDisplayed='Y' WHERE AD_Field_ID=1090
 ;
 
 -- 27/04/2021 19:15:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=680,IsDisplayed='Y' WHERE AD_Field_ID=3001597
 ;
 
 -- 27/04/2021 19:16:18 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:16:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=1108
 ;
 
 -- 27/04/2021 19:18:24 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''PW''',Updated=TO_DATE('2021-04-27 19:18:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=1109
 ;
 
 -- 27/04/2021 19:18:48 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''PW''',Updated=TO_DATE('2021-04-27 19:18:48','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007026
 ;
 
 -- 27/04/2021 19:18:54 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''PW''',Updated=TO_DATE('2021-04-27 19:18:54','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007027
 ;
 
 -- 27/04/2021 19:18:58 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''PW''',Updated=TO_DATE('2021-04-27 19:18:58','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:19:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''PW''',Updated=TO_DATE('2021-04-27 19:19:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007030
 ;
 
 -- 27/04/2021 19:19:06 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''PW''',Updated=TO_DATE('2021-04-27 19:19:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007031
 ;
 
 -- 27/04/2021 19:19:12 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET IsSameLine='Y', DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''PW''',Updated=TO_DATE('2021-04-27 19:19:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007032
 ;
 
 -- 27/04/2021 19:19:19 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''PW''',Updated=TO_DATE('2021-04-27 19:19:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007033
 ;
 
 -- 27/04/2021 19:19:37 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:19:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007033
 ;
 
 -- 27/04/2021 19:19:42 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:19:42','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007032
 ;
 
 -- 27/04/2021 19:19:47 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:19:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007031
 ;
 
 -- 27/04/2021 19:19:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:19:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007030
 ;
 
 -- 27/04/2021 19:19:55 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:19:55','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:19:59 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:19:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007027
 ;
 
 -- 27/04/2021 19:20:04 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:20:04','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007026
 ;
 
 -- 27/04/2021 19:20:47 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLength=20, IsSameLine='Y',Updated=TO_DATE('2021-04-27 19:20:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007026
 ;
 
 -- 27/04/2021 19:20:54 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3007026
 ;
 
 -- 27/04/2021 19:20:54 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=2878
 ;
 
 -- 27/04/2021 19:20:55 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=56446
 ;
 
 -- 27/04/2021 19:20:55 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=1107
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3007030
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3007031
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3007032
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3007033
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=2878
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=56446
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=1107
 ;
 
 -- 27/04/2021 19:21:10 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3007027
 ;
 
 -- 27/04/2021 19:21:43 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3007033
 ;
 
 -- 27/04/2021 19:21:43 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:21:43 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3007027
 ;
 
 -- 27/04/2021 19:21:43 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=2878
 ;
 
 -- 27/04/2021 19:21:43 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=56446
 ;
 
 -- 27/04/2021 19:21:43 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=1107
 ;
 
 -- 27/04/2021 19:22:16 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET IsSameLine='Y',Updated=TO_DATE('2021-04-27 19:22:16','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007030
 ;
 
 -- 27/04/2021 19:22:36 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLength=20,Updated=TO_DATE('2021-04-27 19:22:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:22:46 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLength=20,Updated=TO_DATE('2021-04-27 19:22:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007027
 ;
 
 -- 27/04/2021 19:22:49 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET IsSameLine='Y',Updated=TO_DATE('2021-04-27 19:22:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:22:55 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3007027
 ;
 
 -- 27/04/2021 19:22:55 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:23:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET AD_Reference_Value_ID=3000120, AD_Reference_ID=18,Updated=TO_DATE('2021-04-27 19:23:26','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003724
 ;
 
 -- 27/04/2021 19:26:05 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:26:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007033
 ;
 
 -- 27/04/2021 19:26:19 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:26:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007030
 ;
 
 -- 27/04/2021 19:26:26 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:26:26','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007031
 ;
 
 -- 27/04/2021 19:26:31 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:26:31','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007032
 ;
 
 -- 27/04/2021 19:26:37 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:26:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007027
 ;
 
 -- 27/04/2021 19:26:43 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:26:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007029
 ;
 
 -- 27/04/2021 19:26:58 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:26:58','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007026
 ;
 
 -- 27/04/2021 19:27:06 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=''S'' & @OrderType@=''WP''',Updated=TO_DATE('2021-04-27 19:27:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=1109
 ;
 
 -- 27/04/2021 19:29:12 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-04-27 19:29:12','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=1109
 ;
 
 -- 27/04/2021 19:29:21 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET IsSameLine='N',Updated=TO_DATE('2021-04-27 19:29:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=1109
 ;
 
 -- 07/05/2021 16:52:51 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001109,'codigointegridadcot','LAR','codigointegridadcot','codigointegridadcot',0,TO_DATE('2021-05-07 16:52:51','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-07 16:52:51','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
 ;
 
 -- 07/05/2021 16:52:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001109 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
 ;
 
 -- 07/05/2021 16:52:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003728,319,'LAR',0,'N','N','N','N',60,'N',10,'N',3001109,'N','Y','N','codigointegridadcot','codigointegridadcot',TO_DATE('2021-05-07 16:52:51','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-07 16:52:51','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 07/05/2021 16:52:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003728 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 07/05/2021 16:52:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001110,'numerocomprobantecot','LAR','numerocomprobantecot','numerocomprobantecot',0,TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
 ;
 
 -- 07/05/2021 16:52:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001110 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
 ;
 
 -- 07/05/2021 16:52:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003729,319,'LAR',0,'N','N','N','N',30,'N',10,'N',3001110,'N','Y','N','numerocomprobantecot','numerocomprobantecot',TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 07/05/2021 16:52:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003729 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 07/05/2021 16:52:53 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001111,'errorcot','LAR','errorcot','errorcot',0,TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
 ;
 
 -- 07/05/2021 16:52:53 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001111 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
 ;
 
 -- 07/05/2021 16:52:53 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003730,319,'LAR',0,'N','N','N','N',255,'N',10,'N',3001111,'N','Y','N','errorcot','errorcot',TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-07 16:52:52','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
 -- 07/05/2021 16:52:53 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003730 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 07/05/2021 16:53:45 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET Name='Codigo de Integridad COT', ColumnName='CodigoIntegridadCOT',Updated=TO_DATE('2021-05-07 16:53:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003728
 ;
 
 -- 07/05/2021 16:53:45 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003728
 ;
 
 -- 07/05/2021 16:53:45 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET Name='Codigo de Integridad COT', Description=NULL, Help=NULL WHERE AD_Column_ID=3003728 AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:54:03 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column_Trl SET Name='Codigo de Integridad COT',Updated=TO_DATE('2021-05-07 16:54:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003728 AND AD_Language='es_AR'
 ;
 
 -- 07/05/2021 16:54:44 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element SET ColumnName='CodigoIntegridadCOT', Name='Codigo de Integridad COT', PrintName='Codigo de Integridad COT',Updated=TO_DATE('2021-05-07 16:54:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001109
 ;
 
 -- 07/05/2021 16:54:44 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001109
 ;
 
 -- 07/05/2021 16:54:44 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET ColumnName='CodigoIntegridadCOT', Name='Codigo de Integridad COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001109
 ;
 
 -- 07/05/2021 16:54:44 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Process_Para SET ColumnName='CodigoIntegridadCOT', Name='Codigo de Integridad COT', Description=NULL, Help=NULL, AD_Element_ID=3001109 WHERE UPPER(ColumnName)='CODIGOINTEGRIDADCOT' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
 ;
 
 -- 07/05/2021 16:54:44 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Process_Para SET ColumnName='CodigoIntegridadCOT', Name='Codigo de Integridad COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001109 AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:54:44 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET Name='Codigo de Integridad COT', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001109) AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:54:44 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_PrintFormatItem pi SET PrintName='Codigo de Integridad COT', Name='Codigo de Integridad COT' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001109)
 ;
 
 -- 07/05/2021 16:54:52 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element_Trl SET Name='Codigo de Integridad COT',PrintName='Codigo de Integridad COT',Updated=TO_DATE('2021-05-07 16:54:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001109 AND AD_Language='es_AR'
 ;
 
 -- 07/05/2021 16:55:21 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET ColumnName='ErrorCOT',Updated=TO_DATE('2021-05-07 16:55:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003730
 ;
 
 -- 07/05/2021 16:55:25 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET Name='ErrorCOT',Updated=TO_DATE('2021-05-07 16:55:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003730
 ;
 
 -- 07/05/2021 16:55:25 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003730
 ;
 
 -- 07/05/2021 16:55:25 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET Name='ErrorCOT', Description=NULL, Help=NULL WHERE AD_Column_ID=3003730 AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:55:29 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column_Trl SET Name='ErrorCOT',Updated=TO_DATE('2021-05-07 16:55:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003730 AND AD_Language='es_AR'
 ;
 
 -- 07/05/2021 16:55:38 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET Name='Error COT',Updated=TO_DATE('2021-05-07 16:55:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003730
 ;
 
 -- 07/05/2021 16:55:38 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003730
 ;
 
 -- 07/05/2021 16:55:38 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET Name='Error COT', Description=NULL, Help=NULL WHERE AD_Column_ID=3003730 AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:55:50 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element SET ColumnName='ErrorCOT', Name='Error COT', PrintName='Error COT',Updated=TO_DATE('2021-05-07 16:55:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001111
 ;
 
 -- 07/05/2021 16:55:50 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001111
 ;
 
 -- 07/05/2021 16:55:50 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET ColumnName='ErrorCOT', Name='Error COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001111
 ;
 
 -- 07/05/2021 16:55:50 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Process_Para SET ColumnName='ErrorCOT', Name='Error COT', Description=NULL, Help=NULL, AD_Element_ID=3001111 WHERE UPPER(ColumnName)='ERRORCOT' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
 ;
 
 -- 07/05/2021 16:55:50 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Process_Para SET ColumnName='ErrorCOT', Name='Error COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001111 AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:55:50 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET Name='Error COT', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001111) AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:55:50 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_PrintFormatItem pi SET PrintName='Error COT', Name='Error COT' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001111)
 ;
 
 -- 07/05/2021 16:56:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element_Trl SET Name='Error COT',PrintName='Error COT',Updated=TO_DATE('2021-05-07 16:56:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001111 AND AD_Language='es_AR'
 ;
 
 -- 07/05/2021 16:57:36 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET Name='Número de Comprobante COT', ColumnName='NumeroComprobanteCOT',Updated=TO_DATE('2021-05-07 16:57:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003729
 ;
 
 -- 07/05/2021 16:57:36 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003729
 ;
 
 -- 07/05/2021 16:57:36 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET Name='Número de Comprobante COT', Description=NULL, Help=NULL WHERE AD_Column_ID=3003729 AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:57:40 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column_Trl SET Name='Número de Comprobante COT',Updated=TO_DATE('2021-05-07 16:57:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003729 AND AD_Language='es_AR'
 ;
 
 -- 07/05/2021 16:58:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element SET ColumnName='NumeroComprobanteCOT', Name='Número de Comprobante COT', PrintName='Número de Comprobante COT',Updated=TO_DATE('2021-05-07 16:58:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001110
 ;
 
 -- 07/05/2021 16:58:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001110
 ;
 
 -- 07/05/2021 16:58:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Column SET ColumnName='NumeroComprobanteCOT', Name='Número de Comprobante COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001110
 ;
 
 -- 07/05/2021 16:58:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Process_Para SET ColumnName='NumeroComprobanteCOT', Name='Número de Comprobante COT', Description=NULL, Help=NULL, AD_Element_ID=3001110 WHERE UPPER(ColumnName)='NUMEROCOMPROBANTECOT' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
 ;
 
 -- 07/05/2021 16:58:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Process_Para SET ColumnName='NumeroComprobanteCOT', Name='Número de Comprobante COT', Description=NULL, Help=NULL WHERE AD_Element_ID=3001110 AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:58:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Field SET Name='Número de Comprobante COT', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001110) AND IsCentrallyMaintained='Y'
 ;
 
 -- 07/05/2021 16:58:02 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_PrintFormatItem pi SET PrintName='Número de Comprobante COT', Name='Número de Comprobante COT' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001110)
 ;
 
 -- 07/05/2021 16:58:06 ART
--- ISSUE 60: Mejorar registro de scripts de migración
+-- ISSUE #140: Solicitud de COT, para remitos.
 UPDATE AD_Element_Trl SET Name='Número de Comprobante COT',PrintName='Número de Comprobante COT',Updated=TO_DATE('2021-05-07 16:58:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001110 AND AD_Language='es_AR'
 ;
+
+
 
 -- Registración de script
 SELECT register_migration_script_lar('0169_ISSUE-140.sql', 'LAR', '') FROM dual
