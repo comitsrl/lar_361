@@ -34,8 +34,11 @@ import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MProduct;
 import org.compiere.model.MRegion;
+import org.compiere.model.MShipper;
 import org.compiere.model.MUOM;
+import org.compiere.model.MWarehouse;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.ValueNamePair;
@@ -67,7 +70,7 @@ public class ProcesadorCOT
 
     // @fchiappano parametros a mapear en config.
     private final String esDevolucion = "0";
-    private final String codigoProd = "650300";
+    //private final String codigoProd = "650300";
     private final String planta = "000";
     private final String puerta = "000";
     private final String extencion = ".txt";
@@ -98,7 +101,9 @@ public class ProcesadorCOT
         {
             String errorMsg = COTWebServiceCliente.getMsgError();
             remito.set_ValueOfColumn("ErrorCOT", errorMsg);
-            remito.saveEx(remito.get_TrxName());
+            // Se guarda el error fuera de la transacción
+            // para evitar el rollback que dispara la excepción.
+            remito.saveEx(null);
             log.log(Level.SEVERE, "Error al solicitar COT: " + errorMsg);
             return errorMsg;
         }
@@ -108,6 +113,9 @@ public class ProcesadorCOT
 
         for (ValueNamePair dato : datosCOT)
             remito.set_ValueOfColumn(dato.getName(), dato.getValue());
+
+        // Dejar en blanco el registro de errores
+        remito.set_ValueOfColumn("ErrorCOT", null);
 
         if(!remito.save(remito.get_TrxName()))
             return "Error al actualizar el Remito";
@@ -126,7 +134,7 @@ public class ProcesadorCOT
         String nombreArchivo = "PB"
                              + separadorNombre + cuitOrg
                              + separadorNombre + planta + puerta
-                             + separadorNombre + getFecha(remito.getMovementDate())
+                             + separadorNombre + getFecha(remito.getPickDate())
                              + separadorNombre + codSecuencial + extencion;
 
         File archivo = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + nombreArchivo);
@@ -171,7 +179,11 @@ public class ProcesadorCOT
         // @fchiappano linea cabecera.
         cabecera.append("01" + separador + cuitOrg + finalLinea);
 
+        // FIXME Disparar Excepción si no se pueden recuperar alguno de estos datos.
         MBPartner cliente = remito.getBPartner();
+        MShipper transporte = new MShipper(ctx, remito.get_ValueAsInt("M_Shipper_ID"), remito.get_TrxName());
+        MBPartner bpTransporte = new MBPartner(ctx, transporte.getC_BPartner_ID(), remito.get_TrxName());
+        MWarehouse deposito = new MWarehouse(ctx, remito.getM_Warehouse_ID(), remito.get_TrxName());
 
         // @fchiappano linea descripción del remito.
         String fechaEmision = getFecha(remito.getMovementDate());
@@ -213,7 +225,7 @@ public class ProcesadorCOT
         // @fchiappano Razon social del cliente.
         cabecera.append(separador + cliente.getName());
 
-        // @fchiappano Destinatario Tenedor (depende de la razon social del cliente?)
+        // @fchiappano Destinatario Tenedor (depende de la condición de IVA del cliente)
         cabecera.append(separador + (esConsumidorFinal ? "0" : "1"));
 
         // @fchiappano Datos de la direccion del cliente.
@@ -251,9 +263,10 @@ public class ProcesadorCOT
         // @fachiappano Emisor Tenedor.
         cabecera.append(separador + "1");
 
-        // @fchiappano Datos de dirección origen.
+        // @mzuniga Datos de dirección origen.
+        // Se recupera la diracción del depósito
         // Calle
-        MLocation direcOrigen = (MLocation) orgInfo.getC_Location();
+        MLocation direcOrigen = (MLocation) deposito.getC_Location();
         cabecera.append(separador + direcOrigen.getAddress1());
         // Numero
         cabecera.append(separador + nroDirec);
@@ -273,7 +286,7 @@ public class ProcesadorCOT
         cabecera.append(separador + ((MRegion) direcOrigen.getC_Region()).get_ValueAsString("CodigoCOT"));
 
         // @fchiappano Cuit del transportista.
-        cabecera.append(separador + cuitOrg); // FIXME Recuperar CUIT desde la tabla del transportista.
+        cabecera.append(separador + bpTransporte.getTaxID().replaceAll("-", ""));
 
         // @fchiappano Tipo Recorrido (‘U’, ‘R’, ‘M’ o ‘ ’).
         cabecera.append(separador + " ");
@@ -288,10 +301,12 @@ public class ProcesadorCOT
         cabecera.append(separador + " ");
 
         // @fchiappano Patente del vehiculo.
-        cabecera.append(separador + remito.get_Value("Patente"));
+        String patente = (String) remito.get_Value("Patente");
+        cabecera.append(separador + patente.replaceAll("\\s", ""));
 
         // @fchiappano Patente del Acoplado del vehiculo.
-        cabecera.append(separador + remito.get_Value("Patente_Acoplado"));
+        String patenteAcop = (String) remito.get_Value("Patente");
+        cabecera.append(separador + patenteAcop.replaceAll("\\s", ""));
 
         // @fchiappano Es devolucion
         cabecera.append(separador + esDevolucion);
@@ -313,36 +328,44 @@ public class ProcesadorCOT
     private void agregarLineas(final StringBuffer cuerpoTxt)
     {
         MInOutLine[] lineas = remito.getLines();
+        MUOM unidadMedida;
+        MProduct producto;
 
         for (int x = 0; x < lineas.length; x ++)
         {
             MInOutLine linea = lineas[x];
-            MUOM unidadMedida = (MUOM) linea.getC_UOM();
+            if (linea.getM_Product_ID() > 0)
+            {
+                unidadMedida = (MUOM) linea.getC_UOM();
+                producto = new MProduct(ctx, linea.getM_Product_ID(), remito.get_TrxName());
 
-            // @fchiappano agregar codigo de linea.
-            cuerpoTxt.append("03");
+                // @fchiappano agregar codigo de linea.
+                cuerpoTxt.append("03");
 
-            // @fchiappano Codigo de producto.
-            cuerpoTxt.append(separador + codigoProd);
+                // @mzuniga CODIGO_UNICO_PRODUCTO
+                // Nomenclador-COT (longitud: 6 dígitos)
+                cuerpoTxt.append(separador + (String) producto.get_Value("NomecladorCOT"));
 
-            // @fchiappano Codigo de UM
-            cuerpoTxt.append(separador + unidadMedida.get_ValueAsString("CodigoCOT"));
+                // @fchiappano Codigo de UM
+                cuerpoTxt.append(separador + unidadMedida.get_ValueAsString("CodigoCOT"));
 
-            // @fchiappano Cantidad
-            cuerpoTxt.append(separador + formatearBigDecimal(linea.getQtyEntered()));
+                // @fchiappano Cantidad
+                cuerpoTxt.append(separador + formatearBigDecimal(linea.getQtyEntered()));
 
-            // @fchiappano Datos del producto.
-            cuerpoTxt.append(separador + linea.getM_Product().getValue());// Codigo.
-            cuerpoTxt.append(separador + linea.getM_Product().getName());// Nombre/Descripcion
+                // @fchiappano Datos del producto.
+                cuerpoTxt.append(separador + linea.getM_Product().getValue());// Codigo.
+                cuerpoTxt.append(separador + linea.getM_Product().getName());// Nombre/Descripcion
 
-            // @fchiappano Descripcion UM
-            cuerpoTxt.append(separador + unidadMedida.get_Translation("Name"));
+                // @fchiappano Descripcion UM
+                cuerpoTxt.append(separador + unidadMedida.get_Translation("Name"));
 
-            // @fchiappano Cantidad Ajustada FIXME (Determinar diferencia con el parametro cantidad).
-            cuerpoTxt.append(separador + formatearBigDecimal(linea.getQtyEntered()));
+                // @fchiappano Cantidad Ajustada FIXME (Determinar diferencia con el parametro
+                // cantidad).
+                cuerpoTxt.append(separador + formatearBigDecimal(linea.getQtyEntered()));
 
-            // @fchiappano Final de Linea.
-            cuerpoTxt.append(finalLinea);
+                // @fchiappano Final de Linea.
+                cuerpoTxt.append(finalLinea);
+            }
         }
     } // agregarLineas
 
