@@ -610,6 +610,41 @@ UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_TIMESTAMP('2021-05-10 12:50:
 UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2021-05-10 12:52:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007039
 ;
 
+-- 12/05/2021 18:16:09 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,CreatedBy,Created,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000261,3000002,'LAR','091','Remito R',TO_TIMESTAMP('2021-05-12 18:16:08','YYYY-MM-DD HH24:MI:SS'),100,TO_TIMESTAMP('2021-05-12 18:16:08','YYYY-MM-DD HH24:MI:SS'),100,0,'Y',0)
+;
+
+-- 12/05/2021 18:16:09 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000261 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 12/05/2021 18:34:42 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Reference (AD_Reference_ID,ValidationType,EntityType,IsOrderByValue,Name,AD_Client_ID,AD_Org_ID,CreatedBy,Updated,IsActive,Created,UpdatedBy) VALUES (3000121,'T','LAR','N','LAR_POS_NOREMITOS_ID',0,0,100,TO_TIMESTAMP('2021-05-12 18:34:42','YYYY-MM-DD HH24:MI:SS'),'Y',TO_TIMESTAMP('2021-05-12 18:34:42','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 12/05/2021 18:34:42 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Reference_Trl (AD_Language,AD_Reference_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Reference_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Reference t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Reference_ID=3000121 AND NOT EXISTS (SELECT * FROM AD_Reference_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Reference_ID=t.AD_Reference_ID)
+;
+
+-- 12/05/2021 18:35:30 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Ref_Table (IsValueDisplayed,WhereClause,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,CreatedBy,Updated,Created,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N','C_POS.IsActive=''Y'' AND C_POS.IsShipment=''N''',748,3000121,12745,12749,'LAR',100,TO_TIMESTAMP('2021-05-12 18:35:30','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2021-05-12 18:35:30','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
+;
+
+-- 12/05/2021 18:35:53 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Ref_Table SET OrderByClause='C_POS.PosNumber',Updated=TO_TIMESTAMP('2021-05-12 18:35:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Reference_ID=3000121
+;
+
+-- 12/05/2021 18:37:10 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET AD_Reference_Value_ID=3000121,Updated=TO_TIMESTAMP('2021-05-12 18:37:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000068
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0172_ISSUE-140.sql', 'LAR', '')
 ;

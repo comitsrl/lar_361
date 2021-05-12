@@ -34,6 +34,7 @@ import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MPOS;
 import org.compiere.model.MProduct;
 import org.compiere.model.MRegion;
 import org.compiere.model.MShipper;
@@ -67,6 +68,7 @@ public class ProcesadorCOT
 
     // @fchiappano parametros fijos.
     private final String sujetoGenerador = "E";
+    private String msgError = "";
 
     // @fchiappano parametros a mapear en config.
     private final String esDevolucion = "0";
@@ -96,16 +98,20 @@ public class ProcesadorCOT
         // @fchiappano Generar el archivo txt que se enviara al WS.
         File informe = generarTXT();
 
+        // @fchiappano si el informe es nulo, es porque se disparo una excepción.
+        if (informe == null)
+            return msgError;
+
         // @fchiappano Realizar la solicitud de COT.
         if (!COTWebServiceCliente.solicitarCOT(informe))
         {
-            String errorMsg = COTWebServiceCliente.getMsgError();
-            remito.set_ValueOfColumn("ErrorCOT", errorMsg);
+            msgError = COTWebServiceCliente.getMsgError();
+            remito.set_ValueOfColumn("ErrorCOT", msgError);
             // Se guarda el error fuera de la transacción
             // para evitar el rollback que dispara la excepción.
             remito.saveEx(null);
-            log.log(Level.SEVERE, "Error al solicitar COT: " + errorMsg);
-            return errorMsg;
+            log.log(Level.SEVERE, "Error al solicitar COT: " + msgError);
+            return msgError;
         }
 
         // @fchiappano Recuperar datos de autorización y setearlos en el remito.
@@ -113,6 +119,11 @@ public class ProcesadorCOT
 
         for (ValueNamePair dato : datosCOT)
             remito.set_ValueOfColumn(dato.getName(), dato.getValue());
+
+        // @fchiappano Si no se ingreso una fecha de autorización en el remito,
+        // setearle por defecto la fecha actual, que es la que se le paso al WS.
+        if (remito.getPickDate() == null)
+            remito.setPickDate(new Timestamp(System.currentTimeMillis()));
 
         // Dejar en blanco el registro de errores
         remito.set_ValueOfColumn("ErrorCOT", null);
@@ -131,10 +142,10 @@ public class ProcesadorCOT
     private File generarTXT()
     {
         // @fchiappano Crear el archivo
-        String nombreArchivo = "PB"
+        String nombreArchivo = "TB"
                              + separadorNombre + cuitOrg
                              + separadorNombre + planta + puerta
-                             + separadorNombre + getFecha(remito.getPickDate())
+                             + separadorNombre + getFecha(remito.getMovementDate())
                              + separadorNombre + codSecuencial + extencion;
 
         File archivo = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + nombreArchivo);
@@ -144,6 +155,10 @@ public class ProcesadorCOT
             // @fchiappano Crear el StringBuffer y cargar los datos de la
             // cabecera del remito.
             StringBuffer cuerpoTxt = cargarDatosCabecera();
+
+            // @fchiappano Si el cuerpo del archivo es nulo, es porque se disparo algun error.
+            if (cuerpoTxt == null)
+                return null;
 
             // @fchiappano agregar al StringBuffer, los datos de las lineas del
             // remito.
@@ -159,7 +174,10 @@ public class ProcesadorCOT
         }
         catch (Exception ex)
         {
-            log.log(Level.SEVERE, "Error al escribir archivo " + extencion);
+            msgError = "Error al escribir archivo " + extencion;
+            log.log(Level.SEVERE, msgError + ": " + ex.getMessage());
+            ex.printStackTrace();
+            return null;
         }
 
         return archivo;
@@ -179,21 +197,41 @@ public class ProcesadorCOT
         // @fchiappano linea cabecera.
         cabecera.append("01" + separador + cuitOrg + finalLinea);
 
-        // FIXME Disparar Excepción si no se pueden recuperar alguno de estos datos.
         MBPartner cliente = remito.getBPartner();
-        MShipper transporte = new MShipper(ctx, remito.get_ValueAsInt("M_Shipper_ID"), remito.get_TrxName());
-        MBPartner bpTransporte = new MBPartner(ctx, transporte.getC_BPartner_ID(), remito.get_TrxName());
         MWarehouse deposito = new MWarehouse(ctx, remito.getM_Warehouse_ID(), remito.get_TrxName());
+
+        // @fchiappano validar que se haya seleccionado un transporte.
+        int transporte_ID = remito.get_ValueAsInt("M_Shipper_ID");
+        if(transporte_ID <= 0)
+        {
+            msgError = "Por favor, ingrese un transportista valido.";
+            return null;
+        }
+        MShipper transporte = new MShipper(ctx, transporte_ID, remito.get_TrxName());
+
+        // @fchiappano Validar que el transporte tenga vinculado un Socio del Negocio.
+        int bpTransporte_ID = transporte.getC_BPartner_ID();
+        if (bpTransporte_ID <= 0)
+        {
+            msgError = "El transportista seleccionado, no posee un Socio del Negocio valido asignado.";
+            return null;
+        }
+        MBPartner bpTransporte = new MBPartner(ctx, bpTransporte_ID, remito.get_TrxName());
 
         // @fchiappano linea descripción del remito.
         String fechaEmision = getFecha(remito.getMovementDate());
         cabecera.append("02" + separador + fechaEmision);
 
-        // @fchiappano Codigo tipo de comprobante (DocSubTypeCAE).
-        cabecera.append(separador + generarCodigoUnicoRemito());
+        // @fchiappano Codigo unico del documento (DocSubTypeCAE + pdv + documentno).
+        String codigoUnico = generarCodigoUnicoRemito();
+
+        if(codigoUnico == null)
+            return null;
+
+        cabecera.append(separador + codigoUnico);
 
         // @fchiappano Fecha de salida.
-        cabecera.append(separador + getFecha(new Timestamp(System.currentTimeMillis())));
+        cabecera.append(separador + getFecha(remito.getPickDate()));
 
         // @fchiappano Hora de salida
         cabecera.append(separador + " ");
@@ -217,10 +255,16 @@ public class ProcesadorCOT
             cabecera.append(separador + " ");
 
         // @fchiappano nro de documento del cliente (CF).
-        cabecera.append(separador + (esConsumidorFinal ? cliente.getTaxID().replaceAll("-", "") : " "));
+        String cuit_cliente = cliente.getTaxID();
+        if (cuit_cliente == null)
+        {
+            msgError = "El cliente no posee un número de identificación valido";
+            return null;
+        }
+        cabecera.append(separador + (esConsumidorFinal ? cuit_cliente.replaceAll("-", "") : " "));
 
         // @fchiappano numero de cuit del cliente (si no es CF)
-        cabecera.append(separador + (!esConsumidorFinal ? cliente.getTaxID().replaceAll("-", "") : " "));
+        cabecera.append(separador + (!esConsumidorFinal ? cuit_cliente.replaceAll("-", "") : " "));
 
         // @fchiappano Razon social del cliente.
         cabecera.append(separador + cliente.getName());
@@ -286,7 +330,13 @@ public class ProcesadorCOT
         cabecera.append(separador + ((MRegion) direcOrigen.getC_Region()).get_ValueAsString("CodigoCOT"));
 
         // @fchiappano Cuit del transportista.
-        cabecera.append(separador + bpTransporte.getTaxID().replaceAll("-", ""));
+        String cuit_transporte = bpTransporte.getTaxID();
+        if (cuit_transporte == null)
+        {
+            msgError = "El trasnportista seleccionado, no posee un número de identificación valido";
+            return null;
+        }
+        cabecera.append(separador + cuit_transporte.replaceAll("-", ""));
 
         // @fchiappano Tipo Recorrido (‘U’, ‘R’, ‘M’ o ‘ ’).
         cabecera.append(separador + " ");
@@ -302,10 +352,14 @@ public class ProcesadorCOT
 
         // @fchiappano Patente del vehiculo.
         String patente = (String) remito.get_Value("Patente");
+        if (patente == null)
+            patente = "";
         cabecera.append(separador + patente.replaceAll("\\s", ""));
 
         // @fchiappano Patente del Acoplado del vehiculo.
         String patenteAcop = (String) remito.get_Value("Patente");
+        if (patenteAcop == null)
+            patenteAcop = "";
         cabecera.append(separador + patenteAcop.replaceAll("\\s", ""));
 
         // @fchiappano Es devolucion
@@ -421,14 +475,31 @@ public class ProcesadorCOT
         // @fchiappano Recuperar el codigo del tipo de documento.
         String tipoCbte = ((MDocType) remito.getC_DocType()).get_ValueAsString("DocSubTypeCAE");
 
+        if (tipoCbte == null || tipoCbte.equals(""))
+        {
+            msgError = "El tipo de documento, no posee un Sub Tipo valido para ARBA.";
+            return null;
+        }
+
         // @fchiappano estandarizar numero punto de venta.
-        // FIXME Determinar desde donde recuperar el nro de punto de venta.
+        int c_POS_ID = ((MDocType) remito.getC_DocType()).get_ValueAsInt("C_POS_ID");
+
+        if (c_POS_ID <= 0)
+        {
+            msgError = "El tipo de documento, no posee configurado un Punto de Venta valido.";
+            return null;
+        }
+
+        int pdv = new MPOS(ctx, c_POS_ID, remito.get_TrxName()).get_ValueAsInt("PosNumber");
+        String pdv_str = "00000" + String.valueOf(pdv);
+        pdv_str = pdv_str.substring(pdv_str.length() - 5, pdv_str.length());
 
         // @fchiappano recuperar numero de documento del remito.
-        String nroDoc = remito.getDocumentNo().replace("-", "").replace("R", "0");
-//        nroDoc = nroDoc.substring(nroDoc.length() -8, nroDoc.length());
+        String nroDoc = remito.getDocumentNo();
+        nroDoc = nroDoc.substring(nroDoc.length() -8, nroDoc.length());
 
-        codigoUnico = tipoCbte + nroDoc;
+        // @fchiappano Armar el codigo unico.
+        codigoUnico = tipoCbte + pdv_str + nroDoc;
 
         return codigoUnico;
     } // generarCodigoUnicoRemito
