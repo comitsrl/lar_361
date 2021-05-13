@@ -85,7 +85,7 @@ public class ProcesadorCOT
         this.orgInfo = MOrgInfo.get(ctx, Env.getAD_Org_ID(ctx), remito.get_TrxName());
         this.cuitOrg = orgInfo.get_ValueAsString("TaxID").replaceAll("-", "");
         int length = remito.getDocumentNo().length();
-        this.codSecuencial = remito.getDocumentNo().substring(length - 6, length);
+        this.codSecuencial = remito.getDocumentNo().substring(length - 5, length) + String.valueOf(remito.get_ValueAsInt("NroConexionCOT"));
     } // ProcesadorCOT
 
     /**
@@ -101,6 +101,11 @@ public class ProcesadorCOT
         // @fchiappano si el informe es nulo, es porque se disparo una excepción.
         if (informe == null)
             return msgError;
+
+        // @fchiappano En esta instancia, todo error devuelto sera del WS o bien
+        // de conexion con el mismo. Sea cual fuere el caso, incrementar el
+        // contador de conexiones.
+        remito.set_ValueOfColumn("NroConexionCOT", remito.get_ValueAsInt("NroConexionCOT") + 1);
 
         // @fchiappano Realizar la solicitud de COT.
         if (!COTWebServiceCliente.solicitarCOT(informe))

@@ -194,6 +194,9 @@ public class COTWebServiceCliente
         datosCOT.add(new ValueNamePair(doc.getElementsByTagName("codigoIntegridad").item(0).getTextContent(), "CodigoIntegridadCOT"));
         datosCOT.add(new ValueNamePair(doc.getElementsByTagName("numeroComprobante").item(0).getTextContent(), "NumeroComprobanteCOT"));
         datosCOT.add(new ValueNamePair(doc.getElementsByTagName("cot").item(0).getTextContent(), "COT"));
+
+        String procesado = doc.getElementsByTagName("procesado").item(0).getTextContent();
+        datosCOT.add(new ValueNamePair(procesado.equals("SI") ? "Y" : "N", "COTAutorizado"));
     } // getDatosCOT
 
     private static String documentToString(final Document doc) throws TransformerException
