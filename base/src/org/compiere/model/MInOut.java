@@ -1027,6 +1027,29 @@ public class MInOut extends X_M_InOut implements DocAction
             setC_DocType_ID(docType.getC_DocTypeShipment_ID());
         }
 
+        // @fchiappano Si el remito ya tiene un COT autorizado, no permitir modificar ninguno de los siguientes campos.
+        if (get_ValueAsBoolean("COTAutorizado"))
+        {
+            if (is_ValueChanged("M_Shipper_ID"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar el Transportista.");
+                return false;
+            }
+            else if (is_ValueChanged("PickDate"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar la Fecha de Autorización COT.");
+                return false;
+            }
+            else if (is_ValueChanged("COT") && !get_ValueAsBoolean("EsCOTManual"))
+            {
+                log.saveError("Error al Guardar",
+                        "Para poder modificar el campo COT, es necesario marcar el documento como Autorización COT Manual.");
+                return false;
+            }
+        }
+
 		return true;
 	}	//	beforeSave
 
