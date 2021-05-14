@@ -77,7 +77,8 @@ public class ProcesadorCOT
     private final String puerta = "000";
     private final String extencion = ".txt";
     private final String codSecuencial;
-    private final String nroDirec = "1000";
+    private final String nroDirec = "0";
+    private final String direc_completa = "S/N";
 
     public ProcesadorCOT(final MInOut remito)
     {
@@ -283,7 +284,7 @@ public class ProcesadorCOT
         // Numero
         cabecera.append(separador + nroDirec);
         // Destino_Domicilio_Comple
-        cabecera.append(separador + " ");
+        cabecera.append(separador + direc_completa);
         // Piso
         cabecera.append(separador + " ");
         // Departamento
@@ -320,7 +321,7 @@ public class ProcesadorCOT
         // Numero
         cabecera.append(separador + nroDirec);
         // ORIGEN_DOMICILIO_COMPLE
-        cabecera.append(separador + " ");
+        cabecera.append(separador + direc_completa);
         // Piso
         cabecera.append(separador + " ");
         // Departamento

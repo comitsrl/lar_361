@@ -1028,7 +1028,7 @@ public class MInOut extends X_M_InOut implements DocAction
         }
 
         // @fchiappano Si el remito ya tiene un COT autorizado, no permitir modificar ninguno de los siguientes campos.
-        if (get_ValueAsBoolean("COTAutorizado"))
+        if (!is_ValueChanged("COTAutorizado") && get_ValueAsBoolean("COTAutorizado"))
         {
             if (is_ValueChanged("M_Shipper_ID"))
             {
