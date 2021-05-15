@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
@@ -278,8 +279,14 @@ public class ProcesadorCOT
         // @fchiappano Destinatario Tenedor (depende de la condición de IVA del cliente)
         cabecera.append(separador + (esConsumidorFinal ? "0" : "1"));
 
-        // @fchiappano Datos de la direccion del cliente.
-        MLocation direccion = (MLocation) remito.getC_BPartner_Location().getC_Location();
+        // @fchiappano Datos de la direccion destino.
+        MLocation direccion;
+
+        if (remito.get_ValueAsBoolean("EntregaTransporte"))
+            direccion = (MLocation) new MBPartnerLocation(ctx, remito.get_ValueAsInt("Shipper_Location_ID"), remito.get_TrxName()).getC_Location();
+        else
+            direccion = (MLocation) remito.getC_BPartner_Location().getC_Location();
+
         cabecera.append(separador + direccion.getAddress1());
         // Numero
         cabecera.append(separador + nroDirec);

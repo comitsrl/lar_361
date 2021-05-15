@@ -6,6 +6,13 @@ ALTER TABLE M_Product
 
 ALTER TABLE M_InOut ADD COLUMN COTAutorizado character(1) NOT NULL DEFAULT 'N'::bpchar;
 ALTER TABLE M_InOut ADD COLUMN NroConexionCOT numeric(2,0) DEFAULT 0;
+ALTER TABLE M_InOut ADD COLUMN EntregaTransporte character(1) NOT NULL DEFAULT 'N'::bpchar;
+ALTER TABLE M_InOut ADD COLUMN M_Shipper_Intermediario_ID numeric(10,0);
+ALTER TABLE M_InOut ADD CONSTRAINT mshipperInter_minout FOREIGN KEY (M_Shipper_Intermediario_ID)
+      REFERENCES adempiere.M_Shipper (M_Shipper_ID) MATCH SIMPLE;
+ALTER TABLE M_InOut ADD COLUMN Shipper_Location_ID numeric(10,0);
+ALTER TABLE M_InOut ADD CONSTRAINT shipperlocation_minout FOREIGN KEY (Shipper_Location_ID)
+      REFERENCES adempiere.C_BPartner_Location (C_BPartner_Location_ID) MATCH SIMPLE;
 
 -- Posición Arancelaria y Nomeclador COT
 -- 10/05/2021 9:02:21 ART
@@ -1206,6 +1213,471 @@ DELETE  FROM  AD_Column_Trl WHERE AD_Column_ID=3003918
 -- 13/05/2021 20:07:06 ART
 -- -- ISSUE #140: Solicitud de COT, para remitos.
 DELETE FROM AD_Column WHERE AD_Column_ID=3003918
+;
+
+-- 14/05/2021 21:06:12 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003920,319,'LAR',0,'N','N','N','N',60,'N',10,'N',3001134,'N','Y','N','COT Manual','COTManual',TO_DATE('2021-05-14 21:06:11','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-14 21:06:11','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 14/05/2021 21:06:12 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003920 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 14/05/2021 21:06:12 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001136,'entregatransporte','LAR','entregatransporte','entregatransporte',0,TO_DATE('2021-05-14 21:06:12','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-14 21:06:12','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 14/05/2021 21:06:12 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001136 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003921,319,'LAR',0,'Y','N','N','N',1,'N',20,'N',3001136,'N','Y','N','entregatransporte','entregatransporte',TO_DATE('2021-05-14 21:06:12','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-14 21:06:12','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003921 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001137,'m_shipper_intermediario_id','LAR','m_shipper_intermediario_id','m_shipper_intermediario_id',0,TO_DATE('2021-05-14 21:06:13','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-14 21:06:13','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001137 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003922,319,'LAR',0,'N','N','N','N',10,'N',19,'N',3001137,'N','Y','N','m_shipper_intermediario_id','m_shipper_intermediario_id',TO_DATE('2021-05-14 21:06:13','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-14 21:06:13','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003922 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001138,'shipper_location_id','LAR','shipper_location_id','shipper_location_id',0,TO_DATE('2021-05-14 21:06:13','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-14 21:06:13','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001138 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003923,319,'LAR',0,'N','N','N','N',10,'N',19,'N',3001138,'N','Y','N','shipper_location_id','shipper_location_id',TO_DATE('2021-05-14 21:06:13','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2021-05-14 21:06:13','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 14/05/2021 21:06:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003923 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 14/05/2021 21:06:34 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+DELETE  FROM  AD_Column_Trl WHERE AD_Column_ID=3003920
+;
+
+-- 14/05/2021 21:06:34 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+DELETE FROM AD_Column WHERE AD_Column_ID=3003920
+;
+
+-- 14/05/2021 21:07:31 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET Name='Entrega en Transporte', ColumnName='EntregaTransporte',Updated=TO_DATE('2021-05-14 21:07:31','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003921
+;
+
+-- 14/05/2021 21:07:31 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003921
+;
+
+-- 14/05/2021 21:07:31 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET Name='Entrega en Transporte', Description=NULL, Help=NULL WHERE AD_Column_ID=3003921 AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:07:41 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column_Trl SET Name='Entrega en Transporte',Updated=TO_DATE('2021-05-14 21:07:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003921 AND AD_Language='es_AR'
+;
+
+-- 14/05/2021 21:07:56 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element SET ColumnName='EntregaTransporte', Name='Entrega en Transporte', PrintName='Entrega en Transporte',Updated=TO_DATE('2021-05-14 21:07:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001136
+;
+
+-- 14/05/2021 21:07:56 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001136
+;
+
+-- 14/05/2021 21:07:56 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET ColumnName='EntregaTransporte', Name='Entrega en Transporte', Description=NULL, Help=NULL WHERE AD_Element_ID=3001136
+;
+
+-- 14/05/2021 21:07:56 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Process_Para SET ColumnName='EntregaTransporte', Name='Entrega en Transporte', Description=NULL, Help=NULL, AD_Element_ID=3001136 WHERE UPPER(ColumnName)='ENTREGATRANSPORTE' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 14/05/2021 21:07:56 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Process_Para SET ColumnName='EntregaTransporte', Name='Entrega en Transporte', Description=NULL, Help=NULL WHERE AD_Element_ID=3001136 AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:07:56 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET Name='Entrega en Transporte', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001136) AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:07:56 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_PrintFormatItem pi SET PrintName='Entrega en Transporte', Name='Entrega en Transporte' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001136)
+;
+
+-- 14/05/2021 21:08:01 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element_Trl SET Name='Entrega en Transporte',PrintName='Entrega en Transporte',Updated=TO_DATE('2021-05-14 21:08:01','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001136 AND AD_Language='es_AR'
+;
+
+-- 14/05/2021 21:09:47 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Reference (AD_Reference_ID,ValidationType,EntityType,IsOrderByValue,Name,AD_Client_ID,AD_Org_ID,CreatedBy,Updated,IsActive,Created,UpdatedBy) VALUES (3000122,'T','LAR','N','LAR_Transportes',0,0,100,TO_DATE('2021-05-14 21:09:47','YYYY-MM-DD HH24:MI:SS'),'Y',TO_DATE('2021-05-14 21:09:47','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 14/05/2021 21:09:47 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Reference_Trl (AD_Language,AD_Reference_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Reference_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Reference t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Reference_ID=3000122 AND NOT EXISTS (SELECT * FROM AD_Reference_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Reference_ID=t.AD_Reference_ID)
+;
+
+-- 14/05/2021 21:10:29 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Ref_Table (IsValueDisplayed,OrderByClause,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,CreatedBy,Updated,Created,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N','Name',253,3000122,2077,2085,'LAR',100,TO_DATE('2021-05-14 21:10:29','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2021-05-14 21:10:29','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
+;
+
+-- 14/05/2021 21:11:02 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET AD_Reference_Value_ID=3000122, AD_Reference_ID=18, Name='Transporte Intermediario', ColumnName='M_Shipper_Intermediario_ID',Updated=TO_DATE('2021-05-14 21:11:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003922
+;
+
+-- 14/05/2021 21:11:02 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003922
+;
+
+-- 14/05/2021 21:11:02 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET Name='Transporte Intermediario', Description=NULL, Help=NULL WHERE AD_Column_ID=3003922 AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:12:15 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column_Trl SET Name='Transporte Intermediario',Updated=TO_DATE('2021-05-14 21:12:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003922 AND AD_Language='es_AR'
+;
+
+-- 14/05/2021 21:12:30 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element SET ColumnName='M_Shipper_Intermediario_ID', Name='Transporte Intermediario', PrintName='Transporte Intermediario',Updated=TO_DATE('2021-05-14 21:12:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001137
+;
+
+-- 14/05/2021 21:12:30 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001137
+;
+
+-- 14/05/2021 21:12:30 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET ColumnName='M_Shipper_Intermediario_ID', Name='Transporte Intermediario', Description=NULL, Help=NULL WHERE AD_Element_ID=3001137
+;
+
+-- 14/05/2021 21:12:30 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Process_Para SET ColumnName='M_Shipper_Intermediario_ID', Name='Transporte Intermediario', Description=NULL, Help=NULL, AD_Element_ID=3001137 WHERE UPPER(ColumnName)='M_SHIPPER_INTERMEDIARIO_ID' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 14/05/2021 21:12:30 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Process_Para SET ColumnName='M_Shipper_Intermediario_ID', Name='Transporte Intermediario', Description=NULL, Help=NULL WHERE AD_Element_ID=3001137 AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:12:30 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET Name='Transporte Intermediario', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001137) AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:12:30 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_PrintFormatItem pi SET PrintName='Transporte Intermediario', Name='Transporte Intermediario' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001137)
+;
+
+-- 14/05/2021 21:12:42 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element_Trl SET Name='Transporte Intermediario',PrintName='Transporte Intermediario',Updated=TO_DATE('2021-05-14 21:12:42','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001137 AND AD_Language='es_AR'
+;
+
+-- 14/05/2021 21:14:53 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET AD_Reference_Value_ID=159, AD_Reference_ID=18, Name='Dirección del Transporte', ColumnName='Shipper_Location_ID',Updated=TO_DATE('2021-05-14 21:14:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003923
+;
+
+-- 14/05/2021 21:14:53 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column_Trl SET IsTranslated='N' WHERE AD_Column_ID=3003923
+;
+
+-- 14/05/2021 21:14:53 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET Name='Dirección del Transporte', Description=NULL, Help=NULL WHERE AD_Column_ID=3003923 AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:15:02 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column_Trl SET Name='Dirección del Transporte',Updated=TO_DATE('2021-05-14 21:15:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003923 AND AD_Language='es_AR'
+;
+
+-- 14/05/2021 21:15:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element SET ColumnName='Shipper_Location_ID', Name='Dirección del Transporte', PrintName='Dirección del Transporte',Updated=TO_DATE('2021-05-14 21:15:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001138
+;
+
+-- 14/05/2021 21:15:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001138
+;
+
+-- 14/05/2021 21:15:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET ColumnName='Shipper_Location_ID', Name='Dirección del Transporte', Description=NULL, Help=NULL WHERE AD_Element_ID=3001138
+;
+
+-- 14/05/2021 21:15:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Process_Para SET ColumnName='Shipper_Location_ID', Name='Dirección del Transporte', Description=NULL, Help=NULL, AD_Element_ID=3001138 WHERE UPPER(ColumnName)='SHIPPER_LOCATION_ID' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 14/05/2021 21:15:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Process_Para SET ColumnName='Shipper_Location_ID', Name='Dirección del Transporte', Description=NULL, Help=NULL WHERE AD_Element_ID=3001138 AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:15:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET Name='Dirección del Transporte', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001138) AND IsCentrallyMaintained='Y'
+;
+
+-- 14/05/2021 21:15:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_PrintFormatItem pi SET PrintName='Dirección del Transporte', Name='Dirección del Transporte' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001138)
+;
+
+-- 14/05/2021 21:15:33 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Element_Trl SET Name='Dirección del Transporte',PrintName='Dirección del Transporte',Updated=TO_DATE('2021-05-14 21:15:33','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001138 AND AD_Language='es_AR'
+;
+
+-- 14/05/2021 21:16:20 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007049,10,'Y','N','N',3003923,'N','Y',257,'N','LAR','Dirección del Transporte',100,0,TO_DATE('2021-05-14 21:16:20','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-05-14 21:16:20','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 14/05/2021 21:16:20 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007049 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 14/05/2021 21:16:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007050,1,'Y','N','N',3003921,'N','Y',257,'N','LAR','Entrega en Transporte',100,0,TO_DATE('2021-05-14 21:16:20','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-05-14 21:16:20','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 14/05/2021 21:16:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007050 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 14/05/2021 21:16:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007051,10,'Y','N','N',3003922,'N','Y',257,'N','LAR','Transporte Intermediario',100,0,TO_DATE('2021-05-14 21:16:21','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-05-14 21:16:21','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 14/05/2021 21:16:21 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007051 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3007050
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3007051
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3007049
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3007039
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=4243
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=2930
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=2933
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=7831
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=7829
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=7830
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=7832
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=7828
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=7827
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=2707
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3280
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3281
+;
+
+-- 14/05/2021 21:18:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=5143
+;
+
+-- 14/05/2021 21:19:06 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_DATE('2021-05-14 21:19:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007049
+;
+
+-- 14/05/2021 21:20:17 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET DisplayLogic='@DeliveryViaRule@=S',Updated=TO_DATE('2021-05-14 21:20:17','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007050
+;
+
+-- 14/05/2021 21:20:41 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET DisplayLogic='@EntregaTransporte@=Y',Updated=TO_DATE('2021-05-14 21:20:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007051
+;
+
+-- 14/05/2021 21:20:52 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET DisplayLogic='@EntregaTransporte@=Y',Updated=TO_DATE('2021-05-14 21:20:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007049
+;
+
+-- 14/05/2021 21:21:02 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_DATE('2021-05-14 21:21:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003923
+;
+
+-- 14/05/2021 21:22:10 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_DATE('2021-05-14 21:22:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003922
+;
+
+-- 14/05/2021 21:22:22 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_DATE('2021-05-14 21:22:22','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003921
+;
+
+-- 14/05/2021 21:38:46 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('C_BPartner_Location.C_BPartner_ID = (SELECT s.C_BPartner_ID FROM M_Shipper s WHERE s.M_Shipper_ID = @M_Shipper_Intermediario_ID@) AND C_BPartner_Location.IsShipTo=''Y'' AND C_BPartner_Location.IsActive=''Y''','S',3000089,'LAR','LAR_Shipper_Location',100,100,TO_DATE('2021-05-14 21:38:45','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_DATE('2021-05-14 21:38:45','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 14/05/2021 21:39:07 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000089,Updated=TO_DATE('2021-05-14 21:39:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003923
+;
+
+-- 14/05/2021 21:57:44 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-05-14 21:57:44','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007051
+;
+
+-- 14/05/2021 21:58:19 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET MandatoryLogic='@EntregaTransporte@=Y',Updated=TO_DATE('2021-05-14 21:58:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003922
+;
+
+-- 14/05/2021 21:58:49 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET MandatoryLogic='@EntregaTransporte@=Y',Updated=TO_DATE('2021-05-14 21:58:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003923
+;
+
+-- 14/05/2021 21:58:55 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-05-14 21:58:55','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007049
+;
+
+-- 14/05/2021 21:59:05 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_DATE('2021-05-14 21:59:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007050
+;
+
+-- 14/05/2021 22:00:55 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Field SET IsMandatory='Y',Updated=TO_DATE('2021-05-14 22:00:55','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=2943
 ;
 
 -- Registración de script

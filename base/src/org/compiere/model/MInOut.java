@@ -1048,6 +1048,24 @@ public class MInOut extends X_M_InOut implements DocAction
                         "Para poder modificar el campo COT, es necesario marcar el documento como Autorización COT Manual.");
                 return false;
             }
+            else if (is_ValueChanged("EntregaTransporte"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar la marca Entrega en Transporte");
+                return false;
+            }
+            else if (is_ValueChanged("M_Shipper_Intermediario_ID"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar el Transporte Intermediario");
+                return false;
+            }
+            else if (is_ValueChanged("Shipper_Location_ID"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar la Dirección del Transporte Intermediario");
+                return false;
+            }
         }
 
 		return true;
