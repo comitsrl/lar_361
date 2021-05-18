@@ -64,19 +64,13 @@ public class COTWebServiceCliente
     // @fchiappano Valores de retorno
     private static List<ValueNamePair> datosCOT;
 
-    // @fchiappano Parametros a evaluar si deben pasarse a una ventana de config.
-//    private static String url = "https://cot.arba.gov.ar/TransporteBienes/SeguridadCliente/presentarRemitos.do";
-    private static String url = "http://cot.test.arba.gov.ar/TransporteBienes/SeguridadCliente/presentarRemitos.do";
-    private static String usuario = "30716879867";
-    private static String pass = "Blumos3071";
-
     /**
      * Conectar al WebService y realizar la solicitud del COT.
      * @author fchiappano
      * @param informe
      * @return respuesta.
      */
-    public static boolean solicitarCOT(final File informe)
+    public static boolean solicitarCOT(final String url, final String usuario, final String pass, final File informe)
     {
         try
         {

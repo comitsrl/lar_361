@@ -1680,6 +1680,183 @@ UPDATE AD_Field SET AD_FieldGroup_ID=124,Updated=TO_TIMESTAMP('2021-05-14 21:59:
 UPDATE AD_Field SET IsMandatory='Y',Updated=TO_TIMESTAMP('2021-05-14 22:00:55','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=2943
 ;
 
+-- 17/05/2021 18:12:35 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Ref_Table SET OrderByClause='M_Shipper.Name',Updated=TO_TIMESTAMP('2021-05-17 18:12:35','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Reference_ID=3000122
+;
+
+ALTER TABLE LAR_ConfiguracionFE ADD COLUMN COT character(1) default 'N';
+ALTER TABLE LAR_ConfiguracionFE ALTER Servicio DROP NOT NULL;
+ALTER TABLE LAR_ConfiguracionFE ALTER TiempoVidaTicket DROP NOT NULL;
+ALTER TABLE LAR_ConfiguracionFE ALTER DstDN DROP NOT NULL;
+ALTER TABLE LAR_ConfiguracionFE ALTER CMS DROP NOT NULL;
+ALTER TABLE LAR_ConfiguracionFE ALTER Concepto DROP NOT NULL;
+
+-- 10/05/2021 18:38:23 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3003915,3000137,'LAR',0,'N','N','N','N',1,'N',20,'N',3001102,'N','Y','N','COT','COT',TO_TIMESTAMP('2021-05-10 18:38:22','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_TIMESTAMP('2021-05-10 18:38:22','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 10/05/2021 18:38:23 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3003915 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 10/05/2021 18:39:38 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007044,1,'Y','N','N',3003915,'N','Y',3000228,'N','LAR','COT',100,0,TO_TIMESTAMP('2021-05-10 18:39:37','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_TIMESTAMP('2021-05-10 18:39:37','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 10/05/2021 18:39:38 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007044 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 10/05/2021 18:40:20 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET DisplayLogic='@COT@=''N''',Updated=TO_TIMESTAMP('2021-05-10 18:40:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006878
+;
+
+-- 10/05/2021 18:44:23 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET SeqNo=40,IsDisplayed='Y' WHERE AD_Field_ID=3006888
+;
+
+-- 10/05/2021 18:44:23 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=3006878
+;
+
+-- 10/05/2021 18:44:23 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET SeqNo=150,IsDisplayed='Y' WHERE AD_Field_ID=3007044
+;
+
+-- 10/05/2021 18:45:09 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET DisplayLogic='@COT@=''N''',Updated=TO_TIMESTAMP('2021-05-10 18:45:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006887
+;
+
+-- 10/05/2021 18:45:17 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET DisplayLogic='@COT@=''N''',Updated=TO_TIMESTAMP('2021-05-10 18:45:17','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006881
+;
+
+-- 10/05/2021 18:45:29 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET DisplayLogic='@COT@=''N''',Updated=TO_TIMESTAMP('2021-05-10 18:45:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006885
+;
+
+-- 10/05/2021 18:45:37 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET DisplayLogic='@COT@=''N''',Updated=TO_TIMESTAMP('2021-05-10 18:45:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006889
+;
+
+-- 10/05/2021 18:45:45 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET DisplayLogic='@COT@=''N''',Updated=TO_TIMESTAMP('2021-05-10 18:45:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006890
+;
+
+-- 10/05/2021 18:46:46 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET SeqNo=80,IsDisplayed='Y' WHERE AD_Field_ID=3006891
+;
+
+-- 10/05/2021 18:46:46 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=3006881
+;
+
+-- 10/05/2021 18:46:46 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3006885
+;
+
+-- 10/05/2021 18:46:53 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET IsSameLine='N',Updated=TO_TIMESTAMP('2021-05-10 18:46:53','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006891
+;
+
+-- 10/05/2021 18:47:08 ART
+-- ISSUE #140: Configuración para WebService ARBA.
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2021-05-10 18:47:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3006881
+;
+
+-- 17/05/2021 20:03:15 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsMandatory='N', MandatoryLogic='@COT@=N',Updated=TO_TIMESTAMP('2021-05-17 20:03:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003630
+;
+
+-- 17/05/2021 20:03:34 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET MandatoryLogic='@COT@=N',Updated=TO_TIMESTAMP('2021-05-17 20:03:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003632
+;
+
+-- 17/05/2021 20:03:38 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsMandatory='N',Updated=TO_TIMESTAMP('2021-05-17 20:03:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003632
+;
+
+-- 17/05/2021 20:04:01 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsMandatory='N', MandatoryLogic='@COT@=N',Updated=TO_TIMESTAMP('2021-05-17 20:04:01','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003639
+;
+
+-- 17/05/2021 20:04:13 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsMandatory='N', MandatoryLogic='@COT@=N',Updated=TO_TIMESTAMP('2021-05-17 20:04:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003629
+;
+
+-- 17/05/2021 20:04:28 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsMandatory='N', MandatoryLogic='@COT@=N',Updated=TO_TIMESTAMP('2021-05-17 20:04:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003624
+;
+
+-- 17/05/2021 20:04:39 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Column SET IsMandatory='N', MandatoryLogic='@COT@=N',Updated=TO_TIMESTAMP('2021-05-17 20:04:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003625
+;
+
+-- 17/05/2021 20:10:20 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Menu SET Name='Configuración de Servicios Web Cliente',Updated=TO_TIMESTAMP('2021-05-17 20:10:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Menu_ID=3000367
+;
+
+-- 17/05/2021 20:10:20 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Menu_Trl SET IsTranslated='N' WHERE AD_Menu_ID=3000367
+;
+
+-- 17/05/2021 20:10:26 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Menu_Trl SET IsTranslated='Y',Name='Configuración de Servicios Web Cliente',Updated=TO_TIMESTAMP('2021-05-17 20:10:26','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Menu_ID=3000367 AND AD_Language='es_AR'
+;
+
+-- 17/05/2021 20:10:39 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Window SET Name='Configuración de Servicios Web Cliente',Updated=TO_TIMESTAMP('2021-05-17 20:10:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Window_ID=3000099
+;
+
+-- 17/05/2021 20:10:39 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Window_Trl SET IsTranslated='N' WHERE AD_Window_ID=3000099
+;
+
+-- 17/05/2021 20:10:39 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Menu SET Name='Configuración de Servicios Web Cliente', Description=NULL, IsActive='Y',Updated=TO_TIMESTAMP('2021-05-17 20:10:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Menu_ID=3000367
+;
+
+-- 17/05/2021 20:10:39 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Menu_Trl SET IsTranslated='N' WHERE AD_Menu_ID=3000367
+;
+
+-- 17/05/2021 20:10:47 ART
+-- -- ISSUE #140: Solicitud de COT, para remitos.
+UPDATE AD_Window_Trl SET IsTranslated='Y',Name='Configuración de Servicios Web Cliente',Updated=TO_TIMESTAMP('2021-05-17 20:10:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Window_ID=3000099 AND AD_Language='es_AR'
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0172_ISSUE-140.sql', 'LAR', '')
 ;

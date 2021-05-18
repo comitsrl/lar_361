@@ -21,6 +21,9 @@ import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -42,6 +45,7 @@ import org.compiere.model.MShipper;
 import org.compiere.model.MUOM;
 import org.compiere.model.MWarehouse;
 import org.compiere.util.CLogger;
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.ValueNamePair;
 import org.globalqss.model.X_LCO_TaxIdType;
@@ -70,6 +74,9 @@ public class ProcesadorCOT
     // @fchiappano parametros fijos.
     private final String sujetoGenerador = "E";
     private String msgError = "";
+    private String url = "";
+    private String usuario = "";
+    private String pass = "";
 
     // @fchiappano parametros a mapear en config.
     private final String esDevolucion = "0";
@@ -97,6 +104,10 @@ public class ProcesadorCOT
      */
     public String solcitarCOT()
     {
+        // @fchiappano Recuperar Configuración del WS.
+        if (!getConfiguracionWS())
+            return msgError;
+
         // @fchiappano Generar el archivo txt que se enviara al WS.
         File informe = generarTXT();
 
@@ -110,7 +121,7 @@ public class ProcesadorCOT
         remito.set_ValueOfColumn("NroConexionCOT", remito.get_ValueAsInt("NroConexionCOT") + 1);
 
         // @fchiappano Realizar la solicitud de COT.
-        if (!COTWebServiceCliente.solicitarCOT(informe))
+        if (!COTWebServiceCliente.solicitarCOT(url, usuario, pass, informe))
         {
             msgError = COTWebServiceCliente.getMsgError();
             remito.set_ValueOfColumn("ErrorCOT", msgError);
@@ -516,5 +527,49 @@ public class ProcesadorCOT
 
         return codigoUnico;
     } // generarCodigoUnicoRemito
+
+    /**
+     * Recuperar Configuración del WS de ARBA.
+     * @author fchiappano
+     * @return confirmación
+     */
+    private boolean getConfiguracionWS()
+    {
+        String sql = "SELECT *"
+                   +  " FROM LAR_ConfiguracionFE"
+                   + " WHERE AD_Client_ID = 1000000 AND IsActive = 'Y' AND COT = 'Y'"
+                   + " ORDER BY IsDefault DESC";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, null);
+            rs = pstmt.executeQuery();
+
+            if (rs.next())
+            {
+                usuario = rs.getString("Signer");
+                url = rs.getString("WSDL");
+                pass = rs.getString("ClaveCifrado");
+            }
+            else
+                msgError = "No existe una Configuración valida para el Servicio Web de ARBA.";
+        }
+        catch (SQLException eSql)
+        {
+            log.log(Level.SEVERE, sql, eSql);
+            msgError = "Erorr al recuperar la Configuración del Servicio Web.";
+            return false;
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return true;
+    } // getConfiguracionWS
 
 } // ProcesadorCOT
