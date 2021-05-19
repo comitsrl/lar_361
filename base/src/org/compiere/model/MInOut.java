@@ -409,6 +409,15 @@ public class MInOut extends X_M_InOut implements DocAction
 		setDropShip_BPartner_ID(order.getDropShip_BPartner_ID());
 		setDropShip_Location_ID(order.getDropShip_Location_ID());
 		setDropShip_User_ID(order.getDropShip_User_ID());
+
+        // @fchiappano Copiar campos propios del transporte.
+        set_Value("Chofer", order.get_Value("Chofer"));
+        set_Value("Patente", order.get_Value("Patente"));
+        set_Value("Patente_Acoplado", order.get_Value("Patente_Acoplado"));
+        set_Value("Condicion_Flete", order.get_Value("Condicion_Flete"));
+        set_Value("Domicilio_Transporte", order.get_Value("Domicilio_Transporte"));
+        set_Value("Identificacion_Transporte", order.get_Value("Identificacion_Transporte"));
+        set_Value("Tipo_Ident_Transporte_ID", order.get_Value("Tipo_Ident_Transporte_ID"));
 	}	//	MInOut
 
 	/**
@@ -1016,6 +1025,47 @@ public class MInOut extends X_M_InOut implements DocAction
             MRMA rma = new MRMA(getCtx(), getM_RMA_ID(), get_TrxName());
             MDocType docType = MDocType.get(getCtx(), rma.getC_DocType_ID());
             setC_DocType_ID(docType.getC_DocTypeShipment_ID());
+        }
+
+        // @fchiappano Si el remito ya tiene un COT autorizado, no permitir modificar ninguno de los siguientes campos.
+        if (!is_ValueChanged("COTAutorizado") && get_ValueAsBoolean("COTAutorizado"))
+        {
+            if (is_ValueChanged("M_Shipper_ID"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar el Transportista.");
+                return false;
+            }
+            else if (is_ValueChanged("PickDate"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar la Fecha de Autorización COT.");
+                return false;
+            }
+            else if (is_ValueChanged("COT") && !get_ValueAsBoolean("EsCOTManual"))
+            {
+                log.saveError("Error al Guardar",
+                        "Para poder modificar el campo COT, es necesario marcar el documento como Autorización COT Manual.");
+                return false;
+            }
+            else if (is_ValueChanged("EntregaTransporte"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar la marca Entrega en Transporte");
+                return false;
+            }
+            else if (is_ValueChanged("M_Shipper_Intermediario_ID"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar el Transporte Intermediario");
+                return false;
+            }
+            else if (is_ValueChanged("Shipper_Location_ID"))
+            {
+                log.saveError("Error al Guardar",
+                        "El documento ya posee un COT autorizado, por lo cual no es posible modificar la Dirección del Transporte Intermediario");
+                return false;
+            }
         }
 
 		return true;

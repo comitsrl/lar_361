@@ -305,7 +305,7 @@ public class ProcesadorWSAA
     {
         String sql = "SELECT *"
                    +  " FROM LAR_ConfiguracionFE"
-                   + " WHERE AD_Client_ID = 1000000 AND IsActive = 'Y'"
+                   + " WHERE AD_Client_ID = 1000000 AND IsActive = 'Y' AND COT = 'N'"
                    + " ORDER BY IsDefault DESC";
 
         PreparedStatement pstmt = null;
