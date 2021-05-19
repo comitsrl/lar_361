@@ -1680,6 +1680,29 @@ public class MInOut extends X_M_InOut implements DocAction
 
 		}	//	for all lines
 
+        // @fchiappano Luego de ejecutar todas las acciones necesarias sobre el
+        // remito y sobre los documentos asociados, actualizar la marca
+        // Entregado en la OV si corresponde.
+        if (getC_Order_ID() > 0)
+        {
+            boolean entregado = true;
+            MOrder orden = (MOrder) getC_Order();
+
+            // @fchiappano recorrer todas las lineas de la OV y chequear si se
+            // entrego toda la mercaderia.
+            for (MOrderLine orderLine : orden.getLines())
+            {
+                if (orderLine.getQtyOrdered().compareTo(orderLine.getQtyDelivered()) != 0)
+                {
+                    entregado = false;
+                    break;
+                }
+            }
+
+            orden.setIsDelivered(entregado);
+            orden.saveEx(get_TrxName());
+        }
+
 		//	Counter Documents
 		MInOut counter = createCounterDoc();
 		if (counter != null)
