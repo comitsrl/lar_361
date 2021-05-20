@@ -8,6 +8,11 @@ INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,Upda
 UPDATE AD_Field SET AD_Reference_ID=30, AD_Val_Rule_ID=3000090,Updated=TO_TIMESTAMP('2021-05-18 21:39:31','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=2932
 ;
 
+-- 19/05/2021 19:54:27 ART
+-- ISSUE #142: Validaciones en ventana Entrega Cliente.
+UPDATE AD_Val_Rule SET Code='C_OrderLine.C_Order_ID=@C_Order_ID@ AND C_OrderLine.QtyOrdered != C_OrderLine.QtyDelivered',Updated=TO_TIMESTAMP('2021-05-19 19:54:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=203
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0173_ISSUE-142.sql', 'LAR', '')
 ;

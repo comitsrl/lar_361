@@ -17,6 +17,7 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -597,6 +598,25 @@ public class CalloutInOut extends CalloutEngine
 				C_UOM_To_ID, QtyEntered);
 			if (MovementQty == null)
 				MovementQty = QtyEntered;
+
+            // @fchiappano Validar que no se este remitiendo una cantidad mayor
+            // a la cantidad pendiente de entrega en la orden.
+            int c_OrderLine_ID = (int) mTab.getValue("C_OrderLine_ID");
+            if (c_OrderLine_ID > 0)
+            {
+                String sql = "SELECT ol.QtyOrdered - ol.QtyDelivered"
+                           +  " FROM C_OrderLine ol"
+                           + " WHERE ol.C_OrderLine_ID = ?";
+                BigDecimal pendienteEntrega = DB.getSQLValueBD(null, sql, c_OrderLine_ID);
+                if (pendienteEntrega.compareTo(MovementQty) < 0)
+                {
+                    mTab.setValue("QtyEntered", pendienteEntrega);
+//                    mField.setValueNoFire(false);
+//                    mField.setValue(pendienteEntrega, true);
+                    return "Cantidad ingresada (" + MovementQty.setScale(2, RoundingMode.HALF_UP) + ") mayor a la cantidad pendiente de entrega (" + pendienteEntrega.setScale(2, RoundingMode.HALF_UP) + ").";
+                }
+            }
+
 			boolean conversion = QtyEntered.compareTo(MovementQty) != 0;
 			log.fine("UOM=" + C_UOM_To_ID
 				+ ", QtyEntered=" + QtyEntered
