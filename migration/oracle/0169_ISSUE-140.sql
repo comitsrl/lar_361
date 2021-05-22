@@ -137,25 +137,27 @@ UPDATE AD_Process SET ShowHelp='S',Updated=TO_DATE('2021-04-21 19:40:20','YYYY-M
 UPDATE AD_Column SET AD_Reference_ID=28, AD_Process_ID=3000413,Updated=TO_DATE('2021-04-21 19:40:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3003692
 ;
 
--- 21/04/2021 19:42:05 ART
--- ISSUE #140: Solicitud de COT, para remitos.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007002,20,'Y','N','N',59044,'N','Y',257,'N','The ProcessedOn Date+Time save the exact moment (nanoseconds precision if allowed by the DB) when a document has been processed.','D','The date+time (expressed in decimal format) when the document has been processed','Processed On',100,0,TO_DATE('2021-04-21 19:42:05','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-21 19:42:05','YYYY-MM-DD HH24:MI:SS'),100)
-;
+-- SE COMENTA BLOQUE, YA QUE LOS CAMPOS A INSERTAR, ESTAN PRESENTES EN ALGUNOS CLIENTES.
 
 -- 21/04/2021 19:42:05 ART
 -- ISSUE #140: Solicitud de COT, para remitos.
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007002 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
+--INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007002,20,'Y','N','N',59044,'N','Y',257,'N','The ProcessedOn Date+Time save the exact moment (nanoseconds precision if allowed by the DB) when a document has been processed.','D','The date+time (expressed in decimal format) when the document has been processed','Processed On',100,0,TO_DATE('2021-04-21 19:42:05','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-21 19:42:05','YYYY-MM-DD HH24:MI:SS'),100)
+--;
+
+-- 21/04/2021 19:42:05 ART
+-- ISSUE #140: Solicitud de COT, para remitos.
+--INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007002 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+--;
 
 -- 21/04/2021 19:42:06 ART
 -- ISSUE #140: Solicitud de COT, para remitos.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Description,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007003,22,'Y','N','N',55303,'N','Y',257,'N','D','ID of document reversal','Reversal ID',100,0,TO_DATE('2021-04-21 19:42:05','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-21 19:42:05','YYYY-MM-DD HH24:MI:SS'),100)
-;
+--INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Description,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007003,22,'Y','N','N',55303,'N','Y',257,'N','D','ID of document reversal','Reversal ID',100,0,TO_DATE('2021-04-21 19:42:05','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-04-21 19:42:05','YYYY-MM-DD HH24:MI:SS'),100)
+--;
 
 -- 21/04/2021 19:42:06 ART
 -- ISSUE #140: Solicitud de COT, para remitos.
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007003 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
+-- INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007003 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+--;
 
 -- 21/04/2021 19:42:06 ART
 -- ISSUE #140: Solicitud de COT, para remitos.
