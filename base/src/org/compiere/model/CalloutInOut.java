@@ -601,8 +601,8 @@ public class CalloutInOut extends CalloutEngine
 
             // @fchiappano Validar que no se este remitiendo una cantidad mayor
             // a la cantidad pendiente de entrega en la orden.
-            int c_OrderLine_ID = (int) mTab.getValue("C_OrderLine_ID");
-            if (c_OrderLine_ID > 0)
+            Integer c_OrderLine_ID = (Integer) mTab.getValue("C_OrderLine_ID");
+            if (c_OrderLine_ID != null && c_OrderLine_ID > 0)
             {
                 String sql = "SELECT ol.QtyOrdered - ol.QtyDelivered"
                            +  " FROM C_OrderLine ol"
@@ -611,8 +611,6 @@ public class CalloutInOut extends CalloutEngine
                 if (pendienteEntrega.compareTo(MovementQty) < 0)
                 {
                     mTab.setValue("QtyEntered", pendienteEntrega);
-//                    mField.setValueNoFire(false);
-//                    mField.setValue(pendienteEntrega, true);
                     return "Cantidad ingresada (" + MovementQty.setScale(2, RoundingMode.HALF_UP) + ") mayor a la cantidad pendiente de entrega (" + pendienteEntrega.setScale(2, RoundingMode.HALF_UP) + ").";
                 }
             }
