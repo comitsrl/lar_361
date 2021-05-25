@@ -668,8 +668,11 @@ public class MProduct extends X_M_Product
         if ((newRecord) || is_ValueChanged("PosicionArancelaria"))
         {
             String posA = (String) get_Value("PosicionArancelaria");
-            String nomCOT = posA.replaceAll("\\.", "").substring(0, 6);
-            set_Value("NomecladorCOT", nomCOT);
+            if (posA != null)
+            {
+                String nomCOT = posA.replaceAll("\\.", "").substring(0, 6);
+                set_Value("NomecladorCOT", nomCOT);
+            }
         }
 
 		return true;
