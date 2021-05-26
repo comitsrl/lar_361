@@ -662,6 +662,19 @@ public class MProduct extends X_M_Product
             }
         }
 
+        // Si registra el código Nomeclador COT a partir
+        // de la posición Arancelaria (Nomeclador Mercosur)
+        // Primeros 6 dígitos numéricos (de izquierda a derecha)
+        if ((newRecord) || is_ValueChanged("PosicionArancelaria"))
+        {
+            String posA = (String) get_Value("PosicionArancelaria");
+            if (posA != null)
+            {
+                String nomCOT = posA.replaceAll("\\.", "").substring(0, 6);
+                set_Value("NomecladorCOT", nomCOT);
+            }
+        }
+
 		return true;
 	}	//	beforeSave
 
