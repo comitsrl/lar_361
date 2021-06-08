@@ -27,13 +27,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import javax.swing.JDialog;
-
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoBillToAddressException;
 import org.adempiere.exceptions.BPartnerNoShipToAddressException;
 import org.adempiere.exceptions.FillMandatoryException;
-import org.compiere.apps.ADialog;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
@@ -1045,7 +1042,7 @@ public class MOrder extends X_C_Order implements DocAction
 
                 if (facturaOrigen_ID <= 0)
                 {
-                    ADialog.error(0, new JDialog(), "Por favor, seleccione una Factura Origen valida.");
+                    log.saveError("Por favor, seleccione una Factura Origen valida.", "");
                     return false;
                 }
 
@@ -1057,7 +1054,7 @@ public class MOrder extends X_C_Order implements DocAction
             {
                 if (getC_ConversionType_ID() == 0)
                 {
-                    ADialog.error(0, new JDialog(), "No fue posible, recuperar un tipo de cambio valido");
+                    log.saveError("No fue posible, recuperar un tipo de cambio valido", "");
                     return false;
                 }
 
@@ -1069,7 +1066,7 @@ public class MOrder extends X_C_Order implements DocAction
                     set_ValueOfColumn("TasaDeCambio", rate);
                 else
                 {
-                    ADialog.error(0, new JDialog(), "No fue posible, recuperar una tasa de cambio valida.");
+                    log.saveError("No fue posible, recuperar una tasa de cambio valida.", "");
                     return false;
                 }
             }
@@ -2669,7 +2666,7 @@ public class MOrder extends X_C_Order implements DocAction
             }
             else
             {
-                ADialog.error(0, new JDialog(), "No se logro recuperar, una tasa de cambio.");
+                log.saveError("No se logro recuperar, una tasa de cambio.", "");
                 return false;
             }
         }
@@ -2719,9 +2716,9 @@ public class MOrder extends X_C_Order implements DocAction
         }
         else
         {
-            ADialog.error(0, new JDialog(), "No se encontro el producto en la lista de precios. \n"
+            log.saveError("No se encontro el producto en la lista de precios. \n"
                             + "Producto = " + line.getM_Product().getName() + "\n"
-                            + "N° de Línea = " + line.getLine());
+                            + "N° de Línea = " + line.getLine(), "");
             return false;
         }
 
