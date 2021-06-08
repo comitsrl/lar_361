@@ -166,7 +166,8 @@ public class CalloutInvoice extends CalloutEngine
 			+ " p.SO_Description,p.IsDiscountPrinted,"
 			+ " p.SO_CreditLimit, p.SO_CreditLimit-p.SO_CreditUsed AS CreditAvailable,"
 			+ " l.C_BPartner_Location_ID,c.AD_User_ID,"
-			+ " COALESCE(p.PO_PriceList_ID,g.PO_PriceList_ID) AS PO_PriceList_ID, p.PaymentRulePO,p.PO_PaymentTerm_ID " 
+			+ " COALESCE(p.PO_PriceList_ID,g.PO_PriceList_ID) AS PO_PriceList_ID, p.PaymentRulePO,p.PO_PaymentTerm_ID, "
+            + " p.C_Currency_ID " // @fchiappano Se recupera la moneda configurada en el SdN.
 			+ "FROM C_BPartner p"
 			+ " INNER JOIN C_BP_Group g ON (p.C_BP_Group_ID=g.C_BP_Group_ID)"			
 			+ " LEFT OUTER JOIN C_BPartner_Location l ON (p.C_BPartner_ID=l.C_BPartner_ID AND l.IsBillTo='Y' AND l.IsActive='Y')"
@@ -194,6 +195,11 @@ public class CalloutInvoice extends CalloutEngine
 					if (i != 0)
 						mTab.setValue("M_PriceList_ID", new Integer(i));
 				}
+
+                // @fchiappano setear la moneda del SdN.
+                ii = new Integer(rs.getInt("C_Currency_ID"));
+                if (!rs.wasNull())
+                    mTab.setValue("C_Currency_ID", ii);
 
 				//	PaymentRule
 				String s = "";
