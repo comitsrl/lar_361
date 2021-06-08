@@ -1165,7 +1165,18 @@ public class MOrder extends X_C_Order implements DocAction
 					line.setM_Warehouse_ID(getM_Warehouse_ID());
 				if (is_ValueChanged(MOrder.COLUMNNAME_M_Shipper_ID))
 					line.setM_Shipper_ID(getM_Shipper_ID());
-				if (is_ValueChanged(MOrder.COLUMNNAME_C_Currency_ID))
+				// @fchiappano actualizar los precios de todas las lineas, si se cambia la lista de precios.
+                if (is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
+                {
+                    // @fchiappano actualizar los precios con los de la nueva lista de precios seleccinada.
+                    if (!actualizarPrecios(line, newRecord))
+                        return false;
+                }
+                // @fchiappano Solo disparar la conversion de precios si no se
+                // modifico la lista de precios, ya que la actualización de
+                // precios contemplara esta situación.
+                if (is_ValueChanged(MOrder.COLUMNNAME_C_Currency_ID)
+                        && !is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
                 {
                     line.setC_Currency_ID(getC_Currency_ID());
 
@@ -1173,13 +1184,6 @@ public class MOrder extends X_C_Order implements DocAction
                     if(!convertirPrecios(line, newRecord))
                         return false;
                 }
-				// @fchiappano actualizar los precios de todas las lineas, si se cambia la lista de precios.
-				if (is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
-				{
-				    // @fchiappano actualizar los precios con los de la nueva lista de precios seleccinada.
-				    if (!actualizarPrecios(line))
-				        return false;
-				}
 
 				line.saveEx();
 			}
@@ -2649,7 +2653,7 @@ public class MOrder extends X_C_Order implements DocAction
     private boolean convertirPrecios(final MOrderLine line, final boolean newRecord)
     {
         // @fchiappano Cambiar el precio de la linea, usando la tasa de conversion.
-        if (!newRecord && !is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
+        if (!newRecord)
         {
             BigDecimal tasaCambio = LAR_Utils.getTasaCambio(getC_Currency_ID(), get_ValueOldAsInt("C_Currency_ID"), getC_ConversionType_ID(),
                     getAD_Client_ID(), getAD_Org_ID(), p_ctx, get_TrxName());
@@ -2681,9 +2685,10 @@ public class MOrder extends X_C_Order implements DocAction
      * @author fchiappano
      * @return confirmación
      */
-    private boolean actualizarPrecios(MOrderLine line)
+    private boolean actualizarPrecios(MOrderLine line, final boolean newRecord)
     {
-        MPriceListVersion m_PriceList_Version = ((MPriceList) getM_PriceList()).getPriceListVersion(new Timestamp(System.currentTimeMillis()));
+        MPriceList m_PriceList = (MPriceList) getM_PriceList();
+        MPriceListVersion m_PriceList_Version = m_PriceList.getPriceListVersion(new Timestamp(System.currentTimeMillis()));
         final MWarehousePrice warehousePrice = MWarehousePrice.get((MProduct) line.getM_Product(), m_PriceList_Version.getM_PriceList_Version_ID(),
                 getM_Warehouse_ID(), get_TrxName());
 
@@ -2703,6 +2708,14 @@ public class MOrder extends X_C_Order implements DocAction
                     RoundingMode.HALF_UP));
             line.setPriceList(warehousePrice.getPriceList().setScale(getM_PriceList().getPricePrecision(),
                     RoundingMode.HALF_UP));
+
+            // @fchiappano si la moneda de la nueva lista de precios, es distinta
+            // a la moneda actual de la orden, aplicar la conversion de moneda.
+            if (m_PriceList.getC_Currency_ID() != getC_Currency_ID())
+            {
+                if (!convertirPrecios(line, newRecord))
+                    return false;
+            }
         }
         else
         {

@@ -1114,19 +1114,20 @@ public class MInvoice extends X_C_Invoice implements DocAction
         {
             for (MInvoiceLine line : getLines())
             {
+                // @fchiappano Actualizar precios
+                if (is_ValueChanged(COLUMNNAME_M_PriceList_ID))
+                {
+                    if (!actualizarPrecios(line, newRecord))
+                        return false;
+                }
                 // @fchiappano Convertir moneda.
-                if (is_ValueChanged(COLUMNNAME_C_Currency_ID) && !is_ValueChanged(COLUMNNAME_M_PriceList_ID))
+                else if (is_ValueChanged(COLUMNNAME_C_Currency_ID))
                 {
                     if (!convertirPrecios(line, newRecord))
                         return false;
                 }
 
-                // @fchiappano Actualizar precios
-                else if (is_ValueChanged(COLUMNNAME_M_PriceList_ID))
-                {
-                    if (!actualizarPrecios(line))
-                        return false;
-                }
+                line.saveEx();
             }
         }
 
@@ -2752,7 +2753,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
     {
         // @fchiappano Cambiar el precio de la linea, usando la tasa de
         // conversion.
-        if (!newRecord && !is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID))
+        if (!newRecord)
         {
             BigDecimal tasaCambio = LAR_Utils.getTasaCambio(getC_Currency_ID(), get_ValueOldAsInt("C_Currency_ID"),
                     getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID(), p_ctx, get_TrxName());
@@ -2765,7 +2766,6 @@ public class MInvoice extends X_C_Invoice implements DocAction
                         .setScale(getM_PriceList().getPricePrecision(), RoundingMode.HALF_UP);
                 line.setPrice(precioActual);
                 line.setPriceList(precioLista);
-                line.saveEx();
             }
             else
             {
@@ -2785,9 +2785,10 @@ public class MInvoice extends X_C_Invoice implements DocAction
      * @author fchiappano
      * @return confirmación
      */
-    private boolean actualizarPrecios(MInvoiceLine line)
+    private boolean actualizarPrecios(MInvoiceLine line, final boolean newRecord)
     {
-        MPriceListVersion m_PriceList_Version = ((MPriceList) getM_PriceList()).getPriceListVersion(new Timestamp(System.currentTimeMillis()));
+        MPriceList m_PriceList = (MPriceList) getM_PriceList();
+        MPriceListVersion m_PriceList_Version = m_PriceList.getPriceListVersion(new Timestamp(System.currentTimeMillis()));
         final MWarehousePrice warehousePrice = MWarehousePrice.get((MProduct) line.getM_Product(), m_PriceList_Version.getM_PriceList_Version_ID(),
                 Env.getContextAsInt(p_ctx, "#M_Warehouse_ID"), get_TrxName());
 
@@ -2797,7 +2798,14 @@ public class MInvoice extends X_C_Invoice implements DocAction
                     RoundingMode.HALF_UP));
             line.setPriceList(warehousePrice.getPriceList().setScale(getM_PriceList().getPricePrecision(),
                     RoundingMode.HALF_UP));
-            line.saveEx();
+
+            // @fchiappano si la moneda de la nueva lista de precios, es distinta
+            // a la moneda actual de la orden, aplicar la conversion de moneda.
+            if (m_PriceList.getC_Currency_ID() != getC_Currency_ID())
+            {
+                if (!convertirPrecios(line, newRecord))
+                    return false;
+            }
         }
         else
         {

@@ -277,7 +277,8 @@ public class CalloutOrder extends CalloutEngine
 			+ " COALESCE(p.PO_PriceList_ID,g.PO_PriceList_ID) AS PO_PriceList_ID, p.PaymentRulePO,p.PO_PaymentTerm_ID," 
 			+ " lbill.C_BPartner_Location_ID AS Bill_Location_ID, p.SOCreditStatus, "
 			+ " p.SalesRep_ID, "
-	        + " lbill.M_Shipper_ID "
+	        + " lbill.M_Shipper_ID, "
+	        + " p.C_Currency_ID " // @fchiappano Se recupera la moneda configurada en el SdN.
 			+ "FROM C_BPartner p"
 			+ " INNER JOIN C_BP_Group g ON (p.C_BP_Group_ID=g.C_BP_Group_ID)"			
 			+ " LEFT OUTER JOIN C_BPartner_Location lbill ON (p.C_BPartner_ID=lbill.C_BPartner_ID AND lbill.IsBillTo='Y' AND lbill.IsActive='Y')"
@@ -317,6 +318,11 @@ public class CalloutOrder extends CalloutEngine
                 ii = new Integer(rs.getInt("M_Shipper_ID"));
                 if (!rs.wasNull())
                     mTab.setValue("M_Shipper_ID", ii);
+
+                // @fchiappano setear la moneda del SdN.
+                ii = new Integer(rs.getInt("C_Currency_ID"));
+                if (!rs.wasNull())
+                    mTab.setValue("C_Currency_ID", ii);
 
 				//	Bill-To
 				mTab.setValue("Bill_BPartner_ID", C_BPartner_ID);
