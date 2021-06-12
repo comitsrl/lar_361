@@ -157,6 +157,7 @@ public class TransaccionCuentaBancaria
         int m_creditoTransferido = 0;
         int m_depositoTransferido = 0;
         int m_chequeEmitido = 0;
+        int m_billeteraDigital = 0;
         int tipoPago = 0;
 
         // Chequeo si hay tarjetas de Debito y si las mismas tienen una cuenta bancaria configurada.
@@ -181,6 +182,15 @@ public class TransaccionCuentaBancaria
         {
             final MLARTarjetaCredito deposito = new MLARTarjetaCredito(ctx, tipoPago, trxName);
             return setError(m_informe, "El tipo de deposito directo " + deposito.getName() + ", no posee una cuenta bancaria configurada.");
+        }
+
+        // @fchiappano Chequear que haya configurada una cuenta para pago con billetera digital.
+        tipoPago = comprobarCuentasPorFormaPago(p_BankStatement_ID, "LAR_Quick_Response_ID");
+        if (tipoPago > 0)
+        {
+            final MLARTarjetaCredito billeteraDigital = new MLARTarjetaCredito(ctx, tipoPago, trxName);
+            return setError(m_informe, "El tipo de billetera digital " + billeteraDigital.getName()
+                    + ", no posee una cuenta bancaria configurada.");
         }
 
         // Valido que si es una caja de tipo VENTAS, tenga si o si una caja PRINCIPAL asignada.
@@ -303,7 +313,16 @@ public class TransaccionCuentaBancaria
 
                 m_chequeEmitido ++;
             }
+            // @fchiappano Transferir movimiento con billetera digital
+            else if (pago.getTenderType().equals("Q"))
+            {
+                paymentBankTo = crearPago(pago.getDateAcct(), pago.getDateTrx(),
+                        getCuentaPorFormaPago("LAR_Quick_Response_ID", pago.get_ValueAsInt("LAR_Quick_Response_ID")),
+                        pago, p_C_BPartner_ID, p_Description, ctx, trxName,
+                        statement.getC_BankAccount().getAD_Org_ID());
 
+                m_billeteraDigital ++;
+            }
             // Guardo y completo el cobro en la caja destino.
             if (paymentBankTo != null)
             {
@@ -375,6 +394,7 @@ public class TransaccionCuentaBancaria
         m_informe.add(new KeyNamePair(m_creditoTransferido, "Tarjetas de Credito"));
         m_informe.add(new KeyNamePair(m_debitoTransferido, "Tarjetas de Debito"));
         m_informe.add(new KeyNamePair(m_depositoTransferido, "Depositos Directos"));
+        m_informe.add(new KeyNamePair(m_billeteraDigital, "Billetera Digital"));
         m_informe.add(new KeyNamePair(m_chequeEmitido, "Cheques Emitidos"));
 
         return m_informe.toArray(new KeyNamePair[m_informe.size()]);
