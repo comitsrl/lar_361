@@ -1,4 +1,4 @@
--- @fchiappano ESTE SCRIPT FALLARA EN EL PROYECTO LAR_LEIMAT, YA QUE LA COLUMNA SQL QUE SE AGREGA, YA EXISTE EN ESTE PROYECTO.
+-- @fchiappano Este script no debe aplicrse en proyectos en los que ya existe la columna SQL DocumentoNo.
 
 -- 09/06/2021 19:57:25 ART
 -- ISSUE 60: Mejorar registro de scripts de migración
