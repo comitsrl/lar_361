@@ -190,16 +190,16 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
      * un certificado de retención y un pago de tipo "retención".
      *
      * @param genera Si es true geera el pago retención y el correspondiente certificado.
-     * @return verdadero si se generó la retención correctamente
+     * @return mensaje de error o null si se genero la retención correctamente.
      */
-    public boolean recalcPaymentWithholding(boolean genera)
+    public String recalcPaymentWithholding(boolean genera)
     {
         this.load(get_TrxName());
 
         final MDocType dt = new MDocType(getCtx(), getC_DocType_ID(), get_TrxName());
         String genwh = dt.get_ValueAsString("GenerateWithholding");
         if (genwh == null || genwh.equals("N"))
-            return true;
+            return null;
 
         // Se Borran los certificados y Pagos Retención del Header
         BorrarCertificadosdeRetenciondelHeader();
@@ -232,22 +232,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     // Se recupera y valida el ID del cargo para retención desde el documento
                     cargoRetencion = docRet.get_ValueAsInt("LAR_Withholding_Charge_ID");
                     if (cargoRetencion < 0)
-                    {
-                        JDialog dialog = new JDialog();
-                        dialog.setIconImage(Adempiere.getImage16());
-                        ADialog.warn(1, dialog,
-                                "Error al crear la retenci\u00f3n (No existe cargo retenci\u00f3n configurado en el documento)");
-                        return false;
-                    }
+                        return "Error al crear la retenci\u00f3n (No existe cargo retenci\u00f3n configurado en el documento)";
                 } else
                 {
-                    JDialog dialog = new JDialog();
-                    dialog.setIconImage(Adempiere.getImage16());
-                    ADialog.warn(
-                            1,
-                            dialog,
-                            "Error al crear la retenci\u00f3n (No existe tipo de documento configurado para el Pago Retenci\u00f3n)");
-                    return false;
+                    return "Error al crear la retenci\u00f3n (No existe tipo de documento configurado para el Pago Retenci\u00f3n)";
                 }
                 // En las retenciones de ganancias estos valores se pisan con los recuperados
                 // desde la tabla de conceptos LAR_Concepto_Ret_Ganancias
@@ -345,7 +333,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             } catch (SQLException e)
                             {
                                 log.log(Level.SEVERE, "", e);
-                                return false;
+                                return e.getMessage();
                             }
                         } // Recuperar toda la información asociada al concepto
 
@@ -378,7 +366,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             } catch (SQLException e)
                             {
                                 log.log(Level.SEVERE, "", e);
-                                return false;
+                                return e.getMessage();
                             } // Recuperar la información de la escala
                               // Recorrer la escala para encontrar el rango del pago
                             for (final X_LAR_Escala_Ret_Ganancias esc : escala)
@@ -563,13 +551,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     {
                         impRetencion = calculaRetencionIIBB(facturas, bp, aliquot, impMinNoSujeto);
                         if (impRetencion.compareTo(Env.ZERO) < 0)
-                        {
-                            JDialog dialog = new JDialog();
-                            dialog.setIconImage(Adempiere.getImage16());
-                            ADialog.warn(1, dialog,
-                                    "Error al crear la retenci\u00f3n: " + m_processMsg);
-                            return false;
-                        }
+                            return "Error al crear la retenci\u00f3n: " + m_processMsg;
                         // Exención de IIBB
                         if (wc.isUseBPISIC() && bp.get_ValueAsBoolean("LAR_Exento_Ret_IIBB") && (impRetencion.compareTo(Env.ZERO) > 0))
                         {
@@ -580,14 +562,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                                 impExencion = (BigDecimal) bp.get_Value("LAR_Importe_Exencion_IIBB");
                                 porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_IIBB");
                             }
-                            else
-                            {
-                                // Advertir al ususario que el certificado de Exención esta vencido
-                                JDialog dialog = new JDialog();
-                                dialog.setIconImage(Adempiere.getImage16());
-                                ADialog.warn(1, dialog, bp.getName() +
-                                        ": Certificado de Exenci\u00f3n de IIBB Vencido");
-                            }
+
                             // Exenciones % e importe fijo
                             BigDecimal impExentoDesc = impRetencion.multiply(porcExencion)
                                     .divide(Env.ONEHUNDRED).setScale(2, BigDecimal.ROUND_HALF_EVEN);
@@ -606,7 +581,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             {
                                 m_processMsg = "Error al registrar la retenci\u00f3n en la factura";
                                 log.severe(m_processMsg);
-                                return false;
+                                return m_processMsg;
                             }
                         }
                     }// Es retención de IBB
@@ -626,13 +601,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     {
                         impExencion = (BigDecimal) bp.get_Value("LAR_Importe_Exencion_SUSS");
                         porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_SUSS");
-                    } else
-                    {
-                        // Advertir al ususario que el certificado de Exención esta vencido
-                        JDialog dialog = new JDialog();
-                        dialog.setIconImage(Adempiere.getImage16());
-                        ADialog.warn(1, dialog, "Certificado de Exenci\u00f3n de SUSS Vencido");
                     }
+
                     // Exenciones % e importe fijo
                     BigDecimal impExentoDesc = impRetencion.multiply(porcExencion)
                             .divide(Env.ONEHUNDRED).setScale(2, BigDecimal.ROUND_HALF_EVEN);
@@ -650,15 +620,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     for (final MPaymentAllocate mp : facturas)
                         sumaRemanente = sumaRemanente.add(mp.getAmount());
                     if (sumaRemanente.compareTo(impRetencion) < 0)
-                    {
-                        JDialog dialog = new JDialog();
-                        dialog.setIconImage(Adempiere.getImage16());
-                        ADialog.warn(
-                                1,
-                                dialog,
-                                "No existe suficiente importe pendiente de pago (Revisar las facturas cargadas en la Orden de Pago).");
-                        return false;
-                    }
+                        return "No existe suficiente importe pendiente de pago (Revisar las facturas cargadas en la Orden de Pago).";
                 }
                 // @fchiappano verifico que existan pagos en los que se pueda
                 // descontar el importe de la retención.
@@ -688,12 +650,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     final MPayment pagoRetencion = creaPagoRetencion(impRetencion, cargoRetencion,
                             c_DocType_ID, pago, compensar);
                     if (pagoRetencion == null)
-                    {
-                        JDialog dialog = new JDialog();
-                        dialog.setIconImage(Adempiere.getImage16());
-                        ADialog.warn(1, dialog, "Error al generar el Pago Retenci\u00f3n");
-                        return false;
-                    }
+                        return "Error al generar el Pago Retenci\u00f3n";
                     log.config("Pago Retenci\u00f3n: " + pagoRetencion.getC_Payment_ID());
                     // Se crea el Certificado de Retención
                     final MLARPaymentWithholding certificado = creaCertificadodeRetencion(
@@ -701,12 +658,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             facturaID_Cert, pagoRetencion.getDocumentNo(),
                             pagoRetencion.getC_DocType_ID());
                     if (certificado == null)
-                    {
-                        JDialog dialog = new JDialog();
-                        dialog.setIconImage(Adempiere.getImage16());
-                        ADialog.warn(1, dialog, "Error al generar el Certificado de Retenci\u00f3n");
-                        return false;
-                    }
+                        return "Error al generar el Certificado de Retenci\u00f3n";
                     log.config("Certificado Retenci\u00f3n: "
                             + certificado.getLAR_PaymentWithholding_ID());
                 } else if (genera)
@@ -715,12 +667,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     final MPayment pagoRetencion = creaPagoRetencion(impRetencion, cargoRetencion,
                             c_DocType_ID, pago, false);
                     if (pagoRetencion == null)
-                    {
-                        JDialog dialog = new JDialog();
-                        dialog.setIconImage(Adempiere.getImage16());
-                        ADialog.warn(1, dialog, "Error al generar el Pago Retenci\u00f3n");
-                        return false;
-                    }
+                        return "Error al generar el Pago Retenci\u00f3n";
+
                     log.config("Pago Retenci\u00f3n: " + pagoRetencion.getC_Payment_ID());
                     // Se crea el Certificado de Retención
                     final MLARPaymentWithholding certificado = creaCertificadodeRetencion(
@@ -728,12 +676,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             facturaID_Cert, pagoRetencion.getDocumentNo(),
                             pagoRetencion.getC_DocType_ID());
                     if (certificado == null)
-                    {
-                        JDialog dialog = new JDialog();
-                        dialog.setIconImage(Adempiere.getImage16());
-                        ADialog.warn(1, dialog, "Error al generar el Certificado de Retenci\u00f3n");
-                        return false;
-                    }
+                        return "Error al generar el Certificado de Retenci\u00f3n";
+
                     log.config("Certificado Retenci\u00f3n: "
                             + certificado.getLAR_PaymentWithholding_ID());
                 } else
@@ -744,14 +688,11 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             } // Se recorren las configuraciones recuperadas
         else
         {
-            JDialog dialog = new JDialog();
-            dialog.setIconImage(Adempiere.getImage16());
-            ADialog.warn(1, dialog, "Error al recuperar configuración desde el SdN");
-            return false;
+            return "Error al recuperar configuración desde el SdN";
         }
         // TODO: Refrescar el tab, ya que si existían pagos retención, estos fueron eliminados y se crearon nuevos
         // pero en la pestaña se visualizan los eliminados y es necesario refrescar manualmente para ver los nuevos.
-        return true;
+        return null;
     } // recalcPaymentWithholding
 
     private BigDecimal calculaRetencionIIBB(MPaymentAllocate[] facturas, MBPartner bp,
@@ -980,8 +921,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 {
                     String msg = "No se pudo eliminar alguno de los pagos cargados en el documento que"
                             + "se está eliminando. Se cancelará la operación";
-                    log.severe(msg);
-                    ADialog.error(0, null, msg);
+                    log.saveError("Error: ", msg);
                     return false;
                 }
             }
@@ -993,8 +933,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 {
                     String msg = "No se pudo eliminar alguno de las facturas cargadas en el documento que"
                             + "se está eliminando. Se cancelará la operación";
-                    log.severe(msg);
-                    ADialog.error(0, null, msg);
+                    log.saveError("Error: ", msg);
                     return false;
                 }
             }
@@ -1084,7 +1023,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         MPayment[] pays = getPayments(get_TrxName());
         if (pays.length == 0)
         {
-            ADialog.error(0, null, "La cabecera no tiene cobros/pagos");
+            m_processMsg = "La cabecera no tiene cobros/pagos";
             return DocAction.STATUS_Invalid;
         }
         // Recibos: Validar que la suma de los Pagos Retención sea >=
@@ -1119,8 +1058,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
                 if (sumaFacturas.compareTo(sumPagosRet) == -1)
                 {
-                    ADialog.error(0, null,
-                            "El importe de las Retenciones es mayor que el de las Facturas");
+                    m_processMsg = "El importe de las Retenciones es mayor que el de las Facturas";
                     return DocAction.STATUS_Invalid;
                 }
             }
