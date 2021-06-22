@@ -23,9 +23,6 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import javax.swing.JDialog;
-
-import org.compiere.apps.ADialog;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -279,7 +276,7 @@ public class MProductPrice extends X_M_ProductPrice
         }
         else
         {
-            ADialog.error(0, new JDialog(), "No se pudo recuperar el impuesto del producto.");
+            log.saveError("Error:", "No se pudo recuperar el impuesto del producto.");
             return false;
         }
 
