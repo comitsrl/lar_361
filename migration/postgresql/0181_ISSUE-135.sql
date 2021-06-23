@@ -961,6 +961,31 @@ UPDATE AD_Field SET SeqNo=640,IsDisplayed='Y' WHERE AD_Field_ID=3004046
 UPDATE AD_Field SET SeqNo=650,IsDisplayed='Y' WHERE AD_Field_ID=3001597
 ;
 
+-- 23/06/2021 19:12:49 ART
+-- ISSUE #135: Compatibilizar mensajes al usuario, con la versión Web del ERP.
+UPDATE AD_Column SET MandatoryLogic='@OrderType@=''WI''',Updated=TO_TIMESTAMP('2021-06-23 19:12:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3001210
+;
+
+-- 23/06/2021 19:13:05 ART
+-- ISSUE #135: Compatibilizar mensajes al usuario, con la versión Web del ERP.
+UPDATE AD_Field SET DisplayLogic='@OrderType@=''WI''',Updated=TO_TIMESTAMP('2021-06-23 19:13:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3002015
+;
+
+-- 23/06/2021 19:13:17 ART
+-- ISSUE #135: Compatibilizar mensajes al usuario, con la versión Web del ERP.
+UPDATE AD_Field SET SeqNo=660,IsDisplayed='Y' WHERE AD_Field_ID=3007116
+;
+
+-- 23/06/2021 19:13:49 ART
+-- ISSUE #135: Compatibilizar mensajes al usuario, con la versión Web del ERP.
+UPDATE AD_Field SET SeqNo=105, DisplayLogic='@OrderType@=''WI''',Updated=TO_TIMESTAMP('2021-06-23 19:13:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007116
+;
+
+-- 23/06/2021 19:16:06 ART
+-- ISSUE #135: Compatibilizar mensajes al usuario, con la versión Web del ERP.
+UPDATE AD_Field SET SeqNo=115,Updated=TO_TIMESTAMP('2021-06-23 19:16:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007116
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0181_ISSUE-135.sql', 'LAR', '')
 ;
