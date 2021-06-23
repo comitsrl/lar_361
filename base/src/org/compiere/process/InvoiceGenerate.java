@@ -23,9 +23,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
-import javax.swing.JDialog;
-
-import org.compiere.apps.ADialog;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
 import org.compiere.model.MCurrency;
@@ -354,7 +351,7 @@ public class InvoiceGenerate extends SvrProcess
                 {
                     Trx trx = Trx.get(get_TrxName(), false);
                     trx.rollback();
-                    ADialog.error(0, new JDialog(), "Error al generar factura: \n No es posible incluir dos o mas Ordenes, para el mismo SdN y con distinta Moneda.");
+                    addLog("Error al generar factura: \n No es posible incluir dos o mas Ordenes, para el mismo SdN y con distinta Moneda.");
                     return "@Created@ = " + m_created;
                 }
 			}	//	for all orders
