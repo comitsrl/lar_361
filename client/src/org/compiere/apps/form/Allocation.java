@@ -24,10 +24,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 
-import javax.swing.JDialog;
-
 import org.adempiere.exceptions.AdempiereException;
-import org.compiere.apps.ADialog;
 import org.compiere.minigrid.IMiniTable;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
@@ -872,7 +869,6 @@ public class Allocation
 		//
 		if (AD_Org_ID == 0)
 		{
-			//ADialog.error(m_WindowNo, this, "Org0NotAllowed", null);
 			throw new AdempiereException("@Org0NotAllowed@");
 		}
 		//
@@ -939,10 +935,10 @@ public class Allocation
                 // anterior, advertir al usuario y revertir la transacción.
                 if (monedaFactura_ID != factura.getC_Currency_ID())
                 {
-                    ADialog.error(m_WindowNo, new JDialog(),
-                            "No es posible, asignar movimientos a facturas con distintas monedas. Por favor, realice el procedimiento en dos pasos por separado.");
                     Trx trx = Trx.get(trxName, false);
                     trx.rollback();
+                    throw new AdempiereException(
+                            "No es posible, asignar movimientos a facturas con distintas monedas. Por favor, realice el procedimiento en dos pasos por separado.");
                 }
 
                 // @fchiappano Chequear si la moneda de la factura, es una moneda extranjera.

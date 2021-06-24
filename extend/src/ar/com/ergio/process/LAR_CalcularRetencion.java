@@ -46,9 +46,13 @@ public class LAR_CalcularRetencion extends SvrProcess
 
         // Sólo calcula la retención si el total de la cabecera no es cero (Existe algún pago cargado).
         if (!header.getPayHeaderTotalAmt().equals(Env.ZERO))
-            if (!header.recalcPaymentWithholding(false))
+        {
+            // @fchiappano Recuperar el mensaje apropiadamente.
+            String mensaje = header.recalcPaymentWithholding(false);
+            if (mensaje != null && !mensaje.equals(""))
                 throw new AdempiereUserError(
-                        "Error al calcular la retenci\u00f3n sobre la cabecera de pago");
+                        "Error al calcular la retenci\u00f3n sobre la cabecera de pago. \n " + mensaje);
+        }
 
         return "Retención Calculada";
     } // doIt

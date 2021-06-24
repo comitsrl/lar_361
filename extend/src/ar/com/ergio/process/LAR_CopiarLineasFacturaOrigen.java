@@ -18,19 +18,25 @@ package ar.com.ergio.process;
 
 import java.util.logging.Level;
 
+import org.compiere.apps.ProcessCtl;
+import org.compiere.model.MInvoice;
+import org.compiere.model.MPInstance;
+import org.compiere.model.MPInstancePara;
+import org.compiere.process.ProcessInfo;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
 import org.compiere.util.Env;
-
-import ar.com.ergio.model.MLARPaymentHeader;
+import org.compiere.util.Msg;
+import org.compiere.util.Trx;
 
 /**
- * Genera la retención sobre la cabecera de pago
+ * Proceso que se encargara de copiar las lineas desde la factura origen (en
+ * remplazo de la anterior implementación a travez de un callout)..
  *
- * @author Emiliano Pereyra - http://www.ergio.com.ar
+ * @author fchiappano
  */
-public class LAR_GenerateWithholding extends SvrProcess
+public class LAR_CopiarLineasFacturaOrigen extends SvrProcess
 {
     /** The Record                      */
     private int     p_Record_ID = 0;
@@ -53,21 +59,41 @@ public class LAR_GenerateWithholding extends SvrProcess
     @Override
     protected String doIt() throws Exception
     {
-        final MLARPaymentHeader header = new MLARPaymentHeader(getCtx(), p_Record_ID, get_TrxName());
-        if (header.getLAR_PaymentHeader_ID() == 0)
-            throw new AdempiereUserError("Sin Cabecera de Pago");
+        MInvoice invoice = new MInvoice(getCtx(), p_Record_ID, get_TrxName());
 
-        // Sólo calcula la retención si el total de la cabecera no es cero (Existe algún pago cargado).
-        if (!header.getPayHeaderTotalAmt().equals(Env.ZERO))
+        int source_Invoice_ID = invoice.get_ValueAsInt("Source_Invoice_ID");
+        if (source_Invoice_ID <= 0)
+            throw new AdempiereUserError("Se debe seleccionar una Factura Origen primero.");
+
+        // @fchiappano Si la moneda de la NC o ND difiere de la factura origen,
+        // pisarla.
+        MInvoice facturaOrigen = new MInvoice(getCtx(), source_Invoice_ID, get_TrxName());
+        if (facturaOrigen.getC_Currency_ID() != invoice.getC_Currency_ID())
         {
-            // @fchiappano Recuperar el mensaje apropiadamente.
-            String mensaje = header.recalcPaymentWithholding(true);
-            if (mensaje != null && !mensaje.equals(""))
-                throw new AdempiereUserError(
-                        "Error al calcular la retenci\u00f3n sobre la cabecera de pago. \n " + mensaje);
+            invoice.setC_Currency_ID(facturaOrigen.getC_Currency_ID());
+            invoice.saveEx(get_TrxName());
         }
 
-        return "Retención Generada";
+        // Config CopyFromInvoice process (AD_Process_ID=210)
+        int AD_Process_ID = 210;
+        MPInstance instance = new MPInstance(Env.getCtx(), AD_Process_ID, 0);
+        if (!instance.save())
+            throw new AdempiereUserError(Msg.getMsg(Env.getCtx(), "ProcessNoInstance"));
+        ProcessInfo pi = new ProcessInfo("", AD_Process_ID);
+        pi.setRecord_ID(invoice.getC_Invoice_ID());
+        pi.setAD_PInstance_ID(instance.getAD_PInstance_ID());
+
+        // Add Parameters
+        MPInstancePara param = new MPInstancePara(instance, 10);
+        param.setParameter("C_Invoice_ID", source_Invoice_ID);
+        if (!param.save())
+            return Msg.getMsg(Env.getCtx(), "ParameterMissing");
+
+        // Execute process
+        ProcessCtl worker = new ProcessCtl(null, 0, pi, Trx.get(get_TrxName(), false));
+        worker.run();
+
+        return "Líneas copiadas con exito.";
     } // doIt
 
-} // LAR_GenerateWithholding
+} // LAR_CopiarLineasFacturaOrigen

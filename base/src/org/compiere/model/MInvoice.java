@@ -2769,7 +2769,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
             }
             else
             {
-                log.saveError("No se logro recuperar, una tasa de cambio.", "");
+                log.saveError("", "No se logro recuperar, una tasa de cambio.");
                 return false;
             }
         }
@@ -2809,8 +2809,8 @@ public class MInvoice extends X_C_Invoice implements DocAction
         }
         else
         {
-            log.saveError("No se encontro el producto en la lista de precios. \n" + "Producto = "
-                    + line.getM_Product().getName() + "\n" + "N° de Línea = " + line.getLine(), "");
+            log.saveError("", "No se encontro el producto en la lista de precios. \n" + "Producto = "
+                    + line.getM_Product().getName() + "\n" + "N° de Línea = " + line.getLine());
             return false;
         }
 
@@ -2830,7 +2830,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
             setC_ConversionType_ID(conversionType_ID);
         else
         {
-            log.saveError("El Socio del Negocio, no posee un tipo de cambio configurado.", "");
+            log.saveError("", "El Socio del Negocio, no posee un tipo de cambio configurado.");
             return false;
         }
 
@@ -2852,7 +2852,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
                 set_ValueOfColumn("TasaDeCambio", rate);
             else
             {
-                log.saveError("No fue posible, recuperar una tasa de cambio valida.", "");
+                log.saveError("", "No fue posible, recuperar una tasa de cambio valida.");
                 return false;
             }
         }

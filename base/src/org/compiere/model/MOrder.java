@@ -34,6 +34,7 @@ import org.adempiere.exceptions.FillMandatoryException;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocumentEngine;
+import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -1042,7 +1043,7 @@ public class MOrder extends X_C_Order implements DocAction
 
                 if (facturaOrigen_ID <= 0)
                 {
-                    log.saveError("Por favor, seleccione una Factura Origen valida.", "");
+                    log.saveError("", "Por favor, seleccione una Factura Origen valida.");
                     return false;
                 }
 
@@ -1054,7 +1055,7 @@ public class MOrder extends X_C_Order implements DocAction
             {
                 if (getC_ConversionType_ID() == 0)
                 {
-                    log.saveError("No fue posible, recuperar un tipo de cambio valido", "");
+                    log.saveError("", "No fue posible, recuperar un tipo de cambio valido");
                     return false;
                 }
 
@@ -1066,7 +1067,7 @@ public class MOrder extends X_C_Order implements DocAction
                     set_ValueOfColumn("TasaDeCambio", rate);
                 else
                 {
-                    log.saveError("No fue posible, recuperar una tasa de cambio valida.", "");
+                    log.saveError("", "No fue posible, recuperar una tasa de cambio valida.");
                     return false;
                 }
             }
@@ -2009,7 +2010,7 @@ public class MOrder extends X_C_Order implements DocAction
 		MInvoice invoice = new MInvoice (this, dt.getC_DocTypeInvoice_ID(), invoiceDate);
 		if (!invoice.save(get_TrxName()))
 		{
-			m_processMsg = "Could not create Invoice";
+			m_processMsg = "No fue posible crear la Factura: " + CLogger.retrieveErrorString("");
 			return null;
 		}
 		
@@ -2034,7 +2035,7 @@ public class MOrder extends X_C_Order implements DocAction
 				iLine.setQtyInvoiced(sLine.getMovementQty());
 				if (!iLine.save(get_TrxName()))
 				{
-					m_processMsg = "Could not create Invoice Line from Shipment Line";
+					m_processMsg = "Error al crear Línea de Factura, desde la Línea de Remito.";
 					return null;
 				}
 				//
@@ -2066,7 +2067,7 @@ public class MOrder extends X_C_Order implements DocAction
 						.divide(oLine.getQtyOrdered(), 12, BigDecimal.ROUND_HALF_UP));
 				if (!iLine.save(get_TrxName()))
 				{
-					m_processMsg = "Could not create Invoice Line from Order Line";
+					m_processMsg = "Error al crear Línea de Factura desde la Línea de la Orden.";
 					return null;
 				}
 			}
@@ -2666,7 +2667,7 @@ public class MOrder extends X_C_Order implements DocAction
             }
             else
             {
-                log.saveError("No se logro recuperar, una tasa de cambio.", "");
+                log.saveError("", "No se logro recuperar, una tasa de cambio.");
                 return false;
             }
         }
@@ -2716,9 +2717,9 @@ public class MOrder extends X_C_Order implements DocAction
         }
         else
         {
-            log.saveError("No se encontro el producto en la lista de precios. \n"
+            log.saveError("", "No se encontro el producto en la lista de precios. \n"
                             + "Producto = " + line.getM_Product().getName() + "\n"
-                            + "N° de Línea = " + line.getLine(), "");
+                            + "N° de Línea = " + line.getLine());
             return false;
         }
 

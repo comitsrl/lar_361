@@ -732,8 +732,10 @@ import ar.com.ergio.util.LAR_Utils;
 
                 if (genwh.equals("A")) {
                     // tipo de documento configurado para generar la retención automáticamente
-                    if (!header.recalcPaymentWithholding(true))
-                        return "No se pudo generar la retenci\u00f3n sobre la cabecera de pago";
+                    // @fchiappano Generar mensaje de error de forma apropiada.
+                    String mensaje = header.recalcPaymentWithholding(true);
+                    if (mensaje != null && !mensaje.equals(""))
+                        return "No se pudo generar la retenci\u00f3n sobre la cabecera de pago. \n" + mensaje;
                 }
             }
         }
