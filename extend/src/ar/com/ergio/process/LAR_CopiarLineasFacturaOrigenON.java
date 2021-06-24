@@ -67,6 +67,14 @@ public class LAR_CopiarLineasFacturaOrigenON extends SvrProcess
 
         MInvoice factura = new MInvoice(getCtx(), source_Invoice_ID, get_TrxName());
 
+        // @fchiappano Si la moneda de la factura origen, difiere de la moneda
+        // de la Orden NC, pisarla.
+        if (ordenNC.getC_Currency_ID() != factura.getC_Currency_ID())
+        {
+            ordenNC.setC_Currency_ID(factura.getC_Currency_ID());
+            ordenNC.saveEx(get_TrxName());
+        }
+
         MInvoiceLine[] fromLines = factura.getLines();
         int count = 0;
         for (int i = 0; i < fromLines.length; i++)

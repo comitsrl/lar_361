@@ -65,6 +65,15 @@ public class LAR_CopiarLineasFacturaOrigen extends SvrProcess
         if (source_Invoice_ID <= 0)
             throw new AdempiereUserError("Se debe seleccionar una Factura Origen primero.");
 
+        // @fchiappano Si la moneda de la NC o ND difiere de la factura origen,
+        // pisarla.
+        MInvoice facturaOrigen = new MInvoice(getCtx(), source_Invoice_ID, get_TrxName());
+        if (facturaOrigen.getC_Currency_ID() != invoice.getC_Currency_ID())
+        {
+            invoice.setC_Currency_ID(facturaOrigen.getC_Currency_ID());
+            invoice.saveEx(get_TrxName());
+        }
+
         // Config CopyFromInvoice process (AD_Process_ID=210)
         int AD_Process_ID = 210;
         MPInstance instance = new MPInstance(Env.getCtx(), AD_Process_ID, 0);
