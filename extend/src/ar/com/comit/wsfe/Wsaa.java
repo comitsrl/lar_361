@@ -73,7 +73,7 @@ public class Wsaa
         catch (Exception e)
         {
             e.printStackTrace();
-            msgError = e.getMessage();
+            msgError = "Error de conexión con Servicio Web de AFIP: \n" + e.getMessage();
         }
         return (LoginTicketResponse);
     }

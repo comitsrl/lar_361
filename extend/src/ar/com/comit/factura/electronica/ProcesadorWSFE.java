@@ -482,19 +482,19 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         catch (AxisFault e)
         {
             e.printStackTrace();
-            msgError = e.getMessage();
+            msgError = "Error de conexión con Servicio Web de AFIP: \n" + e.getMessage();
             return msgError;
         }
         catch (RemoteException e)
         {
             e.printStackTrace();
-            msgError = e.getMessage();
+            msgError = "Error de conexión con Servicio Web de AFIP: \n" + e.getMessage();
             return msgError;
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            msgError = e.getMessage();
+            msgError = "Error de conexión con Servicio Web de AFIP: \n" + e.getMessage();
             return msgError;
         }
 
