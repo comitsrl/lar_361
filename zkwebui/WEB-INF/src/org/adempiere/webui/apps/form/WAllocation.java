@@ -305,7 +305,10 @@ public class WAllocation extends Allocation
 		AD_Column_ID = COLUMN_C_PERIOD_AD_ORG_ID; //C_Period.AD_Org_ID (needed to allow org 0)
 		MLookup lookupOrg = MLookupFactory.get(Env.getCtx(), form.getWindowNo(), 0, AD_Column_ID, DisplayType.TableDir);
 		organizationPick = new WTableDirEditor("AD_Org_ID", true, false, true, lookupOrg);
-		organizationPick.setValue(Env.getAD_Org_ID(Env.getCtx()));
+        // @fchiappano Levantar la ventana con la org *, para poder visualizar
+        // todos los movimientos del cliente de forma inmediata.
+        organizationPick.setValue(0);
+        m_AD_Org_ID = 0;
 		organizationPick.addValueChangeListener(this);
 		
 		//  BPartner
