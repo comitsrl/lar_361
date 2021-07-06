@@ -33,6 +33,8 @@ import java.util.logging.Level;
 import org.adempiere.webui.AdempiereIdGenerator;
 import org.adempiere.webui.LayoutUtils;
 import org.adempiere.webui.apps.AEnv;
+import org.adempiere.webui.apps.form.WCreateFromFactory;
+import org.adempiere.webui.apps.form.WCreateFromPaymentUI;
 import org.adempiere.webui.component.Combobox;
 import org.adempiere.webui.component.ConfirmPanel;
 import org.adempiere.webui.component.Label;
@@ -79,6 +81,9 @@ import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Image;
 
+import ar.com.ergio.model.MLARPaymentHeader;
+import ar.com.ergio.model.MLARRetiroCaja;
+
 /**
  *
  * @author  <a href="mailto:agramdass@gmail.com">Ashley G Ramdass</a>
@@ -119,6 +124,14 @@ public class LoginPanel extends Window implements EventListener
         Clients.response(auf);
 
         BrowserToken.load(this.getUuid());
+
+        // @fchiappano Agegar las implementaciones de ventanas del tipo
+        // CreateFrom, en el mapeo de tablas de ZK.
+        // Esta registración es necesaria realizarla en esta instancia, ya que
+        // desde el validador, se genera un conflicto de depencias en la
+        // compilación del proyecto.
+        WCreateFromFactory.registerClass(MLARRetiroCaja.Table_ID, WCreateFromPaymentUI.class);
+        WCreateFromFactory.registerClass(MLARPaymentHeader.Table_ID, WCreateFromPaymentUI.class);
     }
 
     private void init()
