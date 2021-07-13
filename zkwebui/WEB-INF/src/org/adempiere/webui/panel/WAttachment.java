@@ -27,6 +27,7 @@ import org.adempiere.webui.component.ListItem;
 import org.adempiere.webui.component.Listbox;
 import org.adempiere.webui.component.Panel;
 import org.adempiere.webui.component.Textbox;
+import org.adempiere.webui.component.Urlbox;
 import org.adempiere.webui.component.Window;
 import org.adempiere.webui.window.FDialog;
 import org.compiere.model.MAttachment;
@@ -34,10 +35,12 @@ import org.compiere.model.MAttachmentEntry;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.ValueNamePair;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.au.AuScript;
 import org.zkoss.zk.au.out.AuEcho;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -90,7 +93,14 @@ public class WAttachment extends Window implements EventListener
 	private Button bCancel = new Button();
 	private Button bOk = new Button();
 	private Button bRefresh = new Button();
-	
+
+    // @fchiappano Boton Adjuntar URL.
+    private Button bLoadURL = new Button();
+
+    // @fchiappano Campo que mostrara la URL en la ventana.
+    private Urlbox urlBox = new Urlbox();
+    private Panel urlPanel = new Panel();
+
 	private Panel previewPanel = new Panel();
 
 	private Borderlayout mainPanel = new Borderlayout();
@@ -192,6 +202,7 @@ public class WAttachment extends Window implements EventListener
 		cbContent.addEventListener(Events.ON_SELECT, this);
 		
 		toolBar.appendChild(bLoad);
+        toolBar.appendChild(bLoadURL);
 		toolBar.appendChild(bDelete);
 		toolBar.appendChild(bSave);
 		toolBar.appendChild(cbContent);
@@ -217,6 +228,22 @@ public class WAttachment extends Window implements EventListener
 		bDelete.setTooltiptext(Msg.getMsg(Env.getCtx(), "Delete"));
 		bDelete.addEventListener(Events.ON_CLICK, this);
 
+        // @fchiappano Boton adjuntar URL.
+        bLoadURL.setImage("/images/Online24.png");
+        bLoadURL.setTooltiptext(Msg.getMsg(Env.getCtx(), "Load") + " URL");
+        bLoadURL.addEventListener(Events.ON_CLICK, this);
+
+        // @fchiappano agregar panel y campo URL.
+        urlBox.setVisible(false);
+        urlBox.setButtonImage("/images/Online10.png");
+        urlBox.getButton().setTarget("_blank");
+        urlBox.getButton().addActionListener(this);
+        urlPanel.appendChild(urlBox);
+        urlBox.setHeight("100%");
+        urlBox.setWidth("100%");
+        urlBox.getTextbox().setReadonly(true);
+
+        previewPanel.appendChild(urlBox);
 		previewPanel.appendChild(preview);
 		preview.setHeight("100%");
 		preview.setWidth("100%");
@@ -225,6 +252,7 @@ public class WAttachment extends Window implements EventListener
 		centerPane.setAutoscroll(true);
 		centerPane.setFlex(true);
 		mainPanel.appendChild(centerPane);
+//        centerPane.appendChild(urlBox);
 		centerPane.appendChild(previewPanel);
 		
 		South southPane = new South();
@@ -325,13 +353,30 @@ public class WAttachment extends Window implements EventListener
 			
 			log.config(entry.toStringX());
 
+            // @fchiappano Verificar si se trata de una URL, recuperando el
+            // sufijo correspondiente en el nombre.
+            boolean esURL = false;
+            String[] nombre = entry.getName().split("_");
+            if (nombre[nombre.length - 1].equals("URL"))
+                esURL = true;
+
 			try
 			{
-				AMedia media = new AMedia(entry.getName(), null, entry.getContentType(), entry.getData());
-				
-				preview.setContent(media);
-				preview.setVisible(true);
-				preview.invalidate();
+			    // @fchiappano si es una URL, mostrar el campo WURLEditor
+                if (esURL)
+                {
+                    urlBox.setVisible(true);
+                    urlBox.setText(new String(entry.getData()));
+                    preview.setVisible(false);
+                }
+                else
+                {
+                    AMedia media = new AMedia(entry.getName(), null, entry.getContentType(), entry.getData());
+
+                    preview.setContent(media);
+                    preview.setVisible(true);
+                    preview.invalidate();
+                }
 			}
 			catch (Exception e)
 			{
@@ -427,7 +472,20 @@ public class WAttachment extends Window implements EventListener
 		
 		else if (e.getTarget() == bLoad)
 			loadFile();
-		
+
+        // @fchiappano Cargar Url.
+        else if (e.getTarget() == bLoadURL)
+            loadURL();
+
+        // @fchiappano Accion del boton del URLBox.
+        else if (e.getTarget() == urlBox.getButton())
+        {
+            String urlString = urlBox.getText();
+
+            if (urlString != null && !urlString.equals(""))
+                Executions.getCurrent().sendRedirect(urlString, "_blank");
+        }
+
 		//	Open Attachment
 		
 		else if (e.getTarget() == bSave)
@@ -551,8 +609,13 @@ public class WAttachment extends Window implements EventListener
 		if (FDialog.ask(m_WindowNo, this, "AttachmentDeleteEntry?"))
 		{
 			if (m_attachment.deleteEntry(index))
+			{
 				cbContent.removeItemAt(index);
-			
+				// @fchiappano Limpiar y ocultar el campo de la URL.
+                urlBox.setText("");
+                urlBox.setVisible(false);
+            }
+
 			m_change = true;
 		}
 	}	//	deleteAttachment
@@ -584,4 +647,71 @@ public class WAttachment extends Window implements EventListener
 		}
 	}	//	saveAttachmentToFile
 
-}
+    /**
+     * Lectura de URL a Adjuntar.
+     *
+     * @author fchiappano
+     */
+    private void loadURL()
+    {
+        log.info("");
+
+        preview.setVisible(false);
+
+        ValueNamePair url = null;
+
+        try
+        {
+            url = URLPanel.showDialog("Por favor, ingrese un nombre/descripción y una dirección URL.", "Adjuntar URL");
+
+            if (url == null)
+            {
+                preview.setVisible(true);
+                preview.invalidate();
+                return;
+            }
+        }
+        catch (InterruptedException e)
+        {
+            log.log(Level.WARNING, e.getLocalizedMessage(), e);
+        }
+
+        String urlName = url.getName();
+        String urlValue = url.getValue();
+
+        // @fchiappano si la url ingresada, no tiene el protocolo, agregarlo.
+        if (urlValue.indexOf("://") < 0)
+        {
+            urlValue = "http://" + urlValue;
+        }
+
+        log.config(urlName);
+        int cnt = m_attachment.getEntryCount();
+
+        // @fchiappano Actualizar URL Existente.
+        for (int i = 0; i < cnt; i++)
+        {
+            if (m_attachment.getEntryName(i).equals(urlName))
+            {
+                m_attachment.updateEntry(i, urlValue.getBytes());
+                cbContent.setSelectedIndex(i);
+                displayData(cbContent.getSelectedIndex(), false);
+                m_change = true;
+                return;
+            }
+        }
+
+        // @fchiappano agregar sufijo URL antes de agregar el adjunto.
+        urlName = urlName + "_URL";
+
+        // @fchiappano Crear un nuevo adjunto.
+        if (m_attachment.addEntry(urlName, urlValue.getBytes()))
+        {
+            cbContent.appendItem(urlName, urlName);
+            cbContent.setSelectedIndex(cbContent.getItemCount() - 1);
+            displayData(cbContent.getSelectedIndex(), false);
+            m_change = true;
+        }
+    } // loadURL
+
+} // WAttachment
