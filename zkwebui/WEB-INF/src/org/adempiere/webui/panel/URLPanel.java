@@ -115,7 +115,7 @@ public class URLPanel extends Window implements EventListener
         f_Nombre.setWidth("100%");
         Hbox nombreBox = new Hbox();
         nombreBox.setPack("end");
-        nombreBox.setWidth("5500px");
+        nombreBox.setWidth("550px");
         nombreBox.appendChild(lNombre);
         nombreBox.appendChild(f_Nombre);
         nombreBox.setStyle("margin: 10pt 10pt 10pt 10pt;");
