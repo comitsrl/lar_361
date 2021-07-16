@@ -101,6 +101,10 @@ public class WAttachment extends Window implements EventListener
     private Urlbox urlBox = new Urlbox();
     private Panel urlPanel = new Panel();
 
+    // @fchiappano Campo de texto que mostrara la info del adjunto, si el mismo
+    // no se puede previsualizar.
+    private Textbox infoAttachment = new Textbox();
+
 	private Panel previewPanel = new Panel();
 
 	private Borderlayout mainPanel = new Borderlayout();
@@ -247,7 +251,14 @@ public class WAttachment extends Window implements EventListener
 		previewPanel.appendChild(preview);
 		preview.setHeight("100%");
 		preview.setWidth("100%");
-			
+
+        // @fchiappano agregar el campo de informacion al panel de
+        // previsualización.
+        infoAttachment.setHeight("100%");
+        infoAttachment.setWidth("100%");
+        infoAttachment.setReadonly(true);
+        previewPanel.appendChild(infoAttachment);
+
 		Center centerPane = new Center();
 		centerPane.setAutoscroll(true);
 		centerPane.setFlex(true);
@@ -360,6 +371,11 @@ public class WAttachment extends Window implements EventListener
             if (nombre[nombre.length - 1].equals("URL"))
                 esURL = true;
 
+            // @fchiappano Ocultar todos los campos de previsualización.
+            preview.setVisible(false);
+            infoAttachment.setVisible(false);
+            urlBox.setVisible(false);
+
 			try
 			{
 			    // @fchiappano si es una URL, mostrar el campo WURLEditor
@@ -367,15 +383,24 @@ public class WAttachment extends Window implements EventListener
                 {
                     urlBox.setVisible(true);
                     urlBox.setText(new String(entry.getData()));
-                    preview.setVisible(false);
                 }
                 else
                 {
-                    AMedia media = new AMedia(entry.getName(), null, entry.getContentType(), entry.getData());
+                    // @fchiappano Solo si es una imagen o un PDF, desplegar la
+                    // visualización en pantalla.
+                    if (entry.isPDF() || entry.isGraphic())
+                    {
+                        AMedia media = new AMedia(entry.getName(), null, entry.getContentType(), entry.getData());
 
-                    preview.setContent(media);
-                    preview.setVisible(true);
-                    preview.invalidate();
+                        preview.setContent(media);
+                        preview.invalidate();
+                        preview.setVisible(true);
+                    }
+                    else
+                    {
+                        infoAttachment.setText(entry.toStringX());
+                        infoAttachment.setVisible(true);
+                    }
                 }
 			}
 			catch (Exception e)
