@@ -537,12 +537,12 @@ public class Allocation
 	        {
 	            PreparedStatement pstmt = DB.prepareStatement(sql.toString(), null);
 	            pstmt.setInt(1, m_C_Currency_ID);
-	            pstmt.setInt(3, m_C_Currency_ID);
-	            pstmt.setTimestamp(5, (Timestamp)date);
-	            pstmt.setInt(6, m_C_Currency_ID);
-	            pstmt.setInt(7, m_C_BPartner_ID);
+	            pstmt.setInt(2, m_C_Currency_ID);
+	            pstmt.setTimestamp(3, (Timestamp)date);
+	            pstmt.setInt(4, m_C_Currency_ID);
+	            pstmt.setInt(5, m_C_BPartner_ID);
 	            if (!isMultiCurrency)
-	                pstmt.setInt(8, m_C_Currency_ID);
+	                pstmt.setInt(6, m_C_Currency_ID);
 	            ResultSet rs = pstmt.executeQuery();
 	            while (rs.next())
 	            {

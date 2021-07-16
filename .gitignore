@@ -2,5 +2,16 @@
 /bin
 #temp files
 *~
+*.jasper
 *.swp
-/bin
+/.debris
+bin/
+lib/
+out/
+zkwebui/WEB-INF/classes/metainfo/zk/lang-addon.xml
+base/Base.jar
+extend/Extend.jar
+zkwebui/WEB-INF/classes/
+zkwebui/dist/
+build/
+zkwebui/.ant-targets-build.xml

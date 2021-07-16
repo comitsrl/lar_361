@@ -26,6 +26,8 @@ import org.compiere.acct.Doc;
 import org.compiere.acct.DocTax;
 import org.compiere.acct.Fact;
 import org.compiere.acct.FactLine;
+import org.compiere.grid.VCreateFromFactory;
+import org.compiere.grid.VCreateFromPaymentUI;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
@@ -108,6 +110,11 @@ import ar.com.ergio.util.LAR_Utils;
          engine.addDocValidate(MAllocationHdr.Table_Name, this);
          engine.addDocValidate(MLARPaymentHeader.Table_Name, this);
          engine.addDocValidate(PosOrderModel.Table_Name, this);
+
+        // @fchiappano Agegar las implementaciones de ventanas del tipo
+        // CreateFrom, en el mapeo de tablas de Swing.
+        VCreateFromFactory.registerClass(MLARRetiroCaja.Table_ID, VCreateFromPaymentUI.class);
+        VCreateFromFactory.registerClass(MLARPaymentHeader.Table_ID, VCreateFromPaymentUI.class);
      }   //  initialize
 
     /**

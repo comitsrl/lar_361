@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================= -->
+<!-- Recompilacion de LAR                          -->
+<!-- ============================================= -->
+
+<project name="CompileLAR" default="compile" basedir="../">
+    <description>
+            Recompila el proyecto LAR y deja los fuentes en bin
+    </description>
+
+    <!--<property environment="env" />-->
+    <property name="adempiere.trunk" value="../adempiere361" />
+    <property name="target" value="1.8" />
+    <property name="source" value="1.8" />
+
+    <!-- =========================-->
+    <!-- ADempiere 3.61 classpath -->
+    <!-- =========================-->
+    <path id="adempiere361.classpath">
+        <pathelement location="${adempiere.trunk}/bin" /> <!-- @emmie: mejorar esto incluyendo los directorios "build" de cada módulo -->
+        <fileset dir="${adempiere.trunk}/tools/lib">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${adempiere.trunk}/JasperReportsTools/lib/iReport.jar" />
+        <pathelement location="${adempiere.trunk}/JasperReportsTools/lib/jasperreports-3.7.3.jar" />
+        <fileset dir="${adempiere.trunk}/zkwebui/WEB-INF/lib">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${adempiere.trunk}/serverApps/src/web/WEB-INF/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <!--=========================-->
+    <!--   LAR 3.61 classpath    -->
+    <!--=========================-->
+    <path id="lar_361.classpath">
+        <pathelement path="${basedir}/build"/>
+        <fileset dir="${basedir}/lib">
+               <include name="*.jar"/>
+        </fileset>
+        <path refid="adempiere361.classpath" />
+    </path>
+
+    <!--=====================================-->
+    <!-- Compilación del proyecto LAR 361    -->
+    <!--=====================================-->
+    <target name="compile" depends="init">
+        <echo message="${ant.project.name}: ${ant.file}" />
+        <javac destdir="${basedir}/build" source="${source}" target="${target}" includeantruntime="false" debug="on">
+            <src path="${basedir}/base/src" />
+            <src path="${basedir}/client/src" />
+            <src path="${basedir}/extend/src" />
+            <classpath refid="lar_361.classpath" />
+        </javac>
+        <javac destdir="${basedir}/zkwebui/WEB-INF/classes" source="${source}" target="${target}" includeantruntime="false" debug="on">
+            <src path="${basedir}/zkwebui/WEB-INF/src" />
+            <classpath refid="lar_361.classpath" />
+        </javac>
+    </target>
+
+    <!--==========================================-->
+    <!-- Inicialización de la compilación LAR_361 -->
+    <!--==========================================-->
+    <target name="init" depends="clean">
+        <echo message="=========== Compilacion de LAR - ${env.ENCODING}" />
+        <!-- Create the time stamp -->
+        <tstamp />
+        <mkdir dir="${basedir}/build" />
+        <mkdir dir="${basedir}/zkwebui/WEB-INF/classes" />
+        <copy includeemptydirs="false" todir="${basedir}/build">
+            <fileset dir="${basedir}/base/src">
+                <exclude name="**/*.launch" />
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="${basedir}/build">
+            <fileset dir="${basedir}/client/src">
+                <exclude name="**/*.launch" />
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="${basedir}/build">
+            <fileset dir="${basedir}/extend/src">
+                <exclude name="**/*.launch" />
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!--=====================================================-->
+    <!-- Eliminación del directorio bin del proyecto LAR_361 -->
+    <!--=====================================================-->
+    <target name="clean">
+        <delete dir="${basedir}/build" />
+        <delete dir="${basedir}/zkwebui/WEB-INF/classes" />
+    </target>
+
+</project>
