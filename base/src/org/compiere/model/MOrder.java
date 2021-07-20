@@ -1055,8 +1055,17 @@ public class MOrder extends X_C_Order implements DocAction
             {
                 if (getC_ConversionType_ID() == 0)
                 {
-                    log.saveError("", "No fue posible, recuperar un tipo de cambio valido");
-                    return false;
+                    // @fchiappano Si no hay tipo de cambio por defecto,
+                    // recuperar el configurado en el SdN.
+                    int c_ConversionType_ID = ((MBPartner) getC_BPartner()).get_ValueAsInt("C_ConversionType_ID");
+
+                    if (c_ConversionType_ID > 0)
+                        setC_ConversionType_ID(c_ConversionType_ID);
+                    else
+                    {
+                        log.saveError("", "No fue posible, recuperar un tipo de cambio valido");
+                        return false;
+                    }
                 }
 
                 BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(), LAR_Utils.getMonedaPredeterminada(p_ctx,
