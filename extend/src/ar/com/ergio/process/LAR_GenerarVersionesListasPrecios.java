@@ -117,9 +117,13 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
             // moneda.
             if (monedaProducto > 0 && monedaProducto != monedaPredeterminada)
             {
+                int c_ConversionType_ID = getTipoDeCambio(getAD_Client_ID(), get_TrxName());
+
+                if (c_ConversionType_ID <= 0)
+                    throw new AdempiereUserError("No fue posible, recuperar un Tipo de Cambio valido.");
+
                 BigDecimal tasaCambio = LAR_Utils.getTasaCambio(monedaPredeterminada, monedaProducto,
-                        LAR_Utils.getTipoCambioPredeterminado(getAD_Client_ID(), get_TrxName()), getAD_Client_ID(), 0,
-                        getCtx(), get_TrxName());
+                        c_ConversionType_ID, getAD_Client_ID(), 0, getCtx(), get_TrxName());
 
                 BigDecimal precioStd = (BigDecimal) precioMadre.get_Value("PrecioStd_Final");
                 BigDecimal precioLista = (BigDecimal) precioMadre.get_Value("PrecioLista_Final");
@@ -308,5 +312,24 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
 
         return listasPrecios;
     } // getListasPrecios
+
+    /**
+     * Repera el tipo desde la lista madre. Si no posee un tipo de cambio, se
+     * recupera el tipo de cambio preterminado.
+     *
+     * @author fchiappano
+     * @param ad_Client_ID
+     * @param trxName
+     * @return tipoCambio_ID
+     */
+    private int getTipoDeCambio(final int ad_Client_ID, final String trxName)
+    {
+        int c_ConversionType_ID = listaMadre.get_ValueAsInt("C_ConversionType_ID");
+
+        if (c_ConversionType_ID <= 0)
+            c_ConversionType_ID = LAR_Utils.getTipoCambioPredeterminado(ad_Client_ID, trxName);
+
+        return c_ConversionType_ID;
+    } // getTipoDeCambio
 
 } // LAR_ChequeEnCarteraPorCaja
