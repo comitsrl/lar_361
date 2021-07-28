@@ -25,6 +25,7 @@ import org.adempiere.webui.window.FDialog;
 import org.adempiere.webui.window.WFieldRecordInfo;
 import org.compiere.model.GridField;
 import org.compiere.util.Env;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 
@@ -99,6 +100,15 @@ public class WUrlEditor extends WEditor implements ContextMenuListener
 		if (Events.ON_CHANGE.equals(event.getName()) || Events.ON_OK.equals(event.getName()))
 		{
 			String newValue = getComponent().getText();
+
+            // @fchiappano si la url ingresada, no tiene el protocolo,
+            // agregarlo.
+            if (newValue != null && newValue.indexOf("://") < 0)
+            {
+                newValue = "http://" + newValue;
+                getComponent().setText(newValue);
+            }
+
 			if (oldValue != null && newValue != null && oldValue.equals(newValue)) {
 	    	    return;
 	    	}
@@ -117,7 +127,9 @@ public class WUrlEditor extends WEditor implements ContextMenuListener
 			{
 				try
                 {
-                    Env.startBrowser(urlString);
+                    // @fchiappano Implementación correcta, para abrir el enlace
+                    // una nueva pestaña del navegador.
+                    Executions.getCurrent().sendRedirect(urlString, "_blank");
                     return;
                 }
                 catch(Exception e)
