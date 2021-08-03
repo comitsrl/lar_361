@@ -51,6 +51,7 @@ import org.compiere.pos.PosOrderModel;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.globalqss.model.X_LCO_TaxIdType;
 
 import ar.com.ergio.util.LAR_Utils;
 
@@ -138,13 +139,38 @@ import ar.com.ergio.util.LAR_Utils;
          if (po.get_TableName().equals(MBPartner.Table_Name) && (type == TYPE_BEFORE_CHANGE || type == TYPE_BEFORE_NEW))
          {
              MBPartner bp = (MBPartner) po;
-             LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bp);
-             if (MSysConfig.getBooleanValue("LAR_ValidarCuitSdN", true, Env.getAD_Client_ID(Env.getCtx())) &&
-                     !taxPayerType.equals(LAR_TaxPayerType.CONSUMIDOR_FINAL)) {
-                 // Check CUIT number
-                 String cuit = bp.get_ValueAsString("TaxID");
-                 if (!LAR_Utils.validateCUIT(cuit)) {
-                     return "ERROR: CUIT invalido";
+
+             // @fchiappano Validar según el tipo de identificación y no según
+             // la condicion de iva del sdn.
+             int lco_TaxIDType_ID = bp.get_ValueAsInt("LCO_TaxIDType_ID");
+             if (lco_TaxIDType_ID <= 0)
+                 return "ERROR: En neceserario especificar un tipo de identificación valido.";
+
+             String tipoIdentificacion = new X_LCO_TaxIdType(Env.getCtx(), lco_TaxIDType_ID, bp.get_TrxName())
+                     .getName().toUpperCase();
+
+             if (MSysConfig.getBooleanValue("LAR_ValidarCuitSdN", true, Env.getAD_Client_ID(Env.getCtx())))
+             {
+                 if (tipoIdentificacion.equals("CUIT") || tipoIdentificacion.equals("CUIL"))
+                 {
+                     // Check CUIT number
+                     String cuit = bp.get_ValueAsString("TaxID");
+                     if (!LAR_Utils.validateCUIT(cuit))
+                     {
+                         return "ERROR: CUIT/CUIL invalido";
+                     }
+                 }
+                 // @fchiappano Validar largo del DNI.
+                 else if (tipoIdentificacion.equals("DNI"))
+                 {
+                     String dni = bp.get_ValueAsString("TaxID");
+
+                     if (dni != null && !dni.equals(""))
+                     {
+                         int cantCaracteres = dni.length();
+                         if (cantCaracteres < 7 || cantCaracteres > 8)
+                             return "ERROR: Cantidad de caracteres invalida para tipo de identificación DNI.";
+                     }
                  }
              }
 

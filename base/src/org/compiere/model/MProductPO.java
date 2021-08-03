@@ -89,6 +89,10 @@ public class MProductPO extends X_M_Product_PO
     @Override
     protected boolean afterSave(boolean newRecord, boolean success)
     {
+        // @fchiappano Si no se pudo guardar el registro, no ejecutar acciones.
+        if (!success)
+            return success;
+
         // @fchiappano Desmarcar demas proveedores como proveedor actual.
         if (isCurrentVendor())
         {

@@ -371,7 +371,7 @@ public class Allocation
 		}
 		paymentTable.setColumnClass(i++, BigDecimal.class, true);       //  5-ConvAmt
 		paymentTable.setColumnClass(i++, BigDecimal.class, true);       //  6-ConvOpen
-		paymentTable.setColumnClass(i++, BigDecimal.class, false);      //  7-Allocated
+		paymentTable.setColumnClass(i++, BigDecimal.class, true);      //  7-Allocated
 //		paymentTable.setColumnClass(i++, BigDecimal.class, true);      	//  8-Multiplier
 
 	//TODO nuevo by German Wagner
@@ -621,9 +621,9 @@ public class Allocation
 		}
 		invoiceTable.setColumnClass(i++, BigDecimal.class, true);       //  5-ConvAmt
 		invoiceTable.setColumnClass(i++, BigDecimal.class, true);       //  6-ConvAmt Open
-		invoiceTable.setColumnClass(i++, BigDecimal.class, false);      //  7-Conv Discount
-		invoiceTable.setColumnClass(i++, BigDecimal.class, false);      //  8-Conv WriteOff
-		invoiceTable.setColumnClass(i++, BigDecimal.class, false);      //  9-Conv OverUnder
+		invoiceTable.setColumnClass(i++, BigDecimal.class, true);      //  7-Conv Discount
+		invoiceTable.setColumnClass(i++, BigDecimal.class, true);      //  8-Conv WriteOff
+		invoiceTable.setColumnClass(i++, BigDecimal.class, true);      //  9-Conv OverUnder
 		invoiceTable.setColumnClass(i++, BigDecimal.class, true);		//	10-Conv Applied
 //		invoiceTable.setColumnClass(i++, BigDecimal.class, true);      	//  10-Multiplier
 		//  Table UI

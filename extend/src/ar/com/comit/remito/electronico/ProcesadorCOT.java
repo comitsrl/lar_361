@@ -432,7 +432,8 @@ public class ProcesadorCOT
 
                 // @fchiappano Datos del producto.
                 cuerpoTxt.append(separador + linea.getM_Product().getValue());// Codigo.
-                cuerpoTxt.append(separador + linea.getM_Product().getName());// Nombre/Descripcion
+                String name = linea.getM_Product().getName();
+                cuerpoTxt.append(separador + (name.length() > 40 ? name.substring(0, 39) : name));// Nombre/Descripcion
 
                 // @fchiappano Descripcion UM
                 cuerpoTxt.append(separador + unidadMedida.get_Translation("Name"));
