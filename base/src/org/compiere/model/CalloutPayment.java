@@ -849,6 +849,20 @@ public class CalloutPayment extends CalloutEngine
         {
             String tenderType = (String) value;
 
+            // @fchiappano solo para recibos/cobros, si se trata de un cheque
+            // propio, copiar el nombre del SdN en el campo nombre del cheque.
+            int c_BPartner_ID = (Integer) mTab.getValue("C_BPartner_ID");
+            if (Env.getContext(ctx, WindowNo, "IsSOTrx").equals("Y") && c_BPartner_ID > 0)
+            {
+                String sql = "SELECT Name FROM C_BPartner WHERE C_BPartner_ID = ?";
+                String name = DB.getSQLValueString(null, sql, c_BPartner_ID);
+
+                if (tenderType.equals(MPayment.TENDERTYPE_Check))
+                    mTab.setValue("A_Name", name);
+                else if (mTab.get_ValueAsString("A_Name").equals(name))
+                    mTab.setValue("A_Name", "");
+            }
+
             if (tenderType.equals(MPayment.TENDERTYPE_CreditCard))
             {
                 mTab.setValue("LAR_Tarjeta_Debito_ID", null);
