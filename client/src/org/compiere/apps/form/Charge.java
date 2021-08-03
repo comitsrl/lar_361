@@ -72,8 +72,10 @@ public class Charge
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		String sql = "SELECT C_ElementValue_ID,Value, Name, AccountType "
 			+ "FROM C_ElementValue "
-			+ "WHERE AccountType IN ('R','E')"
-			+ " AND IsSummary='N'"
+			+ "WHERE"
+			// @mzuniga Se permite recuperar todo tipo de cuenta contable
+			//+ " AccountType IN ('R','E')"
+			+ " IsSummary='N'"
 			+ " AND C_Element_ID=? "
 			+ "ORDER BY 2";
 		try
