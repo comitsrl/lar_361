@@ -22,6 +22,7 @@ import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -1068,8 +1069,15 @@ public class MOrder extends X_C_Order implements DocAction
                     }
                 }
 
+                // @fchiappano Validacion de fecha de orden, debido a que el
+                // componente fecha de zk, devuelve la hora cuando se trata de
+                // un registro nuevo.
+                Timestamp fechaOrden = getDateOrdered();
+                if (newRecord)
+                    fechaOrden = quitarHora(fechaOrden);
+
                 BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(), LAR_Utils.getMonedaPredeterminada(p_ctx,
-                        getAD_Client_ID(), get_TrxName()), getDateOrdered(),
+                        getAD_Client_ID(), get_TrxName()), fechaOrden,
                         getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
 
                 if (rate != null)
@@ -2734,5 +2742,22 @@ public class MOrder extends X_C_Order implements DocAction
 
         return true;
     } // actualizarPrecios
+
+    /**
+     * Quitar hora (dejar en cero), de un valor tipo fecha/hora.
+     * @param fechaHora
+     * @return
+     */
+    public Timestamp quitarHora(final Timestamp fechaHora)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(fechaHora.getTime());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        return new Timestamp(cal.getTimeInMillis());
+    } // quitarHora
 
 }	//	MOrder

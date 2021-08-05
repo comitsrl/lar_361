@@ -2844,9 +2844,16 @@ public class MInvoice extends X_C_Invoice implements DocAction
         // @fchiappano Si es factura o NC sin factura origen, recuperar tasa del dia.
         else
         {
+            // @fchiappano Validacion de fecha de factura, debido a que el
+            // componente fecha de zk, devuelve la hora cuando se trata de
+            // un registro nuevo.
+            Timestamp fechaFactura = getDateInvoiced();
+
+            if (is_new())
+                fechaFactura = quitarHora(fechaFactura);
             BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(),
-                    LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()),
-                    getDateInvoiced(), conversionType_ID, getAD_Client_ID(), getAD_Org_ID());
+                    LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), fechaFactura,
+                    conversionType_ID, getAD_Client_ID(), getAD_Org_ID());
 
             if (rate != null)
                 set_ValueOfColumn("TasaDeCambio", rate);
@@ -2860,5 +2867,22 @@ public class MInvoice extends X_C_Invoice implements DocAction
         return true;
 
     } // setTipoCambioSdN
+
+    /**
+     * Quitar hora (dejar en cero), de un valor tipo fecha/hora.
+     * @param fechaHora
+     * @return
+     */
+    public Timestamp quitarHora(final Timestamp fechaHora)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(fechaHora.getTime());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        return new Timestamp(cal.getTimeInMillis());
+    } // quitarHora
 
 }	//	MInvoice
