@@ -167,14 +167,16 @@ public class CommissionCalc extends SvrProcess
 				}
 			}
 			else 	//	Invoice Basis
+                    //  @mzuniga: Se utiliza RV_CInvoice y RV_CInvoiceLine
+                    //  para tomar en cuenta las Notas de Crédito
 			{
 				if (m_com.isListDetails())
 				{
 					sql.append("SELECT h.C_Currency_ID, l.LineNetAmt, l.QtyInvoiced, "
 						+ "NULL, l.C_InvoiceLine_ID, h.DocumentNo,"
 						+ " COALESCE(prd.Value,l.Description),h.DateInvoiced "
-						+ "FROM C_Invoice h"
-						+ " INNER JOIN C_InvoiceLine l ON (h.C_Invoice_ID = l.C_Invoice_ID)"
+						+ "FROM RV_C_Invoice h"
+						+ " INNER JOIN RV_C_InvoiceLine l ON (h.C_Invoice_ID = l.C_Invoice_ID)"
 						+ " LEFT OUTER JOIN M_Product prd ON (l.M_Product_ID = prd.M_Product_ID) "
 						+ "WHERE h.DocStatus IN ('CL','CO','RE')"
 						+ " AND h.IsSOTrx='Y'"
@@ -186,8 +188,8 @@ public class CommissionCalc extends SvrProcess
 					sql.append("SELECT h.C_Currency_ID, SUM(l.LineNetAmt) AS Amt,"
 						+ " SUM(l.QtyInvoiced) AS Qty, "
 						+ "NULL, NULL, NULL, NULL, MAX(h.DateInvoiced) "
-						+ "FROM C_Invoice h"
-						+ " INNER JOIN C_InvoiceLine l ON (h.C_Invoice_ID = l.C_Invoice_ID) "
+						+ "FROM RV_C_Invoice h"
+						+ " INNER JOIN RV_C_InvoiceLine l ON (h.C_Invoice_ID = l.C_Invoice_ID) "
 						+ "WHERE h.DocStatus IN ('CL','CO','RE')"
 						+ " AND h.IsSOTrx='Y'"
 						+ " AND h.AD_Client_ID = ?"
