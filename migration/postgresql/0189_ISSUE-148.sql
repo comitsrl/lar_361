@@ -1,3 +1,6 @@
+ALTER TABLE C_BP_BankAccount ADD COLUMN CBU character varying(40);
+ALTER TABLE C_BP_BankAccount ADD COLUMN Alias character varying(20);
+
 -- 04/08/2021 12:43:19 ART
 -- ISSUE #148: Readecuación de la pestaña Cuenta Bancaria.
 UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=4107
