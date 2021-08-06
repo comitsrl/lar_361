@@ -2755,7 +2755,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
         // conversion.
         if (!newRecord)
         {
-            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(getC_Currency_ID(), get_ValueOldAsInt("C_Currency_ID"),
+            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(getC_Currency_ID(), get_ValueOldAsInt("C_Currency_ID"), getDateInvoiced(),
                     getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID(), p_ctx, get_TrxName());
 
             if (tasaCambio != null)

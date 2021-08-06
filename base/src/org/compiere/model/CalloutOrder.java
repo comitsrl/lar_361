@@ -902,7 +902,7 @@ public class CalloutOrder extends CalloutEngine
         if (listaPrecio.getC_Currency_ID() != orden.getC_Currency_ID())
         {
             BigDecimal tasaCambio = LAR_Utils.getTasaCambio(orden.getC_Currency_ID(),
-                    listaPrecio.getC_Currency_ID(), orden.getC_ConversionType_ID(), orden.getAD_Client_ID(),
+                    listaPrecio.getC_Currency_ID(), orden.getDateOrdered(), orden.getC_ConversionType_ID(), orden.getAD_Client_ID(),
                     orden.getAD_Org_ID(), ctx, mTab.getTrxInfo());
 
             if (tasaCambio != null)

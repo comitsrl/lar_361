@@ -2670,8 +2670,8 @@ public class MOrder extends X_C_Order implements DocAction
         // @fchiappano Cambiar el precio de la linea, usando la tasa de conversion.
         if (!newRecord)
         {
-            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(getC_Currency_ID(), get_ValueOldAsInt("C_Currency_ID"), getC_ConversionType_ID(),
-                    getAD_Client_ID(), getAD_Org_ID(), p_ctx, get_TrxName());
+            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(getC_Currency_ID(), get_ValueOldAsInt("C_Currency_ID"), getDateOrdered(),
+                    getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID(), p_ctx, get_TrxName());
 
             if (tasaCambio != null)
             {

@@ -180,7 +180,7 @@ public final class LAR_Utils {
      * @param trxName
      * @return Tasa de Cambio
      */
-    public static BigDecimal getTasaCambio(int c_Currency_ID, final int c_CurrencyOld_ID,
+    public static BigDecimal getTasaCambio(int c_Currency_ID, final int c_CurrencyOld_ID, final Timestamp fechaTasa,
             final int c_ConversionType_ID, final int ad_Client_ID, final int ad_Org_ID, final Properties p_ctx,
             final String trxName)
     {
@@ -206,7 +206,7 @@ public final class LAR_Utils {
                   + " ORDER BY ValidFrom DESC, AD_Client_ID DESC, AD_Org_ID DESC";
 
         BigDecimal tasaCambio = DB.getSQLValueBD(trxName, sql, c_Currency_ID, LAR_Utils.getMonedaPredeterminada(p_ctx,
-                ad_Client_ID, trxName), c_ConversionType_ID, new Timestamp(System.currentTimeMillis()), ad_Client_ID,
+                ad_Client_ID, trxName), c_ConversionType_ID, fechaTasa, ad_Client_ID,
                 ad_Org_ID);
 
         return tasaCambio;
