@@ -400,7 +400,7 @@ public class CalloutInvoice extends CalloutEngine
         MInvoice factura = new MInvoice(ctx, (Integer) mTab.getValue("C_Invoice_ID"), mTab.getTrxInfo());
         if (listaPrecio.getC_Currency_ID() != factura.getC_Currency_ID())
         {
-            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(factura.getC_Currency_ID(), listaPrecio.getC_Currency_ID(),
+            BigDecimal tasaCambio = LAR_Utils.getTasaCambio(factura.getC_Currency_ID(), listaPrecio.getC_Currency_ID(), factura.getDateInvoiced(),
                     factura.getC_ConversionType_ID(), factura.getAD_Client_ID(), factura.getAD_Org_ID(), ctx, mTab.getTrxInfo());
 
             if (tasaCambio != null)

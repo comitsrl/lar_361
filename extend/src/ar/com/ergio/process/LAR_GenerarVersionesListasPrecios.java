@@ -122,7 +122,7 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
                 if (c_ConversionType_ID <= 0)
                     throw new AdempiereUserError("No fue posible, recuperar un Tipo de Cambio valido.");
 
-                BigDecimal tasaCambio = LAR_Utils.getTasaCambio(monedaPredeterminada, monedaProducto,
+                BigDecimal tasaCambio = LAR_Utils.getTasaCambio(monedaPredeterminada, monedaProducto, new Timestamp(System.currentTimeMillis()),
                         c_ConversionType_ID, getAD_Client_ID(), 0, getCtx(), get_TrxName());
 
                 BigDecimal precioStd = (BigDecimal) precioMadre.get_Value("PrecioStd_Final");

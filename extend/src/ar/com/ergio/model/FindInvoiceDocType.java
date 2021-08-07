@@ -179,7 +179,7 @@ public final class FindInvoiceDocType
             int moneda_predeterminada_ID = LAR_Utils.getMonedaPredeterminada(Env.getCtx(), invoice.getAD_Client_ID(), invoice.get_TrxName());
             if (invoice.getC_Currency_ID() != moneda_predeterminada_ID)
             {
-                BigDecimal tasa = LAR_Utils.getTasaCambio(moneda_predeterminada_ID, invoice.getC_Currency_ID(),
+                BigDecimal tasa = LAR_Utils.getTasaCambio(moneda_predeterminada_ID, invoice.getC_Currency_ID(), invoice.getDateInvoiced(),
                         invoice.getC_ConversionType_ID(), invoice.getAD_Client_ID(), ad_Org_ID, Env.getCtx(),
                         invoice.get_TrxName());
 
