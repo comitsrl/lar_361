@@ -21,6 +21,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -40,7 +43,6 @@ import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
-import org.compiere.util.Trx;
 import org.compiere.util.Util;
 
 import ar.com.ergio.model.MLARPaymentHeader;
@@ -904,41 +906,77 @@ public class Allocation
 		//  Invoices - Loop and generate allocations
 		int iRows = invoice.getRowCount();
 
-		//	Create Allocation
-		MAllocationHdr alloc = new MAllocationHdr (Env.getCtx(), true,	//	manual
-			DateTrx, C_Currency_ID, Env.getContext(Env.getCtx(), "#AD_User_Name"), trxName);
-		alloc.setAD_Org_ID(AD_Org_ID);
-		alloc.saveEx();
+        // @fchiappano Restringir la asignación multimoneda a 1 contra 1 (Una
+        // factura contra una NC).
+        ArrayList<Integer[]> invoiceList = new ArrayList<Integer[]>();
+        boolean asignacionNC = false;
+        for (int i = 0; i < iRows; i++)
+        {
+            if (((Boolean) invoice.getValueAt(i, 0)).booleanValue())
+            {
+                KeyNamePair ii = (KeyNamePair) invoice.getValueAt(i, 2);
+                MInvoice factura = new MInvoice(Env.getCtx(), ii.getKey(), trxName);
+
+                // @fchiappano Valor que determinara el orden de los items al
+                // ordenarlos. 1 = Nota de Credito, 2 Factura.
+                int tipoDoc = 2;
+                if (factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)
+                        || factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo))
+                {
+                    tipoDoc = 1;
+                    asignacionNC = true;
+                }
+
+                // @fchiappano Array = C_Invoice_ID, nroRegistro en grilla, tipo de doc.
+                Integer[] lineaSeleccionada = { ii.getKey(), i, tipoDoc };
+                invoiceList.add(lineaSeleccionada);
+
+                if (asignacionNC && invoiceList.size() > 2)
+                    throw new AdempiereException(
+                            "La asignación de Notas de Crédito contra Facturas, deberan realizarse de a una por vez.");
+            }
+        }
+
+        // @fchiappano Ordenar las facturas, dejando primero las NC y luego las
+        // facturas.
+        if (invoiceList.size() > 0)
+            ordenarLista(invoiceList);
+
 		//	For all invoices
-		int invoiceLines = 0;
 		BigDecimal unmatchedApplied = Env.ZERO;
 
         // @fchiappano variable para almacenar la moneda de las facturas.
         int monedaFactura_ID = 0;
+        int notaCredito_ID = 0;
+        MAllocationHdr alloc = null;
 
-		for (int i = 0; i < iRows; i++)
+		for (int x = 0; x < invoiceList.size(); x++)
 		{
-			//  Invoice line is selected
-			if (((Boolean)invoice.getValueAt(i, 0)).booleanValue())
-			{
-				invoiceLines++;
+		        int i = invoiceList.get(x)[1];
+
 				KeyNamePair pp = (KeyNamePair)invoice.getValueAt(i, 2);    //  Value
 				//  Invoice variables
 				int C_Invoice_ID = pp.getKey();
 
                 // @fchiappano Almacenar moneda de la factura.
                 MInvoice factura = new MInvoice(Env.getCtx(), C_Invoice_ID, trxName);
-                if (monedaFactura_ID == 0)
-                    monedaFactura_ID = factura.getC_Currency_ID();
 
-                // @fchiappano Si la moneda de la factura, difiere de la
-                // anterior, advertir al usuario y revertir la transacción.
+                // @fchiappano si cambia la moneda de la factura, crear una
+                // nueva cabecera de asignacion y procesar la anterior.
                 if (monedaFactura_ID != factura.getC_Currency_ID())
                 {
-                    Trx trx = Trx.get(trxName, false);
-                    trx.rollback();
-                    throw new AdempiereException(
-                            "No es posible, asignar movimientos a facturas con distintas monedas. Por favor, realice el procedimiento en dos pasos por separado.");
+                    // @fchiappano procesar la asignación de factura.
+                    if (alloc != null && alloc.get_ID() != 0)
+                    {
+                        alloc.processIt(DocAction.ACTION_Complete);
+                        alloc.saveEx();
+                    }
+                    monedaFactura_ID = factura.getC_Currency_ID();
+                    // Create Allocation
+                    alloc = new MAllocationHdr(Env.getCtx(), true, // manual
+                            DateTrx, monedaFactura_ID, Env.getContext(Env.getCtx(), "#AD_User_Name"), trxName);
+                    alloc.setAD_Org_ID(AD_Org_ID);
+                    alloc.saveEx();
                 }
 
                 // @fchiappano Chequear si la moneda de la factura, es una moneda extranjera.
@@ -962,13 +1000,15 @@ public class Allocation
                     DiscountAmt = DiscountAmt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
                     WriteOffAmt = WriteOffAmt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
                     OverUnderAmt = OverUnderAmt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
-
-                    // @fchiappano Cambiar la moneda de la Asignación.
-                    alloc.setC_Currency_ID(factura.getC_Currency_ID());
-                    alloc.saveEx();
                 }
 
-				log.config("Invoice #" + i + " - AppliedAmt=" + AppliedAmt);// + " -> " + AppliedAbs);
+                // @fchiappano Si la moneda de la factura difiere de la moneda
+                // seleccionada en la ventana, aplicar conversion al monto
+                // aplicado, ya que viene convertido según este ultimo criterio.
+                if (monedaFactura_ID != C_Currency_ID)
+                    AppliedAmt = AppliedAmt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
+
+                log.config("Invoice #" + i + " - AppliedAmt=" + AppliedAmt);// + " -> " + AppliedAbs);
 				//  loop through all payments until invoice applied
 
 				for (int j = 0; j < paymentList.size() && AppliedAmt.signum() != 0; j++)
@@ -980,16 +1020,12 @@ public class Allocation
 						log.config(".. with payment #" + j + ", Amt=" + PaymentAmt);
 
 						BigDecimal amount = AppliedAmt;
-						if (amount.abs().compareTo(PaymentAmt.abs()) > 0)  // if there's more open on the invoice
-							amount = PaymentAmt;							// than left in the payment
 
                         // @fchiappano Si la factura es en moneda extrangera,
                         // convertir el monto a asignar del cobro/pago.
-						BigDecimal amountConvertido = amount;
-
                         if (esMonedaExtranjera)
                         {
-                            amountConvertido = amountConvertido.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
+                            PaymentAmt = PaymentAmt.divide(tasaCambio, redondeo, RoundingMode.FLOOR);
 
                             // @fchiappano Setear tasa de cambio en la cabecera del recibo,
                             // para evitar errores en la posterior validación de la asignación.
@@ -1004,20 +1040,16 @@ public class Allocation
                         }
                         // @fchiappano Fin de Conversión de moneda.
 
+						if (amount.abs().compareTo(PaymentAmt.abs()) > 0)  // if there's more open on the invoice
+							amount = PaymentAmt;							// than left in the payment
+
 						//	Allocation Line
-                        MAllocationLine aLine = new MAllocationLine(alloc, amountConvertido, // @fchiappano Utilizar el amount convertido.
+                        MAllocationLine aLine = new MAllocationLine(alloc, amount,
 							DiscountAmt, WriteOffAmt, OverUnderAmt);
 						aLine.setDocInfo(C_BPartner_ID, C_Order_ID, C_Invoice_ID);
 						aLine.setPaymentInfo(C_Payment_ID, C_CashLine_ID);
                         // @fchiappano Setear tasa de cambio en linea de asignacion.
                         aLine.set_ValueOfColumn("TasaDeCambio", tasaCambio);
-
-                        // @fchiappano Si se trata de una NC, Copio el
-                        // C_Invoice_ID en la columna NotaCredito_ID.
-                        if (aLine.getC_Invoice().getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo) ||
-                                aLine.getC_Invoice().getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo))
-                            aLine.set_ValueOfColumn("NotaCredito_ID", C_Invoice_ID);
-
 						aLine.saveEx();
 
 						//  Apply Discounts and WriteOff only first time
@@ -1032,7 +1064,15 @@ public class Allocation
 				}	//	loop through payments for invoice
 
 				if ( AppliedAmt.signum() == 0 && DiscountAmt.signum() == 0 && WriteOffAmt.signum() == 0)
+				{
+                    // @fchiappano guardar el notaCredito_ID, para en la
+                    // siguiente vuelta, generar la vinculación cruzada en
+                    // la asignación, con la factura.
+                    if (factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)
+                            || factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo))
+                        notaCredito_ID = C_Invoice_ID;
 					continue;
+				}
 				else {			// remainder will need to match against other invoices
 					int C_Payment_ID = 0;
 
@@ -1042,21 +1082,46 @@ public class Allocation
 					aLine.setDocInfo(C_BPartner_ID, C_Order_ID, C_Invoice_ID);
 					aLine.setPaymentInfo(C_Payment_ID, C_CashLine_ID);
 
-                    // @fchiappano Si se trata de una NC, Copio el
-                    // C_Invoice_ID en la columna NotaCredito_ID.
-                    if (aLine.getC_Invoice().getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)
-                            || aLine.getC_Invoice().getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo))
-                        aLine.set_ValueOfColumn("NotaCredito_ID", C_Invoice_ID);
+                    // @fchiappano si se trata de una factura y el
+                    // notacredito_ID es mayor a cero, quiere decir que
+                    // anteriorrmente, se asigno una nota de credito y se debe
+                    // generar la vinculación cruzada.
+                    if (factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARInvoice)
+                            && notaCredito_ID > 0)
+                    {
+                        aLine.set_ValueOfColumn("NotaCredito_ID", notaCredito_ID);
+                        notaCredito_ID = 0;
+                    }
 
 					aLine.saveEx();
 					log.fine("Allocation Amount=" + AppliedAmt);
 					unmatchedApplied = unmatchedApplied.add(AppliedAmt);
 				}
-			}   //  invoice selected
+
+                // @fchiappano guardar el notaCredito_ID, para en la
+                // siguiente vuelta, generar la vinculación cruzada en la
+                // asignación, con la factura.
+                if (factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)
+                        || factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_APCreditMemo))
+                    notaCredito_ID = C_Invoice_ID;
+
 		}   //  invoice loop
+
+        // @fchiappano procesar la asignación de factura.
+        if (alloc != null && alloc.get_ID() != 0)
+        {
+            alloc.processIt(DocAction.ACTION_Complete);
+            alloc.saveEx();
+        }
 
 		// check for unapplied payment amounts (eg from payment reversals)
 		for (int i = 0; i < paymentList.size(); i++)	{
+            // Create Allocation
+            alloc = new MAllocationHdr(Env.getCtx(), true, // manual
+                    DateTrx, C_Currency_ID, Env.getContext(Env.getCtx(), "#AD_User_Name"), trxName);
+            alloc.setAD_Org_ID(AD_Org_ID);
+            alloc.saveEx();
+
 			BigDecimal payAmt = (BigDecimal) amountList.get(i);
 			if ( payAmt.signum() == 0 )
 					continue;
@@ -1071,17 +1136,16 @@ public class Allocation
 			aLine.setPaymentInfo(C_Payment_ID, 0);
 			aLine.saveEx();
 			unmatchedApplied = unmatchedApplied.subtract(payAmt);
+            // Should start WF
+            if (alloc.get_ID() != 0)
+            {
+                alloc.processIt(DocAction.ACTION_Complete);
+                alloc.saveEx();
+            }
 		}
 
 		if ( unmatchedApplied.signum() != 0 )
 			log.log(Level.SEVERE, "Allocation not balanced -- out by " + unmatchedApplied );
-
-		//	Should start WF
-		if (alloc.get_ID() != 0)
-		{
-			alloc.processIt(DocAction.ACTION_Complete);
-			alloc.saveEx();
-		}
 
 		//  Test/Set IsPaid for Invoice - requires that allocation is posted
 		for (int i = 0; i < iRows; i++)
@@ -1117,6 +1181,22 @@ public class Allocation
 		paymentList.clear();
 		amountList.clear();
 
-		return alloc.getDocumentNo();
+		return "Asignación generada con exito.";
 	}   //  saveData
-}
+
+    /**
+     * Ordenar lista segun el tipo de documento.
+     *
+     * @param invoiceList
+     */
+    private void ordenarLista(List<Integer[]> invoiceList)
+    {
+        Collections.sort(invoiceList, new Comparator<Integer[]>()
+        {
+            public int compare(Integer[] o1, Integer[] o2)
+            {
+                return o1[2].compareTo(o2[2]);
+            }
+        });
+    } // ordenarLista
+} // Allocation

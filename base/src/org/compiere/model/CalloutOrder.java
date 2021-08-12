@@ -787,9 +787,9 @@ public class CalloutOrder extends CalloutEngine
 				mTab.setValue("IsTaxIncluded", new Boolean("Y".equals(rs.getString(1))));
 				//	Price Limit Enforce
 				Env.setContext(ctx, WindowNo, "EnforcePriceLimit", rs.getString(2));
-				//	Currency
-				Integer ii = new Integer(rs.getInt(3));
-				mTab.setValue("C_Currency_ID", ii);
+				//	Currency @fchiappano no se requiere pisar la moeneda, ya que la misma se recupera desde SdN.
+				// Integer ii = new Integer(rs.getInt(3));
+				// mTab.setValue("C_Currency_ID", ii);
 				//	PriceList Version
 				Env.setContext(ctx, WindowNo, "M_PriceList_Version_ID", rs.getInt(5));
 			}

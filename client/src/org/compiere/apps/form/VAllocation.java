@@ -58,6 +58,8 @@ import org.compiere.util.Msg;
 import org.compiere.util.Trx;
 import org.compiere.util.TrxRunnable;
 
+import ar.com.ergio.util.LAR_Utils;
+
 public class VAllocation extends Allocation
 	implements FormPanel, ActionListener, TableModelListener, VetoableChangeListener, SystemIDs
 {
@@ -501,6 +503,18 @@ public class VAllocation extends Allocation
 		else if (name.equals("C_Currency_ID"))
 		{
 			m_C_Currency_ID = ((Integer)value).intValue();
+
+            // @fchiappano Solo permitir multi moneda si se selecciona la moneda
+            // pesos.
+            if (m_C_Currency_ID != LAR_Utils.getMonedaPredeterminada(Env.getCtx(), Env.getAD_Client_ID(Env.getCtx()),
+                    null))
+            {
+                multiCurrency.setSelected(false);
+                multiCurrency.setEnabled(false);
+            }
+            else
+                multiCurrency.setEnabled(true);
+
 			loadBPartner();
 		}
 		//	Date for Multi-Currency

@@ -61,6 +61,8 @@ import org.zkoss.zkex.zul.South;
 import org.zkoss.zul.Separator;
 import org.zkoss.zul.Space;
 
+import ar.com.ergio.util.LAR_Utils;
+
 /**
  * Allocation Form
  *
@@ -411,6 +413,18 @@ public class WAllocation extends Allocation
 		else if (name.equals("C_Currency_ID"))
 		{
 			m_C_Currency_ID = ((Integer)value).intValue();
+
+            // @fchiappano Solo permitir multi moneda si se selecciona la moneda
+            // pesos.
+            if (m_C_Currency_ID != LAR_Utils.getMonedaPredeterminada(Env.getCtx(), Env.getAD_Client_ID(Env.getCtx()),
+                    null))
+            {
+                multiCurrency.setSelected(false);
+                multiCurrency.setEnabled(false);
+            }
+            else
+                multiCurrency.setEnabled(true);
+
 			loadBPartner();
 		}
 		//	Date for Multi-Currency

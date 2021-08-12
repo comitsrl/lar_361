@@ -139,8 +139,6 @@ public class WCreateFromPaymentUI extends CreateFromPayment implements EventList
     {
         dateFromField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "DateFrom"));
         dateToField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "DateTo"));
-        dateFromField.getComponent().setStyle("font-size:xx-small");
-        dateToField.getComponent().setStyle("font-size:xx-small");
 
         amtFromField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "AmtFrom"));
         amtToField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "AmtTo"));
