@@ -22,6 +22,8 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -88,7 +90,7 @@ import org.compiere.util.Msg;
  * 				https://sourceforge.net/tracker/?func=detail&aid=2860556&group_id=176962&atid=879332
  */
 public abstract class Info extends CDialog
-	implements ListSelectionListener
+	implements ListSelectionListener, KeyListener
 {
 	/**
 	 * 
@@ -425,6 +427,8 @@ public abstract class Info extends CDialog
 		calcMenu.addActionListener(this);
 		//
 		p_table.getSelectionModel().addListSelectionListener(this);
+		// @fchiappano se agrega key listener para capturar el evento del enter.
+		p_table.addKeyListener(this);
 		enableButtons();
 	}	//	jbInit
 
@@ -930,7 +934,8 @@ public abstract class Info extends CDialog
 	 */
 	public void valueChanged(ListSelectionEvent e)
 	{
-		if (e.getValueIsAdjusting())
+        // @fchiappano Si tabla es nula, puede que se haya ejecutado un dispose.
+        if (e.getValueIsAdjusting() || p_table == null)
 			return;
 		enableButtons();
 	}   //  calueChanged
@@ -1304,5 +1309,36 @@ public abstract class Info extends CDialog
 			super.interrupt();
 		}
 	}   //  Worker
+
+    @Override
+    public void keyTyped(KeyEvent e)
+    {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e)
+    {
+        // @fchiappano Capturar el evento de la tecla Enter, sobre la grilla.
+        if (e.getSource() == p_table && e.getKeyCode() == KeyEvent.VK_ENTER && p_table.getSelectedRow() != -1)
+        {
+            if (p_multiSelection && m_keyColumnIndex >= 0)
+            {
+                Object data = p_table.getValueAt(p_table.getSelectedRow(), m_keyColumnIndex);
+                if (data instanceof IDColumn)
+                {
+                    IDColumn id = (IDColumn) data;
+                    id.setSelected(!id.isSelected());
+                    p_table.setValueAt(data, p_table.getSelectedRow(), m_keyColumnIndex);
+                }
+            }
+            else
+                dispose(true);
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e)
+    {
+    }
 
 }	//	Info
