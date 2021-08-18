@@ -1228,6 +1228,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             pays[p].testAllocation();
             pays[p].saveEx();
         }
+
+        // @fchiappano se imita comportamiento de modelos nativos de AD.
+        setDefiniteDocumentNo();
+
         setDocStatus(ACTION_Complete);
         setDocAction(DOCACTION_Close);
         setProcessed(true);
@@ -1777,5 +1781,22 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         }
         return letra;
     } // recuperaLetra
+
+    /**
+     * Set the definite document number after completed
+     */
+    private void setDefiniteDocumentNo()
+    {
+        MDocType dt = MDocType.get(getCtx(), getC_DocType_ID());
+        if (dt.isOverwriteDateOnComplete())
+            setDateTrx(new Timestamp(System.currentTimeMillis()));
+
+        if (dt.isOverwriteSeqOnComplete())
+        {
+            String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
+            if (value != null)
+                setDocumentNo(value);
+        }
+    } // setDefiniteDocumentNo
 
 }	//	MLARPaymentHeader

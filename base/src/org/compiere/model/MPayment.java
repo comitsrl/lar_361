@@ -2128,7 +2128,8 @@ public final class MPayment extends X_C_Payment
 		if (dt.isOverwriteDateOnComplete()) {
 			setDateTrx(new Timestamp (System.currentTimeMillis()));
 		}
-		if (dt.isOverwriteSeqOnComplete()) {
+		// @fchiappano No pisar el nro de doc, si existe una cabecera.
+		if (dt.isOverwriteSeqOnComplete() && get_ValueAsInt("LAR_PaymentHeader_ID") <= 0) {
 			String value = DB.getDocumentNo(getC_DocType_ID(), get_TrxName(), true, this);
 			if (value != null)
 				setDocumentNo(value);
