@@ -31,10 +31,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import javax.swing.JDialog;
-
-import org.compiere.Adempiere;
-import org.compiere.apps.ADialog;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
@@ -438,14 +434,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                                         .get_Value("LAR_Importe_Exencion_Ganancias");
                                 porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_Ganancias");
                             }
-                            else
-                            {
-                                // Advertir al ususario que el certificado de Exención esta vencido
-                                JDialog dialog = new JDialog();
-                                dialog.setIconImage(Adempiere.getImage16());
-                                ADialog.warn(1, dialog,
-                                        "Certificado de Exenci\u00f3n de Ganancias Vencido");
-                            }
                         }
                         // Exenciones % e importe fijo
                         BigDecimal impExentoDesc = impRetencion.multiply(porcExencion)
@@ -526,14 +514,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             {
                                 impExencion = (BigDecimal) bp.get_Value("LAR_Importe_Exencion_IVA");
                                 porcExencion = (BigDecimal) bp.get_Value("LAR_Exencion_IVA");
-                            } else
-                            {
-                                // Advertir al ususario que el certificado de Exención esta
-                                // vencido
-                                JDialog dialog = new JDialog();
-                                dialog.setIconImage(Adempiere.getImage16());
-                                ADialog.warn(1, dialog,
-                                        "Certificado de Exenci\u00f3n de IVA Vencido");
                             }
                         }
                         // Exenciones % e importe fijo
@@ -646,6 +626,11 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 // Existe un pago que permite compensar el importe de la retención
                 if (compensar && genera)
                 {
+                    // @fchiappano Se agrega validación para determinar si
+                    // existe un pago que permita compesar la retencion.
+                    if (compensar && pago == null)
+                        return "No existe un pago que permita compensar el importe de la retenci\u00f3n";
+
                     // Se crea el Pago Retención compensando el importe
                     final MPayment pagoRetencion = creaPagoRetencion(impRetencion, cargoRetencion,
                             c_DocType_ID, pago, compensar);
@@ -1573,15 +1558,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         // Se compensa el importe de la retención en el pago recibido
         if (compensa)
         {
-            if (pago == null)
-            {
-                JDialog dialog = new JDialog();
-                dialog.setIconImage(Adempiere.getImage16());
-                ADialog.warn(1, dialog,
-                        "No existe un pago que permita compensar el importe de la retenci\u00f3n");
-                return null;
-
-            }
             // Se actualiza el total del pago compensado directamente vía SQL
             // para evitar que se dispare el recálculo de retenciones
             setPayAmtDirectly(pago, pago.getPayAmt().subtract(impRetencion));
