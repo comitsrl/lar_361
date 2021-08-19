@@ -210,9 +210,6 @@ public class CalloutInvoice extends CalloutEngine
                     {
                         if (Env.getContext(ctx, WindowNo, "DocBaseType").endsWith("C")) // Credits are Payment Term
                             s = "P";
-                        else if (IsSOTrx && (s.equals("S") || s.equals("U"))) // No Check/Transfer
-                                                                              // for SO_Trx
-                            s = "P"; // Payment Term
                         mTab.setValue("PaymentRule", s);
                     }
                     // Payment Term

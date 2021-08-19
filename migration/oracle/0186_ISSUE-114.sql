@@ -50,16 +50,6 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTran
 
 -- 22/07/2021 20:52:20 ART
 -- ISSUE #114: Moneda y Tipo de Cambio para proveedores.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007262,100,'Y','N','N',3000895,'N','Y',224,'N','The Email Address is the Electronic Mail ID for this User and should be fully qualified (e.g. joe.smith@company.com). The Email Address is used to access the self service application functionality from the web.','LAR','Electronic Mail Address','EMail Address',100,0,TO_DATE('2021-07-22 20:52:18','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-07-22 20:52:18','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 22/07/2021 20:52:20 ART
--- ISSUE #114: Moneda y Tipo de Cambio para proveedores.
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007262 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 22/07/2021 20:52:20 ART
--- ISSUE #114: Moneda y Tipo de Cambio para proveedores.
 INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007263,1,'Y','N','N',3003524,'N','Y',224,'N','LAR','Es Grande',100,0,TO_DATE('2021-07-22 20:52:20','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-07-22 20:52:20','YYYY-MM-DD HH24:MI:SS'),100)
 ;
 
@@ -116,16 +106,6 @@ INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLi
 -- 22/07/2021 20:52:21 ART
 -- ISSUE #114: Moneda y Tipo de Cambio para proveedores.
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007268 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 22/07/2021 20:52:21 ART
--- ISSUE #114: Moneda y Tipo de Cambio para proveedores.
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007269,10,'Y','N','N',3001796,'N','Y',224,'N','LAR','PlazoPago',100,0,TO_DATE('2021-07-22 20:52:21','YYYY-MM-DD HH24:MI:SS'),'Y',0,TO_DATE('2021-07-22 20:52:21','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 22/07/2021 20:52:21 ART
--- ISSUE #114: Moneda y Tipo de Cambio para proveedores.
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007269 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 22/07/2021 20:52:22 ART
