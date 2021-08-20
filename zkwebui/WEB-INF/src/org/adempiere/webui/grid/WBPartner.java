@@ -17,6 +17,8 @@
 
 package org.adempiere.webui.grid;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.logging.Level;
 
 import org.adempiere.webui.component.ConfirmPanel;
@@ -27,6 +29,7 @@ import org.adempiere.webui.component.Textbox;
 import org.adempiere.webui.component.VerticalBox;
 import org.adempiere.webui.component.Window;
 import org.adempiere.webui.editor.WLocationEditor;
+import org.adempiere.webui.editor.WTableDirEditor;
 import org.adempiere.webui.event.ValueChangeEvent;
 import org.adempiere.webui.event.ValueChangeListener;
 import org.adempiere.webui.window.FDialog;
@@ -34,13 +37,17 @@ import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.model.MLocationLookup;
+import org.compiere.model.MLookup;
+import org.compiere.model.MLookupFactory;
 import org.compiere.model.MRole;
-import org.compiere.model.MUser;
+import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
+import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
+import org.globalqss.model.X_LCO_ISIC;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
@@ -48,6 +55,8 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Separator;
+
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  * Business Partner : Based on VBPartner
@@ -57,7 +66,7 @@ import org.zkoss.zul.Separator;
  *
  */
 
-public class WBPartner extends Window implements EventListener, ValueChangeListener
+public class WBPartner extends Window implements EventListener, ValueChangeListener, FocusListener
 {
 	/**
 	 * 
@@ -74,21 +83,22 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 	/** The Location			*/
 	private MBPartnerLocation m_pLocation = null;
 	
-	/** The User				*/
-	private MUser m_user = null;
-	
 	/** Read Only				*/
 	private boolean m_readOnly = false;
 
-	private Object[] m_greeting;
-	
-	private Textbox fValue = new Textbox();
-	private Listbox fGreetingBP = new Listbox();
+    // @fchiappano Lista de datos de los combosboxs
+    private KeyNamePair[] m_categoriaIva, m_tipoIIBB, m_tipoDocumento;
+
+    // @fchiappano Nuevos componentes agregados para implementación estandar de LAR.
+    private Listbox fCategoriaIva;
+    private Listbox fTipoIIBB;
+    private Textbox fCUIT = new Textbox();
+    private Textbox fNroIIBB = new Textbox();
+    private WTableDirEditor fListaPrecio;
+    private WTableDirEditor fCondVenta;
+
 	private Textbox fName = new Textbox();
 	private Textbox fName2 = new Textbox();
-	private Textbox fContact = new Textbox();
-	private Listbox fGreetingC = new Listbox();
-	private Textbox fTitle = new Textbox();
 	private Textbox fEMail = new Textbox();
 	private Textbox fPhone = new Textbox();
 	private Textbox fPhone2 = new Textbox();
@@ -140,7 +150,7 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 		this.setWidth("350px");
 		this.setBorder("normal");
 		this.setClosable(true);
-		this.setTitle("Business Partner");
+		this.setTitle("Socio del Negocio");
 		this.setAttribute("mode", "modal");
 		this.appendChild(centerPanel);
 		this.appendChild(confirmPanel);
@@ -153,42 +163,51 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 	 */
 	private void initBPartner()
 	{
-		//	Get Data
-		m_greeting = fillGreeting();
+        // @fchiappano recuperar data de los combos.
+        m_categoriaIva = fillCategoriaIva();
+        m_tipoIIBB = fillTipoIIBB();
+        m_tipoDocumento = fillTipoDocumento();
 
-		//	Value
-		fValue.addEventListener(Events.ON_CHANGE , this);
-		createLine (fValue, "Value", true);
-		
-		//	Greeting Business Partner
-		fGreetingBP.setMold("select");
-		fGreetingBP.setRows(0);
-		
-		for (int i = 0; i < m_greeting.length; i++)
-			fGreetingBP.appendItem(m_greeting[i].toString(), m_greeting[i]);
-		createLine (fGreetingBP, "Greeting", false);
-		
+        // @fchiappano Categoría de Iva
+        fCategoriaIva = new Listbox(m_categoriaIva);
+        fCategoriaIva.setMold("select");
+        createLine(fCategoriaIva, "LCO_TaxPayerType_ID", false);
+
+        // @fchiappano CUIT
+        fCUIT.addFocusListener(this);
+        createLine (fCUIT, "CUIT/DNI", false);
+
 		//	Name
 		fName.addEventListener(Events.ON_CLICK, this);
-		createLine (fName, "Name", false)/*.setFontBold(true)*/;
+        createLine(fName, "Raz\u00f3n Social", false)/*.setFontBold(true)*/;
 
 		//	Name2
-		createLine (fName2, "Name2", false);
-		
-		//	Contact
-		createLine (fContact, "Contact", true)/*.setFontBold(true)*/;
+        createLine(fName2, "Nombre Comercial", false);
 
-		//	Greeting Contact
-		fGreetingC.setMold("select");
-		fGreetingC.setRows(0);
-		
-		for (int i = 0; i < m_greeting.length; i++)
-			fGreetingC.appendItem(m_greeting[i].toString(), m_greeting[i]);
-		
-		createLine (fGreetingC, "Greeting", false);
-		
-		//	Title
-		createLine(fTitle, "Title", false);
+        // @fchiappano Tipo de IIBB
+        fTipoIIBB = new Listbox(m_tipoIIBB);
+        fTipoIIBB.setMold("select");
+        // @fchiappano setear el valor por defecto en el combo
+        KeyNamePair defaultValue = getTipoIIBBDefault();
+        if (defaultValue != null)
+            fTipoIIBB.setSelectedKeyNamePair(defaultValue);
+        createLine(fTipoIIBB, "LCO_ISIC_ID", false);
+
+        // @fchiappano Nro de IIBB
+        createLine(fNroIIBB, "DUNS", false);
+
+        // @fchiappano Campo Lista de precios
+        final int m_PriceList_Column_ID = 3789; // C_Order.M_PriceList_ID
+        final MLookup lookupPriceList = MLookupFactory.get(Env.getCtx(), 0, 0, m_PriceList_Column_ID,
+                DisplayType.Table);
+        fListaPrecio = new WTableDirEditor("M_PriceList_ID", true, false, true, lookupPriceList);
+        createLine(fListaPrecio.getComponent(), "Lista de Precios", false);
+
+        // @fchiappano Condición de Venta.
+        final int m_CondVenta_Column_ID = 3084; // C_BPartner.PaymentRule
+        final MLookup lookupCondVenta = MLookupFactory.get(Env.getCtx(), 0, 0, m_CondVenta_Column_ID, DisplayType.List);
+        fCondVenta = new WTableDirEditor("M_PriceList_ID", true, false, true, lookupCondVenta);
+        createLine(fCondVenta.getComponent(), "Cond. de Venta", false);
 
 		//	Email
 		createLine (fEMail, "EMail", false);
@@ -249,37 +268,6 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 	}	//	createLine
 
 	/**
-	 *	Fill Greeting
-	 * 	@return KeyNamePair Array of Greetings
-	 */
-	
-	private Object[] fillGreeting()
-	{
-		String sql = "SELECT C_Greeting_ID, Name FROM C_Greeting WHERE IsActive='Y' ORDER BY 2";
-		sql = MRole.getDefault().addAccessSQL(sql, "C_Greeting", MRole.SQL_NOTQUALIFIED, MRole.SQL_RO);
-		
-		return DB.getKeyNamePairs(sql, true);
-	}	//	fillGreeting
-
-	/**
-	 *	Search m_greeting for key
-	 * 	@param key	C_Greeting_ID
-	 * 	@return	Greeting
-	 */
-	
-	private KeyNamePair getGreeting (int key)
-	{
-		for (int i = 0; i < m_greeting.length; i++)
-		{
-			KeyNamePair p = (KeyNamePair)m_greeting[i];
-			if (p.getKey() == key)
-				return p;
-		}
-		
-		return new KeyNamePair(-1, " ");
-	}	//	getGreeting
-
-	/**
 	 *	Load BPartner
 	 *  @param C_BPartner_ID - existing BPartner or 0 for new
 	 * 	@return true if loaded
@@ -294,7 +282,6 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 		{
 			m_partner = null;
 			m_pLocation = null;
-			m_user = null;
 			return true;
 		}
 
@@ -306,25 +293,16 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 			return false;
 		}
 
-		//	BPartner - Load values
-		fValue.setText(m_partner.getValue());
-		
-		KeyNamePair keynamepair = getGreeting(m_partner.getC_Greeting_ID());
-		
-		for (int i = 0; i < fGreetingBP.getItemCount(); i++)
-		{
-			ListItem listitem = fGreetingBP.getItemAtIndex(i);
-			KeyNamePair compare = (KeyNamePair)listitem.getValue();
-			
-			if (compare == keynamepair)
-			{
-				fGreetingBP.setSelectedIndex(i);
-				break;
-			}
-		}
-		
-		fName.setText(m_partner.getName());
-		fName2.setText(m_partner.getName2());
+		// @fchiappano Leer valores del SdN.
+        fCUIT.setText(m_partner.getTaxID());
+        fCategoriaIva.setSelectedKeyNamePair(getCategoriaIva(m_partner.get_ValueAsInt("LCO_TaxPayerType_ID")));
+        fName.setText(m_partner.getName());
+        fName2.setText(m_partner.getName2());
+        fTipoIIBB.setSelectedKeyNamePair(getTipoIIBB(m_partner.get_ValueAsInt("LCO_ISIC_ID")));
+        fNroIIBB.setText(m_partner.getDUNS());
+        fEMail.setText(m_partner.get_ValueAsString("EMail"));
+        fListaPrecio.setValue(m_partner.getM_PriceList_ID());
+        fCondVenta.setValue(m_partner.getPaymentRule());
 
 		//	Contact - Load values
 		m_pLocation = m_partner.getLocation(
@@ -339,34 +317,7 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 			fPhone2.setText(m_pLocation.getPhone2());
 			fFax.setText(m_pLocation.getFax());
 		}
-		//	User - Load values
-		m_user = m_partner.getContact(
-			Env.getContextAsInt(Env.getCtx(), m_WindowNo, "AD_User_ID"));
-		
-		if (m_user != null)
-		{
-			keynamepair = getGreeting(m_user.getC_Greeting_ID());
-			
-			for (int i = 0; i < fGreetingC.getItemCount(); i++)
-			{
-				ListItem listitem = fGreetingC.getItemAtIndex(i);
-				KeyNamePair compare = (KeyNamePair)listitem.getValue();
-				
-				if (compare == keynamepair)
-				{
-					fGreetingC.setSelectedIndex(i);
-					break;
-				}
-			}
 
-			fContact.setText(m_user.getName());
-			fTitle.setText(m_user.getTitle());
-			fEMail.setText(m_user.getEMail());
-			
-			fPhone.setText(m_user.getPhone());
-			fPhone2.setText(m_user.getPhone2());
-			fFax.setText(m_user.getFax());
-		}
 		return true;
 	}	//	loadBPartner
 
@@ -379,6 +330,10 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 	private boolean actionSave()
 	{
 		log.config("");
+
+        // Chequea la consistencia de la categoria de IVA y el CUIT
+        if (!checkBPartnerData())
+            return false;
 
 		//	Check Mandatory fields
 		if (fName.getText().equals(""))
@@ -397,91 +352,81 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 		{
 			int AD_Client_ID = Env.getAD_Client_ID(Env.getCtx());
 			m_partner = MBPartner.getTemplate(Env.getCtx(), AD_Client_ID);
-			m_partner.setAD_Org_ID(Env.getAD_Org_ID(Env.getCtx())); // Elaine 2009/07/03
+            m_partner.setAD_Org_ID(0); // @fchiappano Organización * por defecto.
 			boolean isSOTrx = !"N".equals(Env.getContext(Env.getCtx(), m_WindowNo, "IsSOTrx"));
 			m_partner.setIsCustomer (isSOTrx);
 			m_partner.setIsVendor (!isSOTrx);
 		}
-		
-		//	Check Value
-		
-		String value = fValue.getText();
-		
-		if (value == null || value.length() == 0)
-		{
-			//	get Table Document No
-			value = DB.getDocumentNo (Env.getAD_Client_ID(Env.getCtx()), "C_BPartner", null);
-			fValue.setText(value);
-		}
-		
-		m_partner.setValue(fValue.getText());
-		
-		m_partner.setName(fName.getText());
-		m_partner.setName2(fName2.getText());
-		
-		ListItem listitem = fGreetingBP.getSelectedItem();
-		KeyNamePair p = listitem != null ? (KeyNamePair)listitem.getValue() : null;
-		
-		if (p != null && p.getKey() > 0)
-			m_partner.setC_Greeting_ID(p.getKey());
-		else
-			m_partner.setC_Greeting_ID(0);
-		
-		if (m_partner.save())
-			log.fine("C_BPartner_ID=" + m_partner.getC_BPartner_ID());
-		else
-			FDialog.error(m_WindowNo, this, "BPartnerNotSaved");
-		
-		//	***** Business Partner - Location *****
-		
-		if (m_pLocation == null)
-			m_pLocation = new MBPartnerLocation(m_partner);
-		
-		m_pLocation.setC_Location_ID(fAddress.getC_Location_ID());
 
-		m_pLocation.setPhone(fPhone.getText());
-		m_pLocation.setPhone2(fPhone2.getText());
-		m_pLocation.setFax(fFax.getText());
-		
-		if (m_pLocation.save())
-			log.fine("C_BPartner_Location_ID=" + m_pLocation.getC_BPartner_Location_ID());
-		else
-			FDialog.error(m_WindowNo, this, "BPartnerNotSaved", Msg.translate(Env.getCtx(), "C_BPartner_Location_ID"));
-			
-		//	***** Business Partner - User *****
-		
-		String contact = fContact.getText();
-		String email = fEMail.getText();
-		
-		if (m_user == null && (contact.length() > 0 || email.length() > 0))
-			m_user = new MUser (m_partner);
-		
-		if (m_user != null)
-		{
-			if (contact.length() == 0)
-				contact = fName.getText();
-		
-			m_user.setName(contact);
-			m_user.setEMail(email);
-			m_user.setTitle(fTitle.getText());
-			
-			listitem = fGreetingC.getSelectedItem();
-			p = listitem != null ? (KeyNamePair)listitem.getValue() : null;
-			
-			if (p != null && p.getKey() > 0)
-				m_user.setC_Greeting_ID(p.getKey());
-			else
-				m_user.setC_Greeting_ID(0);
-			
-			m_user.setPhone(fPhone.getText());
-			m_user.setPhone2(fPhone2.getText());
-			m_user.setFax(fFax.getText());
-			
-			if (m_user.save())
-				log.fine("AD_User_ID=" + m_user.getAD_User_ID());
-			else
-				FDialog.error(m_WindowNo, this, "BPartnerNotSaved", Msg.translate(Env.getCtx(), "AD_User_ID"));
-		}
+        m_partner.setTaxID(fCUIT.getText());
+        m_partner.setName(fName.getText());
+        m_partner.setName2(fName2.getText());
+        KeyNamePair p = fCategoriaIva.getSelectedItem().toKeyNamePair();
+        if (p != null && p.getKey() > 0)
+        {
+            m_partner.set_ValueOfColumn("LCO_TaxPayerType_ID", p.getKey());
+
+            // Determina el Calificador de Documento, necesario para el
+            // Controlador Fiscal
+            // Consumidor Final ==> DNI - RI,RM,EX,NC ==> CUIT
+            KeyNamePair dni = getTipoDocumento("DNI");
+            KeyNamePair cuit = getTipoDocumento("CUIT");
+            if (p.getName().equals("ConsumidorFinal"))
+            {
+                if (dni != null && dni.getKey() > 0)
+                    m_partner.set_ValueOfColumn("LCO_TaxIdType_ID", dni.getKey());
+            }
+            else
+            {
+                if (cuit != null && cuit.getKey() > 0)
+                    m_partner.set_ValueOfColumn("LCO_TaxIdType_ID", cuit.getKey());
+            }
+        }
+        else
+            m_partner.set_ValueOfColumn("LCO_TaxPayerType_ID", null);
+
+        p = fTipoIIBB.getSelectedItem().toKeyNamePair();
+        if (p != null && p.getKey() > 0)
+            m_partner.set_ValueOfColumn("LCO_ISIC_ID", p.getKey());
+
+        m_partner.setDUNS(fNroIIBB.getText());
+        m_partner.set_ValueOfColumn("EMail", fEMail.getText());
+
+        String condVenta = (String) fCondVenta.getValue();
+        if (condVenta != null && !condVenta.equals(""))
+            m_partner.setPaymentRule(condVenta);
+
+        if (m_partner.save())
+            log.fine("C_BPartner_ID=" + m_partner.getC_BPartner_ID());
+        else
+        {
+            FDialog.error(m_WindowNo, this, "BPartnerNotSaved");
+            return false;
+        }
+
+        Integer listaPrecio = (Integer) fListaPrecio.getValue();
+        if (listaPrecio != null && listaPrecio > 0)
+        {
+            m_partner.setM_PriceList_ID(listaPrecio);
+            m_partner.saveEx();
+        }
+
+        // ***** Business Partner - Location *****
+        if (m_pLocation == null)
+            m_pLocation = new MBPartnerLocation(m_partner);
+        m_pLocation.setC_Location_ID(fAddress.getC_Location_ID());
+        //
+        m_pLocation.setPhone(fPhone.getText());
+        m_pLocation.setPhone2(fPhone2.getText());
+        m_pLocation.setFax(fFax.getText());
+        if (m_pLocation.save())
+            log.fine("C_BPartner_Location_ID=" + m_pLocation.getC_BPartner_Location_ID());
+        else
+        {
+            FDialog.error(m_WindowNo, this, "BPartnerNotSaved", Msg.translate(Env.getCtx(), "C_BPartner_Location_ID"));
+            return false;
+        }
+
 		return true;
 	}	//	actionSave
 
@@ -502,20 +447,7 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 	{
 		if (m_readOnly)
 			this.detach();
-		
-		//	copy value
-		
-		else if (e.getTarget() == fValue)
-		{
-			if (fName.getText() == null || fName.getText().length() == 0)
-				fName.setText(fValue.getText());
-		}
-		else if (e.getTarget() == fName)
-		{
-			if (fContact.getText() == null || fContact.getText().length() == 0)
-				fContact.setText(fName.getText());
-		}
-		
+
 		//	OK pressed
 		else if ((e.getTarget() == confirmPanel.getButton("Ok")) && actionSave())
 			this.detach();
@@ -525,6 +457,179 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 			this.detach();
 		
 	}
+
+    /**
+     * Verifica la consistencia de la categoría de IVA y el Nro de CUIT
+     */
+    private boolean checkBPartnerData()
+    {
+        // Si no es consumidor final, el cuit no puede ser 0
+        ListItem item = fCategoriaIva.getSelectedItem();
+        if (item == null || ((Integer)item.getValue()) <= 0)
+        {
+            throw new WrongValueException(fCategoriaIva, Msg.translate(Env.getCtx(), "FillMandatory"));
+        }
+
+        KeyNamePair p = item.toKeyNamePair();
+        if (p != null && !p.getName().equals("ConsumidorFinal"))
+        {
+            if (fCUIT.getText() == null && fCUIT.getText().equals(""))
+            {
+                FDialog.error(m_WindowNo, this, "Tiene que ingresar el CUIT");
+                return false;
+            }
+            else if (!LAR_Utils.validateCUIT(fCUIT.getText()))
+            {
+                FDialog.error(m_WindowNo, this, "El CUIT es inv\u00e1lido");
+                return false;
+            }
+        }
+        else
+        // Si es consumidor final y el cuit está vacío, se asigna el por defecto
+        {
+            if (fCUIT.getText() == null || fCUIT.getText().equals(""))
+                fCUIT.setText("00000000");
+        }
+
+        // @fchiappano Chequear que se haya ingresado un tipo de IIBB.
+        item = fTipoIIBB.getSelectedItem();
+        if (item == null || ((Integer) item.getValue()) <= 0)
+        {
+            throw new WrongValueException(fTipoIIBB, Msg.translate(Env.getCtx(), "FillMandatory"));
+        }
+
+        // @fchiappano Chequear el ingreso de lista de precio y condicion de
+        // venta.
+        Integer listaPrecios = (Integer) fListaPrecio.getValue();
+        if (listaPrecios == null || listaPrecios < 0)
+        {
+            throw new WrongValueException(fListaPrecio.getComponent(), Msg.translate(Env.getCtx(), "FillMandatory"));
+        }
+
+        String condVenta = (String) fCondVenta.getValue();
+        if (condVenta == null || condVenta.equals(""))
+        {
+            throw new WrongValueException(fCondVenta.getComponent(), Msg.translate(Env.getCtx(), "FillMandatory"));
+        }
+
+        return true;
+    } // checkBPartnerData
+
+    /**
+     * Recupera los tipos de documentos
+     * @return KeyNamePair arreglo de tipos de documento
+     */
+    private KeyNamePair[] fillTipoDocumento()
+    {
+        String sql = "SELECT LCO_TaxIdType_ID, Name FROM LCO_TaxIdType WHERE IsActive='Y' ORDER BY 2";
+        sql = MRole.getDefault().addAccessSQL(sql, "LCO_TaxIdType", MRole.SQL_NOTQUALIFIED, MRole.SQL_RO);
+        return DB.getKeyNamePairs(sql, true);
+    } // fillTipoDocumento
+
+    /**
+     * Recupera las categorias de IVA
+     * @author fchiappano
+     * @return KeyNamePair arreglo de categorías
+     */
+    private KeyNamePair[] fillCategoriaIva()
+    {
+        String sql = "SELECT LCO_TaxPayerType_ID, Name FROM LCO_TaxPayerType WHERE IsActive='Y' ORDER BY 2";
+        sql = MRole.getDefault().addAccessSQL(sql, "LCO_TaxPayerType", MRole.SQL_NOTQUALIFIED, MRole.SQL_RO);
+        return DB.getKeyNamePairs(sql, true);
+    } // fillCategoriaIva
+
+    /**
+     * Recupera los tipos de IIBB
+     * @author fchiappano
+     * @return KeyNamePair arreglo de tipos de IIBB
+     */
+    private KeyNamePair[] fillTipoIIBB()
+    {
+        String sql = "SELECT LCO_ISIC_ID, Name FROM LCO_ISIC WHERE IsActive='Y' ORDER BY 2";
+        sql = MRole.getDefault().addAccessSQL(sql, "LCO_ISIC", MRole.SQL_NOTQUALIFIED, MRole.SQL_RO);
+        return DB.getKeyNamePairs(sql, true);
+    } // fillTipoIIBB
+
+    /**
+     * Recuperar el Tipo de IIBB por defecto.
+     * @author fchiappano
+     * @return predeterminado o null
+     */
+    private KeyNamePair getTipoIIBBDefault()
+    {
+        String where = "IsActive = 'Y' AND IsDefault = 'Y' AND AD_Client_ID = ?";
+        X_LCO_ISIC retValue = new Query(Env.getCtx(), X_LCO_ISIC.Table_Name, where, null)
+                .setParameters(Env.getAD_Client_ID(Env.getCtx())).firstOnly();
+
+        if (retValue != null && retValue.getLCO_ISIC_ID() > 0)
+            return new KeyNamePair(retValue.getLCO_ISIC_ID(), retValue.getName());
+
+        return null;
+    } // getTipoIIBBDefault
+
+    /**
+     * Busca un tipo de IIBB
+     *
+     * @param key LCO_ISIC_ID
+     * @return Categoría de IVA
+     */
+    private KeyNamePair getTipoIIBB(int key)
+    {
+        for (int i = 0; i < m_tipoIIBB.length; i++)
+        {
+            KeyNamePair p = (KeyNamePair) m_tipoIIBB[i];
+            if (p.getKey() == key)
+                return p;
+        }
+        return new KeyNamePair(-1, " ");
+    } // getTipoIIBB
+
+    /**
+     * Busca una categoría de IVA
+     * @param key LCO_TaxPayerType_ID
+     * @return Categoría de IVA
+     */
+    private KeyNamePair getCategoriaIva(int key)
+    {
+        for (int i = 0; i < m_categoriaIva.length; i++)
+        {
+            KeyNamePair p = (KeyNamePair) m_categoriaIva[i];
+            if (p.getKey() == key)
+                return p;
+        }
+        return new KeyNamePair(-1, " ");
+    } // getCategoriaIva
+
+    /**
+     * Busca un tipo de documento
+     *
+     * @param key Nombre del documento
+     * @return tipo de documento
+     */
+    private KeyNamePair getTipoDocumento(String key)
+    {
+        for (int i = 0; i < m_tipoDocumento.length; i++)
+        {
+            KeyNamePair p = (KeyNamePair) m_tipoDocumento[i];
+            if (p.getName().equals(key))
+                return p;
+        }
+        return new KeyNamePair(-1, " ");
+    } // getTipoDocumento
+
+    @Override
+    public void focusLost(FocusEvent e)
+    {
+        // Solo realiza el chequeo en el "alta" de la operación, no en la
+        // "actualización"
+        if (m_partner == null && LAR_Utils.checkDuplicateCUIT(fCUIT.getText(), 0))
+            FDialog.warn(m_WindowNo, WBPartner.this, "El CUIT/DNI ingresado ya existe", "");
+    } // focusLost
+
+    @Override
+    public void focusGained(FocusEvent e)
+    {
+    }
 
 	public void valueChange(ValueChangeEvent evt)
 	{
