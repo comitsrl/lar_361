@@ -44,6 +44,7 @@ import org.compiere.model.MLocationLookup;
 import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
 import org.compiere.model.MRole;
+import org.compiere.model.Query;
 import org.compiere.swing.CComboBox;
 import org.compiere.swing.CDialog;
 import org.compiere.swing.CLabel;
@@ -55,6 +56,7 @@ import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
+import org.globalqss.model.X_LCO_ISIC;
 
 import ar.com.ergio.util.LAR_Utils;
 
@@ -192,7 +194,10 @@ public final class VBPartner extends CDialog implements ActionListener
 
 		// Tipo de IIBB
 		fTipoIIBB = new JComboBox(m_tipoIIBB);
-		fTipoIIBB.setSelectedIndex(6); // "Sin documentacion" por defecto
+        // @fchiappano setear el valor por defecto en el combo
+        KeyNamePair defaultValue = getTipoIIBBDefault();
+        if (defaultValue != null)
+            fTipoIIBB.setSelectedItem(defaultValue);
 		createLine (fTipoIIBB, "LCO_ISIC_ID", false);
 		// Nro de IIBB
 		fNroIIBB = new VString("DUNS", false, false, true, 30, 40, "", null);
@@ -332,6 +337,23 @@ public final class VBPartner extends CDialog implements ActionListener
         }
         return new KeyNamePair(-1, " ");
     } // getCategoriaIva
+
+    /**
+     * Recuperar el Tipo de IIBB por defecto.
+     * @author fchiappano
+     * @return predeterminado o null
+     */
+    private KeyNamePair getTipoIIBBDefault()
+    {
+        String where = "IsActive = 'Y' AND IsDefault = 'Y' AND AD_Client_ID = ?";
+        X_LCO_ISIC retValue = new Query(Env.getCtx(), X_LCO_ISIC.Table_Name, where, null)
+                .setParameters(Env.getAD_Client_ID(Env.getCtx())).firstOnly();
+
+        if (retValue != null && retValue.getLCO_ISIC_ID() > 0)
+            return new KeyNamePair(retValue.getLCO_ISIC_ID(), retValue.getName());
+
+        return null;
+    } // getTipoIIBBDefault
 
     /**
      * Busca un tipo de IIBB
