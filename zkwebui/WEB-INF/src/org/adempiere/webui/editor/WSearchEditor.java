@@ -38,8 +38,10 @@ import org.adempiere.webui.panel.InfoProductPanel;
 import org.adempiere.webui.window.WFieldRecordInfo;
 import org.compiere.model.GridField;
 import org.compiere.model.Lookup;
+import org.compiere.model.MColumn;
 import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
+import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MRole;
 import org.compiere.model.SystemIDs;
 import org.compiere.util.CLogger;
@@ -492,6 +494,8 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 
 		Object result[] = null;			
 		boolean cancelled = false;	
+        // @fchiappano variable que determinara la multiseleccion.
+        boolean multipleSelection = false;
 
 		String col = lookup.getColumnName();		//	fully qualified name
 
@@ -570,8 +574,15 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
             if (m_tableName == null)    //  sets table name & key column
                 getDirectAccessSQL("*");
 
+            // @fchiappano Chequear que mField no sea nulo.
+            if (gridField != null)
+            {
+                int AD_Table_ID = MColumn.getTable_ID(Env.getCtx(), gridField.getAD_Column_ID(), null);
+                multipleSelection = (MPaymentAllocate.Table_ID == AD_Table_ID);
+            }
+
             InfoInvoicePanel ii = (InfoInvoicePanel) InfoInvoicePanel.create(lookup.getWindowNo(), m_tableName,
-                    m_keyColumnName, queryValue, true, whereClause);
+                    m_keyColumnName, queryValue, multipleSelection, whereClause);
 
             ii.setVisible(true);
             ii.setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "InfoBPartner")));
