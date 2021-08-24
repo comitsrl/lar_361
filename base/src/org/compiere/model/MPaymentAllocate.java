@@ -227,6 +227,10 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
      */
     protected boolean afterSave(boolean newRecord, boolean success)
     {
+        // @fchiappano no realizar acciones, si el registro no fue guardado.
+        if (!success)
+            return success;
+
         // @fchippano Obtener la tasa de cambio, desde la factura.
         if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
         {
