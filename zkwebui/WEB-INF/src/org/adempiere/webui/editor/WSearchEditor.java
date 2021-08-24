@@ -32,6 +32,7 @@ import org.adempiere.webui.event.ValueChangeEvent;
 import org.adempiere.webui.event.ValueChangeListener;
 import org.adempiere.webui.grid.WBPartner;
 import org.adempiere.webui.panel.InfoBPartnerPanel;
+import org.adempiere.webui.panel.InfoInvoicePanel;
 import org.adempiere.webui.panel.InfoPanel;
 import org.adempiere.webui.panel.InfoProductPanel;
 import org.adempiere.webui.window.WFieldRecordInfo;
@@ -559,6 +560,31 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 			cancelled = ip.isCancelled();
 			result = ip.getSelectedKeys();
 		}
+        // @fchiappano Instanciar InfoInvoice y permitir multiselección.
+        else if (col.equals("C_Invoice_ID"))
+        {
+            // Replace Value with name if no value exists
+            if (queryValue.length() == 0 && getComponent().getText().length() > 0)
+                queryValue = getComponent().getText();
+
+            if (m_tableName == null)    //  sets table name & key column
+                getDirectAccessSQL("*");
+
+            InfoInvoicePanel ii = (InfoInvoicePanel) InfoInvoicePanel.create(lookup.getWindowNo(), m_tableName,
+                    m_keyColumnName, queryValue, true, whereClause);
+
+            ii.setVisible(true);
+            ii.setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "InfoBPartner")));
+            ii.setStyle("border: 2px");
+            ii.setClosable(true);
+            ii.setAttribute("mode", "modal");
+            ii.addValueChangeListener(this);
+            infoPanel = ii;
+            AEnv.showWindow(ii);
+
+            cancelled = ii.isCancelled();
+            result = ii.getSelectedKeys();
+        }
 		else	//	General Info
 		{
 			if (m_tableName == null)	//	sets table name & key column
