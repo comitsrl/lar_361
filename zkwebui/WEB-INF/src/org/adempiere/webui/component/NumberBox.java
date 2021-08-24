@@ -60,6 +60,10 @@ public class NumberBox extends Div
     private Decimalbox decimalBox = null;
     private Button btn;
 
+    private Object m_oldValue = null;
+
+    private boolean btnEnabled = true;
+
 	private Popup popup;
     
     /**
@@ -73,6 +77,13 @@ public class NumberBox extends Div
         init();
     }
     
+    /**
+     * @return popup
+     */
+    public Popup getPopupMenu()
+    {
+    	return popup;
+    }
     private void init()
     {
     	Table grid = new Table();
@@ -90,10 +101,13 @@ public class NumberBox extends Div
 		tr.appendChild(td);
 		td.setStyle("border: none; padding: 0px; margin: 0px;");
 		decimalBox = new Decimalbox();
+		// @fchiappano Acción que reemplaza automaticamente el punto por la coma decimal.
+		decimalBox.setAction("onkeyup:#{self}.value = #{self}.value.replace('.',',');");
     	if (integral)
     		decimalBox.setScale(0);
-    	decimalBox.setStyle("display: inline;");
-		td.appendChild(decimalBox);
+        // @fchiappano estilo alineado a la derecha.
+        decimalBox.setStyle("display: inline; text-align: right; padding-right: 2px");
+        td.appendChild(decimalBox);
 		
 		Td btnColumn = new Td();
 		tr.appendChild(btnColumn);
@@ -197,7 +211,8 @@ public class NumberBox extends Div
         Vbox vbox = new Vbox();
 
         char separatorChar = DisplayType.getNumberFormat(DisplayType.Number, Env.getLanguage(Env.getCtx())).getDecimalFormatSymbols().getDecimalSeparator();
-        
+        String separator = Character.toString(separatorChar);
+
         txtCalc = new Textbox();
         txtCalc.setAction("onKeyPress : return calc.validate('" + 
         		decimalBox.getId() + "','" + txtCalc.getId() 
@@ -279,7 +294,7 @@ public class NumberBox extends Div
         Button btnModulo = new Button();
         btnModulo.setWidth("40px");
         btnModulo.setLabel("%");
-        btnModulo.setAction("onClick : calc.append('" + txtCalcId + "', ' % ')");
+        btnModulo.setAction("onClick : calc.percentage('" + decimalBox.getId() + "','" + txtCalcId + "','" + separator + "')");
 
         Button btn1 = new Button();
         btn1.setWidth("30px");
@@ -319,7 +334,6 @@ public class NumberBox extends Div
         btn0.setLabel("0");
         btn0.setAction("onClick : calc.append('" + txtCalcId + "', '0')");
 
-        String separator = Character.toString(separatorChar);
         Button btnDot = new Button();
         btnDot.setWidth("30px");
         btnDot.setLabel(separator);
@@ -378,9 +392,11 @@ public class NumberBox extends Div
 	 */
 	public void setEnabled(boolean enabled)
 	{
-	     decimalBox.setReadonly(!enabled);
-	     btn.setEnabled(enabled);
-	     if (enabled)
+        decimalBox.setReadonly(!enabled);
+
+        boolean isCalculatorEnabled = btnEnabled && enabled;
+        btn.setEnabled(isCalculatorEnabled);
+        if (isCalculatorEnabled)
 	    	 btn.setPopup(popup);
 	     else 
 	     {
@@ -398,6 +414,11 @@ public class NumberBox extends Div
 		 return decimalBox.isReadonly();
 	}
 	
+    public boolean isReadonly()
+    {
+        return decimalBox.isReadonly();
+    }
+
 	@Override
 	public boolean addEventListener(String evtnm, EventListener listener)
 	{
@@ -425,4 +446,55 @@ public class NumberBox extends Div
 	{
 		return decimalBox;
 	}
+
+    public void setCalculatorEnabled(boolean enabled)
+    {
+        btnEnabled = enabled;
+        btn.setEnabled(btnEnabled);
+        btn.setVisible(btnEnabled);
+    }
+
+    public boolean isCalculatorEnabled()
+    {
+        return this.btnEnabled;
+    }
+
+    /**
+     * Set the old value of the field. For use in future comparisons. The old
+     * value must be explicitly set though this call.
+     */
+    public void set_oldValue()
+    {
+        this.m_oldValue = getValue();
+    }
+
+    /**
+     * Get the old value of the field explicitly set in the past
+     * 
+     * @return
+     */
+    public Object get_oldValue()
+    {
+        return m_oldValue;
+    }
+
+    /**
+     * Has the field changed over time?
+     * 
+     * @return true if the old value is different than the current.
+     */
+    public boolean hasChanged()
+    {
+        // Both or either could be null
+        if (getValue() != null)
+            if (m_oldValue != null)
+                return !m_oldValue.equals(getValue());
+            else
+                return true;
+        else // getValue() is null
+        if (m_oldValue != null)
+            return true;
+        else
+            return false;
+    }
 }
