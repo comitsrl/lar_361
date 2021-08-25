@@ -167,7 +167,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             opcionales.add(opcional);
         }
 
-        String fechaComprobante = formatTime(factura.getDateAcct(), "yyyyMMdd");
+        String fechaComprobante = formatTime(factura.getDateInvoiced(), "yyyyMMdd");
         String fechaActual = formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
 
         // @fchiappano Si el concepto es 1, no es necesario informar fecha de servicio.
