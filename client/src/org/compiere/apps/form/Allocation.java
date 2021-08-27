@@ -975,6 +975,7 @@ public class Allocation
                     // Create Allocation
                     alloc = new MAllocationHdr(Env.getCtx(), true, // manual
                             DateTrx, monedaFactura_ID, Env.getContext(Env.getCtx(), "#AD_User_Name"), trxName);
+                    alloc.set_ValueOfColumn("C_ConversionType_ID", factura.getC_ConversionType_ID());
                     alloc.setAD_Org_ID(AD_Org_ID);
                     alloc.saveEx();
                 }
