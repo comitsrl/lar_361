@@ -29,6 +29,7 @@ import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
 import ar.com.ergio.model.MLARPaymentHeader;
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  * 	Payment Allocate Model
@@ -213,6 +214,28 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
                 rs = null;
                 pstmt = null;
             }
+
+            // @fchiappano Si es factura en moneda extranjera, validar que no
+            // haya mas de una cargada en el Recibo/Pago.
+            int monedaPredeterminada = LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName());
+            if (m_invoice.getC_Currency_ID() != monedaPredeterminada)
+            {
+                sql = "SELECT COUNT (p.C_Invoice_ID)"
+                    +  " FROM C_PaymentAllocate p"
+                    +  " JOIN C_Invoice i ON p.C_Invoice_ID = i.C_Invoice_ID"
+                    + " WHERE p.LAR_PaymentHeader_ID = " + get_ValueAsInt("LAR_PaymentHeader_ID")
+                    +   " AND i.C_Currency_ID != " + monedaPredeterminada
+                    +   " AND p.C_Invoice_ID != ?";
+
+                int count = DB.getSQLValue(get_TrxName(), sql, m_invoice.getC_Invoice_ID());
+
+                if (count > 0)
+                {
+                    log.saveError("Error",
+                            "No está permitido ingresar mas de una factura en moneda extranjera, debido a que pueden existir diferencias de tasas de cambio.");
+                    return false;
+                }
+            }
         } // @fchiappano No permitir agregar facturas con distintas monedas.
 
 		return true;
@@ -227,6 +250,10 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
      */
     protected boolean afterSave(boolean newRecord, boolean success)
     {
+        // @fchiappano no realizar acciones, si el registro no fue guardado.
+        if (!success)
+            return success;
+
         // @fchippano Obtener la tasa de cambio, desde la factura.
         if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
         {

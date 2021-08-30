@@ -138,7 +138,13 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         final X_LCO_TaxIdType tipoIdentificacion = new X_LCO_TaxIdType(ctx, cliente.get_ValueAsInt("LCO_TaxIdType_ID"),
                 factura.get_TrxName());
 
-        tipoDoc = Integer.parseInt(tipoIdentificacion.getLCO_TaxCodeDian());
+        String tipoDoc_Str = tipoIdentificacion.getLCO_TaxCodeDian();
+        if (tipoDoc_Str == null || tipoDoc_Str.equals(""))
+        {
+            msgError = "El tipo de identifiación del cliente, no posee un codigo asociado valido.";
+            return null;
+        }
+        tipoDoc = Integer.parseInt(tipoDoc_Str);
 
         if (cliente.getTaxID() == null || cliente.getTaxID().equals(""))
         {
@@ -167,7 +173,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
             opcionales.add(opcional);
         }
 
-        String fechaComprobante = formatTime(factura.getDateAcct(), "yyyyMMdd");
+        String fechaComprobante = formatTime(factura.getDateInvoiced(), "yyyyMMdd");
         String fechaActual = formatTime(new Timestamp(System.currentTimeMillis()), "yyyyMMdd");
 
         // @fchiappano Si el concepto es 1, no es necesario informar fecha de servicio.
