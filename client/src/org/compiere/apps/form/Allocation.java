@@ -975,6 +975,10 @@ public class Allocation
                     // Create Allocation
                     alloc = new MAllocationHdr(Env.getCtx(), true, // manual
                             DateTrx, monedaFactura_ID, Env.getContext(Env.getCtx(), "#AD_User_Name"), trxName);
+
+                    if (factura.getC_ConversionType_ID() > 0)
+                        alloc.set_ValueOfColumn("C_ConversionType_ID", factura.getC_ConversionType_ID());
+
                     alloc.setAD_Org_ID(AD_Org_ID);
                     alloc.saveEx();
                 }
@@ -1116,15 +1120,17 @@ public class Allocation
 
 		// check for unapplied payment amounts (eg from payment reversals)
 		for (int i = 0; i < paymentList.size(); i++)	{
-            // Create Allocation
+
+            BigDecimal payAmt = (BigDecimal) amountList.get(i);
+            if (payAmt.signum() == 0)
+                continue;
+
+			// Create Allocation
             alloc = new MAllocationHdr(Env.getCtx(), true, // manual
                     DateTrx, C_Currency_ID, Env.getContext(Env.getCtx(), "#AD_User_Name"), trxName);
             alloc.setAD_Org_ID(AD_Org_ID);
             alloc.saveEx();
 
-			BigDecimal payAmt = (BigDecimal) amountList.get(i);
-			if ( payAmt.signum() == 0 )
-					continue;
 			int C_Payment_ID = ((Integer)paymentList.get(i)).intValue();
 			log.fine("Payment=" + C_Payment_ID
 					+ ", Amount=" + payAmt);

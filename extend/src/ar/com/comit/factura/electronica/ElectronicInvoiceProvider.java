@@ -23,7 +23,6 @@ import java.util.Properties;
 
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
-import org.compiere.model.MPreference;
 import org.compiere.util.Env;
 
 public class ElectronicInvoiceProvider
@@ -33,18 +32,20 @@ public class ElectronicInvoiceProvider
     public static Properties ctx = Env.getCtx();
 
     /** Preferencia sobre proveedor del servicio de FE */
-    public static String PREFERENCE_WSFE_PROVIDER = "WSFE_PROVIDER_CLASS";
+    public static String PREFERENCE_WSFE_PROVIDER = "ar.com.comit.factura.electronica.ProcesadorWSFE";
 
     /** Preferencia sobre proveedor del servicio de FE de Exportacion */
-    public static String PREFERENCE_WSFEX_PROVIDER = "WSFEX_PROVIDER_CLASS";
+    public static String PREFERENCE_WSFEX_PROVIDER = "";
 
+    // @fchiappano Se comentan variables, ya que actualmente manejamos una sola implementación.
+    // Evaluar a futuro si es necesario utilizarla, quizas en una transición de funcionalidad.
     /** Nombre de la clase que provee el servicio de FE (si es que existe) */
-    public static MPreference wsfeProviderClass = MPreference.getClientPreference(Env.getAD_Client_ID(ctx),
-            PREFERENCE_WSFE_PROVIDER, ctx, null);
+    //public static MPreference wsfeProviderClass = MPreference.getClientPreference(Env.getAD_Client_ID(ctx),
+            //PREFERENCE_WSFE_PROVIDER, ctx, null);
 
     /** Nombre de la clase que provee el servicio de FEX (si es que existe) */
-    public static MPreference wsfexProviderClass = MPreference.getClientPreference(Env.getAD_Client_ID(ctx),
-            PREFERENCE_WSFEX_PROVIDER, ctx, null);
+    //public static MPreference wsfexProviderClass = MPreference.getClientPreference(Env.getAD_Client_ID(ctx),
+            //PREFERENCE_WSFEX_PROVIDER, ctx, null);
 
     /**
      * Listado de tipos de documento de exportacion segun definicion de FE de
@@ -73,9 +74,9 @@ public class ElectronicInvoiceProvider
             MDocType docType = new MDocType(Env.getCtx(), inv.getC_DocTypeTarget_ID(), inv.get_TrxName());
             if (exportacionDocTypes.contains(docType.getdocsubtypecae()))
             {
-                return getProvider(inv, wsfexProviderClass.getValue());
+                return getProvider(inv, PREFERENCE_WSFEX_PROVIDER);
             }
-            return getProvider(inv, wsfeProviderClass.getValue());
+            return getProvider(inv, PREFERENCE_WSFE_PROVIDER);
         }
         catch (Exception e)
         {

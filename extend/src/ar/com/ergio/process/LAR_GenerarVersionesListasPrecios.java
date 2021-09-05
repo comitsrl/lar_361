@@ -69,7 +69,20 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
     @Override
     protected String doIt() throws Exception
     {
-        listaMadre = new MPriceList(getCtx(), getRecord_ID(), get_TrxName());
+        // @fchiappano Recuperar la lista madre, según desde donde se esta
+        // ejecutando el proceso.
+        int tableID = getTable_ID();
+
+        if (tableID == MPriceList.Table_ID)
+            listaMadre = new MPriceList(getCtx(), getRecord_ID(), get_TrxName());
+        else
+        {
+            int m_PriceListMadre_ID = getM_PriceListMadre_ID();
+            if (m_PriceListMadre_ID <= 0)
+                throw new AdempiereUserError("No fue posible recuperar, una lista de precios MADRE.");
+
+            listaMadre = new MPriceList(getCtx(), m_PriceListMadre_ID, get_TrxName());
+        }
 
         // @fchiappano Obtener la lista de precios base.
         int m_PriceListBase_ID = getM_PriceListBase_ID();
@@ -222,6 +235,25 @@ public class LAR_GenerarVersionesListasPrecios extends SvrProcess
                    +   " AND IsSOPriceList = ?";
 
         return DB.getSQLValue(get_TrxName(), sql, listaMadre.getAD_Client_ID(), listaMadre.isSOPriceList());
+    } // getM_PriceListBase_ID
+
+    /**
+     * Obtener el ID, de la lista de precios MADRE. En este caso, el proceso
+     * quedara limitado a la actualización de listas de precios de venta.
+     *
+     * @author fchiappano
+     * @return M_PriceList_ID
+     */
+    private int getM_PriceListMadre_ID()
+    {
+        String sql = "SELECT M_PriceList_ID"
+                   +  " FROM M_PriceList"
+                   + " WHERE IsActive = 'Y'"
+                   +   " AND EsListaMadre = 'Y'"
+                   +   " AND AD_Client_ID = ?"
+                   +   " AND IsSOPriceList = 'Y'";
+
+        return DB.getSQLValue(get_TrxName(), sql, getAD_Client_ID());
     } // getM_PriceListBase_ID
 
     /**
