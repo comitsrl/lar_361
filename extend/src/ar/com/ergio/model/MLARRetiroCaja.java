@@ -208,9 +208,31 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
                 return STATUS_Drafted;
             }
 
+            // @fchiappano verificar que exista un tipo de doc valido.
+            if (!paymentBankFrom.setLAR_C_DoctType_ID(false,
+                    ((MBankAccount) paymentBankFrom.getC_BankAccount()).get_ValueAsBoolean("IsDrawer")
+                            ? paymentBankFrom.getC_BankAccount().getAD_Org_ID() : getAD_Org_ID()))
+            {
+                m_processMsg = "No fue posible recuperar, un tipo de documento válido para débito de valores.";
+                return STATUS_Drafted;
+            }
+
+            // Si es un depósito recuperar el doc salida de caja origen desde el parámetro
+            if (get_ValueAsBoolean("Deposito") || isRetiro())
+            {
+                int docSalida_ID = MSysConfig.getIntValue(
+                            "LAR_Tipo_Documeto_ID_Depositos_Salida_Caja", 0, getAD_Client_ID());
+                // Si el valor es cero dejar el valor anterior recuperado
+                if (docSalida_ID != 0)
+                {
+                    paymentBankFrom.setC_DocType_ID(docSalida_ID);
+                    paymentBankFrom.saveEx(get_TrxName());
+                }
+            }
+
             // @fchiappano Verificar si se debe utilizar el c_charge_id
             // configurado en el concepto de caja.
-            if (isRetiro() && getLAR_ConceptoCaja_ID() > 0)
+            if ((isRetiro() || get_ValueAsBoolean("Deposito")) && getLAR_ConceptoCaja_ID() > 0)
             {
                 String sql = "SELECT C_Charge_ID FROM LAR_ConceptoCaja WHERE LAR_ConceptoCaja_ID = ?";
                 int c_Charge_ID = DB.getSQLValue(get_TrxName(), sql, getLAR_ConceptoCaja_ID());
