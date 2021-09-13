@@ -423,7 +423,7 @@ public final class MAllocationHdr extends X_C_AllocationHdr implements DocAction
                     BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
                     min = min.pow(getC_Currency().getStdPrecision());
 
-                    if (line.getAmount().compareTo(min) < 0)
+                    if (line.getAmount().abs().compareTo(min) < 0)
                         ignorarValidacion = true;
                 }
 
