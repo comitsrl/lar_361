@@ -285,7 +285,8 @@ public class ProcesadorCOT
         cabecera.append(separador + (!esConsumidorFinal ? cuit_cliente.replaceAll("-", "") : " "));
 
         // @fchiappano Razon social del cliente.
-        cabecera.append(separador + cliente.getName());
+        String razonSocial = cliente.getName();
+        cabecera.append(separador + (razonSocial.length() > 50 ? razonSocial.substring(0, 49) : razonSocial));
 
         // @fchiappano Destinatario Tenedor (depende de la condición de IVA del cliente)
         cabecera.append(separador + (esConsumidorFinal ? "0" : "1"));
@@ -298,7 +299,8 @@ public class ProcesadorCOT
         else
             direccion = (MLocation) remito.getC_BPartner_Location().getC_Location();
 
-        cabecera.append(separador + direccion.getAddress1());
+        String calle = direccion.getAddress1();
+        cabecera.append(separador + (calle.length() > 40 ? calle.substring(0, 39) : calle));
         // Numero
         cabecera.append(separador + nroDirec);
         // Destino_Domicilio_Comple
@@ -312,7 +314,8 @@ public class ProcesadorCOT
         // Codigo Postal
         cabecera.append(separador + direccion.getPostal());
         // Ciudad
-        cabecera.append(separador + direccion.getCity());
+        String ciudad = direccion.getCity();
+        cabecera.append(separador + (ciudad.length() > 50 ? ciudad.substring(0, 49) : ciudad));
         // Codigo Provincia
         cabecera.append(separador + ((MRegion) direccion.getC_Region()).get_ValueAsString("CodigoCOT"));
         // PROPIO_DESTINO_DOMICILIO_CODIGO
@@ -326,7 +329,8 @@ public class ProcesadorCOT
         cabecera.append(separador + cuitOrg);
 
         // @fchiappano Razon social del emisor
-        cabecera.append(separador + MClient.get(ctx).getName());
+        razonSocial = MClient.get(ctx).getName();
+        cabecera.append(separador + (razonSocial.length() > 50 ? razonSocial.substring(0, 49) : razonSocial));
 
         // @fachiappano Emisor Tenedor.
         cabecera.append(separador + "1");
@@ -335,7 +339,8 @@ public class ProcesadorCOT
         // Se recupera la diracción del depósito
         // Calle
         MLocation direcOrigen = (MLocation) deposito.getC_Location();
-        cabecera.append(separador + direcOrigen.getAddress1());
+        calle = direcOrigen.getAddress1();
+        cabecera.append(separador + (calle.length() > 40 ? calle.substring(0, 39) : calle));
         // Numero
         cabecera.append(separador + nroDirec);
         // ORIGEN_DOMICILIO_COMPLE
@@ -349,7 +354,8 @@ public class ProcesadorCOT
         // Codigo postal
         cabecera.append(separador + direcOrigen.getPostal());
         // Localidad
-        cabecera.append(separador + direcOrigen.getCity());
+        ciudad = direcOrigen.getCity();
+        cabecera.append(separador + (ciudad.length() > 50 ? ciudad.substring(0, 49) : ciudad));
         // Cod Provincia
         cabecera.append(separador + ((MRegion) direcOrigen.getC_Region()).get_ValueAsString("CodigoCOT"));
 
@@ -436,7 +442,8 @@ public class ProcesadorCOT
                 cuerpoTxt.append(separador + (name.length() > 40 ? name.substring(0, 39) : name));// Nombre/Descripcion
 
                 // @fchiappano Descripcion UM
-                cuerpoTxt.append(separador + unidadMedida.get_Translation("Name"));
+                String umName = unidadMedida.get_Translation("Name");
+                cuerpoTxt.append(separador + (umName.length() > 20 ? umName.substring(0, 19) : umName));
 
                 // @fchiappano Cantidad Ajustada FIXME (Determinar diferencia con el parametro
                 // cantidad).
