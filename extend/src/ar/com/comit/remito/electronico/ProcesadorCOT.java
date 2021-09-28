@@ -300,7 +300,10 @@ public class ProcesadorCOT
             direccion = (MLocation) remito.getC_BPartner_Location().getC_Location();
 
         String calle = direccion.getAddress1();
-        cabecera.append(separador + (calle.length() > 40 ? calle.substring(0, 39) : calle));
+        if (calle != null && !calle.equals(""))
+            cabecera.append(separador + (calle.length() > 40 ? calle.substring(0, 39) : calle));
+        else
+            cabecera.append(separador + "");
         // Numero
         cabecera.append(separador + nroDirec);
         // Destino_Domicilio_Comple
@@ -315,7 +318,10 @@ public class ProcesadorCOT
         cabecera.append(separador + direccion.getPostal());
         // Ciudad
         String ciudad = direccion.getCity();
-        cabecera.append(separador + (ciudad.length() > 50 ? ciudad.substring(0, 49) : ciudad));
+        if (ciudad != null && !ciudad.equals(""))
+            cabecera.append(separador + (ciudad.length() > 50 ? ciudad.substring(0, 49) : ciudad));
+        else
+            cabecera.append(separador + " ");
         // Codigo Provincia
         cabecera.append(separador + ((MRegion) direccion.getC_Region()).get_ValueAsString("CodigoCOT"));
         // PROPIO_DESTINO_DOMICILIO_CODIGO
@@ -339,8 +345,10 @@ public class ProcesadorCOT
         // Se recupera la diracción del depósito
         // Calle
         MLocation direcOrigen = (MLocation) deposito.getC_Location();
-        calle = direcOrigen.getAddress1();
-        cabecera.append(separador + (calle.length() > 40 ? calle.substring(0, 39) : calle));
+        if (calle != null && !calle.equals(""))
+            cabecera.append(separador + (calle.length() > 40 ? calle.substring(0, 39) : calle));
+        else
+            cabecera.append(separador + " ");
         // Numero
         cabecera.append(separador + nroDirec);
         // ORIGEN_DOMICILIO_COMPLE
@@ -355,7 +363,10 @@ public class ProcesadorCOT
         cabecera.append(separador + direcOrigen.getPostal());
         // Localidad
         ciudad = direcOrigen.getCity();
-        cabecera.append(separador + (ciudad.length() > 50 ? ciudad.substring(0, 49) : ciudad));
+        if (ciudad != null && !ciudad.equals(""))
+            cabecera.append(separador + (ciudad.length() > 50 ? ciudad.substring(0, 49) : ciudad));
+        else
+            cabecera.append(separador + " ");
         // Cod Provincia
         cabecera.append(separador + ((MRegion) direcOrigen.getC_Region()).get_ValueAsString("CodigoCOT"));
 

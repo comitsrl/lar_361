@@ -2138,7 +2138,9 @@ public class MInvoice extends X_C_Invoice implements DocAction
 	 */
 	private void setDefiniteDocumentNo() {
 		MDocType dt = MDocType.get(getCtx(), getC_DocType_ID());
-		if (dt.isOverwriteDateOnComplete()) {
+        // @fchiappano no sobreescribir fecha, si el tipo de doc es electronico.
+        if (!dt.isElectronic() && dt.isOverwriteDateOnComplete())
+        {
 			setDateInvoiced(new Timestamp (System.currentTimeMillis()));
 		}
 		if (dt.isOverwriteSeqOnComplete()) {
