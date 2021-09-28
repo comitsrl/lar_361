@@ -106,6 +106,7 @@ public class ConsultarDocumentosFE extends SvrProcess
         FECompConsResponse comprobante = respuesta.getResultGet();
         String datos = "Identificación Cliente: " + comprobante.getDocNro() + " \n "
                      + "Fecha de Comprobante: " + comprobante.getCbteFch() + " \n "
+                     + "Fecha de Venc. PAGO: " + comprobante.getFchVtoPago() + " \n "
                      + "Tipo Doc.: " + comprobante.getDocTipo() + " \n "
                      + "CAE: " + comprobante.getCodAutorizacion() + " \n "
                      + "Neto: " + comprobante.getImpNeto() + " \n "
