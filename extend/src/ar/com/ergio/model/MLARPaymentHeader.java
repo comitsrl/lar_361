@@ -1117,6 +1117,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             // Asignaciones
             for (int i = 0; (i < invoices.length && p < pays.length);)
             {
+                // @fchiappano Si el pago tiene un cargo y no es una retención,
+                // no asignar a la factura (continuar con la siguiente iteración).
+                if (pays[p].getC_Charge_ID() != 0 && !pays[p].get_ValueAsBoolean("EsRetencionIIBB"))
+                {
+                    p++;
+                    continue;
+                }
+
                 // @fchiappano crear cabecera de asignación, con la moneda de la factura.
                 MPaymentAllocate pa = invoices[i];
                 MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
@@ -1147,7 +1155,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                         BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
                         min = min.pow(invoice.getC_Currency().getStdPrecision());
 
-                        if (impPago.compareTo(min) < 0)
+                        if (impPago.abs().compareTo(min) < 0)
                             impMinimo = true;
                     }
                 }
