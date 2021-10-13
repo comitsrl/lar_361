@@ -21,6 +21,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.logging.Level;
 
+import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.ConfirmPanel;
 import org.adempiere.webui.component.Label;
 import org.adempiere.webui.component.ListItem;
@@ -192,6 +193,13 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
         if (defaultValue != null)
             fTipoIIBB.setSelectedKeyNamePair(defaultValue);
         createLine(fTipoIIBB, "LCO_ISIC_ID", false);
+
+        // @fchiappano Si el navegador es firefox, forzar un estilo mas chico para los combos.
+        if (AEnv.isFirefox2())
+        {
+            fCategoriaIva.setStyle("font-size:xx-small");
+            fTipoIIBB.setStyle("font-size:xx-small");
+        }
 
         // @fchiappano Nro de IIBB
         createLine(fNroIIBB, "DUNS", false);

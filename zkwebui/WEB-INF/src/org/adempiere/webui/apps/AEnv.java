@@ -549,7 +549,7 @@ public final class AEnv
     	Object n = execution.getNativeRequest();
     	if (n instanceof ServletRequest) {
     		String userAgent = Servlets.getUserAgent((ServletRequest) n);
-    		return userAgent.indexOf("Firefox/2") >= 0;
+    		return userAgent.indexOf("Firefox") >= 0;
     	} else {
     		return false;
     	}
