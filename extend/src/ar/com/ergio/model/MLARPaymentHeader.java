@@ -35,6 +35,7 @@ import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
+import org.compiere.model.MBankAccount;
 import org.compiere.model.MCharge;
 import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
@@ -1011,6 +1012,25 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             m_processMsg = "La cabecera no tiene cobros/pagos";
             return DocAction.STATUS_Invalid;
         }
+
+        // @fchiappano Cambiar la caja de los movimietos, que van directamente a
+        // cuenta bancaria, si es que la caja no esta marcada como concilia
+        // movimientos bancarios.
+        boolean conciliaMovBancarios = ((MBankAccount) getC_BankAccount()).get_ValueAsBoolean("Concilia_Mov_Bancarios");
+
+        for (int p = 0; p < pays.length; p++)
+        {
+            if (!conciliaMovBancarios)
+            {
+                int cuentaBancaria_ID = getCuentaPorFormaPago(pays[p]);
+                if (cuentaBancaria_ID > 0)
+                {
+                    pays[p].setC_BankAccount_ID(cuentaBancaria_ID);
+                    pays[p].saveEx(get_TrxName());
+                }
+            }
+        }
+
         // Recibos: Validar que la suma de los Pagos Retención sea >=
         // que la suma del importe abierto (impago) de las facturas
         // @begin
@@ -1782,5 +1802,81 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 setDocumentNo(value);
         }
     } // setDefiniteDocumentNo
+
+    /**
+     * Obtener la cuenta bancaria configurada, según la forma de pago.
+     *
+     * @param ctx
+     * @param trxName
+     * @return
+     */
+    private int getCuentaPorFormaPago(final MPayment payment)
+    {
+        String tenderType = payment.getTenderType();
+        String nombreColumna = "";
+
+        switch (tenderType)
+        {
+        case MPayment.TENDERTYPE_CreditCard:
+            nombreColumna = "LAR_Tarjeta_Credito_ID";
+            break;
+
+        case MPayment.TENDERTYPE_DirectDebit:
+            nombreColumna = "LAR_Tarjeta_Debito_ID";
+
+        case MPayment.TENDERTYPE_DirectDeposit:
+            nombreColumna = "LAR_Deposito_Directo_ID";
+            break;
+
+        case MPayment.TENDERTYPE_Check:
+            nombreColumna = "LAR_Cheque_Emitido_ID";
+            break;
+
+        // @fchiappano Billetera Digital
+        case "Q":
+            nombreColumna = "LAR_Quick_Response_ID";
+            break;
+
+        default:
+            nombreColumna = "";
+        }
+
+        if (nombreColumna == null || nombreColumna.equals(""))
+            return 0;
+
+        int tipoPago_ID = payment.get_ValueAsInt(nombreColumna);
+        if (tipoPago_ID <= 0)
+            return 0;
+
+        int cuenta = 0;
+
+        // Busco las cuentas bancarias segun la forma de pago.
+        String sql = "SELECT C_BankAccount_ID"
+                   +  " FROM LAR_TenderType_BankAccount"
+                   + " WHERE TenderType = '" + tenderType + "'"
+                   +   " AND " + nombreColumna + "=?";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, null);
+            pstmt.setInt(1, tipoPago_ID);
+            rs = pstmt.executeQuery();
+            if (rs.next())
+                cuenta = rs.getInt("C_BankAccount_ID");
+        }
+        catch (SQLException eSql)
+        {
+            log.log(Level.SEVERE, sql, eSql);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+        return cuenta;
+    } // getCuentaPorFormaPago
 
 }	//	MLARPaymentHeader
