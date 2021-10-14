@@ -259,6 +259,7 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
         {
             MLARPaymentHeader paymentHeader = new MLARPaymentHeader(p_ctx, get_ValueAsInt("LAR_PaymentHeader_ID"), get_TrxName());
             paymentHeader.set_Value("TasaDeCambio", getInvoice().get_Value("TasaDeCambio"));
+            paymentHeader.set_Value("C_CurrencyTo_ID", getInvoice().get_Value("C_Currency_ID"));
             paymentHeader.saveEx();
         }
 
