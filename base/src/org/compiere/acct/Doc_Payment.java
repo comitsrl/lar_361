@@ -209,7 +209,7 @@ public class Doc_Payment extends Doc
 			else if (m_Prepayment)
 				acct = getAccount(Doc.ACCTTYPE_V_Prepayment, as);
 			else
-				acct = getAccount(Doc.ACCTTYPE_PaymentSelect, as);
+				acct = getAccount(Doc.ACCTTYPE_V_Liability, as);
 
             // En el caso de una retención efectuada se modifica la forma de contabilizar
             FactLine fl = null;
