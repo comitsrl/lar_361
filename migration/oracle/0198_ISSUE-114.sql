@@ -143,6 +143,26 @@ UPDATE AD_Field SET DisplayLogic='@C_CurrencyTo_ID@ > 0 & @C_CurrencyTo_ID@!118'
 UPDATE AD_Field SET DisplayLogic='@C_CurrencyTo_ID@ > 0 & @C_CurrencyTo_ID@!118',Updated=TO_DATE('2021-10-19 17:49:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3005766
 ;
 
+-- 19/10/2021 19:03:09 ART
+-- ISSUE #114: Despliegue de campos en Recibos.
+UPDATE AD_Field SET DisplayLogic='@C_CurrencyTo_ID@ <= 0 | @C_CurrencyTo_ID@ = 118',Updated=TO_DATE('2021-10-19 19:03:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001296
+;
+
+-- 19/10/2021 19:03:20 ART
+-- ISSUE #114: Despliegue de campos en Recibos.
+UPDATE AD_Field SET DisplayLogic='@C_CurrencyTo_ID@ <= 0 | @C_CurrencyTo_ID@ = 118',Updated=TO_DATE('2021-10-19 19:03:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000602
+;
+
+-- 19/10/2021 19:10:36 ART
+-- ISSUE #114: Despliegue de campos en Recibos.
+UPDATE AD_Field SET DisplayLogic='@C_CurrencyTo_ID@ < 0 | @C_CurrencyTo_ID@ = 0 | @C_CurrencyTo_ID@ = 118',Updated=TO_DATE('2021-10-19 19:10:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3000602
+;
+
+-- 19/10/2021 19:11:14 ART
+-- ISSUE #114: Despliegue de campos en Recibos.
+UPDATE AD_Field SET DisplayLogic='@C_CurrencyTo_ID@ < 0 | @C_CurrencyTo_ID@ = 0 | @C_CurrencyTo_ID@ = 118',Updated=TO_DATE('2021-10-19 19:11:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3001296
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0198_ISSUE-114.sql', 'LAR', '') FROM dual
 ;
