@@ -176,6 +176,9 @@ public final class VBPartner extends CDialog implements ActionListener
 		m_gbc.ipady = 0;
 		m_line = 0;
 
+        // @fchiappano Determinar si se trata de una trasacción de compras o ventas.
+        boolean isSOTrx = !"N".equals(Env.getContext(Env.getCtx(), m_WindowNo, "IsSOTrx"));
+
         //  Categoría de Iva
         fCategoriaIva = new JComboBox (m_categoriaIva);
         createLine (fCategoriaIva, "LCO_TaxPayerType_ID", false);
@@ -203,9 +206,13 @@ public final class VBPartner extends CDialog implements ActionListener
 		fNroIIBB = new VString("DUNS", false, false, true, 30, 40, "", null);
 		createLine (fNroIIBB, "DUNS", false);
 
-		// Lista de Precios
-		// @fchiappano Campo Lista de precios
-        final int m_PriceList_Column_ID = 3789; // C_Order.M_PriceList_ID
+        // Lista de Precios
+        // @fchiappano Campo Lista de precios
+        int m_PriceList_Column_ID = 0;
+        if (isSOTrx)
+            m_PriceList_Column_ID = 2930; // C_BPartner.M_PriceList_ID
+        else
+            m_PriceList_Column_ID = 2931; // C_BPartner.PO_PriceList_ID
         final MLookup lookupPriceList = MLookupFactory.get(Env.getCtx(), 0, 0, m_PriceList_Column_ID, DisplayType.Table);
         final List<Object> ccs = lookupPriceList.getData(false, false, true, true);
         final DefaultComboBoxModel ccsModel = new DefaultComboBoxModel(ccs.toArray());
@@ -531,13 +538,14 @@ public final class VBPartner extends CDialog implements ActionListener
 		else
 			fAddress.setBackground(AdempierePLAF.getFieldBackground_Mandatory());
 
+        boolean isSOTrx = !"N".equals(Env.getContext(Env.getCtx(), m_WindowNo, "IsSOTrx"));
+
 		//	***** Business Partner *****
 		if (m_partner == null)
 		{
 			int AD_Client_ID = Env.getAD_Client_ID(Env.getCtx());
 			m_partner = MBPartner.getTemplate(Env.getCtx(), AD_Client_ID);
 			m_partner.setAD_Org_ID(0); // @fchiappano Organización * por defecto.
-			boolean isSOTrx = !"N".equals(Env.getContext(Env.getCtx(), m_WindowNo, "IsSOTrx"));
 			m_partner.setIsCustomer (isSOTrx);
 			m_partner.setIsVendor (!isSOTrx);
 		}
@@ -588,7 +596,25 @@ public final class VBPartner extends CDialog implements ActionListener
 
         ValueNamePair condVenta = (ValueNamePair) fCondVenta.getSelectedItem();
         if (condVenta != null && !condVenta.getValue().equals(""))
-            m_partner.setPaymentRule(condVenta.getValue());
+        {
+            // @fchiappano Setear la lista de precios, en el campo que
+            // corresponda según si se esta dando de alta un cliente o un proveedor.
+            if (isSOTrx)
+                m_partner.setPaymentRule(condVenta.getValue());
+            else
+                m_partner.setPaymentRulePO(condVenta.getValue());
+        }
+
+        KeyNamePair listaPrecio = (KeyNamePair) fListaPrecio.getSelectedItem();
+        if (listaPrecio != null && listaPrecio.getKey() > 0)
+        {
+            // @fchiappano Setear la lista de precios, en el campo que
+            // corresponda según si se esta dando de alta un cliente o un proveedor.
+            if (isSOTrx)
+                m_partner.setM_PriceList_ID(listaPrecio.getKey());
+            else
+                m_partner.setPO_PriceList_ID(listaPrecio.getKey());
+        }
 
         if (m_partner.save())
 			log.fine("C_BPartner_ID=" + m_partner.getC_BPartner_ID());
@@ -597,13 +623,6 @@ public final class VBPartner extends CDialog implements ActionListener
 			ADialog.error(m_WindowNo, this, "BPartnerNotSaved");
 			return false;
 		}
-
-        KeyNamePair listaPrecio = (KeyNamePair) fListaPrecio.getSelectedItem();
-        if (listaPrecio != null && listaPrecio.getKey() > 0)
-        {
-            m_partner.setM_PriceList_ID(listaPrecio.getKey());
-            m_partner.saveEx();
-        }
 
 		//	***** Business Partner - Location *****
 		if (m_pLocation == null)
