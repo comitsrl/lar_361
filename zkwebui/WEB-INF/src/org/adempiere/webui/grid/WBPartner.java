@@ -17,8 +17,6 @@
 
 package org.adempiere.webui.grid;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.logging.Level;
 
 import org.adempiere.webui.apps.AEnv;
@@ -67,7 +65,7 @@ import ar.com.ergio.util.LAR_Utils;
  *
  */
 
-public class WBPartner extends Window implements EventListener, ValueChangeListener, FocusListener
+public class WBPartner extends Window implements EventListener, ValueChangeListener
 {
 	/**
 	 * 
@@ -178,7 +176,7 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
         createLine(fCategoriaIva, "LCO_TaxPayerType_ID", false);
 
         // @fchiappano CUIT
-        fCUIT.addFocusListener(this);
+        fCUIT.addEventListener(Events.ON_BLUR, this);
         createLine (fCUIT, "CUIT/DNI", false);
 
 		//	Name
@@ -475,6 +473,15 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 		if (m_readOnly)
 			this.detach();
 
+        // @fchiappano Validar duplicidad de CUIT.
+        if (e.getTarget() == fCUIT)
+        {
+            // Solo realiza el chequeo en el "alta" de la operación, no en la
+            // "actualización"
+            if (m_partner == null && LAR_Utils.checkDuplicateCUIT(fCUIT.getText(), 0))
+                FDialog.warn(m_WindowNo, WBPartner.this, "El CUIT/DNI ingresado ya existe", "");
+        }
+
 		//	OK pressed
 		else if ((e.getTarget() == confirmPanel.getButton("Ok")) && actionSave())
 			this.detach();
@@ -643,20 +650,6 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
         }
         return new KeyNamePair(-1, " ");
     } // getTipoDocumento
-
-    @Override
-    public void focusLost(FocusEvent e)
-    {
-        // Solo realiza el chequeo en el "alta" de la operación, no en la
-        // "actualización"
-        if (m_partner == null && LAR_Utils.checkDuplicateCUIT(fCUIT.getText(), 0))
-            FDialog.warn(m_WindowNo, WBPartner.this, "El CUIT/DNI ingresado ya existe", "");
-    } // focusLost
-
-    @Override
-    public void focusGained(FocusEvent e)
-    {
-    }
 
 	public void valueChange(ValueChangeEvent evt)
 	{
