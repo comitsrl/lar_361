@@ -17,8 +17,6 @@
 
 package org.adempiere.webui.grid;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.logging.Level;
 
 import org.adempiere.webui.apps.AEnv;
@@ -67,7 +65,7 @@ import ar.com.ergio.util.LAR_Utils;
  *
  */
 
-public class WBPartner extends Window implements EventListener, ValueChangeListener, FocusListener
+public class WBPartner extends Window implements EventListener, ValueChangeListener
 {
 	/**
 	 * 
@@ -169,13 +167,16 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
         m_tipoIIBB = fillTipoIIBB();
         m_tipoDocumento = fillTipoDocumento();
 
+        // @fchiappano Determinar si se trata de una trasacción de compras o ventas.
+        boolean isSOTrx = !"N".equals(Env.getContext(Env.getCtx(), m_WindowNo, "IsSOTrx"));
+
         // @fchiappano Categoría de Iva
         fCategoriaIva = new Listbox(m_categoriaIva);
         fCategoriaIva.setMold("select");
         createLine(fCategoriaIva, "LCO_TaxPayerType_ID", false);
 
         // @fchiappano CUIT
-        fCUIT.addFocusListener(this);
+        fCUIT.addEventListener(Events.ON_BLUR, this);
         createLine (fCUIT, "CUIT/DNI", false);
 
 		//	Name
@@ -205,7 +206,11 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
         createLine(fNroIIBB, "DUNS", false);
 
         // @fchiappano Campo Lista de precios
-        final int m_PriceList_Column_ID = 3789; // C_Order.M_PriceList_ID
+        int m_PriceList_Column_ID = 0;
+        if (isSOTrx)
+            m_PriceList_Column_ID = 2930; // C_BPartner.M_PriceList_ID
+        else
+            m_PriceList_Column_ID = 2931; // C_BPartner.PO_PriceList_ID
         final MLookup lookupPriceList = MLookupFactory.get(Env.getCtx(), 0, 0, m_PriceList_Column_ID,
                 DisplayType.Table);
         fListaPrecio = new WTableDirEditor("M_PriceList_ID", true, false, true, lookupPriceList);
@@ -354,6 +359,8 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 			throw new WrongValueException(fAddress.getComponent(), Msg.translate(Env.getCtx(), "FillMandatory"));
 		}
 
+        boolean isSOTrx = !"N".equals(Env.getContext(Env.getCtx(), m_WindowNo, "IsSOTrx"));
+
 		//	***** Business Partner *****
 		
 		if (m_partner == null)
@@ -361,7 +368,6 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 			int AD_Client_ID = Env.getAD_Client_ID(Env.getCtx());
 			m_partner = MBPartner.getTemplate(Env.getCtx(), AD_Client_ID);
             m_partner.setAD_Org_ID(0); // @fchiappano Organización * por defecto.
-			boolean isSOTrx = !"N".equals(Env.getContext(Env.getCtx(), m_WindowNo, "IsSOTrx"));
 			m_partner.setIsCustomer (isSOTrx);
 			m_partner.setIsVendor (!isSOTrx);
 		}
@@ -402,7 +408,25 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 
         String condVenta = (String) fCondVenta.getValue();
         if (condVenta != null && !condVenta.equals(""))
-            m_partner.setPaymentRule(condVenta);
+        {
+            // @fchiappano Setear la lista de precios, en el campo que
+            // corresponda según si se esta dando de alta un cliente o un proveedor.
+            if (isSOTrx)
+                m_partner.setPaymentRule(condVenta);
+            else
+                m_partner.setPaymentRulePO(condVenta);
+        }
+
+        Integer listaPrecio = (Integer) fListaPrecio.getValue();
+        if (listaPrecio != null && listaPrecio > 0)
+        {
+            // @fchiappano Setear la lista de precios, en el campo que
+            // corresponda según si se esta dando de alta un cliente o un proveedor.
+            if (isSOTrx)
+                m_partner.setM_PriceList_ID(listaPrecio);
+            else
+                m_partner.setPO_PriceList_ID(listaPrecio);
+        }
 
         if (m_partner.save())
             log.fine("C_BPartner_ID=" + m_partner.getC_BPartner_ID());
@@ -410,13 +434,6 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
         {
             FDialog.error(m_WindowNo, this, "BPartnerNotSaved");
             return false;
-        }
-
-        Integer listaPrecio = (Integer) fListaPrecio.getValue();
-        if (listaPrecio != null && listaPrecio > 0)
-        {
-            m_partner.setM_PriceList_ID(listaPrecio);
-            m_partner.saveEx();
         }
 
         // ***** Business Partner - Location *****
@@ -455,6 +472,15 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 	{
 		if (m_readOnly)
 			this.detach();
+
+        // @fchiappano Validar duplicidad de CUIT.
+        if (e.getTarget() == fCUIT)
+        {
+            // Solo realiza el chequeo en el "alta" de la operación, no en la
+            // "actualización"
+            if (m_partner == null && LAR_Utils.checkDuplicateCUIT(fCUIT.getText(), 0))
+                FDialog.warn(m_WindowNo, WBPartner.this, "El CUIT/DNI ingresado ya existe", "");
+        }
 
 		//	OK pressed
 		else if ((e.getTarget() == confirmPanel.getButton("Ok")) && actionSave())
@@ -624,20 +650,6 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
         }
         return new KeyNamePair(-1, " ");
     } // getTipoDocumento
-
-    @Override
-    public void focusLost(FocusEvent e)
-    {
-        // Solo realiza el chequeo en el "alta" de la operación, no en la
-        // "actualización"
-        if (m_partner == null && LAR_Utils.checkDuplicateCUIT(fCUIT.getText(), 0))
-            FDialog.warn(m_WindowNo, WBPartner.this, "El CUIT/DNI ingresado ya existe", "");
-    } // focusLost
-
-    @Override
-    public void focusGained(FocusEvent e)
-    {
-    }
 
 	public void valueChange(ValueChangeEvent evt)
 	{
