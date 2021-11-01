@@ -504,7 +504,7 @@ public class CreateFromPayment extends CreateFrom
         whereSQL.append(" AND p.C_BankAccount_ID = " + getGridTab().getValue("C_BankAccount_ID"));
         whereSQL.append(" AND p.isReceipt = 'Y'");
         whereSQL.append(" AND p.Docstatus IN ('CO','CL')");
-        whereSQL.append(" AND p.TenderType IN ('K')");
+        whereSQL.append(" AND p.TenderType IN ('K', 'Z')");
         whereSQL.append(" AND p.C_Payment_ID NOT IN (" + usedDocs + ")");
 
         return whereSQL.toString();
