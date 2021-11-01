@@ -27,6 +27,7 @@ import java.util.logging.Level;
 
 import javax.swing.table.DefaultTableModel;
 
+import org.compiere.apps.ADialog;
 import org.compiere.apps.AEnv;
 import org.compiere.apps.ConfirmPanel;
 import org.compiere.grid.ed.VDate;
@@ -41,6 +42,8 @@ import org.compiere.util.CLogger;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.Trx;
+import org.compiere.util.TrxRunnable;
 
 /**
  * Ventana de creación de lineas, a partir de la selección de pagos/cobros.
@@ -59,6 +62,9 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
         log.info(getGridTab().toString());
 
         dialog = new VCreateFromDialog(this, getGridTab().getWindowNo(), true);
+
+        // @fchiappano Delegar la acción del boton ok y cancel.
+        dialog.getConfirmPanel().addActionListener(this);
 
         p_WindowNo = getGridTab().getWindowNo();
 
@@ -132,7 +138,7 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
         dialog.getRootPane().setDefaultButton(refreshButton);
         dialog.setTitle(getTitle());
 
-        loadBankAccount();
+        loadPayments();
 
         return true;
     } // dynInit
@@ -238,22 +244,54 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
     public void actionPerformed(ActionEvent e)
     {
         log.config("Action=" + e.getActionCommand());
+
+        if (e.getActionCommand().equals(ConfirmPanel.A_OK))
+        {
+            try
+            {
+                Trx.run(new TrxRunnable()
+                {
+                    public void run(String trxName)
+                    {
+                        // @fchiappano No cerrar la ventana.
+                        dialog.save(trxName);
+                        // dialog.dispose();
+
+                    }
+                });
+
+                // @fchiappano volver a ejecutar la consulta a DB, para
+                // continuar con la carga de cheques
+                loadPayments();
+                dialog.tableChanged(null);
+            }
+            catch (Exception ex)
+            {
+                ADialog.error(getGridTab().getWindowNo(), dialog, "Error", ex.getLocalizedMessage());
+            }
+        }
+        // Cancel
+        else if (e.getActionCommand().equals(ConfirmPanel.A_CANCEL))
+        {
+            dialog.dispose();
+        }
+
         // Object source = e.getSource();
-        if (e.getActionCommand().equals(ConfirmPanel.A_REFRESH))
+        else if (e.getActionCommand().equals(ConfirmPanel.A_REFRESH))
         {
             Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-            loadBankAccount();
+            loadPayments();
             dialog.tableChanged(null);
             Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
         }
     } // actionPerformed
 
-    protected void loadBankAccount()
+    protected void loadPayments()
     {
         loadTableOIS(getPaymentData(documentNoField.getText(), nameField.getText(), dateFromField.getValue(),
                 dateToField.getValue(), amtFromField.getValue(), amtToField.getValue(), routingNoField.getText(),
                 checkNoField.getText()));
-    } // loadBankAccount
+    } // loadPayments
 
     protected void loadTableOIS(Vector<?> data)
     {
