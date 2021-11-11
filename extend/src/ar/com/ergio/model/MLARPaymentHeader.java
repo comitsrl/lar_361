@@ -1147,10 +1147,9 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
                 // @fchiappano crear cabecera de asignación, con la moneda de la factura.
                 MPaymentAllocate pa = invoices[i];
-                MInvoice invoice = new MInvoice(Env.getCtx(), pa.getC_Invoice_ID(), get_TrxName());
 
                 MAllocationHdr alloc = new MAllocationHdr(getCtx(), false, getDateTrx(),
-                        invoice.getC_Currency_ID(), "Asignación Pagos a Facturas - Cabecera: "
+                        pa.get_ValueAsInt("C_Currency_ID"), "Asignación Pagos a Facturas - Cabecera: "
                                 + getDocumentNo(), get_TrxName());
                 alloc.setAD_Org_ID(getAD_Org_ID());
                 if (!alloc.save())
@@ -1160,29 +1159,29 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 }
 
                 BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt());
+                impPago = impPago.subtract(pays[p].getAllocatedAmt().abs());
 
                 // @fchiappano Si la moneda de la factura, es distinta de la
                 // moneda predeterminada, realizo la conversión.
                 boolean impMinimo = false;
-                if (invoice.getC_Currency_ID() != getC_Currency_ID())
+                if (pa.get_ValueAsInt("C_Currency_ID") != getC_Currency_ID())
                 {
-                    BigDecimal tasaCambio = (BigDecimal) get_Value("TasaDeCambio");
+                    BigDecimal tasaCambio = (BigDecimal) pa.get_Value("TasaDeCambio");
 
                     if (tasaCambio != null)
                     {
-                        impPago = impPago.divide(tasaCambio, invoice.getC_Currency().getStdPrecision() + 2, RoundingMode.FLOOR);
+                        impPago = impPago.divide(tasaCambio, pa.getInvoice().getC_Currency().getStdPrecision() + 2, RoundingMode.FLOOR);
 
                         BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
-                        min = min.pow(invoice.getC_Currency().getStdPrecision());
+                        min = min.pow(pa.getInvoice().getC_Currency().getStdPrecision());
 
                         if (impPago.abs().compareTo(min) < 0)
                             impMinimo = true;
                     }
                 }
 
-                // @fchiappano Obtener el importe asignado pero sin conversion de moneda.
-                impPago = impPago.subtract(pays[p].getLAR_AllocatedAmt().abs());
-                final BigDecimal importeFactura = invoice.getOpenAmt().subtract(pa.getDiscountAmt());
+                MInvoice factura = new MInvoice(p_ctx, pa.getC_Invoice_ID(), get_TrxName());
+                final BigDecimal importeFactura = factura.getOpenAmt().subtract(pa.getDiscountAmt());
                 int comp = impPago.compareTo(importeFactura);
                 MAllocationLine aLine = null;
                 BigDecimal alineOUAmt = Env.ZERO;
@@ -1206,7 +1205,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 aLine.setPaymentInfo(pays[p].getC_Payment_ID(), 0);
 
                 // @fchiappano setear la tasa de cambio de la cabecera del recibo, en la linea de asignación.
-                aLine.set_ValueOfColumn("TasaDeCambio", get_Value("TasaDeCambio"));
+                aLine.set_ValueOfColumn("TasaDeCambio", pa.get_Value("TasaDeCambio"));
 
                 if (!aLine.save(get_TrxName()))
                     log.warning("Asignación: No se pudo guradar la línea");

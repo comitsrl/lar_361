@@ -31,7 +31,6 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
-import ar.com.ergio.model.MLARPaymentHeader;
 import ar.com.ergio.util.LAR_Utils;
 
 /**
@@ -424,7 +423,7 @@ public class CalloutPayment extends CalloutEngine
                 {
                     // @fchiappano Obtengo la moneda de la factura, para
                     // determinar posteriormente si el monto sugerido necesita conversión.
-                    c_Currency_ID = facturas[i].getC_Invoice().getC_Currency_ID();
+                    c_Currency_ID = facturas[i].get_ValueAsInt("C_Currency_ID");
 
                     // @fchiappano. Obtengo el C_InvoicePaySchedule_ID para calcular el importe impago.
                     int c_InvoicePaySchedule_ID = facturas[i].get_ValueAsInt("C_InvoicePaySchedule_ID");
@@ -443,9 +442,28 @@ public class CalloutPayment extends CalloutEngine
                             BigDecimal InvoiceOpenAmt = rs.getBigDecimal(1); // Importe Impago
                             if (InvoiceOpenAmt == null)
                                 InvoiceOpenAmt = Env.ZERO;
+                            BigDecimal descuento = facturas[i].getDiscountAmt();
+
+                            // @fchiappano Determinar si se debe convertir el
+                            // monto sugerido.
+                            if (c_Currency_ID > 0 && c_Currency_ID != LAR_Utils.getMonedaPredeterminada(ctx,
+                                    Env.getAD_Client_ID(ctx), mTab.getTrxInfo()))
+                            {
+                                // @fchiappano Obtener tasa de cambio.
+                                BigDecimal tasaCambio = (BigDecimal) facturas[i].get_Value("TasaDeCambio");
+
+                                if (tasaCambio != null)
+                                {
+                                    InvoiceOpenAmt = InvoiceOpenAmt.multiply(tasaCambio).setScale(2,
+                                            RoundingMode.HALF_UP);
+                                    descuento = descuento.multiply(tasaCambio).setScale(2, RoundingMode.HALF_UP);
+                                }
+                                else
+                                    return "No se logro recuperar, una tasa de cambio.";
+                            } // fin de conversión
 
                             sumaFacturas = sumaFacturas.add(InvoiceOpenAmt);
-                            sumaDescuento = facturas[i].getDiscountAmt();
+                            sumaDescuento = descuento;
                         }
                     } catch (SQLException e)
                     {
@@ -467,22 +485,6 @@ public class CalloutPayment extends CalloutEngine
                 // Recorrer Pagos
                 for (int p = 0; p < pagos.length; p++)
                     sumaPagos = sumaPagos.add(pagos[p].getPayAmt().add(pagos[p].getWriteOffAmt()));
-
-                // @fchiappano Determinar si se debe convertir el monto sugerido.
-                if (c_Currency_ID > 0 && c_Currency_ID != LAR_Utils.getMonedaPredeterminada(ctx, Env.getAD_Client_ID(ctx), mTab.getTrxInfo()))
-                {
-                    // @fchiappano Obtener tasa de cambio.
-                    MLARPaymentHeader header = new MLARPaymentHeader(ctx, LAR_PaymentHeader_ID, mTab.getTrxInfo());
-                    BigDecimal tasaCambio = (BigDecimal) header.get_Value("TasaDeCambio");
-
-                    if (tasaCambio != null)
-                    {
-                        sumaFacturas = sumaFacturas.multiply(tasaCambio).setScale(2, RoundingMode.HALF_UP);
-                        sumaDescuento = sumaDescuento.multiply(tasaCambio).setScale(2, RoundingMode.HALF_UP);
-                    }
-                    else
-                        return "No se logro recuperar, una tasa de cambio.";
-                }
 
                 mTab.setValue("PayAmt", sumaFacturas.subtract(sumaPagos).subtract(sumaDescuento));
                 mTab.setValue("OverUnderAmt", Env.ZERO);

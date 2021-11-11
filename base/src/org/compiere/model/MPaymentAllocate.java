@@ -17,19 +17,14 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 
-import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
 import ar.com.ergio.model.MLARPaymentHeader;
-import ar.com.ergio.util.LAR_Utils;
 
 /**
  * 	Payment Allocate Model
@@ -178,6 +173,7 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
             }
 		}
 
+		/* Se paso la tasa de cambio a la C_PaymentAllocate, con lo cual se permite mas de una factura en moneda extranjera.
         // @fchiappano No permitir agregar facturas con distintas monedas.
         if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0 && is_ValueChanged("C_Invoice_ID"))
         {
@@ -236,7 +232,7 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
                     return false;
                 }
             }
-        } // @fchiappano No permitir agregar facturas con distintas monedas.
+        } // @fchiappano No permitir agregar facturas con distintas monedas. */
 
 		return true;
 	}	//	beforeSave
@@ -258,7 +254,7 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
         if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
         {
             MLARPaymentHeader paymentHeader = new MLARPaymentHeader(p_ctx, get_ValueAsInt("LAR_PaymentHeader_ID"), get_TrxName());
-            paymentHeader.set_Value("TasaDeCambio", getInvoice().get_Value("TasaDeCambio"));
+//            paymentHeader.set_Value("TasaDeCambio", getInvoice().get_Value("TasaDeCambio"));
             paymentHeader.set_Value("C_CurrencyTo_ID", getInvoice().get_Value("C_Currency_ID"));
             paymentHeader.saveEx();
         }
