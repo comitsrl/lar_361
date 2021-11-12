@@ -17,10 +17,12 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Properties;
 
+import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
@@ -125,8 +127,79 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
 			return 0;
 		return m_invoice.getC_BPartner_ID();
 	}	//	getC_BPartner_ID
-	
-	
+
+    /**
+     * Calcular la diferencia de valoración en pesos
+     *
+     * @author fchiappano
+     * @return
+     */
+    private BigDecimal getDifValoracion(final MLARPaymentHeader header, final BigDecimal tasaCambio,
+            final BigDecimal tasaDia, final BigDecimal montoPagado)
+    {
+        String sql = "SELECT (CurrencyConvertRate(?, ?, ?, ?)) - (CurrencyConvertRate(?, ?, ?, ?))";
+        int c_CurrencyInvoice_ID = get_ValueAsInt("C_Currency_ID");
+        int c_CurrencyHeader_ID = header.get_ValueAsInt("C_Currency_ID");
+        Object[] parametros = { montoPagado, c_CurrencyInvoice_ID, c_CurrencyHeader_ID, tasaDia, montoPagado,
+                c_CurrencyInvoice_ID, c_CurrencyHeader_ID, tasaCambio };
+
+        BigDecimal difValoracion = DB.getSQLValueBD(get_TrxName(), sql, parametros);
+
+        return difValoracion;
+
+    } // getDifValoracion
+
+    /**
+     * Calcular la diferencia de valoración en moneda extranjera.
+     *
+     * @author fchiappano
+     * @return
+     */
+    private BigDecimal getDifValoracionExt(final MLARPaymentHeader header, final BigDecimal tasaDia, final BigDecimal difValoracion)
+    {
+        String sql = "SELECT CurrencyConvertRateDiv(?, ?, ?, ?)";
+        int c_CurrencyInvoice_ID = get_ValueAsInt("C_Currency_ID");
+        int c_CurrencyHeader_ID = header.get_ValueAsInt("C_Currency_ID");
+        Object[] parametros = {difValoracion, c_CurrencyHeader_ID, c_CurrencyInvoice_ID, tasaDia};
+
+        BigDecimal difValoracionExt = DB.getSQLValueBD(get_TrxName(), sql, parametros);
+
+        return difValoracionExt;
+
+    } // getDifValoracionExt
+
+    /**
+     * Actualizar columnas PorcDiferenciaValoracion, DiferenciaValoracion y
+     * DiferenciaValoracionExt.
+     *
+     * @author fchiappano
+     */
+    public void calcularDifValoracion()
+    {
+        // @fchiappano Calcular las diferencias de valoración.
+        int lar_PaymentHeader_ID = get_ValueAsInt("LAR_PaymentHeader_ID");
+        if (lar_PaymentHeader_ID > 0)
+        {
+            MLARPaymentHeader header = new MLARPaymentHeader(p_ctx, lar_PaymentHeader_ID, get_TrxName());
+            BigDecimal tasaCambio = (BigDecimal) get_Value("TasaDeCambio");
+            BigDecimal tasaDia = (BigDecimal) header.get_Value("TasaDelDia");
+            BigDecimal montoPagado = (BigDecimal) get_Value("MontoPagado");
+
+            if (tasaCambio.compareTo(Env.ZERO) > 0 && tasaDia.compareTo(Env.ZERO) > 0
+                    && montoPagado.compareTo(Env.ZERO) > 0)
+            {
+                BigDecimal porcDifValoracion = ((tasaDia.subtract(tasaCambio)).multiply(Env.ONEHUNDRED))
+                        .divide(tasaCambio, 6, RoundingMode.HALF_UP);
+                BigDecimal difValoracion = getDifValoracion(header, tasaCambio, tasaDia, montoPagado);
+                BigDecimal difValoracionExt = getDifValoracionExt(header, tasaDia, difValoracion);
+
+                set_Value("PorcDiferenciaValoracion", porcDifValoracion);
+                set_Value("DiferenciaValoracion", difValoracion);
+                set_Value("DiferenciaValoracionExt", difValoracionExt);
+            }
+        }
+    } // calcularDifValoracion
+
 	/**
 	 * 	Before Save
 	 *	@param newRecord new

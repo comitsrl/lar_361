@@ -1130,104 +1130,17 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             }
         }
         // Asigna los cobros/pagos a las facturas
-        MPaymentAllocate[] invoices = getInvoices(get_TrxName());
-        if (invoices.length != 0)
+        // @fchiappano se aislo la generación de asignaciones en un metodo
+        // publico, para poder ser utilizado en el proceso de previsualización
+        // de diferencias de cambio.
+        String msg = calcularAsignaciones(true, pays);
+        if (msg != null)
         {
-            p = 0;
-            // Asignaciones
-            for (int i = 0; (i < invoices.length && p < pays.length);)
-            {
-                // @fchiappano Si el pago tiene un cargo y no es una retención,
-                // no asignar a la factura (continuar con la siguiente iteración).
-                if (pays[p].getC_Charge_ID() != 0 && !pays[p].get_ValueAsBoolean("EsRetencionIIBB"))
-                {
-                    p++;
-                    continue;
-                }
-
-                // @fchiappano crear cabecera de asignación, con la moneda de la factura.
-                MPaymentAllocate pa = invoices[i];
-
-                MAllocationHdr alloc = new MAllocationHdr(getCtx(), false, getDateTrx(),
-                        pa.get_ValueAsInt("C_Currency_ID"), "Asignación Pagos a Facturas - Cabecera: "
-                                + getDocumentNo(), get_TrxName());
-                alloc.setAD_Org_ID(getAD_Org_ID());
-                if (!alloc.save())
-                {
-                    log.severe("La Cabecera de Asignacion no pudo crearse");
-                    return DocAction.STATUS_Invalid;
-                }
-
-                BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt());
-                impPago = impPago.subtract(pays[p].getAllocatedAmt().abs());
-
-                // @fchiappano Si la moneda de la factura, es distinta de la
-                // moneda predeterminada, realizo la conversión.
-                boolean impMinimo = false;
-                if (pa.get_ValueAsInt("C_Currency_ID") != getC_Currency_ID())
-                {
-                    BigDecimal tasaCambio = (BigDecimal) pa.get_Value("TasaDeCambio");
-
-                    if (tasaCambio != null)
-                    {
-                        impPago = impPago.divide(tasaCambio, pa.getInvoice().getC_Currency().getStdPrecision() + 2, RoundingMode.FLOOR);
-
-                        BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
-                        min = min.pow(pa.getInvoice().getC_Currency().getStdPrecision());
-
-                        if (impPago.abs().compareTo(min) < 0)
-                            impMinimo = true;
-                    }
-                }
-
-                MInvoice factura = new MInvoice(p_ctx, pa.getC_Invoice_ID(), get_TrxName());
-                final BigDecimal importeFactura = factura.getOpenAmt().subtract(pa.getDiscountAmt());
-                int comp = impPago.compareTo(importeFactura);
-                MAllocationLine aLine = null;
-                BigDecimal alineOUAmt = Env.ZERO;
-                BigDecimal alineAmt;
-                // Evita Sobrepagos
-                // @fchiappano si la factura es en dolare, y importe del pago es
-                // menor al minimo, utilizar el importe del pago para realizar
-                // la asignacion.
-                if (comp <= 0 || impMinimo)
-                    alineAmt = impPago;
-                else
-                    alineAmt = importeFactura;
-                alineOUAmt = importeFactura.subtract(impPago);
-                if (isReceipt())
-                    aLine = new MAllocationLine(alloc, alineAmt, Env.ZERO,
-                            pa.getWriteOffAmt(), alineOUAmt);
-                else
-                    aLine = new MAllocationLine(alloc, alineAmt.negate(), Env.ZERO
-                            , pa.getWriteOffAmt().negate(), alineOUAmt);
-                aLine.setDocInfo(pa.getC_BPartner_ID(), 0, pa.getC_Invoice_ID());
-                aLine.setPaymentInfo(pays[p].getC_Payment_ID(), 0);
-
-                // @fchiappano setear la tasa de cambio de la cabecera del recibo, en la linea de asignación.
-                aLine.set_ValueOfColumn("TasaDeCambio", pa.get_Value("TasaDeCambio"));
-
-                if (!aLine.save(get_TrxName()))
-                    log.warning("Asignación: No se pudo guradar la línea");
-                else
-                {
-                    pa.setC_AllocationLine_ID(aLine.getC_AllocationLine_ID());
-                    pa.saveEx();
-                }
-                if (comp >= 0)
-                {
-                    i = i + 1;
-                    if (comp == 0)
-                        p = p + 1;
-                } else
-                    p = p + 1;
-                // Cabecera de Asignación: Comienzo de WF
-                alloc.processIt(DocAction.ACTION_Complete);
-                alloc.save(get_TrxName());
-                m_processMsg = "@C_AllocationHdr_ID@: " + alloc.getDocumentNo();
-                log.fine(m_processMsg);
-            }
+            log.severe(msg);
+            m_processMsg = msg;
+            return DocAction.STATUS_Invalid;
         }
+
         // setC_BankAccount_ID(C_BankAccount_ID);
         // Dispara la validación del documento
         m_processMsg = ModelValidationEngine.get().fireDocValidate(this,
@@ -1877,5 +1790,168 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         }
         return cuenta;
     } // getCuentaPorFormaPago
+
+    /**
+     * Calcula los montos a asignar para cada factura. Si generaAsignaciones = true,
+     * crea y completa las imputaciones a las facturas.
+     *
+     * @author fchiappano
+     * @param generaAsignaciones
+     * @param pays
+     * @return mensaje de error o null.
+     */
+    public String calcularAsignaciones(final boolean generaAsignaciones, final MPayment[] pays)
+    {
+        MPaymentAllocate[] invoices = getInvoices(get_TrxName());
+
+        if (invoices.length != 0)
+        {
+            // @fchiappano Variable que acumulara el monto asignado de la factura.
+            BigDecimal montoPagado = Env.ZERO;
+            // @fchiappano variable que acumula el monto asignado del pago/cobro.
+            BigDecimal montoAsignado = Env.ZERO;
+            MAllocationHdr alloc = null;
+
+            int p = 0;
+            // Asignaciones
+            for (int i = 0; (i < invoices.length && p < pays.length);)
+            {
+                // @fchiappano Si el pago tiene un cargo y no es una retención,
+                // no asignar a la factura (continuar con la siguiente iteración).
+                if (pays[p].getC_Charge_ID() != 0 && !pays[p].get_ValueAsBoolean("EsRetencionIIBB"))
+                {
+                    p++;
+                    continue;
+                }
+
+                MPaymentAllocate pa = invoices[i];
+                BigDecimal tasaCambio = (BigDecimal) pa.get_Value("TasaDeCambio");
+                boolean esMonedaExtranjera = pa.get_ValueAsInt("C_Currency_ID") != getC_Currency_ID();
+
+                // @fchiappano si el parametro asi lo determina, generar la asignación.
+                if (generaAsignaciones)
+                {
+                    // @fchiappano crear cabecera de asignación, con la moneda
+                    // de la factura.
+                    alloc = new MAllocationHdr(getCtx(), false, getDateTrx(), pa.get_ValueAsInt("C_Currency_ID"),
+                            "Asignación Pagos a Facturas - Cabecera: " + getDocumentNo(), get_TrxName());
+                    alloc.setAD_Org_ID(getAD_Org_ID());
+
+                    if (!alloc.save())
+                        return "La Cabecera de Asignacion no pudo crearse";
+                }
+
+                BigDecimal impPago = pays[p].getPayAmt().add(pays[p].getWriteOffAmt());
+
+                if (generaAsignaciones)
+                    impPago = impPago.subtract(pays[p].getAllocatedAmt().abs());
+                else
+                    impPago = impPago.subtract(montoAsignado);
+
+                // @fchiappano Si la moneda de la factura, es distinta de la
+                // moneda predeterminada, realizo la conversión.
+                boolean impMinimo = false;
+                if (esMonedaExtranjera)
+                {
+                    if (tasaCambio != null)
+                    {
+                        impPago = impPago.divide(tasaCambio, pa.getInvoice().getC_Currency().getStdPrecision() + 2, RoundingMode.FLOOR);
+
+                        BigDecimal min = Env.ONE.divide(new BigDecimal(10), 1, RoundingMode.FLOOR);
+                        min = min.pow(pa.getInvoice().getC_Currency().getStdPrecision());
+
+                        if (impPago.abs().compareTo(min) < 0)
+                            impMinimo = true;
+                    }
+                }
+
+                MInvoice factura = new MInvoice(p_ctx, pa.getC_Invoice_ID(), get_TrxName());
+                final BigDecimal importeFactura;
+
+                if (generaAsignaciones)
+                    importeFactura = factura.getOpenAmt().subtract(pa.getDiscountAmt());
+                else
+                    importeFactura = factura.getOpenAmt().subtract(pa.getDiscountAmt()).subtract(montoPagado);
+
+                int comp = impPago.compareTo(importeFactura);
+                MAllocationLine aLine = null;
+                BigDecimal alineOUAmt = Env.ZERO;
+                BigDecimal alineAmt;
+                // Evita Sobrepagos
+                // @fchiappano si la factura es en dolares, y importe del pago es
+                // menor al minimo, utilizar el importe del pago para realizar
+                // la asignacion.
+                if (comp <= 0 || impMinimo)
+                    alineAmt = impPago;
+                else
+                    alineAmt = importeFactura;
+
+                // @fchiappano Sumar el monto de la asignación, al monto
+                // pagado de la factura y al monto asignado del pago.
+                montoPagado = montoPagado.add(alineAmt.setScale(4, RoundingMode.HALF_UP));
+
+                if (esMonedaExtranjera)
+                    montoAsignado = montoAsignado.add((alineAmt.multiply(tasaCambio))
+                                    .setScale(4, RoundingMode.HALF_UP));
+
+                if (generaAsignaciones)
+                {
+                    alineOUAmt = importeFactura.subtract(impPago);
+                    if (isReceipt())
+                        aLine = new MAllocationLine(alloc, alineAmt, Env.ZERO, pa.getWriteOffAmt(), alineOUAmt);
+                    else
+                        aLine = new MAllocationLine(alloc, alineAmt.negate(), Env.ZERO, pa.getWriteOffAmt().negate(),
+                                alineOUAmt);
+                    aLine.setDocInfo(pa.getC_BPartner_ID(), 0, pa.getC_Invoice_ID());
+                    aLine.setPaymentInfo(pays[p].getC_Payment_ID(), 0);
+
+                    // @fchiappano setear la tasa de cambio de la cabecera del
+                    // recibo, en la linea de asignación.
+                    aLine.set_ValueOfColumn("TasaDeCambio", pa.get_Value("TasaDeCambio"));
+
+                    if (!aLine.save(get_TrxName()))
+                        return "Asignación: No se pudo guradar la línea";
+                    else
+                    {
+                        pa.setC_AllocationLine_ID(aLine.getC_AllocationLine_ID());
+                        pa.saveEx(get_TrxName());
+                    }
+                }
+
+                // @fchiappano Guardar el monto pagado en la PA.
+                pa.set_ValueOfColumn("MontoPagado", montoPagado);
+                pa.calcularDifValoracion();
+                pa.saveEx(get_TrxName());
+
+                if (comp >= 0)
+                {
+                    i = i + 1;
+
+                    montoPagado = Env.ZERO;
+
+                    if (comp == 0)
+                    {
+                        p = p + 1;
+                        montoAsignado = Env.ZERO;
+                    }
+                } else
+                {
+                    p = p + 1;
+                    montoAsignado = Env.ZERO;
+                }
+
+                if (generaAsignaciones)
+                {
+                    // Cabecera de Asignación: Comienzo de WF
+                    alloc.processIt(DocAction.ACTION_Complete);
+                    alloc.save(get_TrxName());
+                    m_processMsg = "@C_AllocationHdr_ID@: " + alloc.getDocumentNo();
+                    log.fine(m_processMsg);
+                }
+            }
+        }
+
+        return null;
+    } // calcularAsignaciones
 
 }	//	MLARPaymentHeader
