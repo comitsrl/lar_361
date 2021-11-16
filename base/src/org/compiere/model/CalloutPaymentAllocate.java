@@ -84,7 +84,8 @@ public class CalloutPaymentAllocate extends CalloutEngine
 		//
 		String sql = "SELECT C_BPartner_ID,C_Currency_ID,"		//	1..2
 			+ " invoiceOpen(C_Invoice_ID, ?),"					//	3		#1
-			+ " invoiceDiscount(C_Invoice_ID,?,?), IsSOTrx "	//	4..5	#2/3
+			+ " invoiceDiscount(C_Invoice_ID,?,?), IsSOTrx, "	//	4..5	#2/3
+			+ " TasaDeCambio " // @fchiappano   6
 			+ "FROM C_Invoice WHERE C_Invoice_ID=?";			//			#4
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -99,8 +100,8 @@ public class CalloutPaymentAllocate extends CalloutEngine
 			if (rs.next())
 			{
 			//	mTab.setValue("C_BPartner_ID", new Integer(rs.getInt(1)));
-			//	int C_Currency_ID = rs.getInt(2);					//	Set Invoice Currency
-			//	mTab.setValue("C_Currency_ID", new Integer(C_Currency_ID));
+                int C_Currency_ID = rs.getInt(2); // Set Invoice Currency
+                mTab.setValue("C_Currency_ID", new Integer(C_Currency_ID));
 				//
 				BigDecimal InvoiceOpen = rs.getBigDecimal(3);		//	Set Invoice OPen Amount
 				if (InvoiceOpen == null)
@@ -111,6 +112,8 @@ public class CalloutPaymentAllocate extends CalloutEngine
 				mTab.setValue("InvoiceAmt", InvoiceOpen);
 				mTab.setValue("Amount", InvoiceOpen.subtract(DiscountAmt));
 				mTab.setValue("DiscountAmt", DiscountAmt);
+                // @fchiappano Setear tasa de la factura.
+                mTab.setValue("TasaDeCambio", rs.getBigDecimal(6));
 				//  reset as dependent fields get reset
 				Env.setContext(ctx, WindowNo, "C_Invoice_ID", C_Invoice_ID.toString());
 				mTab.setValue("C_Invoice_ID", C_Invoice_ID);

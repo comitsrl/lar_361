@@ -176,7 +176,11 @@ public final class MPayment extends X_C_Payment
 	
 	/** Reversal Indicator			*/
 	public static String	REVERSE_INDICATOR = "^";
-	
+
+    // @fchiappano tasa promedio de asignación, utilizada para determinar si el
+    // monto abierto del payment es despreciable.
+    private BigDecimal tasaPromedio = Env.ZERO;
+
 	/**
 	 *  Reset Payment to new status
 	 */
@@ -885,8 +889,7 @@ public final class MPayment extends X_C_Payment
                 // distinta de la moneda predeterminada (moneda extranjera),
                 // validar si la diferencia en la asignacion, es menor al minimo
                 // de redondeo de la moneda en cuestion.
-                if (c_Currency_ID > 0
-                        && c_Currency_ID != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+                if (c_Currency_ID > 0)
                     test = esDespreciable(c_Currency_ID, total.subtract(alloc));
             }
 
@@ -2956,7 +2959,9 @@ public final class MPayment extends X_C_Payment
      */
     private int getMonedaAsignacion()
     {
-        String sql = "SELECT alh.C_Currency_ID"
+        int c_Currency_ID = 0;
+
+        String sql = "SELECT alh.C_Currency_ID, al.TasaDeCambio"
                    +  " FROM C_AllocationLine al"
                    +  " JOIN C_AllocationHdr alh ON al.C_AllocationHdr_ID = alh.C_AllocationHdr_ID"
                    + " WHERE al.C_Payment_ID = ?"
@@ -2971,8 +2976,24 @@ public final class MPayment extends X_C_Payment
             pstmt.setInt(1, getC_Payment_ID());
             rs = pstmt.executeQuery();
 
-            if (rs.next())
-                return rs.getInt(1);
+            int c_CurrencyAsig_ID = 0;
+            int contadorTasas = 0;
+            BigDecimal tasaCambioAcumulativo = Env.ZERO;
+            while (rs.next())
+            {
+                c_CurrencyAsig_ID = rs.getInt(1);
+
+                if (c_CurrencyAsig_ID > 0 && c_CurrencyAsig_ID != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+                {
+                    c_Currency_ID = c_CurrencyAsig_ID;
+                    tasaCambioAcumulativo = tasaCambioAcumulativo.add(rs.getBigDecimal(2));
+                    contadorTasas ++;
+                }
+            }
+
+            if (contadorTasas > 0)
+                tasaPromedio = tasaCambioAcumulativo.divide(new BigDecimal(contadorTasas),
+                        MCurrency.get(p_ctx, c_Currency_ID).getStdPrecision(), RoundingMode.HALF_UP);
         }
         catch (SQLException e)
         {
@@ -2985,7 +3006,7 @@ public final class MPayment extends X_C_Payment
             pstmt = null;
         }
 
-        return 0;
+        return c_Currency_ID;
     } // getMonedaAsignaciones
 
     /**
@@ -3007,8 +3028,7 @@ public final class MPayment extends X_C_Payment
         if (lar_PaymentHeader_ID <= 0)
             return despreciable;
 
-        MLARPaymentHeader recibo = new MLARPaymentHeader(p_ctx, lar_PaymentHeader_ID, get_TrxName());
-        BigDecimal tasaCambio = (BigDecimal) recibo.get_Value("TasaDeCambio");
+        BigDecimal tasaCambio = tasaPromedio;
 
         BigDecimal convertido = diferencia.divide(tasaCambio, 8, RoundingMode.FLOOR).abs();
 
