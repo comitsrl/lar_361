@@ -17,19 +17,16 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
 import ar.com.ergio.model.MLARPaymentHeader;
-import ar.com.ergio.util.LAR_Utils;
 
 /**
  * 	Payment Allocate Model
@@ -130,8 +127,79 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
 			return 0;
 		return m_invoice.getC_BPartner_ID();
 	}	//	getC_BPartner_ID
-	
-	
+
+    /**
+     * Calcular la diferencia de valoración en pesos
+     *
+     * @author fchiappano
+     * @return
+     */
+    private BigDecimal getDifValoracion(final MLARPaymentHeader header, final BigDecimal tasaCambio,
+            final BigDecimal tasaDia, final BigDecimal montoPagado)
+    {
+        String sql = "SELECT (CurrencyConvertRate(?, ?, ?, ?)) - (CurrencyConvertRate(?, ?, ?, ?))";
+        int c_CurrencyInvoice_ID = get_ValueAsInt("C_Currency_ID");
+        int c_CurrencyHeader_ID = header.get_ValueAsInt("C_Currency_ID");
+        Object[] parametros = { montoPagado, c_CurrencyInvoice_ID, c_CurrencyHeader_ID, tasaDia, montoPagado,
+                c_CurrencyInvoice_ID, c_CurrencyHeader_ID, tasaCambio };
+
+        BigDecimal difValoracion = DB.getSQLValueBD(get_TrxName(), sql, parametros);
+
+        return difValoracion;
+
+    } // getDifValoracion
+
+    /**
+     * Calcular la diferencia de valoración en moneda extranjera.
+     *
+     * @author fchiappano
+     * @return
+     */
+    private BigDecimal getDifValoracionExt(final MLARPaymentHeader header, final BigDecimal tasaDia, final BigDecimal difValoracion)
+    {
+        String sql = "SELECT CurrencyConvertRateDiv(?, ?, ?, ?)";
+        int c_CurrencyInvoice_ID = get_ValueAsInt("C_Currency_ID");
+        int c_CurrencyHeader_ID = header.get_ValueAsInt("C_Currency_ID");
+        Object[] parametros = {difValoracion, c_CurrencyHeader_ID, c_CurrencyInvoice_ID, tasaDia};
+
+        BigDecimal difValoracionExt = DB.getSQLValueBD(get_TrxName(), sql, parametros);
+
+        return difValoracionExt;
+
+    } // getDifValoracionExt
+
+    /**
+     * Actualizar columnas PorcDiferenciaValoracion, DiferenciaValoracion y
+     * DiferenciaValoracionExt.
+     *
+     * @author fchiappano
+     */
+    public void calcularDifValoracion()
+    {
+        // @fchiappano Calcular las diferencias de valoración.
+        int lar_PaymentHeader_ID = get_ValueAsInt("LAR_PaymentHeader_ID");
+        if (lar_PaymentHeader_ID > 0)
+        {
+            MLARPaymentHeader header = new MLARPaymentHeader(p_ctx, lar_PaymentHeader_ID, get_TrxName());
+            BigDecimal tasaCambio = (BigDecimal) get_Value("TasaDeCambio");
+            BigDecimal tasaDia = (BigDecimal) header.get_Value("TasaDelDia");
+            BigDecimal montoPagado = (BigDecimal) get_Value("MontoPagado");
+
+            if (tasaCambio.compareTo(Env.ZERO) > 0 && tasaDia.compareTo(Env.ZERO) > 0
+                    && montoPagado.compareTo(Env.ZERO) > 0)
+            {
+                BigDecimal porcDifValoracion = ((tasaDia.subtract(tasaCambio)).multiply(Env.ONEHUNDRED))
+                        .divide(tasaCambio, 6, RoundingMode.HALF_UP);
+                BigDecimal difValoracion = getDifValoracion(header, tasaCambio, tasaDia, montoPagado);
+                BigDecimal difValoracionExt = getDifValoracionExt(header, tasaDia, difValoracion);
+
+                set_Value("PorcDiferenciaValoracion", porcDifValoracion);
+                set_Value("DiferenciaValoracion", difValoracion);
+                set_Value("DiferenciaValoracionExt", difValoracionExt);
+            }
+        }
+    } // calcularDifValoracion
+
 	/**
 	 * 	Before Save
 	 *	@param newRecord new
@@ -178,6 +246,7 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
             }
 		}
 
+		/* Se paso la tasa de cambio a la C_PaymentAllocate, con lo cual se permite mas de una factura en moneda extranjera.
         // @fchiappano No permitir agregar facturas con distintas monedas.
         if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0 && is_ValueChanged("C_Invoice_ID"))
         {
@@ -236,7 +305,7 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
                     return false;
                 }
             }
-        } // @fchiappano No permitir agregar facturas con distintas monedas.
+        } // @fchiappano No permitir agregar facturas con distintas monedas. */
 
 		return true;
 	}	//	beforeSave
@@ -258,7 +327,7 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
         if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
         {
             MLARPaymentHeader paymentHeader = new MLARPaymentHeader(p_ctx, get_ValueAsInt("LAR_PaymentHeader_ID"), get_TrxName());
-            paymentHeader.set_Value("TasaDeCambio", getInvoice().get_Value("TasaDeCambio"));
+//            paymentHeader.set_Value("TasaDeCambio", getInvoice().get_Value("TasaDeCambio"));
             paymentHeader.set_Value("C_CurrencyTo_ID", getInvoice().get_Value("C_Currency_ID"));
             paymentHeader.saveEx();
         }
