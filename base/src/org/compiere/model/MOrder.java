@@ -1033,9 +1033,20 @@ public class MOrder extends X_C_Order implements DocAction
 			}
 		}
 
-		// @fchiappano guardar tasa de cambio en la orden
-        if (getC_Currency_ID() != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+        // @fchiappano guardar tasa de cambio en la orden, solo si cambio la
+        // moneda o la fecha de orden y se trata de moneda extrajera.
+		int monedaPredeterminada_ID = LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName());
+        if ((is_ValueChanged("C_Currency_ID") || is_ValueChanged("DateOrdered")) && getC_Currency_ID() != monedaPredeterminada_ID)
         {
+            // @fchiappano No permitir cambiar de una moneda extranjera a otra,
+            // sin pasar por la moneda pesos antes.
+            if (!newRecord && is_ValueChanged("C_Currency_ID") && get_ValueOldAsInt("C_Currency_ID") != monedaPredeterminada_ID)
+            {
+                log.saveError("", "No es posible realizar conversión de moneda, entre monedas extranjeras."
+                        + "Para realizar esta operación, primero debe convertirse el documento a pesos y luego a la segunda moneda extranjera en cuestión.");
+                return false;
+            }
+
             // @fchiappano Si se trata de una Orden de Nota de Credito, tomar el
             // Tipo y Tasa de Cambio desde la Factura Origen.
             if (getC_DocTypeTarget().getDocSubTypeSO().equals(DocSubTypeSO_OnCredit))
