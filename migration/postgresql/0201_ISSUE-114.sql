@@ -193,16 +193,6 @@ DELETE FROM AD_Field_Trl WHERE AD_Field_ID=3005767
 DELETE FROM AD_Field WHERE AD_Field_ID=3005767
 ;
 
--- 10/11/2021 20:28:17 ART
--- ISSUE #114: Tasa de cambio en pestaña factura de Recibo/OP.
-DELETE FROM AD_Column_Trl WHERE AD_Column_ID=3003021
-;
-
--- 10/11/2021 20:28:18 ART
--- ISSUE #114: Tasa de cambio en pestaña factura de Recibo/OP.
-DELETE FROM AD_Column WHERE AD_Column_ID=3003021
-;
-
 -- 10/11/2021 20:29:01 ART
 -- ISSUE #114: Tasa de cambio en pestaña factura de Recibo/OP.
 DELETE FROM AD_Field_Trl WHERE AD_Field_ID=3005878
@@ -241,6 +231,26 @@ DELETE FROM AD_Field_Trl WHERE AD_Field_ID=3007666
 -- 10/11/2021 20:30:32 ART
 -- ISSUE #114: Tasa de cambio en pestaña factura de Recibo/OP.
 DELETE FROM AD_Field WHERE AD_Field_ID=3007666
+;
+
+-- 17/11/2021 18:56:20 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+DELETE FROM AD_Field_Trl WHERE AD_Field_ID=3007392
+;
+
+-- 17/11/2021 18:56:20 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+DELETE FROM AD_Field WHERE AD_Field_ID=3007392
+;
+
+-- 17/11/2021 18:57:07 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+DELETE FROM AD_Field_Trl WHERE AD_Field_ID=3007391
+;
+
+-- 17/11/2021 18:57:07 ART
+-- ISSUE 60: Mejorar registro de scripts de migración
+DELETE FROM AD_Field WHERE AD_Field_ID=3007391
 ;
 
 -- 10/11/2021 20:31:05 ART
@@ -956,6 +966,36 @@ UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2021-11-12 18:32:44','Y
 -- 12/11/2021 18:37:37 ART
 -- ISSUE #114: Tasa de cambio en pestaña factura de Recibo/OP.
 UPDATE AD_Field SET DisplayLength=20,Updated=TO_TIMESTAMP('2021-11-12 18:37:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007661
+;
+
+-- 17/11/2021 17:25:06 ART
+-- ISSUE #114: Eliminar columna porcentaje de diferencia, en LAR_PaymentHeader.
+DELETE FROM AD_Field_Trl WHERE AD_Field_ID=3006245
+;
+
+-- 17/11/2021 17:25:06 ART
+-- ISSUE #114: Eliminar columna porcentaje de diferencia, en LAR_PaymentHeader.
+DELETE FROM AD_Field WHERE AD_Field_ID=3006245
+;
+
+-- 17/11/2021 17:25:39 ART
+-- ISSUE #114: Eliminar columna porcentaje de diferencia, en LAR_PaymentHeader.
+DELETE FROM AD_Field_Trl WHERE AD_Field_ID=3007389
+;
+
+-- 17/11/2021 17:25:39 ART
+-- ISSUE #114: Eliminar columna porcentaje de diferencia, en LAR_PaymentHeader.
+DELETE FROM AD_Field WHERE AD_Field_ID=3007389
+;
+
+-- 17/11/2021 17:26:13 ART
+-- ISSUE #114: Eliminar columna porcentaje de diferencia, en LAR_PaymentHeader.
+DELETE FROM AD_Column_Trl WHERE AD_Column_ID=3003363
+;
+
+-- 17/11/2021 17:26:13 ART
+-- ISSUE #114: Eliminar columna porcentaje de diferencia, en LAR_PaymentHeader.
+DELETE FROM AD_Column WHERE AD_Column_ID=3003363
 ;
 
 -- Registración de script
