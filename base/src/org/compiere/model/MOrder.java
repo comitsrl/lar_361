@@ -1083,11 +1083,8 @@ public class MOrder extends X_C_Order implements DocAction
                 if (!get_ValueAsBoolean("TasaManual"))
                 {
                     // @fchiappano Validacion de fecha de orden, debido a que el
-                    // componente fecha de zk, devuelve la hora cuando se trata
-                    // de un registro nuevo.
-                    Timestamp fechaOrden = getDateOrdered();
-                    if (newRecord)
-                        fechaOrden = quitarHora(fechaOrden);
+                    // componente fecha de zk, devuelve la hora.
+                    Timestamp fechaOrden = quitarHora(getDateOrdered());
 
                     BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(),
                             LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), fechaOrden,

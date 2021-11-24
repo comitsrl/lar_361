@@ -2859,12 +2859,9 @@ public class MInvoice extends X_C_Invoice implements DocAction
         else if (!get_ValueAsBoolean("TasaManual"))
         {
             // @fchiappano Validacion de fecha de factura, debido a que el
-            // componente fecha de zk, devuelve la hora cuando se trata de
-            // un registro nuevo.
-            Timestamp fechaFactura = getDateInvoiced();
+            // componente fecha de zk, devuelve la hora.
+            Timestamp fechaFactura = quitarHora(getDateInvoiced());
 
-            if (is_new())
-                fechaFactura = quitarHora(fechaFactura);
             BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(),
                     LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), fechaFactura,
                     conversionType_ID, getAD_Client_ID(), getAD_Org_ID());
