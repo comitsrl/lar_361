@@ -1017,7 +1017,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
         // @fchiappano guardar tasa de cambio en la orden, solo si cambio la
         // moneda o la fecha de orden y se trata de moneda extrajera.
         int monedaPredeterminada_ID = LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName());
-        if ((is_ValueChanged("C_Currency_ID") || is_ValueChanged("DateOrdered"))
+        if ((is_ValueChanged(COLUMNNAME_C_Currency_ID) || is_ValueChanged(COLUMNNAME_DateInvoiced) || is_ValueChanged("Source_Invoice_ID"))
                 && getC_Currency_ID() != monedaPredeterminada_ID && !getDocStatus().equals(DOCSTATUS_Completed)
                 && !getDocStatus().equals(DOCSTATUS_Closed))
         {
@@ -2856,15 +2856,12 @@ public class MInvoice extends X_C_Invoice implements DocAction
             set_ValueOfColumn("TasaDeCambio", facturaOrigen.get_Value("TasaDeCambio"));
         }
         // @fchiappano Si es factura o NC sin factura origen, recuperar tasa del dia.
-        else
+        else if (!get_ValueAsBoolean("TasaManual"))
         {
             // @fchiappano Validacion de fecha de factura, debido a que el
-            // componente fecha de zk, devuelve la hora cuando se trata de
-            // un registro nuevo.
-            Timestamp fechaFactura = getDateInvoiced();
+            // componente fecha de zk, devuelve la hora.
+            Timestamp fechaFactura = quitarHora(getDateInvoiced());
 
-            if (is_new())
-                fechaFactura = quitarHora(fechaFactura);
             BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(),
                     LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), fechaFactura,
                     conversionType_ID, getAD_Client_ID(), getAD_Org_ID());

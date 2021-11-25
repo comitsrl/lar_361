@@ -1036,7 +1036,7 @@ public class MOrder extends X_C_Order implements DocAction
         // @fchiappano guardar tasa de cambio en la orden, solo si cambio la
         // moneda o la fecha de orden y se trata de moneda extrajera.
 		int monedaPredeterminada_ID = LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName());
-        if ((is_ValueChanged("C_Currency_ID") || is_ValueChanged("DateOrdered")) && getC_Currency_ID() != monedaPredeterminada_ID)
+        if ((is_ValueChanged("C_Currency_ID") || is_ValueChanged("DateOrdered") || is_ValueChanged("Source_Invoice_ID")) && getC_Currency_ID() != monedaPredeterminada_ID)
         {
             // @fchiappano No permitir cambiar de una moneda extranjera a otra,
             // sin pasar por la moneda pesos antes.
@@ -1080,23 +1080,23 @@ public class MOrder extends X_C_Order implements DocAction
                     }
                 }
 
-                // @fchiappano Validacion de fecha de orden, debido a que el
-                // componente fecha de zk, devuelve la hora cuando se trata de
-                // un registro nuevo.
-                Timestamp fechaOrden = getDateOrdered();
-                if (newRecord)
-                    fechaOrden = quitarHora(fechaOrden);
-
-                BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(), LAR_Utils.getMonedaPredeterminada(p_ctx,
-                        getAD_Client_ID(), get_TrxName()), fechaOrden,
-                        getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
-
-                if (rate != null)
-                    set_ValueOfColumn("TasaDeCambio", rate);
-                else
+                if (!get_ValueAsBoolean("TasaManual"))
                 {
-                    log.saveError("", "No fue posible, recuperar una tasa de cambio valida.");
-                    return false;
+                    // @fchiappano Validacion de fecha de orden, debido a que el
+                    // componente fecha de zk, devuelve la hora.
+                    Timestamp fechaOrden = quitarHora(getDateOrdered());
+
+                    BigDecimal rate = MConversionRate.getRate(getC_Currency_ID(),
+                            LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), fechaOrden,
+                            getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
+
+                    if (rate != null)
+                        set_ValueOfColumn("TasaDeCambio", rate);
+                    else
+                    {
+                        log.saveError("", "No fue posible, recuperar una tasa de cambio valida.");
+                        return false;
+                    }
                 }
             }
         }
