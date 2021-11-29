@@ -929,6 +929,18 @@ public class MInvoiceLine extends X_C_InvoiceLine
 			if (!updateInvoiceTax(true))
 				return false;
 		}
+
+        // @fchiappano Si cambio el precio o se agrego una nueva linea, eliminar
+        // el programa de pagos, para que se
+        // vuelva a generar al procesar el documento.
+        if (!isProcessed()
+                && (newRecord || is_ValueChanged(COLUMNNAME_PriceEntered) || is_ValueChanged(COLUMNNAME_QtyInvoiced)))
+        {
+            String sql = "DELETE C_InvoicePaySchedule WHERE C_Invoice_ID=" + getC_Invoice_ID();
+            int no = DB.executeUpdate(sql, get_TrxName());
+            log.fine("C_Invoice_ID=" + getC_Invoice_ID() + " - #" + no);
+        }
+
 		return updateHeaderTax();
 	}	//	afterSave
 
