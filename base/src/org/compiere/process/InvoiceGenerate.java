@@ -25,20 +25,16 @@ import java.util.logging.Level;
 
 import org.compiere.model.MBPartner;
 import org.compiere.model.MClient;
-import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
-import org.compiere.model.MInvoicePaySchedule;
 import org.compiere.model.MInvoiceSchedule;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
-import org.compiere.model.MOrderPaySchedule;
 import org.compiere.model.MSysConfig;
-import org.compiere.model.PO;
 import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
@@ -542,6 +538,10 @@ public class InvoiceGenerate extends SvrProcess
 				m_invoice.setC_PaymentTerm_ID(order.getC_PaymentTerm_ID());
 				m_invoice.saveEx();
 				m_invoice.load(m_invoice.get_TrxName()); // refresh from DB
+
+				/** @fchiappano Se comenta codigo,
+				 * ya que la factura puede realizarse varios dias despues y
+				 * las fechas del programa de pago quedan desfasadas.
 				// copy payment schedule from order if invoice doesn't have a current payment schedule
 				MOrderPaySchedule[] opss = MOrderPaySchedule.getOrderPaySchedule(getCtx(), order.getC_Order_ID(), 0, get_TrxName());
 				MInvoicePaySchedule[] ipss = MInvoicePaySchedule.getInvoicePaySchedule(getCtx(), m_invoice.getC_Invoice_ID(), 0, get_TrxName());
@@ -571,7 +571,7 @@ public class InvoiceGenerate extends SvrProcess
 					}
 					m_invoice.validatePaySchedule();
 					m_invoice.saveEx();
-				}
+				} */
 			}
 
 			if (!m_invoice.processIt(p_docAction))
