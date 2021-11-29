@@ -1054,7 +1054,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), get_TrxName());
                     if (moneda.getC_Currency_ID() != monedaPredeterminada.getC_Currency_ID())
                     {
-                        BigDecimal tasaCambio = (BigDecimal) get_Value("TasaDeCambio");
+                        BigDecimal tasaCambio = (BigDecimal) invoices[i].get_Value("TasaDeCambio");
                         sumaFacturas = sumaFacturas.add(invoices[i].getAmount().multiply(tasaCambio).setScale(monedaPredeterminada.getStdPrecision(), RoundingMode.HALF_UP));
                     }
                     else

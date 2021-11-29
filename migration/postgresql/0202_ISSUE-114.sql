@@ -174,5 +174,5 @@ UPDATE AD_Column SET ReadOnlyLogic='@TasaManual@=''N''',Updated=TO_TIMESTAMP('20
 ;
 
 -- Registración de script
-SELECT register_migration_script_lar('0201_ISSUE-114.sql', 'LAR', '')
+SELECT register_migration_script_lar('0202_ISSUE-114.sql', 'LAR', '')
 ;
