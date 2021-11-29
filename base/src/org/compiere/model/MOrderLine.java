@@ -974,6 +974,17 @@ public class MOrderLine extends X_C_OrderLine
 				if (!updateOrderTax(true))
 					return false;
 		}
+
+        // @fchiappano Si el documento esta procesado y se cambio un precio o se
+        // agrego una nueva linea, eliminar el programa de pagos generado.
+        if (!isProcessed()
+                && (newRecord || is_ValueChanged(COLUMNNAME_PriceEntered) || is_ValueChanged(COLUMNNAME_QtyOrdered)))
+        {
+            String sql = "DELETE C_OrderPaySchedule WHERE C_Order_ID=" + getC_Order_ID();
+            int no = DB.executeUpdate(sql, get_TrxName());
+            log.fine("C_Order_ID=" + getC_Order_ID() + " - #" + no);
+        }
+
 		return updateHeaderTax();
 	}	//	afterSave
 

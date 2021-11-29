@@ -1164,7 +1164,19 @@ public class MOrder extends X_C_Order implements DocAction
 			int no = DB.executeUpdate(sql, get_TrxName());
 			log.fine("DateAcct -> #" + no);
 		}
-	      
+
+        // @fchiappano Si cambio la fecha ordenada, la moneda, la lista de
+        // precios o GrandTotal, eliminar el programa de pagos, para que se
+        // vuelva a generar al procesar el documento.
+        if (!isProcessed() && ((is_ValueChanged(MOrder.COLUMNNAME_DateOrdered)
+                || is_ValueChanged(MOrder.COLUMNNAME_C_Currency_ID) || is_ValueChanged(MOrder.COLUMNNAME_M_PriceList_ID)
+                || is_ValueChanged(MOrder.COLUMNNAME_GrandTotal))))
+        {
+            String sql = "DELETE C_OrderPaySchedule WHERE C_Order_ID=" + getC_Order_ID();
+            int no = DB.executeUpdate(sql, get_TrxName());
+            log.fine("C_Order_ID=" + getC_Order_ID() + " - #" + no);
+        }
+
 		//	Sync Lines
 		if (   is_ValueChanged("AD_Org_ID")
 		    || is_ValueChanged(MOrder.COLUMNNAME_C_BPartner_ID)
