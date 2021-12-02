@@ -102,7 +102,8 @@ public class NumberBox extends Div
 		td.setStyle("border: none; padding: 0px; margin: 0px;");
 		decimalBox = new Decimalbox();
 		// @fchiappano Acción que reemplaza automaticamente el punto por la coma decimal.
-		decimalBox.setAction("onkeyup:#{self}.value = #{self}.value.replace('.',',');");
+		// (función en archivo comitsrl.js del módulo zkwebui)
+		decimalBox.setAction("onkeypress:reemplazarPuntoPorComa(event)");
     	if (integral)
     		decimalBox.setScale(0);
         // @fchiappano estilo alineado a la derecha.
