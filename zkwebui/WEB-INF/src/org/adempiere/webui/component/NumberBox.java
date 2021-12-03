@@ -146,9 +146,9 @@ public class NumberBox extends Div
      */
     public void setValue(Object value)
     {
-    	if (value == null)
-    		decimalBox.setValue(null);
-    	else if (value instanceof BigDecimal)
+    	// if (value == null)
+    		//decimalBox.setValue(null);
+    	if (value instanceof BigDecimal)
     		decimalBox.setValue((BigDecimal) value);
     	else if (value instanceof Number)
     		decimalBox.setValue(new BigDecimal(((Number)value).doubleValue()));

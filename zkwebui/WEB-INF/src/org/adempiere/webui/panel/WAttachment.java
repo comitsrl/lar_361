@@ -38,8 +38,8 @@ import org.compiere.util.Msg;
 import org.compiere.util.ValueNamePair;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
-import org.zkoss.zk.au.AuScript;
 import org.zkoss.zk.au.out.AuEcho;
+import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -535,26 +535,19 @@ public class WAttachment extends Window implements EventListener
 		
 		Media media = null;
 		
-		try 
-		{
-			media = Fileupload.get(true); 
-			
-			if (media != null)
-			{
+		media = Fileupload.get(true); 
+        
+        if (media != null)
+        {
 //				pdfViewer.setContent(media);
-				;
-			}
-			else 
-			{
-				preview.setVisible(true);
-				preview.invalidate();
-				return;
-			}
-		}
-		catch (InterruptedException e) 
-		{
-			log.log(Level.WARNING, e.getLocalizedMessage(), e);
-		}
+        	;
+        }
+        else 
+        {
+        	preview.setVisible(true);
+        	preview.invalidate();
+        	return;
+        }
 	
 		String fileName = media.getName(); 
 		log.config(fileName);
