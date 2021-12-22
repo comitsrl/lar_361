@@ -69,6 +69,9 @@ public class LAR_CalcularDifCambio extends SvrProcess
             return "@Error@ Ingrese al menos un detalle de Pago/Cobro";
         else
         {
+            // @fchiapppano Eliminar previamente, los pagos por diferencia de cambio.
+            header.deletePagosDifCambio();
+
             String msg = header.calcularAsignaciones(false, pays);
             if (msg != null)
                 return "@Error@ " + msg;

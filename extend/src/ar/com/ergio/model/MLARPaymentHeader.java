@@ -97,6 +97,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     final static private int responsableInscripto = 1000000;
     // C_SalesRegion_ID para Río Negro
     final static private int regionRioNegroID = 224;
+    // @fchiappano Cargo diferencia de cambio compras.
+    final static private int cargoDifCambioCompras = 1000191;
 
     /**
      * Recupera la cabecera de pagos relacionada con el id de la factura dada
@@ -1114,6 +1116,9 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         if (m_processMsg != null)
             return DocAction.STATUS_Invalid;
 
+        // @fchiapppano Eliminar previamente, los pagos por diferencia de cambio.
+        deletePagosDifCambio();
+
         MPayment[] pays = getPayments(get_TrxName());
         int p = 0;
         for (; p < pays.length; p++)
@@ -1828,6 +1833,17 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 BigDecimal tasaCambio = (BigDecimal) pa.get_Value("TasaDeCambio");
                 boolean esMonedaExtranjera = pa.get_ValueAsInt("C_Currency_ID") != getC_Currency_ID();
 
+                // @fchiappano Calcular el PayAmt en base a la tasa de la
+                // factura, si es que el pago tiene un monto en moneda
+                // extranjera asignado.
+                BigDecimal montoMonedExt = (BigDecimal) pays[p].get_Value("MontoMonedExt");
+                if (esMonedaExtranjera && montoMonedExt.compareTo(Env.ZERO) > 0)
+                {
+                    BigDecimal payamt = montoMonedExt.multiply(tasaCambio);
+                    pays[p].setPayAmt(payamt);
+                    pays[p].saveEx(get_TrxName());
+                }
+
                 // @fchiappano si el parametro asi lo determina, generar la asignación.
                 if (generaAsignaciones)
                 {
@@ -1918,14 +1934,12 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     }
                 }
 
-                // @fchiappano Guardar el monto pagado en la PA.
-                pa.set_ValueOfColumn("MontoPagado", montoPagado);
-                pa.calcularDifValoracion();
-                pa.saveEx(get_TrxName());
-
                 if (comp >= 0)
                 {
                     i = i + 1;
+
+                    // @fchiappano Guardar el monto pagado en la PA.
+                    calcularDifValoracion(pays[p], pa, montoPagado, generaAsignaciones);
 
                     montoPagado = Env.ZERO;
 
@@ -1949,9 +1963,96 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     log.fine(m_processMsg);
                 }
             }
+
+            // @fchiappano asignar el monto pagado y diferencias de cambio para
+            // la ultima factura.
+            if (montoPagado.compareTo(Env.ZERO) > 0)
+            {
+                // @fchiappano Guardar el monto pagado en la PA.
+                MPaymentAllocate pa = invoices[invoices.length - 1];
+                calcularDifValoracion(pays[pays.length - 1], pa, montoPagado, generaAsignaciones);
+            }
         }
 
         return null;
     } // calcularAsignaciones
+
+    /**
+     * Actualizar columnas PorcDiferenciaValoracion, DiferenciaValoracion y
+     * DiferenciaValoracionExt.
+     *
+     * @author fchiappano
+     */
+    private void calcularDifValoracion(final MPayment payment, final MPaymentAllocate pa, final BigDecimal montoPagado, final boolean generaAsignaciones)
+    {
+        // @fchiappano Calcular las diferencias de valoración.
+        BigDecimal tasaCambio = (BigDecimal) pa.get_Value("TasaDeCambio");
+        BigDecimal tasaDia = (BigDecimal) get_Value("TasaDelDia");
+
+        pa.set_ValueOfColumn("MontoPagado", montoPagado);
+
+        if (tasaCambio.compareTo(Env.ZERO) > 0 && tasaDia.compareTo(Env.ZERO) > 0
+                && montoPagado.compareTo(Env.ZERO) > 0)
+        {
+            BigDecimal porcDifValoracion = ((tasaDia.subtract(tasaCambio)).multiply(Env.ONEHUNDRED)).divide(tasaCambio,
+                    6, RoundingMode.HALF_UP);
+            BigDecimal difValoracion = pa.getDifValoracion(this, tasaCambio, tasaDia, montoPagado);
+            BigDecimal difValoracionExt = pa.getDifValoracionExt(this, tasaDia, difValoracion);
+
+            pa.set_ValueOfColumn("PorcDiferenciaValoracion", porcDifValoracion);
+            pa.set_ValueOfColumn("DiferenciaValoracion", difValoracion);
+            pa.set_ValueOfColumn("DiferenciaValoracionExt", difValoracionExt);
+
+            // @fchiappano Generar pago por diferencia de cambio, si es que la
+            // marca asi lo establece.
+            if (get_ValueAsBoolean("GeneraPagoDifCambio"))
+            {
+                MPayment pagoDifCambio = new MPayment(getCtx(), 0, get_TrxName());
+                MPayment.copyValues(payment, pagoDifCambio);
+                pagoDifCambio.set_ValueOfColumn("LAR_PaymentHeader_ID", get_ValueAsInt("LAR_PaymentHeader_ID"));
+                pagoDifCambio.setPayAmt(difValoracion);
+                pagoDifCambio.set_ValueOfColumn("MontoMonedExt", Env.ZERO);
+                pagoDifCambio.setC_Charge_ID(cargoDifCambioCompras);
+                pagoDifCambio.saveEx(get_TrxName());
+
+                if (generaAsignaciones)
+                {
+                    pagoDifCambio.processIt(DOCACTION_Complete);
+                    pagoDifCambio.saveEx(get_TrxName());
+                }
+            }
+        }
+
+        pa.saveEx(get_TrxName());
+
+    } // calcularDifValoracion
+
+    /**
+     * Eliminar todos los pagos por diferencia de cambio generados
+     * automaticamente.
+     *
+     * @author fchiappano
+     */
+    public void deletePagosDifCambio()
+    {
+        String sql = "DELETE FROM C_Payment WHERE LAR_PaymentHeader_ID = ? AND C_Charge_ID = ?";
+        PreparedStatement pstmt = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setInt(1, getLAR_PaymentHeader_ID());
+            pstmt.setInt(2, cargoDifCambioCompras);
+            pstmt.executeUpdate();
+        }
+        catch (Exception e)
+        {
+            log.log(Level.SEVERE, sql, e);
+        }
+        finally
+        {
+            DB.close(pstmt);
+            pstmt = null;
+        }
+    } // deletePagosDifCambio
 
 }	//	MLARPaymentHeader

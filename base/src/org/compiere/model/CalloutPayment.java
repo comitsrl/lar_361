@@ -1014,4 +1014,40 @@ public class CalloutPayment extends CalloutEngine
         return payments;
     } // getPayments
 
+    /**
+     * Si se ingresa un monto en moneda extranjera, tomar las medidas necesarias
+     * con por ejemplo, el PayAmt.
+     *
+     * @author fchiappano
+     *
+     * @param ctx
+     *            context
+     * @param WindowNo
+     *            current Window No
+     * @param mTab
+     *            Grid Tab
+     * @param mField
+     *            Grid Field
+     * @param value
+     *            New Value
+     * @param oldValue
+     *            Old Value
+     * @return null or error message
+     */
+    public String montoMonedaExt(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value,
+            Object oldValue)
+    {
+        // @fchiappano si se ingreso un monto en moneda extranjera, dejar el
+        // payAmt en cero.
+        if (value != null)
+        {
+            BigDecimal montoMonedExt = (BigDecimal) value;
+
+            if (montoMonedExt.compareTo(Env.ZERO) > 0)
+                mTab.setValue("PayAmt", 0);
+        }
+
+        return "";
+    } // montoMonedaExt
+
 } // CalloutPayment
