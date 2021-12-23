@@ -104,7 +104,8 @@ public class InvoiceGen extends GenForm implements SystemIDs
 	            + " AND io.C_DocType_ID=dt.C_DocType_ID"
 	            + " AND io.C_Order_ID=ic.C_Order_ID"
 	            + " AND bp.LCO_TaxPayerType_ID = tpt.LCO_TaxPayerType_ID"
-	            + " AND ic.AD_Client_ID=? AND ic.TotalLines > 0");
+	            + " AND ic.AD_Client_ID=? AND ic.TotalLines > 0"
+	            + " AND io.DocStatus IN ('CO', 'CL')"); // @fchiappano Filtrar remitos por estados.
 
         if (m_AD_Org_ID != null)
             sql.append(" AND ic.AD_Org_ID=").append(m_AD_Org_ID);
