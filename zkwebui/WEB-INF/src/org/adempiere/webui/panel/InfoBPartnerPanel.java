@@ -67,8 +67,8 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 	 * 
 	 */
 	private static final long serialVersionUID = 5677624151607188344L;
-	private Label lblValue ;
-	private Textbox fieldValue ;
+	private Label lblCUIT ;
+	private Textbox fieldCUIT ;
 	private Label lblName;
 	private Textbox fieldName ;
 	private Label lblContact ;
@@ -102,7 +102,7 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 	/**  Array of Column Info    */
 	private static ColumnInfo[] s_partnerLayout = {
 		new ColumnInfo(" ", "C_BPartner.C_BPartner_ID", IDColumn.class),
-		new ColumnInfo(Msg.translate(Env.getCtx(), "Value"), "C_BPartner.Value", String.class),
+		new ColumnInfo(Msg.translate(Env.getCtx(), "TaxId"), "C_BPartner.TaxId", String.class),
 		new ColumnInfo(Msg.translate(Env.getCtx(), "Name"), "C_BPartner.Name", String.class),
 		new ColumnInfo(Msg.translate(Env.getCtx(), "Contact"), "c.Name AS Contact", KeyNamePair.class, "c.AD_User_ID"),
 		new ColumnInfo(Msg.translate(Env.getCtx(), "SO_CreditAvailable"), "C_BPartner.SO_CreditLimit-C_BPartner.SO_CreditUsed AS SO_CreditAvailable", BigDecimal.class, true, true, null),
@@ -159,8 +159,8 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 	
 	private void initComponents()
 	{
-		lblValue = new Label();
-		lblValue.setValue(Util.cleanAmp(Msg.translate(Env.getCtx(), "Value")));
+		lblCUIT = new Label();
+		lblCUIT.setValue(Util.cleanAmp(Msg.translate(Env.getCtx(), "TaxId")));
 		lblName = new Label();
 		lblName.setValue(Util.cleanAmp(Msg.translate(Env.getCtx(), "Name")));
 		lblContact = new Label();
@@ -172,8 +172,8 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 		lblPhone = new Label();
 		lblPhone.setValue(Msg.translate(Env.getCtx(), "Phone"));
 		
-		fieldValue = new Textbox();
-		fieldValue.setMaxlength(40);
+		fieldCUIT = new Textbox();
+		fieldCUIT.setMaxlength(40);
 		fieldName = new Textbox();
 		fieldName.setMaxlength(40);
 		fieldContact = new Textbox();
@@ -200,7 +200,7 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 	
 	private void init()
 	{
-		fieldValue.setWidth("100%");
+		fieldCUIT.setWidth("100%");
 		fieldContact.setWidth("100%");
 		fieldPhone.setWidth("100%");
 		
@@ -215,8 +215,8 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 		
 		Row row = new Row();
 		rows.appendChild(row);
-		row.appendChild(lblValue.rightAlign());
-		row.appendChild(fieldValue);
+		row.appendChild(lblCUIT.rightAlign());
+		row.appendChild(fieldCUIT);
 		row.appendChild(lblContact.rightAlign());
 		row.appendChild(fieldContact);
 		row.appendChild(lblPhone.rightAlign());
@@ -324,7 +324,7 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 			}
 			//	Number entered
 			else
-				fieldValue.setText(value);
+				fieldCUIT.setText(value);
 	}	//	initInfo
 
 	/**
@@ -338,13 +338,13 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 	{
 		int index = 1;
 		//	=> Value
-		String value = fieldValue.getText().toUpperCase();
-		if (!(value.equals("") || value.equals("%")))
+		String cuit = fieldCUIT.getText().toUpperCase();
+		if (!(cuit.equals("") || cuit.equals("%")))
 		{
-			if (!value.endsWith("%"))
-				value += "%";
-			pstmt.setString(index++, value);
-			log.fine("Value: " + value);
+			if (!cuit.endsWith("%"))
+				cuit += "%";
+			pstmt.setString(index++, cuit);
+			log.fine("CUIT: " + cuit);
 		}
 		//	=> Name
 		String name = fieldName.getText().toUpperCase();
@@ -405,9 +405,9 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 	{
 		ArrayList<String> list = new ArrayList<String>();
 		//	=> Value
-		String value = fieldValue.getText().toUpperCase();
-		if (!(value.equals("") || value.equals("%")))
-			list.add ("UPPER(C_BPartner.Value) LIKE ?");
+		String cuit = fieldCUIT.getText().toUpperCase();
+		if (!(cuit.equals("") || cuit.equals("%")))
+			list.add ("UPPER(C_BPartner.TaxId) LIKE ?");
 		//	=> Name
 		String name = fieldName.getText().toUpperCase();
 		if (!(name.equals("") || name.equals("%")))
