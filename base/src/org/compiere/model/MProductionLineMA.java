@@ -7,10 +7,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.compiere.model.X_M_ProductionLineMA;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
-import org.compiere.util.Util;
+
+import ar.com.ergio.util.LAR_Utils;
 
 public class MProductionLineMA extends X_M_ProductionLineMA {
 	/**
@@ -59,7 +59,7 @@ public class MProductionLineMA extends X_M_ProductionLineMA {
 	@Override
 	public void setDateMaterialPolicy(Timestamp DateMaterialPolicy) {
 		if (DateMaterialPolicy != null)
-			DateMaterialPolicy = Util.removeTime(DateMaterialPolicy);
+			DateMaterialPolicy = LAR_Utils.removeTime(DateMaterialPolicy);
 		super.setDateMaterialPolicy(DateMaterialPolicy);
 	}
 	

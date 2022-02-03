@@ -148,7 +148,37 @@ public interface I_M_Production
 	  */
 	public int getC_Project_ID();
 
-	public I_C_Project getC_Project() throws RuntimeException;
+	public org.compiere.model.I_C_Project getC_Project() throws RuntimeException;
+
+    /** Column name C_ProjectPhase_ID */
+    public static final String COLUMNNAME_C_ProjectPhase_ID = "C_ProjectPhase_ID";
+
+	/** Set Project Phase.
+	  * Phase of a Project
+	  */
+	public void setC_ProjectPhase_ID (int C_ProjectPhase_ID);
+
+	/** Get Project Phase.
+	  * Phase of a Project
+	  */
+	public int getC_ProjectPhase_ID();
+
+	public org.compiere.model.I_C_ProjectPhase getC_ProjectPhase() throws RuntimeException;
+
+    /** Column name C_ProjectTask_ID */
+    public static final String COLUMNNAME_C_ProjectTask_ID = "C_ProjectTask_ID";
+
+	/** Set Project Task.
+	  * Actual Project Task in a Phase
+	  */
+	public void setC_ProjectTask_ID (int C_ProjectTask_ID);
+
+	/** Get Project Task.
+	  * Actual Project Task in a Phase
+	  */
+	public int getC_ProjectTask_ID();
+
+	public org.compiere.model.I_C_ProjectTask getC_ProjectTask() throws RuntimeException;
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -205,6 +235,32 @@ public interface I_M_Production
 	  */
 	public String getDescription();
 
+    /** Column name DocAction */
+    public static final String COLUMNNAME_DocAction = "DocAction";
+
+	/** Set Document Action.
+	  * The targeted status of the document
+	  */
+	public void setDocAction (String DocAction);
+
+	/** Get Document Action.
+	  * The targeted status of the document
+	  */
+	public String getDocAction();
+
+    /** Column name DocStatus */
+    public static final String COLUMNNAME_DocStatus = "DocStatus";
+
+	/** Set Document Status.
+	  * The current status of the document
+	  */
+	public void setDocStatus (String DocStatus);
+
+	/** Get Document Status.
+	  * The current status of the document
+	  */
+	public String getDocStatus();
+
     /** Column name DocumentNo */
     public static final String COLUMNNAME_DocumentNo = "DocumentNo";
 
@@ -237,12 +293,12 @@ public interface I_M_Production
 	/** Set Complete.
 	  * It is complete
 	  */
-	public void setIsComplete (String IsComplete);
+	public void setIsComplete (boolean IsComplete);
 
 	/** Get Complete.
 	  * It is complete
 	  */
-	public String getIsComplete();
+	public boolean isComplete();
 
     /** Column name IsCreated */
     public static final String COLUMNNAME_IsCreated = "IsCreated";
@@ -252,6 +308,15 @@ public interface I_M_Production
 
 	/** Get Records created	  */
 	public String getIsCreated();
+
+    /** Column name IsUseProductionPlan */
+    public static final String COLUMNNAME_IsUseProductionPlan = "IsUseProductionPlan";
+
+	/** Set Use Production Plan	  */
+	public void setIsUseProductionPlan (boolean IsUseProductionPlan);
+
+	/** Get Use Production Plan	  */
+	public boolean isUseProductionPlan();
 
     /** Column name M_Locator_ID */
     public static final String COLUMNNAME_M_Locator_ID = "M_Locator_ID";
@@ -308,6 +373,15 @@ public interface I_M_Production
 	  * Plan for producing a product
 	  */
 	public int getM_Production_ID();
+
+    /** Column name M_Production_UU */
+    public static final String COLUMNNAME_M_Production_UU = "M_Production_UU";
+
+	/** Set M_Production_UU	  */
+	public void setM_Production_UU (String M_Production_UU);
+
+	/** Get M_Production_UU	  */
+	public String getM_Production_UU();
 
     /** Column name Name */
     public static final String COLUMNNAME_Name = "Name";
@@ -383,6 +457,21 @@ public interface I_M_Production
 	  */
 	public BigDecimal getProductionQty();
 
+    /** Column name Reversal_ID */
+    public static final String COLUMNNAME_Reversal_ID = "Reversal_ID";
+
+	/** Set Reversal ID.
+	  * ID of document reversal
+	  */
+	public void setReversal_ID (int Reversal_ID);
+
+	/** Get Reversal ID.
+	  * ID of document reversal
+	  */
+	public int getReversal_ID();
+
+	public org.compiere.model.I_M_Production getReversal() throws RuntimeException;
+
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -402,12 +491,12 @@ public interface I_M_Production
     /** Column name User1_ID */
     public static final String COLUMNNAME_User1_ID = "User1_ID";
 
-	/** Set User List 1.
+	/** Set User Element List 1.
 	  * User defined list element #1
 	  */
 	public void setUser1_ID (int User1_ID);
 
-	/** Get User List 1.
+	/** Get User Element List 1.
 	  * User defined list element #1
 	  */
 	public int getUser1_ID();
@@ -417,12 +506,12 @@ public interface I_M_Production
     /** Column name User2_ID */
     public static final String COLUMNNAME_User2_ID = "User2_ID";
 
-	/** Set User List 2.
+	/** Set User Element List 2.
 	  * User defined list element #2
 	  */
 	public void setUser2_ID (int User2_ID);
 
-	/** Get User List 2.
+	/** Get User Element List 2.
 	  * User defined list element #2
 	  */
 	public int getUser2_ID();

@@ -183,7 +183,7 @@ public class MProductionPlan extends X_M_ProductionPlan {
 					{
 
 						// BOM stock info
-						MStorageOnHand[] storages = null;
+						MStorage[] storages = null;
 						MProduct usedProduct = MProduct.get(getCtx(), BOMProduct_ID);
 						defaultLocator = usedProduct.getM_Locator_ID();
 						if ( defaultLocator == 0 )
@@ -200,7 +200,7 @@ public class MProductionPlan extends X_M_ProductionPlan {
 							MMPolicy = client.getMMPolicy();
 						}
 
-						storages = MStorageOnHand.getWarehouse(getCtx(), M_Warehouse_ID, BOMProduct_ID, 0, null,
+						storages = MStorage.getWarehouse(getCtx(), M_Warehouse_ID, BOMProduct_ID, 0, null,
 								MProductCategory.MMPOLICY_FiFo.equals(MMPolicy), true, 0, get_TrxName());
 
 						MProductionLine BOMLine = null;

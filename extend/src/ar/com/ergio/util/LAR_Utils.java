@@ -18,6 +18,7 @@ package ar.com.ergio.util;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -231,5 +232,21 @@ public final class LAR_Utils {
 
         return DB.getSQLValue(trxName, sql, ad_Client_ID);
     } // getTipoCambioPredeterminado
+
+    /**
+     * Quitar hora del timestamp.
+     * @param ts
+     * @return solo fecha.
+     */
+    public static Timestamp removeTime(Timestamp ts)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(ts);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return new Timestamp(cal.getTimeInMillis());
+    } // removeTime
 
 } // LAR_Utils

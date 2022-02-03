@@ -731,6 +731,136 @@ public class MStorage extends X_M_Storage
 	}
 
 	/**
+     * Add quantity on hand directly - not using cached value - solving
+     * IDEMPIERE-2629
+     *
+     * @param addition
+     */
+    public String addQtyOnHand(BigDecimal addition)
+    {
+        final String sql = "UPDATE M_Storage"
+                         +   " SET QtyOnHand = QtyOnHand + ?, Updated = getDate(), UpdatedBy = ?"
+                         + " WHERE M_Product_ID = ?"
+                         +   " AND M_Locator_ID = ?"
+                         +   " AND M_AttributeSetInstance_ID = ?";
+
+        DB.executeUpdateEx(sql, new Object[] { addition, Env.getAD_User_ID(Env.getCtx()), getM_Product_ID(),
+                getM_Locator_ID(), getM_AttributeSetInstance_ID() }, get_TrxName());
+        load(get_TrxName());
+        if (getQtyOnHand().signum() == -1)
+        {
+            MWarehouse wh = MWarehouse.get(Env.getCtx(), getM_Warehouse_ID());
+            if (wh.isDisallowNegativeInv())
+            {
+                return "El deposito seleccionado, no permite inventario negativo.";
+            }
+        }
+
+        return "";
+    } // addQtyOnHand
+
+    /**
+     * Codigo incorporado desde IDempiere.
+     *
+     * @param M_Product_ID
+     * @param M_AttributeSetInstance_ID
+     * @param trxName
+     * @return datempolicy timestamp
+     */
+    public static Timestamp getDateMaterialPolicy(int M_Product_ID, int M_AttributeSetInstance_ID, String trxName)
+    {
+        if (M_Product_ID <= 0 || M_AttributeSetInstance_ID <= 0)
+            return null;
+
+        String sql = "SELECT dateMaterialPolicy FROM M_Storage WHERE M_Product_ID = ? and M_AttributeSetInstance_ID = ? ORDER BY QtyOnHand DESC";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, trxName);
+            pstmt.setInt(1, M_Product_ID);
+            pstmt.setInt(2, M_AttributeSetInstance_ID);
+
+            rs = pstmt.executeQuery();
+            if (rs.next())
+            {
+                return rs.getTimestamp(1);
+            }
+        }
+        catch (SQLException ex)
+        {
+            s_log.log(Level.SEVERE, sql, ex);
+
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return null;
+    } // getDateMaterialPolicy
+
+    /**
+     * Get Date Material Policy.
+     *
+     * @return Time used for LIFO and FIFO Material Policy
+     */
+    public Timestamp getDateMaterialPolicy()
+    {
+        return (Timestamp) get_Value("DateMaterialPolicy");
+    } // getDateMaterialPolicy
+
+    /**
+     * 
+     * @param M_Product_ID
+     * @param M_AttributeSetInstance_ID
+     * @param M_Locator_ID
+     * @param trxName
+     * @return datempolicy timestamp
+     */
+    public static Timestamp getDateMaterialPolicy(int M_Product_ID, int M_AttributeSetInstance_ID, int M_Locator_ID,
+            String trxName)
+    {
+
+        if (M_Product_ID <= 0 || M_AttributeSetInstance_ID <= 0)
+            return null;
+
+        String sql = "SELECT DateMaterialPolicy FROM M_Storage WHERE M_Product_ID = ? AND M_AttributeSetInstance_ID = ? AND M_Locator_ID = ? ORDER BY QtyOnHand DESC";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, trxName);
+            pstmt.setInt(1, M_Product_ID);
+            pstmt.setInt(2, M_AttributeSetInstance_ID);
+            pstmt.setInt(3, M_Locator_ID);
+
+            rs = pstmt.executeQuery();
+            if (rs.next())
+            {
+                return rs.getTimestamp(1);
+            }
+        }
+        catch (SQLException ex)
+        {
+            s_log.log(Level.SEVERE, sql, ex);
+
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+
+        return null;
+    } // getDateMaterialPolicy
+
+	/**
 	 *	String Representation
 	 * 	@return info
 	 */

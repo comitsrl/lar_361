@@ -19,6 +19,7 @@ package org.compiere.model;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
@@ -156,5 +157,26 @@ public class X_M_ProductionLineMA extends PO implements I_M_ProductionLineMA, I_
     public KeyNamePair getKeyNamePair() 
     {
         return new KeyNamePair(get_ID(), String.valueOf(getM_ProductionLine_ID()));
+    }
+
+    /**
+     * Set Date Material Policy.
+     *
+     * @param DateMaterialPolicy
+     *            Time used for LIFO and FIFO Material Policy
+     */
+    public void setDateMaterialPolicy(Timestamp DateMaterialPolicy)
+    {
+        set_ValueNoCheck(COLUMNNAME_DateMaterialPolicy, DateMaterialPolicy);
+    }
+
+    /**
+     * Get Date Material Policy.
+     *
+     * @return Time used for LIFO and FIFO Material Policy
+     */
+    public Timestamp getDateMaterialPolicy()
+    {
+        return (Timestamp) get_Value(COLUMNNAME_DateMaterialPolicy);
     }
 }
