@@ -483,7 +483,7 @@ public class MProductionLine extends X_M_ProductionLine {
 			// create quality control results
 			for (MQualityTest test : tests)
 			{
-				test.createResult(getM_AttributeSetInstance_ID());
+				test.createResult(getM_AttributeSetInstance_ID(), getM_Product_ID());
 			}
 		}
 		

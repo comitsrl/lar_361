@@ -15,6 +15,10 @@ ALTER TABLE M_Production ADD COLUMN DocAction character(2) NOT NULL;
 ALTER TABLE M_Production ADD COLUMN DocStatus character(2) NOT NULL;
 ALTER TABLE M_Production ADD COLUMN IsUseProductionPlan character(1) NOT NULL DEFAULT 'N'::bpchar;
 
+ALTER TABLE M_QualityTestResult ADD COLUMN M_Product_ID numeric(10,0);
+ALTER TABLE M_QualityTestResult ADD CONSTRAINT mproduct_mqualitytestresult FOREIGN KEY (M_Product_ID)
+      REFERENCES M_Product (M_Product_ID) MATCH SIMPLE;
+
 -- 04/01/2022 19:08:48 ART
 -- PRT 2: Configuración Productos.
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3004426,325,'LAR',0,'Y','N','N','You find the current status in the Document Status field. The options are listed in a popup','N',2,'N',17,'N',287,'N','Y','N','The targeted status of the document','Document Action','DocAction',TO_TIMESTAMP('2022-01-04 19:08:46','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_TIMESTAMP('2022-01-04 19:08:46','YYYY-MM-DD HH24:MI:SS'),100)
@@ -980,6 +984,96 @@ UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3007745
 -- 14/02/2022 18:54:39 ART
 -- ISSUE #154: Botón DocAction en proceso de producción de productos.
 UPDATE AD_Ref_Table SET WhereClause=NULL,Updated=TO_TIMESTAMP('2022-02-14 18:54:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Reference_ID=3000142
+;
+
+-- 25/02/2022 21:24:33 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3004435,53331,'LAR',0,'N','N','N','Identifies an item which is either purchased or sold in this organization.','N',10,'N',19,'N',454,'N','Y','N','Product, Service, Item','Product','M_Product_ID',TO_TIMESTAMP('2022-02-25 21:24:32','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_TIMESTAMP('2022-02-25 21:24:32','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 25/02/2022 21:24:33 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3004435 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 25/02/2022 21:26:05 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Column SET ColumnSQL='(SELECT pqt.ExpectedResult FROM M_Product_QualityTest pqt WHERE pqt.M_QualityTest_ID=M_QualityTestResult.M_QualityTest_ID AND pqt.M_Product_ID=M_QualityTestResult.M_Product_ID)', IsAllowCopy='N',Updated=TO_TIMESTAMP('2022-02-25 21:26:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=61960
+;
+
+-- 25/02/2022 21:27:39 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,Help,EntityType,Description,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007748,10,'Y','N','N',3004435,'N','Y',53421,'N','Identifies an item which is either purchased or sold in this organization.','LAR','Product, Service, Item','Product',100,0,'Y',TO_TIMESTAMP('2022-02-25 21:27:39','YYYY-MM-DD HH24:MI:SS'),0,TO_TIMESTAMP('2022-02-25 21:27:39','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 25/02/2022 21:27:39 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007748 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=10,IsDisplayed='Y' WHERE AD_Field_ID=61983
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=20,IsDisplayed='Y' WHERE AD_Field_ID=61973
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=30,IsDisplayed='Y' WHERE AD_Field_ID=61974
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=40,IsDisplayed='Y' WHERE AD_Field_ID=61975
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=50,IsDisplayed='Y' WHERE AD_Field_ID=61976
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=3007748
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=70,IsDisplayed='Y' WHERE AD_Field_ID=61977
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=80,IsDisplayed='Y' WHERE AD_Field_ID=61978
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=61979
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=61980
+;
+
+-- 25/02/2022 21:28:00 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=61981
+;
+
+-- 25/02/2022 21:28:08 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2022-02-25 21:28:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3007748
+;
+
+-- 25/02/2022 21:31:05 ART
+-- ISSUE #154: M_Product_ID en resultado de test de calidad.
+UPDATE AD_Column SET IsUpdateable='N',Updated=TO_TIMESTAMP('2022-02-25 21:31:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3004435
 ;
 
 -- Registración de script

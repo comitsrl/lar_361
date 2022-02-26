@@ -13,12 +13,14 @@ public class MQualityTest extends X_M_QualityTest {
 		super(ctx, rs, trxName);
 	}
 	
-	public MQualityTestResult createResult(int m_attributesetinstance_id) 
+	public MQualityTestResult createResult(int m_attributesetinstance_id, int m_product_id) 
 	{
 		MQualityTestResult result = new MQualityTestResult(getCtx(),0, get_TrxName());
 		result.setClientOrg(this);
 		result.setM_QualityTest_ID(getM_QualityTest_ID());
 		result.setM_AttributeSetInstance_ID(m_attributesetinstance_id);
+        // @fchiappano setear el m_product_id, en el resultado del test.
+        result.set_Value("M_Product_ID", m_product_id);
 		result.setProcessed(false);
 		result.setIsQCPass(false);
 		result.saveEx();
