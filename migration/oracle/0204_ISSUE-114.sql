@@ -326,6 +326,241 @@ UPDATE AD_Field SET DisplayLogic='@TasaDelDia@ > 0',Updated=TO_DATE('2021-12-21 
 UPDATE AD_Column SET Callout='org.compiere.model.CalloutPayment.montoMonedaExt',Updated=TO_DATE('2021-12-22 12:38:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3004422
 ;
 
+-- 16/02/2022 21:00:49 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Column SET ReadOnlyLogic='@LAR_PaymentSource_ID@!0  | @EsRetencionIIBB@=Y',Updated=TO_TIMESTAMP('2022-02-16 21:00:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=5303
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3007721
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=3000441
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=3000442
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=3000443
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=3000444
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=220,IsDisplayed='Y' WHERE AD_Field_ID=3000445
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3000450
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3003313
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3002769
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=260,IsDisplayed='Y' WHERE AD_Field_ID=3002770
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=270,IsDisplayed='Y' WHERE AD_Field_ID=3002806
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=280,IsDisplayed='Y' WHERE AD_Field_ID=3003311
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=290,IsDisplayed='Y' WHERE AD_Field_ID=3000453
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=300,IsDisplayed='Y' WHERE AD_Field_ID=3000462
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=310,IsDisplayed='Y' WHERE AD_Field_ID=3000452
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=320,IsDisplayed='Y' WHERE AD_Field_ID=3000454
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=330,IsDisplayed='Y' WHERE AD_Field_ID=3006640
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=340,IsDisplayed='Y' WHERE AD_Field_ID=3000458
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=350,IsDisplayed='Y' WHERE AD_Field_ID=3000459
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=360,IsDisplayed='Y' WHERE AD_Field_ID=3000460
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=370,IsDisplayed='Y' WHERE AD_Field_ID=3000461
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=380,IsDisplayed='Y' WHERE AD_Field_ID=3000463
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=390,IsDisplayed='Y' WHERE AD_Field_ID=3000464
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=400,IsDisplayed='Y' WHERE AD_Field_ID=3000465
+;
+
+-- 16/02/2022 21:01:02 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=410,IsDisplayed='Y' WHERE AD_Field_ID=3000466
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=420,IsDisplayed='Y' WHERE AD_Field_ID=3000467
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=430,IsDisplayed='Y' WHERE AD_Field_ID=3000468
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=440,IsDisplayed='Y' WHERE AD_Field_ID=3000469
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=450,IsDisplayed='Y' WHERE AD_Field_ID=3000470
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=460,IsDisplayed='Y' WHERE AD_Field_ID=3000471
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=470,IsDisplayed='Y' WHERE AD_Field_ID=3000472
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=480,IsDisplayed='Y' WHERE AD_Field_ID=3000473
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=3000474
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=3000475
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=510,IsDisplayed='Y' WHERE AD_Field_ID=3000476
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=520,IsDisplayed='Y' WHERE AD_Field_ID=3000477
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=530,IsDisplayed='Y' WHERE AD_Field_ID=3000478
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=540,IsDisplayed='Y' WHERE AD_Field_ID=3000479
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=550,IsDisplayed='Y' WHERE AD_Field_ID=3000480
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=560,IsDisplayed='Y' WHERE AD_Field_ID=3000481
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=570,IsDisplayed='Y' WHERE AD_Field_ID=3000482
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=580,IsDisplayed='Y' WHERE AD_Field_ID=3000483
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=590,IsDisplayed='Y' WHERE AD_Field_ID=3000484
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=600,IsDisplayed='Y' WHERE AD_Field_ID=3000490
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=610,IsDisplayed='Y' WHERE AD_Field_ID=3000489
+;
+
+-- 16/02/2022 21:01:03 ART
+-- BUG #432: Incorporación de Billeteras Digitales en POS.
+UPDATE AD_Field SET SeqNo=620,IsDisplayed='Y' WHERE AD_Field_ID=3000491
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0204_ISSUE-114.sql', 'LAR', '') FROM dual
 ;
