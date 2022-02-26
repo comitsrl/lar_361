@@ -225,7 +225,7 @@ public class LAR_AjustePorInflacion extends SvrProcess
                     lineaReporte.append(nombreCuenta).append("|");
                     lineaReporte.append(nombrePeriodo).append("|");
                     lineaReporte.append(String.format("%.2f",saldo)).append("|");
-                    lineaReporte.append(String.format("%.2f",indice)).append("|");
+                    lineaReporte.append(String.format("%.6f",indice)).append("|");
                     lineaReporte.append(String.format("%.2f",saldoAjustado)).append("|");
                     lineaReporte.append(String.format("%.2f",recpam)).append("|");
                     lineaReporte.append("\n");
@@ -292,7 +292,6 @@ public class LAR_AjustePorInflacion extends SvrProcess
                     asiento.setDocStatus(asiento.completeIt());
                     asiento.saveEx(get_TrxName());
                 } // !soloEjecutaReporte
-
                 // Registra el asiento generado en el archivo - Linea DR
                 lineaReporte.delete(0, lineaReporte.length());
                 lineaReporte.append("->").append("|");
