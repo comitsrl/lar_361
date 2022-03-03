@@ -1121,19 +1121,6 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			log.fine("Lines -> #" + no);
 		}
 
-        // @fchiappano Si cambio la fecha ordenada, la moneda, la lista de
-        // precios o GrandTotal, eliminar el programa de pagos, para que se
-        // vuelva a generar al procesar el documento.
-        if (!isProcessed() && (is_ValueChanged(MInvoice.COLUMNNAME_DateInvoiced)
-                || is_ValueChanged(MInvoice.COLUMNNAME_C_Currency_ID)
-                || is_ValueChanged(MInvoice.COLUMNNAME_M_PriceList_ID)
-                || is_ValueChanged(MInvoice.COLUMNNAME_GrandTotal)))
-        {
-            String sql = "DELETE C_InvoicePaySchedule WHERE C_Invoice_ID=" + getC_Invoice_ID();
-            int no = DB.executeUpdate(sql, get_TrxName());
-            log.fine("C_Invoice_ID=" + getC_Invoice_ID() + " - #" + no);
-        }
-
         // @fchiappano Actualizar factura, ante un cambio de moneda y/o lista de precios.
         if (is_ValueChanged(COLUMNNAME_C_Currency_ID) || is_ValueChanged(COLUMNNAME_M_PriceList_ID))
         {
@@ -1750,21 +1737,19 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		log.fine(pt.toString());
 		
 		int numSchema = pt.getSchedule(false).length;
-		
-		MInvoicePaySchedule[] schedule = MInvoicePaySchedule.getInvoicePaySchedule
-			(getCtx(), getC_Invoice_ID(), 0, get_TrxName());
 
-		if (schedule.length > 0) {
-			if (numSchema == 0)
-				return false; // created a schedule for a payment term that doesn't manage schedule
-			return validatePaySchedule();
-		} else {
-			boolean isValid = pt.apply(this);		//	calls validate pay schedule
-			if (numSchema == 0)
-				return true; // no schedule, no schema, OK
-			else
-				return isValid;
-		}
+        // @fchiappano @mzuniga
+        // Si el programa de pagos no es válido
+        // se fuerza la re-creación del mismo.
+        if (!validatePaySchedule())
+        {
+            boolean isValid = pt.apply(this); // calls validate pay schedule
+            if (numSchema == 0)
+                return true; // no schedule, no schema, OK
+            else
+                return isValid;
+        } else
+            return true;
 	}	//	createPaySchedule
 
 
