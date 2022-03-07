@@ -37,6 +37,7 @@ import org.compiere.model.MBPartner;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MCharge;
+import org.compiere.model.MConversionRate;
 import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
@@ -889,6 +890,29 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 					return false;
 				}
 			}
+
+            // @fchiappano si cambio la fecha del Recibo/OP, determinar si se debe actualizar la tasa del dia.
+            if ((is_ValueChanged(COLUMNNAME_DateTrx) || is_ValueChanged("FechaOP")) && get_ValueAsInt("C_CurrencyTo_ID") > 0 && MSysConfig.getBooleanValue("LAR_Actualizar_TasaDelDia_Recibos/OP", false, Env.getAD_Client_ID(p_ctx)))
+            {
+                int conversionType_ID = ((MBPartner) getC_BPartner()).get_ValueAsInt("C_ConversionType_ID");
+
+                if (conversionType_ID <= 0)
+                {
+                    log.saveError("", "El Socio del Negocio, no posee un tipo de cambio configurado.");
+                    return false;
+                }
+
+                // @fchiappano Dependiendo de si es un recibo o una orden de
+                // pago, recuperar la "fecha de acreditación".
+                Timestamp fechaDeAcreditacion = isReceipt() ? (Timestamp) get_Value("FechaOP") : getDateTrx();
+
+                BigDecimal rate = MConversionRate.getRate(get_ValueAsInt("C_CurrencyTo_ID"),
+                        LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), fechaDeAcreditacion,
+                        conversionType_ID, getAD_Client_ID(), getAD_Org_ID());
+
+                if (rate.compareTo(Env.ZERO) > 0)
+                    set_Value("TasaDelDia", rate);
+            }
 		}
 		return true;
 	} // beforeSave

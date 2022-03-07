@@ -26,6 +26,7 @@ import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
 import ar.com.ergio.model.MLARPaymentHeader;
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  * 	Payment Allocate Model
@@ -290,13 +291,38 @@ public class MPaymentAllocate extends X_C_PaymentAllocate
         if (!success)
             return success;
 
-        // @fchippano Obtener la tasa de cambio, desde la factura.
+        // @fchippano Obtener moneda, desde la factura.
         if (get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
         {
-            MLARPaymentHeader paymentHeader = new MLARPaymentHeader(p_ctx, get_ValueAsInt("LAR_PaymentHeader_ID"), get_TrxName());
-//            paymentHeader.set_Value("TasaDeCambio", getInvoice().get_Value("TasaDeCambio"));
-            paymentHeader.set_Value("C_CurrencyTo_ID", getInvoice().get_Value("C_Currency_ID"));
-            paymentHeader.saveEx();
+            int c_Currency_ID = getInvoice().getC_Currency_ID();
+
+            if (c_Currency_ID != LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()))
+            {
+                MLARPaymentHeader paymentHeader = new MLARPaymentHeader(p_ctx, get_ValueAsInt("LAR_PaymentHeader_ID"),
+                        get_TrxName());
+                paymentHeader.set_Value("C_CurrencyTo_ID", c_Currency_ID);
+
+                // @fchiappano Si la cabecera de la orden de pago, no tiene una tasa del dia ingresada, recuperarla automaticamente.
+                if (!paymentHeader.isReceipt() && (paymentHeader.get_Value("TasaDelDia") == null || ((BigDecimal) paymentHeader.get_Value("TasaDelDia")).compareTo(Env.ZERO) == 0))
+                {
+                    int conversionType_ID = ((MBPartner) paymentHeader.getC_BPartner()).get_ValueAsInt("C_ConversionType_ID");
+
+                    if (conversionType_ID <= 0)
+                    {
+                        log.saveError("", "El Socio del Negocio, no posee un tipo de cambio configurado.");
+                        return false;
+                    }
+
+                    BigDecimal rate = MConversionRate.getRate(c_Currency_ID,
+                            LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName()), paymentHeader.getDateTrx(),
+                            conversionType_ID, getAD_Client_ID(), getAD_Org_ID());
+
+                    if (rate.compareTo(Env.ZERO) > 0)
+                        paymentHeader.set_Value("TasaDelDia", rate);
+                }
+
+                paymentHeader.saveEx();
+            }
         }
 
         return true;
