@@ -17,8 +17,10 @@
 
 package org.adempiere.webui.panel;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -94,6 +96,8 @@ import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Menuitem;
 import org.zkoss.zul.Menupopup;
+
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  *
@@ -2054,6 +2058,11 @@ public abstract class AbstractADWindowPanel extends AbstractUIPart implements To
 				//batch = win.isBatch();
 				startWOasking = true;
 				//vda.dispose();
+
+                // @fchiappano Forzar un cambio en el gridTable, para que de
+                // esta manera, se ejecuten las validaciones de los campos
+                // obligatorios.
+				curTab.setValue("Created", LAR_Utils.sumarTiempo(Calendar.MILLISECOND, 1, (Timestamp) curTab.getValue("Created")));
 			}
 		} // DocAction
 

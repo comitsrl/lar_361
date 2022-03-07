@@ -29,8 +29,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -105,6 +107,8 @@ import org.compiere.util.Env;
 import org.compiere.util.Language;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
+
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  *	Main Panel of application window.
@@ -2540,6 +2544,12 @@ public final class APanel extends CPanel
 					return;
 //				batch = vda.isBatch();
 				startWOasking = true;
+
+				// @fchiappano Forzar un cambio en el gridTable, para que de
+                // esta manera, se ejecuten las validaciones de los campos
+                // obligatorios.
+                m_curTab.setValue("Created", LAR_Utils.sumarTiempo(Calendar.MILLISECOND, 1, (Timestamp) m_curTab.getValue("Created")));
+
 				vda.dispose();
 			}
 		}	//	DocAction
