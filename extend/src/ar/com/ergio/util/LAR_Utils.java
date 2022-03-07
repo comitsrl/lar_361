@@ -249,4 +249,19 @@ public final class LAR_Utils {
         return new Timestamp(cal.getTimeInMillis());
     } // removeTime
 
+    /**
+     * Sumar tiempo a una fecha.
+     * @param atributo
+     * @param cantSuma
+     * @param fecha
+     * @return
+     */
+    public static Timestamp sumarTiempo(final int atributo, final int cantSuma, final Timestamp fecha)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(fecha.getTime());
+        calendar.add(atributo, cantSuma);
+        return new Timestamp(calendar.getTimeInMillis());
+    } // sumarTiempo
+
 } // LAR_Utils
