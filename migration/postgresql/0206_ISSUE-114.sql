@@ -1,3 +1,5 @@
+ALTER TABLE LAR_PaymentHeader ADD COLUMN FechaOP timestamp without time zone;
+
 -- 23/02/2022 19:21:38 ART
 -- ISSUE #114: Recuperar tasa del dia automaticamente en Recibos/OP.
 INSERT INTO AD_SysConfig (AD_SysConfig_ID,EntityType,ConfigurationLevel,Value,Description,Name,AD_Client_ID,AD_Org_ID,Created,Updated,CreatedBy,UpdatedBy,IsActive) VALUES (3000080,'LAR','C','N','Ingresar Y, si desea actualizar de manera automatica la tasa del día, al cambiar la fecha del Recibo/OP. Caso contrario, ingresar N.','LAR_Actualizar_TasaDelDia_Recibos/OP',1000000,0,TO_TIMESTAMP('2022-02-23 19:21:37','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2022-02-23 19:21:37','YYYY-MM-DD HH24:MI:SS'),100,100,'Y')
