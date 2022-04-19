@@ -31,7 +31,6 @@ import org.json.simple.JSONObject;
 
 import ar.com.ergio.print.fiscal.BasicFiscalPrinter;
 import ar.com.ergio.print.fiscal.FiscalPacket;
-import ar.com.ergio.print.fiscal.FiscalPrinterDevice;
 import ar.com.ergio.print.fiscal.comm.FiscalComm;
 import ar.com.ergio.print.fiscal.document.CreditNote;
 import ar.com.ergio.print.fiscal.document.Customer;
@@ -46,7 +45,7 @@ import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterIOException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterStatusError;
 
-public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDevice
+public class EpsonPrinter extends BasicFiscalPrinter
 {
     /** Logger */
     protected CLogger log = CLogger.getCLogger(getClass());
@@ -112,26 +111,6 @@ public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDev
     private String impresora = "IMPRESORA_FISCAL_E2G";
 
     @Override
-    public String formatQuantity(BigDecimal quantity)
-    {
-        return null;
-    }
-
-    @Override
-    public String formatAmount(BigDecimal amount)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String formatPerceptionAmount(BigDecimal amount)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public void setFiscalComm(FiscalComm fiscalComm)
     {
         this.fiscalComm = (WebSocketComm) fiscalComm;
@@ -150,25 +129,8 @@ public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDev
         // @fchiappano Crear el json "Principal"
         JSONObject printTicketJSON = new JSONObject();
 
-        // @fchiappano Crear json con el Target Encabezado.
-        JSONObject encabezado = new JSONObject();
-
-        // @fchiappano Json con los datos de la cabecera.
-        JSONObject datosCabecera = new JSONObject();
-
-        if (invoice.getCustomer().getIvaResponsibility() == Customer.CONSUMIDOR_FINAL)
-            invoice.getCustomer().setIdentificationType(Customer.DNI);
-
-        // @fchiappano determinar el tipo de comprobante (es F + letra del doc).
-        datosCabecera.put("tipo_cbte", "F" + invoice.getLetter());
-        String tipo_doc = traduceIdentificationType(invoice.getCustomer().getIdentificationType());
-        datosCabecera.put("nro_doc", formatDocNumber(tipo_doc, invoice.getCustomer().getIdentificationNumber()));
-        datosCabecera.put("domicilio_cliente", formatText(invoice.getCustomer().getLocation(), 120));
-        datosCabecera.put("tipo_doc", tipo_doc);
-        datosCabecera.put("nombre_cliente", formatText(invoice.getCustomer().getName(), 80));
-        datosCabecera.put("tipo_responsable", traduceIvaResponsibility(invoice.getCustomer().getIvaResponsibility()));
-
-        encabezado.put("encabezado", datosCabecera);
+        // @fchiappano Recuperar datos de Encabezado del documento.
+        JSONObject encabezado = getEncabezado(invoice, "F");
 
         // @fchiappano icorporar lineas del documento, al json.
         JSONArray items = getDocumentItems(invoice);
@@ -202,38 +164,86 @@ public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDev
 
         // Se indica al manejador de eventos que la impresión ha finalizado.
         firePrintEnded();
-    } // printDocument
+    } // printDocument (Invoice)
 
     @Override
     public void printDocument(CreditNote creditNote)
             throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException
     {
-        // TODO Auto-generated method stub
-        
-    }
+        // @fchiappano Crear el json "Principal"
+        JSONObject printTicketJSON = new JSONObject();
+
+        // @fchiappano Recuperar datos de Encabezado del documento.
+        JSONObject encabezado = getEncabezado(creditNote, "NC");
+
+        // @fchiappano icorporar lineas del documento, al json.
+        JSONArray items = getDocumentItems(creditNote);
+        encabezado.put("items", items);
+
+        // @fchiappano Agregar percepciones.
+        JSONArray percepcion = getDocumentPercepcion(creditNote);
+
+        if (percepcion != null)
+            encabezado.put("percepciones", percepcion);
+
+        // @fchiappano Agregar el nombre de la impresora.
+        printTicketJSON.put("printerName", impresora);
+        printTicketJSON.put("printTicket", encabezado);
+
+        // @fchiappano envio mensaje a la impresora.
+        fiscalComm.sendMessage(printTicketJSON.toString());
+
+        // @fchiappano Obtener respuesta y setear en el documento, tras la
+        // emision de la factura.
+        setMessage(creditNote);
+
+        // Se indica al manejador de eventos que la impresión ha finalizado.
+        firePrintEnded();
+    } // printDocument (CreditNote)
 
     @Override
     public void printDocument(DebitNote debitNote)
             throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException
     {
-        // TODO Auto-generated method stub
-        
-    }
+        // @fchiappano Crear el json "Principal"
+        JSONObject printTicketJSON = new JSONObject();
+
+        // @fchiappano Recuperar datos de Encabezado del documento.
+        JSONObject encabezado = getEncabezado(debitNote, "ND");
+
+        // @fchiappano icorporar lineas del documento, al json.
+        JSONArray items = getDocumentItems(debitNote);
+        encabezado.put("items", items);
+
+        // @fchiappano Agregar percepciones.
+        JSONArray percepcion = getDocumentPercepcion(debitNote);
+
+        if (percepcion != null)
+            encabezado.put("percepciones", percepcion);
+
+        // @fchiappano Agregar el nombre de la impresora.
+        printTicketJSON.put("printerName", impresora);
+        printTicketJSON.put("printTicket", encabezado);
+
+        // @fchiappano envio mensaje a la impresora.
+        fiscalComm.sendMessage(printTicketJSON.toString());
+
+        // @fchiappano Obtener respuesta y setear en el documento, tras la
+        // emision de la factura.
+        setMessage(debitNote);
+
+        // Se indica al manejador de eventos que la impresión ha finalizado.
+        firePrintEnded();
+    } // printDocument (DebitNote)
 
     @Override
     public void printDocument(NonFiscalDocument nonFiscalDocument)
             throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException
-    {
-        // TODO Auto-generated method stub
-        
-    }
+    {}
 
     @Override
     public void printDocument(DNFH dnfh) throws FiscalPrinterStatusError, FiscalPrinterIOException, DocumentException
-    {
-        // TODO Auto-generated method stub
-        
-    }
+    {}
 
     @Override
     public void fiscalClose(String type) throws FiscalPrinterStatusError, FiscalPrinterIOException
@@ -347,6 +357,37 @@ public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDev
     } // traduceIvaResponsibility
 
     /**
+     * Recuperar json con los datos del encabezado del documento.
+     * @param documento
+     * @param tipoCbte
+     * @return
+     */
+    private JSONObject getEncabezado(final Document documento, final String tipoCbte)
+    {
+        if (documento.getCustomer().getIvaResponsibility() == Customer.CONSUMIDOR_FINAL)
+            documento.getCustomer().setIdentificationType(Customer.DNI);
+
+        // @fchiappano Crear json con el Target Encabezado.
+        JSONObject encabezado = new JSONObject();
+
+        // @fchiappano Json con los datos de la cabecera.
+        JSONObject datosCabecera = new JSONObject();
+
+        // @fchiappano determinar el tipo de comprobante (es F + letra del doc).
+        datosCabecera.put("tipo_cbte", tipoCbte + documento.getLetter());
+        String tipo_doc = traduceIdentificationType(documento.getCustomer().getIdentificationType());
+        datosCabecera.put("nro_doc", formatDocNumber(tipo_doc, documento.getCustomer().getIdentificationNumber()));
+        datosCabecera.put("domicilio_cliente", formatText(documento.getCustomer().getLocation(), 120));
+        datosCabecera.put("tipo_doc", tipo_doc);
+        datosCabecera.put("nombre_cliente", formatText(documento.getCustomer().getName(), 80));
+        datosCabecera.put("tipo_responsable", traduceIvaResponsibility(documento.getCustomer().getIvaResponsibility()));
+
+        encabezado.put("encabezado", datosCabecera);
+
+        return encabezado;
+    } // getEncabezado
+
+    /**
      * Recorrer lineas del documento y agregarlas en un JSONArray.
      * @author fchiappano
      * @param document
@@ -398,6 +439,8 @@ public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDev
             JSONObject percepcionOject = new JSONObject();
             percepcionOject.put("importe", percepcion.getAmt());
             percepcionOject.put("ds", percepcion.getDescription());
+            percepcionOject.put("iva", "NINGUNO"); // codigo 0 de otros tributos: sin iva.
+            percepcionOject.put("percepcion_tipo", "PERCEPCION_DE_INGRESOS_BRUTOS");
 
             jsonPercepcion.add(percepcionOject);
 
@@ -467,10 +510,13 @@ public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDev
             JSONObject rta = (JSONObject) jsonRta.get(0);
             String respuesta = (String) rta.get("rta");
 
-            if (respuesta != null && !respuesta.equals("") && !respuesta.equals("None") && !respuesta.equals("Ninguno"))
-                invoice.setDocumentNo(respuesta);
-            else
+            if (respuesta == null || respuesta.equals("") || respuesta.equals("None"))
                 throw new FiscalPrinterIOException("Error de impresión Fiscal. Respuesta Recibida: " + respuesta);
+            else if (respuesta.equals("Ninguno"))
+                throw new FiscalPrinterIOException(
+                        "No fue posible abrir un comprobante fiscal. Verifique que se haya realizado el cierre fiscal (Z) diario.");
+            else
+                invoice.setDocumentNo(respuesta);
         }
     } // setMessage
 
@@ -551,7 +597,19 @@ public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDev
     } // convertRemainingAccentCharacters
 
     @Override
-    protected FiscalPacket createFiscalPacket()
+    public String formatQuantity(BigDecimal quantity)
+    {
+        return null;
+    }
+
+    @Override
+    public String formatAmount(BigDecimal amount)
+    {
+        return null;
+    }
+
+    @Override
+    public String formatPerceptionAmount(BigDecimal amount)
     {
         return null;
     }
@@ -559,8 +617,13 @@ public class EpsonPrinter extends BasicFiscalPrinter implements FiscalPrinterDev
     @Override
     public int getAllowedPaymentQty()
     {
-        // TODO Auto-generated method stub
         return 0;
+    }
+
+    @Override
+    protected FiscalPacket createFiscalPacket()
+    {
+        return null;
     }
 
 } // EpsonPrinter
