@@ -45,6 +45,11 @@ import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterIOException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterStatusError;
 
+/**
+ * Implementación para impresoras EpsonG2 TM-T900FA
+ *
+ * @author fchiappano - www.comit.com.ar
+ */
 public class EpsonPrinter extends BasicFiscalPrinter
 {
     /** Logger */
@@ -414,6 +419,15 @@ public class EpsonPrinter extends BasicFiscalPrinter
                 item.put("id_ii", 1);
                 item.put("ii_valor", linea.getImporteImpuestosInternos().divide(linea.getQuantity(), 2, RoundingMode.HALF_UP));
             }
+
+            // @fchiappano determinar el codigo de unidad de medida.
+            int codUM = 0;
+            if (linea.getUnidMedida().equals("Unidad"))
+                codUM = 7;
+            else
+                codUM = 62; // Pack (lo mas parecido a bulto)
+
+            item.put("codigo_unidad_medida", codUM);
 
             items.add(x, item);
             x++;

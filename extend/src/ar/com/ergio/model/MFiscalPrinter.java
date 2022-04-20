@@ -113,8 +113,15 @@ public class MFiscalPrinter extends X_LAR_Fiscal_Printer {
 	}
 	String host = getHost();
 	int port = getPort();
-	// FiscalComm fiscalComm = new SpoolerTCPComm(host, port);
-	FiscalComm fiscalComm = new WebSocketComm(host, port);
+
+    // @fchiappano Instanciar el fiscalcomm, segun la configuración del tipo de
+    // impresora.
+    FiscalComm fiscalComm;
+    if (cType.get_ValueAsBoolean("EsWebSocket"))
+        fiscalComm = new WebSocketComm(host, port);
+    else
+        fiscalComm = new SpoolerTCPComm(host, port);
+
 	fiscalPrinter.setFiscalComm(fiscalComm);
 
 	return fiscalPrinter;
