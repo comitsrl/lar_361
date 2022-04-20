@@ -24,6 +24,7 @@ import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
+import ar.com.comit.print.fiscal.epson.WebSocketComm;
 import ar.com.ergio.print.fiscal.FiscalPrinterDevice;
 import ar.com.ergio.print.fiscal.comm.FiscalComm;
 import ar.com.ergio.print.fiscal.comm.SpoolerTCPComm;
@@ -112,7 +113,15 @@ public class MFiscalPrinter extends X_LAR_Fiscal_Printer {
 	}
 	String host = getHost();
 	int port = getPort();
-	FiscalComm fiscalComm = new SpoolerTCPComm(host, port);
+
+    // @fchiappano Instanciar el fiscalcomm, segun la configuración del tipo de
+    // impresora.
+    FiscalComm fiscalComm;
+    if (cType.get_ValueAsBoolean("EsWebSocket"))
+        fiscalComm = new WebSocketComm(host, port);
+    else
+        fiscalComm = new SpoolerTCPComm(host, port);
+
 	fiscalPrinter.setFiscalComm(fiscalComm);
 
 	return fiscalPrinter;

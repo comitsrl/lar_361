@@ -1023,7 +1023,11 @@ public class FiscalDocumentPrint {
                 // de la
                 // línea, es decir el PriceActual.
                 // if (!mLine.hasBonus()) {
-                BigDecimal unitPrice = mLine.getPriceActual();
+
+                // @fchiappano utilizar el precio ingresado, que es el precio
+                // que se corresponde con la unidad de medida.
+                BigDecimal unitPrice = mLine.getPriceEntered();
+
                 totalLineAmt = totalLineAmt.add(unitPrice);
                 // } else {
                 // 2. Con Bonificaciones
@@ -1060,11 +1064,23 @@ public class FiscalDocumentPrint {
                 docLine.setUnitPrice(unitPrice);
                 docLine.setQuantity(mLine.getQtyEntered());
                 docLine.setPriceIncludeIva(taxIncluded);
+                BigDecimal impInt = (BigDecimal) mLine.get_Value("Importe_Impuesto_Interno");
+                BigDecimal coefLi = unitPrice.compareTo(BigDecimal.ZERO) == 0 ? Env.ZERO : impInt.divide(unitPrice.multiply(mLine.getQtyEntered()), 8, BigDecimal.ROUND_HALF_UP);
+                BigDecimal coefK = BigDecimal.ONE.divide(BigDecimal.ONE.add(coefLi), 8, BigDecimal.ROUND_HALF_UP);
+                docLine.setImpuestosInternos(coefK);
+                docLine.setImporteImpuestosInternos(impInt);
                 // Se obtiene la tasa del IVA de la línea
                 // Se asume que el impuesto es siempre IVA, a futuro se verá
                 // que hacer si el producto tiene otro impuesto que no sea IVA.
                 MTax mTax = MTax.get(Env.getCtx(), mLine.getC_Tax_ID());
                 docLine.setIvaRate(mTax.getRate());
+
+                // @fchiappano Setear Unidad de medida.
+                docLine.setUnidMedida(mLine.getC_UOM().getName());
+
+                // @mzuniga Setear Unidades por Bulto.
+                docLine.setUnitsperPack(mLine.getProduct().get_ValueAsString("UnitsPerPack"));
+
                 // Se agrega la línea al documento.
                 document.addLine(docLine);
             }
