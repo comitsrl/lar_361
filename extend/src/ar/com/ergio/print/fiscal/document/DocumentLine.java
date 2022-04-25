@@ -30,6 +30,8 @@ public class DocumentLine implements Serializable{
 	private static final long serialVersionUID = 1L;
 	/** Descripción de la línea. */
 	private String description;
+    /** Unidad de Medida de la línea. */
+    private String unidMedida;
 	/** Cantidad del ítem. */
 	private BigDecimal quantity;
 	/** Precio unitario del ítem. */
@@ -42,6 +44,12 @@ public class DocumentLine implements Serializable{
 	private DiscountLine discount;
 	/** Número de línea */
 	private int lineNumber;
+    /** Coeficiente k de Impuestos Internos */
+    private BigDecimal impuestosInternos;
+    /** Imorte Impuestos Internos */
+    private BigDecimal importeImpuestosInternos;
+    /** Cantidad de unidades por Bulto */
+    private String unitsperpack;
 
 	public DocumentLine() {
 	
@@ -72,6 +80,25 @@ public class DocumentLine implements Serializable{
 		this.description = description;
 	}
 
+    public String getUnidMedida()
+    {
+        return unidMedida;
+    }
+
+    public void setUnidMedida(String unidMedida)
+    {
+        this.unidMedida = unidMedida;
+    }
+
+    public String getUnitsperPack()
+    {
+        return unitsperpack;
+    }
+
+    public void setUnitsperPack(String unitsperpack)
+    {
+        this.unitsperpack = unitsperpack;
+    }
 	/**
 	 * @return Returns the ivaRate.
 	 */
@@ -209,7 +236,14 @@ public class DocumentLine implements Serializable{
 	public boolean hasDiscount() {
 		return getDiscount() != null;
 	}
-	
+
+    /**
+     * @return Indica si la línea del documento tiene un impuestos internos
+     */
+    public boolean tieneImpuestosInternos() {
+        return getImporteImpuestosInternos().compareTo(BigDecimal.ZERO) != 0;
+    }
+
 	/**
 	 * Validación de la línea de documento.
 	 * @throws DocumentException cuando la línea del documento contiene
@@ -256,6 +290,38 @@ public class DocumentLine implements Serializable{
 			   " (" + MsgRepository.get("Line") + " " + getLineNumber() + ")";
 	}
 
+    /**
+     * @return el valor del coeficiente k que utiliza el
+     * controlador fiscal para calcular los Impuestos Internos.
+     */
+    public BigDecimal getImpuestosInternos() {
+        return impuestosInternos;
+    }
+
+    /**
+     * Setea el valor del coeficiente k que utiliza
+     * el controlador fiscal para calcular los Impuestos Internos.
+     * @param impuestosInternos
+     */
+    public void setImpuestosInternos(BigDecimal impuestosInternos) {
+        this.impuestosInternos = impuestosInternos;
+    }
+
+    /**
+     * @return el valor de los Impuestos Internos.
+     */
+    public BigDecimal getImporteImpuestosInternos() {
+        return importeImpuestosInternos;
+    }
+
+    /**
+     * Setea el valor de los Impuestos Internos.
+     * @param impuestosInternos
+     */
+    public void setImporteImpuestosInternos(BigDecimal importeImpuestosInternos) {
+        this.importeImpuestosInternos = importeImpuestosInternos;
+    }
+
     @Override
     public String toString()
     {
@@ -266,6 +332,8 @@ public class DocumentLine implements Serializable{
                 .append(",ivaRate=").append(ivaRate)
                 .append(",includeIva=").append(priceIncludeIva)
                 .append(",ln=").append(lineNumber)
+                .append(",k=").append(impuestosInternos)
+                .append(",iii=").append(importeImpuestosInternos)
                 .append(",discount=").append(discount)
                 .append("]");
         return sb.toString();
