@@ -5,7 +5,6 @@
 	<classpathentry kind="src" path="client/src"/>
 	<classpathentry kind="src" path="zkwebui/WEB-INF/src"/>
 	<classpathentry kind="src" path="test/src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk8"/>
 	<classpathentry kind="lib" path="test/lib/easymock-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/epsonupos.admin.jar"/>
 	<classpathentry kind="lib" path="lib/epsonupos.core.v1.14.0001.jar"/>
@@ -31,6 +30,10 @@
 	<classpathentry kind="lib" path="lib/httpclient-4.5.jar" sourcepath="lib/httpclient-4.5-src.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.4.1.jar" sourcepath="lib/httpcore-4.4.1-src.jar"/>
 	<classpathentry kind="lib" path="lib/httpmime-4.5.jar" sourcepath="lib/httpmime-4.5-src.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/adempiere361.jdk8"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/adempiere361"/>
+	<classpathentry kind="lib" path="lib/javax.websocket-api-1.1.jar" sourcepath="lib/javax.websocket-api-1.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/javaee-api-8.0.jar" sourcepath="lib/javaee-api-8.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/tyrus-standalone-client-1.9.jar" sourcepath="lib/tyrus-standalone-client-1.9-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

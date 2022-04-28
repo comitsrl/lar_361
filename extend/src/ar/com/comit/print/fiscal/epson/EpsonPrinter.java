@@ -277,7 +277,7 @@ public class EpsonPrinter extends BasicFiscalPrinter
         if (docNumber != null)
         {
             if (docType.equals(DNI))
-                result = docNumber.replace(".", "");
+                result = docNumber.replace(".", "").replace("-", "");
             if (docType.equals(CUIT) || docType.equals(CUIL))
                 result = docNumber.replace("-", "");
             result.trim();
@@ -431,6 +431,20 @@ public class EpsonPrinter extends BasicFiscalPrinter
 
             items.add(x, item);
             x++;
+
+            // @fchiappano Agregar descuento de item.
+            if (linea.hasDiscount())
+            {
+                item = new JSONObject();
+                item.put("alic_iva", linea.getIvaRate().setScale(2, RoundingMode.HALF_UP));
+                item.put("importe", linea.getDiscount().getAmount().setScale(2, RoundingMode.HALF_UP));
+                item.put("ds", "aplicado");
+                item.put("qty", 1);
+                item.put("discountNegative", true);
+
+                items.add(x, item);
+                x++;
+            }
         }
 
         return items;
@@ -528,7 +542,7 @@ public class EpsonPrinter extends BasicFiscalPrinter
                 throw new FiscalPrinterIOException("Error de impresión Fiscal. Respuesta Recibida: " + respuesta);
             else if (respuesta.equals("Ninguno"))
                 throw new FiscalPrinterIOException(
-                        "No fue posible abrir un comprobante fiscal. Verifique que se haya realizado el cierre fiscal (Z) diario.");
+                        "No fue posible abrir un comprobante fiscal. Verifique que se haya realizado el cierre fiscal (Z) diario y que los datos del cliente sean validos.");
             else
                 invoice.setDocumentNo(respuesta);
         }
