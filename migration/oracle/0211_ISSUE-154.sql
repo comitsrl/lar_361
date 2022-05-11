@@ -1,5 +1,6 @@
 ALTER TABLE M_ProductionLine ADD COLUMN EsPerdida character(1) not null default 'N';
 ALTER TABLE C_Order ADD COLUMN Prioridad numeric(10,0);
+ALTER TABLE C_Order ADD COLUMN Producida character(1) not null default 'N'::bpchar;
 
 -- 10/05/2022 20:01:21 ART
 -- PRT 2: Configuración Productos.
@@ -714,6 +715,91 @@ UPDATE AD_Field SET SeqNo=490,IsDisplayed='Y' WHERE AD_Field_ID=7825
 -- 11/05/2022 17:27:44 ART
 -- PRT 2: Configuración Productos.
 UPDATE AD_Field SET SeqNo=500,IsDisplayed='Y' WHERE AD_Field_ID=7038
+;
+
+-- 11/05/2022 19:15:21 ART
+-- PRT 2: Configuración Productos.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,AD_Org_ID,CreatedBy,UpdatedBy) VALUES (3001247,'producida','LAR','producida','producida',0,TO_DATE('2022-05-11 19:15:20','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2022-05-11 19:15:20','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,100)
+;
+
+-- 11/05/2022 19:15:21 ART
+-- PRT 2: Configuración Productos.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001247 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 11/05/2022 19:15:21 ART
+-- PRT 2: Configuración Productos.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3004461,259,'LAR',0,'Y','N','N','N',1,'N',20,'N',3001247,'N','Y','N','producida','producida',TO_DATE('2022-05-11 19:15:20','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2022-05-11 19:15:20','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 11/05/2022 19:15:21 ART
+-- PRT 2: Configuración Productos.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3004461 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 11/05/2022 19:15:50 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Column SET ColumnName='Producida',Updated=TO_DATE('2022-05-11 19:15:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3004461
+;
+
+-- 11/05/2022 19:16:06 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Column_Trl SET Name='Producida',Updated=TO_DATE('2022-05-11 19:16:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3004461 AND AD_Language='es_AR'
+;
+
+-- 11/05/2022 19:16:49 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Element SET ColumnName='Producida', Name='Producida', PrintName='Producida',Updated=TO_DATE('2022-05-11 19:16:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001247
+;
+
+-- 11/05/2022 19:16:49 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001247
+;
+
+-- 11/05/2022 19:16:49 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Column SET ColumnName='Producida', Name='Producida', Description=NULL, Help=NULL WHERE AD_Element_ID=3001247
+;
+
+-- 11/05/2022 19:16:49 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Process_Para SET ColumnName='Producida', Name='Producida', Description=NULL, Help=NULL, AD_Element_ID=3001247 WHERE UPPER(ColumnName)='PRODUCIDA' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 11/05/2022 19:16:49 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Process_Para SET ColumnName='Producida', Name='Producida', Description=NULL, Help=NULL WHERE AD_Element_ID=3001247 AND IsCentrallyMaintained='Y'
+;
+
+-- 11/05/2022 19:16:49 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Field SET Name='Producida', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001247) AND IsCentrallyMaintained='Y'
+;
+
+-- 11/05/2022 19:16:49 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_PrintFormatItem pi SET PrintName='Producida', Name='Producida' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=pi.AD_Column_ID AND c.AD_Element_ID=3001247)
+;
+
+-- 11/05/2022 19:16:54 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Element_Trl SET Name='Producida',PrintName='Producida',Updated=TO_DATE('2022-05-11 19:16:54','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001247 AND AD_Language='es_AR'
+;
+
+-- 11/05/2022 19:17:37 ART
+-- PRT 2: Configuración Productos.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3007780,1,'Y','N','N',3004461,'N','Y',186,'N','LAR','Producida',100,0,'Y',TO_DATE('2022-05-11 19:17:36','YYYY-MM-DD HH24:MI:SS'),0,TO_DATE('2022-05-11 19:17:36','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 11/05/2022 19:17:37 ART
+-- PRT 2: Configuración Productos.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3007780 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 11/05/2022 19:17:45 ART
+-- PRT 2: Configuración Productos.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3007780
 ;
 
 -- Registración de script
