@@ -63,6 +63,7 @@ public class MLARTarjetaCredito extends X_LAR_Tarjeta_Credito
 	 */
 	protected boolean beforeSave(boolean newRecord)
 	{
+        /* @fchiappano se comenta codigo, ya que se deja de utilizar la referencia de tarjetas de credito.
         final int AD_Column_ID = 3001185;
         final MLookup lookup = MLookupFactory.get(Env.getCtx(), 0, 0, AD_Column_ID, DisplayType.List);
         final List<Object> tiposTarjetas = lookup.getData(true, false, true, true);
@@ -75,6 +76,33 @@ public class MLARTarjetaCredito extends X_LAR_Tarjeta_Credito
 
         final String descripcion = getName() + " " + tipoName;
         set_Value("Description", descripcion);
+        */
+
+	    // @fchiappano Validar que se haya seleccionado un tipo de forma de pago.
+        if (!get_ValueAsBoolean("EsCredito") && !get_ValueAsBoolean("EsDebito") && !get_ValueAsBoolean("EsDeposito")
+                && !get_ValueAsBoolean("EsChequeEmitido") && !get_ValueAsBoolean("EsQR"))
+        {
+            log.saveError("", "Por favor, seleccione un Tipo de Forma de Pago (Credito, Debito, Deposito, QR, etc).");
+            return false;
+        }
+
+        // @fchiappano Si la descrición (Nombre interno) esta vacia, setearle el
+        // nombre.
+        if (getDescription() == null || getDescription().equals(""))
+        {
+            final int AD_Column_ID = 3004457;
+            final MLookup lookup = MLookupFactory.get(Env.getCtx(), 0, 0, AD_Column_ID, DisplayType.List);
+            final List<Object> tiposTrx = lookup.getData(true, false, true, true);
+            String tipoName = "";
+            for (Object tipo : tiposTrx)
+            {
+                if (((ValueNamePair) tipo).getValue().equals(get_Value("SOPOType")))
+                    tipoName = ((ValueNamePair) tipo).getName();
+            }
+
+            setDescription(getName() + "_" + tipoName.toUpperCase());
+        }
+
         return true;
 	}//beforeSave
 }
