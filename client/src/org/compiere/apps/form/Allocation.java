@@ -985,7 +985,7 @@ public class Allocation
 
                 // @fchiappano Chequear si la moneda de la factura, es una moneda extranjera.
                 BigDecimal tasaCambio = Env.ZERO;
-                int redondeo = factura.getC_Currency().getStdPrecision() + 2;
+                int redondeo = factura.getC_Currency().getCostingPrecision() + 2;
                 boolean esMonedaExtranjera = monedaFactura_ID != LAR_Utils.getMonedaPredeterminada(
                         Env.getCtx(), AD_Client_ID, trxName) ? true : false;
 
@@ -1024,6 +1024,7 @@ public class Allocation
 						log.config(".. with payment #" + j + ", Amt=" + PaymentAmt);
 
 						BigDecimal amount = AppliedAmt;
+						MPayment cobro = new MPayment(Env.getCtx(), C_Payment_ID, trxName);
 
                         // @fchiappano Si la factura es en moneda extrangera,
                         // convertir el monto a asignar del cobro/pago.
@@ -1033,7 +1034,6 @@ public class Allocation
 
                             // @fchiappano Setear tasa de cambio en la cabecera del recibo,
                             // para evitar errores en la posterior validación de la asignación.
-                            MPayment cobro = new MPayment(Env.getCtx(), C_Payment_ID, trxName);
                             if (cobro.get_ValueAsInt("LAR_PaymentHeader_ID") > 0)
                             {
                                 MLARPaymentHeader cabecera = new MLARPaymentHeader(Env.getCtx(),
@@ -1063,6 +1063,16 @@ public class Allocation
 						AppliedAmt = AppliedAmt.subtract(amount);
 						PaymentAmt = PaymentAmt.subtract(amount);
 						log.fine("Allocation Amount=" + amount + " - Remaining  Applied=" + AppliedAmt + ", Payment=" + PaymentAmt);
+
+                        // @fchiappano si la asignación fue en moneda
+                        // extranjera, volver a convertir el saldo del pago a
+                        // pesos.
+                        if (esMonedaExtranjera)
+                        {
+                            PaymentAmt = PaymentAmt.multiply(tasaCambio)
+                                    .setScale(cobro.getC_Currency().getStdPrecision(), RoundingMode.HALF_UP);
+                        }
+
 						amountList.set(j, PaymentAmt);  //  update
 					}	//	for all applied amounts
 				}	//	loop through payments for invoice
