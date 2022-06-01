@@ -290,21 +290,6 @@ DELETE  FROM  AD_Reference_Trl WHERE AD_Reference_ID=3000145
 DELETE FROM AD_Reference WHERE AD_Reference_ID=3000145
 ;
 
--- 12/05/2022 16:45:27 ART
--- ISSUE #80: Ajuste de Ventana de Tipos de Formas de Pago.
-INSERT INTO AD_Ref_Table (IsValueDisplayed,WhereClause,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,AD_Window_ID,CreatedBy,Created,Updated,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N','LAR_Tarjeta_Credito.EsChequeEmitido=''Y''',3000031,3000062,3001045,3001055,'LAR',3000028,100,TO_DATE('2022-05-12 16:45:27','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2022-05-12 16:45:27','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
-;
-
--- 12/05/2022 16:45:44 ART
--- ISSUE #80: Ajuste de Ventana de Tipos de Formas de Pago.
-INSERT INTO AD_Ref_Table (IsValueDisplayed,WhereClause,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,AD_Window_ID,CreatedBy,Created,Updated,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N','LAR_Tarjeta_Credito.EsChequeEmitido=''Y''',3000031,3000062,3001045,3001055,'LAR',3000028,100,TO_DATE('2022-05-12 16:45:44','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2022-05-12 16:45:44','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
-;
-
--- 12/05/2022 16:47:29 ART
--- ISSUE #80: Ajuste de Ventana de Tipos de Formas de Pago.
-INSERT INTO AD_Ref_Table (IsValueDisplayed,WhereClause,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,AD_Window_ID,CreatedBy,Created,Updated,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N','LAR_Tarjeta_Credito.EsChequeEmitido=''Y''',3000031,3000062,3001045,3001055,'LAR',3000028,100,TO_DATE('2022-05-12 16:47:29','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2022-05-12 16:47:29','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
-;
-
 -- 12/05/2022 16:47:49 ART
 -- ISSUE #80: Ajuste de Ventana de Tipos de Formas de Pago.
 INSERT INTO AD_Reference (AD_Reference_ID,ValidationType,EntityType,IsOrderByValue,Name,AD_Client_ID,AD_Org_ID,CreatedBy,Updated,IsActive,Created,UpdatedBy) VALUES (3000146,'T','LAR','N','Tipos de Cheques Emitidos INTERNO',0,0,100,TO_DATE('2022-05-12 16:47:49','YYYY-MM-DD HH24:MI:SS'),'Y',TO_DATE('2022-05-12 16:47:49','YYYY-MM-DD HH24:MI:SS'),100)
