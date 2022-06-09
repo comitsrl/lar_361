@@ -74,6 +74,8 @@ public abstract class Document implements Serializable{
 	private List<DiscountLine> documentDiscounts = null;
 	/** Apertura de cajón de dinero */
 	protected boolean aperturaCajon;
+    /** @fchiappano Almacenar referencia al PDV. */
+    private String pdv;
 		
 	public Document() {
 		super();
@@ -214,7 +216,25 @@ public abstract class Document implements Serializable{
 	public boolean hasLetter() {
 		return getLetter() != null;
 	}
-	
+
+	/**
+     * @return Returns the PDV.
+     */
+    public String getPDV()
+    {
+        if (pdv == null)
+            pdv = "";
+        return pdv;
+    }
+
+    /**
+     * @param pdv The PDV to set.
+     */
+    public void setPDV(String pdv)
+    {
+        this.pdv = pdv;
+    }
+
 	/**
 	 * @return Retorna el tipo de documento.
 	 */

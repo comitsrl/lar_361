@@ -623,6 +623,9 @@ public class FiscalDocumentPrint {
 		invoice.setCustomer(getCustomer(mInvoice.getC_BPartner_ID()));
 		// Se asigna la letra de la factura.
 		invoice.setLetter(LAR_Utils.getLetter(mInvoice));
+        // @fchiappano Setear el nro de PDV del documento.
+        MPOS pdv = new MPOS(ctx, mInvoice.get_ValueAsInt("C_Pos_ID"), getTrxName());
+        invoice.setPDV(pdv.get_ValueAsString("PosNumber"));
 
 		// Se asigna el número de remito en caso de existir.
 		loadShipmentOrderNumbers(mInvoice, invoice); // @emmie
@@ -889,6 +892,9 @@ public class FiscalDocumentPrint {
         Customer customer = new Customer();
 
         if (bPartner != null) {
+
+            // @fchiappano Vincular el "Customer" con el BPartner.
+            customer.setC_BPartner_ID(bPartnerID);
 
             // Se asigna la categoría de iva del cliente.
             LAR_TaxPayerType taxPayerType = LAR_TaxPayerType.getTaxPayerType(bPartner);

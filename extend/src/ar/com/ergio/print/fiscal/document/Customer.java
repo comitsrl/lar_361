@@ -83,6 +83,8 @@ public class Customer implements Serializable{
 	private int ivaResponsibility = NO_CATEGORIZADO;
 	/** Domicilio legal del cliente */
 	private String location = null;
+    /** @fchiappano Almacenar referencia al C_BPartner */
+    private int c_BPartner_ID = 0;
 
 	public Customer(){
 		super();
@@ -176,6 +178,16 @@ public class Customer implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
+
+    public int getC_BPartner_ID()
+    {
+        return c_BPartner_ID;
+    }
+
+    public void setC_BPartner_ID(int c_BPartner_ID)
+    {
+        this.c_BPartner_ID = c_BPartner_ID;
+    }
 
 	/**
 	 * Validación del cliente del documento.
