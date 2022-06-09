@@ -21,11 +21,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.Normalizer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+import org.compiere.model.MBPartner;
 import org.compiere.util.CLogger;
+import org.compiere.util.Env;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -40,6 +43,7 @@ import ar.com.ergio.print.fiscal.document.Document;
 import ar.com.ergio.print.fiscal.document.DocumentLine;
 import ar.com.ergio.print.fiscal.document.Invoice;
 import ar.com.ergio.print.fiscal.document.NonFiscalDocument;
+import ar.com.ergio.print.fiscal.document.Payment;
 import ar.com.ergio.print.fiscal.document.PerceptionLine;
 import ar.com.ergio.print.fiscal.exception.DocumentException;
 import ar.com.ergio.print.fiscal.exception.FiscalPrinterIOException;
@@ -111,6 +115,10 @@ public class EpsonPrinter extends BasicFiscalPrinter
      */
     private Map<Integer, String> identificationTypes;
 
+    // @fchiappano tipos de documento factura.
+    private static final String FACTURA_A = "081";
+    private static final String FACTURA_B = "082";
+
     /** Interfaz de comunicación con el dispositivo */
     private WebSocketComm fiscalComm;
     private String impresora = "IMPRESORA_FISCAL_E2G";
@@ -135,7 +143,7 @@ public class EpsonPrinter extends BasicFiscalPrinter
         JSONObject printTicketJSON = new JSONObject();
 
         // @fchiappano Recuperar datos de Encabezado del documento.
-        JSONObject encabezado = getEncabezado(invoice, "F");
+        JSONObject encabezado = getEncabezado(invoice, "F" + invoice.getLetter());
 
         // @fchiappano icorporar lineas del documento, al json.
         JSONArray items = getDocumentItems(invoice);
@@ -158,6 +166,61 @@ public class EpsonPrinter extends BasicFiscalPrinter
         // emision de la factura.
         setMessage(invoice);
 
+        // @fchiapppano Armado del ticket no fiscal para cuentas corrientes.
+        List<Payment> pagos = invoice.getPayments();
+
+        if (pagos.size() == 1 && pagos.get(0).getDescription().equals("Cuenta Corriente"))
+        {
+            String lineaGuion =     "------------------------------------------------";
+            String lineaGuionBajo = "________________________________________________";
+            String nroDoc = "00000000" + invoice.getDocumentNo();
+            nroDoc = nroDoc.substring(nroDoc.length() - 8, nroDoc.length());
+            String pdv = "0000" + invoice.getPDV();
+            pdv = pdv.substring(pdv.length() - 4, pdv.length());
+            MBPartner sdn = new MBPartner(Env.getCtx(), invoice.getCustomer().getC_BPartner_ID(), null);
+            BigDecimal limiteCredito = sdn.getSO_CreditLimit();
+            BigDecimal creditoUsado = sdn.getSO_CreditUsed().add(invoice.getTotal());
+
+            // @fchiappano Json Array de Lineas.
+            JSONArray lineas = new JSONArray();
+            lineas.add("TALON DE CUENTA CORRIENTE");
+            lineas.add(lineaGuion);
+            lineas.add("Cliente: " + formatText(invoice.getCustomer().getName(), 40));
+            lineas.add("CUIT: " + invoice.getCustomer().getIdentificationNumber());
+            lineas.add(" ");
+            lineas.add(" ");
+            lineas.add("Factura: " + invoice.getLetter() + pdv + "-" + nroDoc);
+            lineas.add("Importe de Compra: " + invoice.getTotal().setScale(2, RoundingMode.HALF_UP));
+            lineas.add(" ");
+            lineas.add("Limite de Credito: " + limiteCredito.setScale(2, RoundingMode.HALF_UP));
+            lineas.add("Credito Usado: " + creditoUsado.setScale(2, RoundingMode.HALF_UP));
+            lineas.add("Credito Disponible: " + limiteCredito.subtract(creditoUsado).setScale(2, RoundingMode.HALF_UP));
+            lineas.add(" ");
+            lineas.add(" ");
+            lineas.add(" ");
+            lineas.add(" ");
+            lineas.add(" ");
+            lineas.add(" ");
+            lineas.add(" ");
+            lineas.add(lineaGuionBajo);
+            lineas.add("                     FIRMA");
+            lineas.add(" ");
+            lineas.add(" ");
+            lineas.add(lineaGuionBajo);
+            lineas.add("                   ACLARACION");
+
+            // @fchiappano Json con tipo de documento y lineas.
+            JSONObject tipoDoc = new JSONObject();
+            tipoDoc.put("tipo_cbte", "G");
+            tipoDoc.put("lineas", lineas);
+
+            // @fchiappano JSon Principal.
+            JSONObject dnfh = new JSONObject();
+            dnfh.put("printerName", impresora);
+            dnfh.put("printDNFH", tipoDoc);
+            fiscalComm.sendMessage(dnfh.toString());
+        }
+
         // @fchiappano ejecutar la apertura de cajon si corresponde.
         if (invoice.isAperturaCajon())
         {
@@ -179,7 +242,7 @@ public class EpsonPrinter extends BasicFiscalPrinter
         JSONObject printTicketJSON = new JSONObject();
 
         // @fchiappano Recuperar datos de Encabezado del documento.
-        JSONObject encabezado = getEncabezado(creditNote, "NC");
+        JSONObject encabezado = getEncabezado(creditNote, "NC" + creditNote.getLetter());
 
         // @fchiappano icorporar lineas del documento, al json.
         JSONArray items = getDocumentItems(creditNote);
@@ -214,7 +277,7 @@ public class EpsonPrinter extends BasicFiscalPrinter
         JSONObject printTicketJSON = new JSONObject();
 
         // @fchiappano Recuperar datos de Encabezado del documento.
-        JSONObject encabezado = getEncabezado(debitNote, "ND");
+        JSONObject encabezado = getEncabezado(debitNote, "ND" + debitNote.getLetter());
 
         // @fchiappano icorporar lineas del documento, al json.
         JSONArray items = getDocumentItems(debitNote);
@@ -379,13 +442,30 @@ public class EpsonPrinter extends BasicFiscalPrinter
         JSONObject datosCabecera = new JSONObject();
 
         // @fchiappano determinar el tipo de comprobante (es F + letra del doc).
-        datosCabecera.put("tipo_cbte", tipoCbte + documento.getLetter());
+        datosCabecera.put("tipo_cbte", tipoCbte);
         String tipo_doc = traduceIdentificationType(documento.getCustomer().getIdentificationType());
         datosCabecera.put("nro_doc", formatDocNumber(tipo_doc, documento.getCustomer().getIdentificationNumber()));
         datosCabecera.put("domicilio_cliente", formatText(documento.getCustomer().getLocation(), 120));
         datosCabecera.put("tipo_doc", tipo_doc);
         datosCabecera.put("nombre_cliente", formatText(documento.getCustomer().getName(), 80));
         datosCabecera.put("tipo_responsable", traduceIvaResponsibility(documento.getCustomer().getIvaResponsibility()));
+
+        // @fchiappano si es un tipo de documento que requiera comprobante
+        // asociado, se agrega.
+        if (tipoCbte.startsWith("NF"))
+        {
+            String tipoDoc_origen = "";
+            if (documento.getLetter().equals("A"))
+                tipoDoc_origen = FACTURA_A;
+            else
+                tipoDoc_origen = FACTURA_B;
+
+            String documentNo = "00000000" + documento.getDocumentNo();
+            documentNo = documentNo.substring(documentNo.length() -8, documentNo.length());
+
+            String referencia = tipoDoc_origen + "-" + "0111-" + documentNo;
+            datosCabecera.put("referencia", referencia);
+        }
 
         encabezado.put("encabezado", datosCabecera);
 
