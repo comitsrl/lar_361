@@ -212,7 +212,12 @@ public class DocumentLine implements Serializable{
 	 */
 	public BigDecimal getSubtotal() {
 		BigDecimal ivaAmt = BigDecimal.ZERO;
-		BigDecimal subtotal = getUnitPrice().multiply(getQuantity()); 
+        // @fchiappano Correccion de calculo de neto de linea.
+        BigDecimal subtotal = getUnitPrice().multiply(getQuantity());
+
+        if (hasDiscount())
+            subtotal = subtotal.subtract(getDiscount().getAmount());
+
 		if(!isPriceIncludeIva()) {
 			ivaAmt = subtotal.multiply(getIvaRate()).divide(new BigDecimal(100), BigDecimal.ROUND_HALF_UP);
 		}
@@ -224,8 +229,11 @@ public class DocumentLine implements Serializable{
 	 */
 	public BigDecimal getLineTotal() {
 		BigDecimal lineTotal = getSubtotal();
-		if(hasDiscount())
-			lineTotal = lineTotal.add(getDiscount().getAmount());
+		// @fchiappano los descuentos en ADempiere son sobre el neto, con lo
+        // cual este codigo se pasa al getSubTotal()
+
+		/*if(hasDiscount())
+			lineTotal = lineTotal.add(getDiscount().getAmount());*/
 		return lineTotal;
 	}
 	
