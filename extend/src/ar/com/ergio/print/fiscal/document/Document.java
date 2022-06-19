@@ -287,6 +287,10 @@ public abstract class Document implements Serializable{
 		// Se suma el descuento en caso de existir.
 		if(hasGeneralDiscount())
 			sum = sum.add(getGeneralDiscount().getAmount());
+
+		// @fchiappano sumar las percepciones.
+		if (perceptionLine != null)
+		    sum = sum.add(perceptionLine.getAmt());
 		
 		return sum;
 	}

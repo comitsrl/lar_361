@@ -178,8 +178,9 @@ public class EpsonPrinter extends BasicFiscalPrinter
             String pdv = "0000" + invoice.getPDV();
             pdv = pdv.substring(pdv.length() - 4, pdv.length());
             MBPartner sdn = new MBPartner(Env.getCtx(), invoice.getCustomer().getC_BPartner_ID(), null);
+            BigDecimal totalInvoice = invoice.getTotal();
             BigDecimal limiteCredito = sdn.getSO_CreditLimit();
-            BigDecimal creditoUsado = sdn.getSO_CreditUsed().add(invoice.getTotal());
+            BigDecimal creditoUsado = sdn.getSO_CreditUsed().add(totalInvoice);
 
             // @fchiappano Json Array de Lineas.
             JSONArray lineas = new JSONArray();
@@ -190,7 +191,7 @@ public class EpsonPrinter extends BasicFiscalPrinter
             lineas.add(" ");
             lineas.add(" ");
             lineas.add("Factura: " + invoice.getLetter() + pdv + "-" + nroDoc);
-            lineas.add("Importe de Compra: " + invoice.getTotal().setScale(2, RoundingMode.HALF_UP));
+            lineas.add("Importe de Compra: " + totalInvoice.setScale(2, RoundingMode.HALF_UP));
             lineas.add(" ");
             lineas.add("Limite de Credito: " + limiteCredito.setScale(2, RoundingMode.HALF_UP));
             lineas.add("Credito Usado: " + creditoUsado.setScale(2, RoundingMode.HALF_UP));
