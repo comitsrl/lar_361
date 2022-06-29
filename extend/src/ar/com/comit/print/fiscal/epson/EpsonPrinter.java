@@ -605,6 +605,7 @@ public class EpsonPrinter extends BasicFiscalPrinter
     {
         Object objeto = fiscalComm.getRespuesta();
         JSONArray jsonRta = null;
+        String respuesta = "";
 
         if (objeto == null)
         {
@@ -612,21 +613,31 @@ public class EpsonPrinter extends BasicFiscalPrinter
             throw new FiscalPrinterIOException("No se obtuvo respuesta del Controlador Fiscal");
         }
         else
-            jsonRta = (JSONArray) ((JSONObject) objeto).getOrDefault("rta", null);
+            objeto = ((JSONObject) objeto).getOrDefault("rta", null);
 
-        if (jsonRta != null)
+        // @fchiappano si la respusta es de tipo array, recuperar la posición
+        // cero.
+        if (objeto instanceof JSONArray)
         {
-            JSONObject rta = (JSONObject) jsonRta.get(0);
-            String respuesta = (String) rta.get("rta");
-
-            if (respuesta == null || respuesta.equals("") || respuesta.equals("None"))
-                throw new FiscalPrinterIOException("Error de impresión Fiscal. Respuesta Recibida: " + respuesta);
-            else if (respuesta.equals("Ninguno"))
-                throw new FiscalPrinterIOException(
-                        "No fue posible abrir un comprobante fiscal. Verifique que se haya realizado el cierre fiscal (Z) diario y que los datos del cliente sean validos.");
-            else
-                invoice.setDocumentNo(respuesta);
+            jsonRta = (JSONArray) objeto;
+            if (jsonRta != null)
+            {
+                JSONObject rta = (JSONObject) jsonRta.get(0);
+                respuesta = (String) rta.get("rta");
+            }
         }
+        else
+            respuesta = (String) objeto;
+
+        // @fchiappano una vez recuperada la respuesta, validar que sea una respuesta valida.
+        if (respuesta == null || respuesta.equals("") || respuesta.equals("None"))
+            throw new FiscalPrinterIOException("Error de impresión Fiscal. Respuesta Recibida: " + respuesta);
+        else if (respuesta.equals("Ninguno"))
+            throw new FiscalPrinterIOException(
+                    "No fue posible abrir un comprobante fiscal. Verifique que se haya realizado el cierre fiscal (Z) diario y que los datos del cliente sean validos.");
+        else
+            invoice.setDocumentNo(respuesta);
+
     } // setMessage
 
     /**
@@ -701,6 +712,11 @@ public class EpsonPrinter extends BasicFiscalPrinter
             {
                 decomposed.deleteCharAt(i);
                 decomposed.insert(i, 'l');
+            }
+            else if (decomposed.charAt(i) == '°')
+            {
+                decomposed.deleteCharAt(i);
+                decomposed.insert(i, "");
             }
         }
     } // convertRemainingAccentCharacters
