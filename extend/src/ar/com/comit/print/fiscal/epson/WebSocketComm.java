@@ -146,13 +146,7 @@ public class WebSocketComm implements FiscalComm
 
             this.userSession.getBasicRemote().sendText(message);
             // @fchiappano esperar 5 segundos por la respuesta del CF.
-            Thread.sleep(5000);
-
-            // @fchiappano Esperar otros 5 segundos.
-            if (respuesta == null)
-                Thread.sleep(5000);
-            // @fchiappano Cerrar Conexión.
-            close();
+            Thread.sleep(8000);
         }
         catch (IOException e)
         {
@@ -170,7 +164,7 @@ public class WebSocketComm implements FiscalComm
         {
             URI endPointURI = new URI("ws://" + host + ":" + port + "/ws");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            container.setAsyncSendTimeout(12000);
+            container.setAsyncSendTimeout(8000);
             userSession = container.connectToServer(this, endPointURI);
         }
         catch (IOException | URISyntaxException e)
