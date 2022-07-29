@@ -1986,15 +1986,14 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     m_processMsg = "@C_AllocationHdr_ID@: " + alloc.getDocumentNo();
                     log.fine(m_processMsg);
                 }
-            }
 
-            // @fchiappano asignar el monto pagado y diferencias de cambio para
-            // la ultima factura.
-            if (montoPagado.compareTo(Env.ZERO) > 0)
-            {
-                // @fchiappano Guardar el monto pagado en la PA.
-                MPaymentAllocate pa = invoices[invoices.length - 1];
-                calcularDifValoracion(pays[pays.length - 1], pa, montoPagado, generaAsignaciones);
+                // @fchiappano asignar el monto pagado y diferencias de cambio
+                // para la ultima factura.
+                if (montoPagado.compareTo(Env.ZERO) > 0)
+                {
+                    // @fchiappano Guardar el monto pagado en la PA.
+                    calcularDifValoracion(pays[pays.length - 1], pa, montoPagado, generaAsignaciones);
+                }
             }
         }
 
