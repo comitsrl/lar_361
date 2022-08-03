@@ -53,8 +53,6 @@ import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 
-import ar.com.ergio.model.MLARTarjetaCredito;
-
 public class VCreateFromStatementUI extends CreateFromStatement implements ActionListener, SystemIDs
 {
 	private static final long serialVersionUID = 1L;
@@ -84,6 +82,14 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 			setInitOK(false);
 		}
 		AEnv.positionCenterWindow(Env.getWindow(p_WindowNo), dialog);
+
+        // @fchiappano luego de levantar la ventana (para que todos los campos
+        // ocupen el espacio debido), ocultar aquellos que no deban ser visibles
+        // en principio.
+        tipoTarjetaLabel.setVisible(false);
+        tipoTarjetaField.setVisible(false);
+        tipoTarjetaDebitoLabel.setVisible(false);
+        tipoTarjetaDebitoField.setVisible(false);
 	}   //  VCreateFrom
 	
 	/** Window No               */
@@ -110,6 +116,8 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 	// @fchiappano Se agrega un nuevo filtro a la ventana.
 	private JLabel tipoTarjetaLabel = new JLabel();
 	protected VLookup tipoTarjetaField;
+    private JLabel tipoTarjetaDebitoLabel = new JLabel();
+    protected VLookup tipoTarjetaDebitoField;
 	
 	private CLabel amtFromLabel = new CLabel(Msg.translate(Env.getCtx(), "PayAmt"));
 	protected VNumber amtFromField = new VNumber("AmtFrom", false, false, true, DisplayType.Amount, Msg.translate(Env.getCtx(), "AmtFrom"));
@@ -171,9 +179,17 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 		tenderTypeField.setName("TenderType");
 		tenderTypeField.addActionListener(this);
 
-		MLookup lookupTipoTarjeta = MLookupFactory.get(Env.getCtx(), p_WindowNo, 0, MColumn.getColumn_ID(MLARTarjetaCredito.Table_Name, "CreditCardType"), DisplayType.List);
-		tipoTarjetaField = new VLookup ("CreditCardType", false, false, true, lookupTipoTarjeta);
+		// @fchiappano Crear el combo con las nuevas tarjetas de credito.
+		AD_Column_ID = 3001776; // LAR_TenderType_BankAccount.LAR_Tarjeta_Credito_ID
+		MLookup lookupTipoTarjeta = MLookupFactory.get(Env.getCtx(), p_WindowNo, 0, AD_Column_ID, DisplayType.Table);
+		tipoTarjetaField = new VLookup ("LAR_Tarjeta_Credito_ID", false, false, true, lookupTipoTarjeta);
 		tipoTarjetaField.addActionListener(this);
+
+        // @fchiappano Combo de tarjetas de debito.
+        AD_Column_ID = 3001774; // LAR_TenderType_BankAccount.LAR_Tarjeta_Debito_ID
+        lookupTipoTarjeta = MLookupFactory.get(Env.getCtx(), p_WindowNo, 0, AD_Column_ID, DisplayType.Table);
+        tipoTarjetaDebitoField = new VLookup("LAR_Tarjeta_Debito_ID", false, false, true, lookupTipoTarjeta);
+        tipoTarjetaDebitoField.addActionListener(this);
 		
 		bPartnerLookup = new VLookup("C_BPartner_ID", false, false, true,
 				MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, 3499, DisplayType.Search));
@@ -210,7 +226,8 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
     	
     	documentTypeLabel.setText(Msg.translate(Env.getCtx(), "C_DocType_ID"));
     	tenderTypeLabel.setText(Msg.translate(Env.getCtx(), "TenderType"));
-    	tipoTarjetaLabel.setText("Tipo de Tarjeta");
+    	tipoTarjetaLabel.setText("Tarjeta de Crédito");
+    	tipoTarjetaDebitoLabel.setText("Tarjeta de Débito");
     	
     	documentNoLabel.setLabelFor(documentNoField);
     	dateFromLabel.setLabelFor(dateFromField);
@@ -251,7 +268,13 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
                 ,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
         if(tipoTarjetaField!=null)
             parameterBankPanel.add(tipoTarjetaField, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0
-                    ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0)); 
+                    ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
+
+        parameterBankPanel.add(tipoTarjetaDebitoLabel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0
+                ,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+        if(tipoTarjetaDebitoField!=null)
+            parameterBankPanel.add(tipoTarjetaDebitoField, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0
+                    ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
     	
     	parameterBankPanel.add(BPartner_idLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0
     			,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
@@ -298,6 +321,35 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 	{
 		log.config("Action=" + e.getActionCommand());
 //		Object source = e.getSource();
+
+		// @fchiappano si el evento lo disparo el combo de formas de pago, mostrar los
+		// campos dependientes de este.
+		String tenderType = (String) tenderTypeField.getValue();
+		if (tenderType != null)
+		{
+		    if (tenderType.equals("C"))
+		    {
+		        tipoTarjetaField.setVisible(true);
+		        tipoTarjetaLabel.setVisible(true);
+		        tipoTarjetaDebitoField.setVisible(false);
+                tipoTarjetaDebitoLabel.setVisible(false);
+		    }
+		    else if (tenderType.equals("D"))
+            {
+		        tipoTarjetaField.setVisible(false);
+                tipoTarjetaLabel.setVisible(false);
+                tipoTarjetaDebitoField.setVisible(true);
+                tipoTarjetaDebitoLabel.setVisible(true);
+            }
+		    else
+		    {
+		        tipoTarjetaField.setVisible(false);
+                tipoTarjetaLabel.setVisible(false);
+		        tipoTarjetaDebitoField.setVisible(false);
+                tipoTarjetaDebitoLabel.setVisible(false);
+		    }
+		}
+
 		if ( e.getActionCommand().equals(ConfirmPanel.A_REFRESH) )
 		{
 			Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
@@ -311,7 +363,7 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 	{
 		loadTableOIS(getBankData(documentNoField.getText(), bPartnerLookup.getValue(), dateFromField.getValue(), dateToField.getValue(),
 				amtFromField.getValue(), amtToField.getValue(), documentTypeField.getValue(), tenderTypeField.getValue(), tipoTarjetaField.getValue(),
-				authorizationField.getText()));
+				tipoTarjetaDebitoField.getValue(), authorizationField.getText()));
 	}
 	
 	protected void loadTableOIS (Vector<?> data)

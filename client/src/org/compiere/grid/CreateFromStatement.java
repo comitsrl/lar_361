@@ -75,7 +75,7 @@ public class CreateFromStatement extends CreateFrom
 	 *  @return sql where clause
 	 */
 	public String getSQLWhere(String DocumentNo, Object BPartner, Object DateFrom, Object DateTo, 
-			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, String AuthCode)
+			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, Object TipoTarjetaDebito, String AuthCode)
 	{
 		StringBuffer sql = new StringBuffer("WHERE p.Processed='Y' AND p.IsReconciled='N'"
 		+ " AND p.DocStatus IN ('CO','CL','RE','VO') AND p.PayAmt<>0" 
@@ -124,11 +124,11 @@ public class CreateFromStatement extends CreateFrom
             if (TenderType.equals(MPayment.TENDERTYPE_CreditCard))
             {
                 if (TipoTarjeta != null && TipoTarjeta.toString().length() > 0)
-                    sql.append(" AND pay.LAR_Tarjeta_Credito_ID IN (SELECT t.LAR_Tarjeta_Credito_ID FROM LAR_Tarjeta_Credito t WHERE t.CreditCardType=?)");
+                    sql.append(" AND pay.LAR_Tarjeta_Credito_ID = ?");
             }
             else if (TenderType.equals(MPayment.TENDERTYPE_DirectDebit))
-                if (TipoTarjeta != null && TipoTarjeta.toString().length() > 0)
-                    sql.append(" AND pay.LAR_Tarjeta_Debito_ID IN (SELECT t.LAR_Tarjeta_Credito_ID FROM LAR_Tarjeta_Credito t WHERE t.CreditCardType=?)");
+                if (TipoTarjetaDebito != null && TipoTarjetaDebito.toString().length() > 0)
+                    sql.append(" AND pay.LAR_Tarjeta_Debito_ID = ?");
         }
 		if(AuthCode.length() > 0 )
 			sql.append(" AND p.R_AuthCode LIKE ?");
@@ -146,7 +146,7 @@ public class CreateFromStatement extends CreateFrom
 	 */
 	void setParameters(PreparedStatement pstmt, boolean forCount, 
 			String DocumentNo, Object BPartner, Object DateFrom, Object DateTo, 
-			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, String AuthCode) 
+			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, Object TipoTarjetaDebito, String AuthCode) 
 	throws SQLException
 	{
 		int index = 1;
@@ -199,10 +199,16 @@ public class CreateFromStatement extends CreateFrom
         if (TenderType != null && TenderType.toString().length() > 0)
         {
             pstmt.setString(index++, (String) TenderType);
-            if (TenderType.equals(MPayment.TENDERTYPE_CreditCard) ||
-                    TenderType.equals(MPayment.TENDERTYPE_DirectDebit))
+            if (TenderType.equals(MPayment.TENDERTYPE_CreditCard))
+            {
                 if (TipoTarjeta != null && TipoTarjeta.toString().length() > 0)
-                    pstmt.setString(index++, (String) TipoTarjeta);
+                    pstmt.setInt(index++, (Integer) TipoTarjeta);
+            }
+            else if (TenderType.equals(MPayment.TENDERTYPE_DirectDebit))
+            {
+                if (TipoTarjetaDebito != null && TipoTarjetaDebito.toString().length() > 0)
+                    pstmt.setInt(index++, (Integer) TipoTarjetaDebito);
+            }
         }
 		if(AuthCode.length() > 0 )
 			pstmt.setString(index++, getSQLText(AuthCode));
@@ -224,7 +230,7 @@ public class CreateFromStatement extends CreateFrom
 	}   //  getSQLText
 	
 	protected Vector<Vector<Object>> getBankData(String DocumentNo, Object BPartner, Object DateFrom, Object DateTo, 
-			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, String AuthCode)
+			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, Object TipoTarjetaDebito, String AuthCode)
 	{
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		
@@ -239,14 +245,14 @@ public class CreateFromStatement extends CreateFrom
 			+ " INNER JOIN AD_Ref_List_Trl rt ON (rt.AD_Ref_List_ID=r.AD_Ref_List_ID)"
 			+ " LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID) ";
 
-		sql = sql + getSQLWhere(DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, TipoTarjeta, AuthCode) + " ORDER BY p.DateTrx";
+		sql = sql + getSQLWhere(DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, TipoTarjeta, TipoTarjetaDebito, AuthCode) + " ORDER BY p.DateTrx";
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try
 		{
 			pstmt = DB.prepareStatement(sql.toString(), null);
-			setParameters(pstmt, false, DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, TipoTarjeta, AuthCode);
+			setParameters(pstmt, false, DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, TipoTarjeta, TipoTarjetaDebito, AuthCode);
 			rs = pstmt.executeQuery();
 			while (rs.next())
 			{

@@ -56,8 +56,6 @@ import org.zkoss.zkex.zul.Borderlayout;
 import org.zkoss.zkex.zul.Center;
 import org.zkoss.zul.Hbox;
 
-import ar.com.ergio.model.MLARTarjetaCredito;
-
 public class WCreateFromStatementUI extends CreateFromStatement implements EventListener, SystemIDs
 {
 	private static final long serialVersionUID = 1L;
@@ -112,6 +110,8 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
     // @fchiappano nuevo filtro Tipo de Tarjeta.
     protected Label tipoTarjetaLabel = new Label();
     protected WTableDirEditor tipoTarjetaField;
+    protected Label tipoTarjetaDebitoLabel = new Label();
+    protected WTableDirEditor tipoTarjetaDebitoField;
 
 	protected Label amtFromLabel = new Label(Msg.translate(Env.getCtx(), "PayAmt"));
 	protected WNumberEditor amtFromField = new WNumberEditor("AmtFrom", false, false, true, DisplayType.Amount, Msg.translate(Env.getCtx(), "AmtFrom"));
@@ -169,10 +169,16 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 		tenderTypeField.getComponent().addEventListener(Events.ON_CHANGE, this);
 
         // @fchiappano filtro tipo de tarjeta.
-        lookup = MLookupFactory.get(Env.getCtx(), p_WindowNo, 0,
-                MColumn.getColumn_ID(MLARTarjetaCredito.Table_Name, "CreditCardType"), DisplayType.List);
-        tipoTarjetaField = new WTableDirEditor("CreditCardType", false, false, true, lookup);
+		AD_Column_ID = 3001776; // LAR_TenderType_BankAccount.LAR_Tarjeta_Credito_ID
+        lookup = MLookupFactory.get(Env.getCtx(), p_WindowNo, 0, AD_Column_ID, DisplayType.Table);
+        tipoTarjetaField = new WTableDirEditor("LAR_Tarjeta_Credito_ID", false, false, true, lookup);
         tipoTarjetaField.getComponent().addEventListener(Events.ON_CHANGE, this);
+
+        // @fchiappano filtro tarjetas de debito
+        AD_Column_ID = 3001774; // LAR_TenderType_BankAccount.LAR_Tarjeta_Debito_ID
+        lookup = MLookupFactory.get(Env.getCtx(), p_WindowNo, 0, AD_Column_ID, DisplayType.Table);
+        tipoTarjetaDebitoField = new WTableDirEditor("LAR_Tarjeta_Debito_ID", false, false, true, lookup);
+        tipoTarjetaDebitoField.getComponent().addEventListener(Events.ON_CHANGE, this);
 
 		lookup = MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, 3499, DisplayType.Search);
 		bPartnerLookup = new WSearchEditor ("C_BPartner_ID", false, false, true, lookup);
@@ -202,7 +208,13 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
     	amtToField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "AmtTo"));
 
         // @fchiappano Label tipo de tarjeta.
-        tipoTarjetaLabel.setText("Tipo de Tarjeta");
+        tipoTarjetaLabel.setText("Tarjeta de Crédito");
+        tipoTarjetaDebitoLabel.setText("Tarjeta de Débito");
+
+        tipoTarjetaDebitoField.setVisible(false);
+        tipoTarjetaDebitoLabel.setVisible(false);
+        tipoTarjetaField.setVisible(false);
+        tipoTarjetaLabel.setVisible(false);
 
     	Borderlayout parameterLayout = new Borderlayout();
         parameterLayout.setHeight("130px");
@@ -240,6 +252,10 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 		row.appendChild(tenderTypeField.getComponent());
         row.appendChild(tipoTarjetaLabel.rightAlign());
         row.appendChild(tipoTarjetaField.getComponent());
+
+        row = rows.newRow();
+        row.appendChild(tipoTarjetaDebitoLabel.rightAlign());
+        row.appendChild(tipoTarjetaDebitoField.getComponent());
 		
 		row = rows.newRow();
 		row.appendChild(BPartner_idLabel.rightAlign());
@@ -261,6 +277,35 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 	public void onEvent(Event e) throws Exception
 	{
 		log.config("Action=" + e.getTarget().getId());
+
+        // @fchiappano si el evento lo disparo el combo de formas de pago,
+        // mostrar los campos dependientes de este.
+        String tenderType = (String) tenderTypeField.getValue();
+        if (tenderType != null)
+        {
+            if (tenderType.equals("C"))
+            {
+                tipoTarjetaField.setVisible(true);
+                tipoTarjetaLabel.setVisible(true);
+                tipoTarjetaDebitoField.setVisible(false);
+                tipoTarjetaDebitoLabel.setVisible(false);
+            }
+            else if (tenderType.equals("D"))
+            {
+                tipoTarjetaField.setVisible(false);
+                tipoTarjetaLabel.setVisible(false);
+                tipoTarjetaDebitoField.setVisible(true);
+                tipoTarjetaDebitoLabel.setVisible(true);
+            }
+            else
+            {
+                tipoTarjetaField.setVisible(false);
+                tipoTarjetaLabel.setVisible(false);
+                tipoTarjetaDebitoField.setVisible(false);
+                tipoTarjetaDebitoLabel.setVisible(false);
+            }
+        }
+
 		if(e.getTarget().equals(window.getConfirmPanel().getButton(ConfirmPanel.A_REFRESH)))
 		{
 			loadBankAccount();
@@ -272,7 +317,7 @@ public class WCreateFromStatementUI extends CreateFromStatement implements Event
 	{
 		loadTableOIS(getBankData(documentNoField.getValue().toString(), bPartnerLookup.getValue(), dateFromField.getValue(), dateToField.getValue(),
 				amtFromField.getValue(), amtToField.getValue(), documentTypeField.getValue(), tenderTypeField.getValue(), 
-                tipoTarjetaField.getValue(), authorizationField.getValue().toString()));
+                tipoTarjetaField.getValue(), tipoTarjetaDebitoField.getValue(), authorizationField.getValue().toString()));
 	}
 	
 	protected void loadTableOIS (Vector<?> data)
