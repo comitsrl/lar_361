@@ -222,4 +222,10 @@ public interface FiscalPrinterDevice {
 	 *         factura.
 	 */
 	public int getAllowedPaymentQty();
+
+    /**
+     * Apertura de cajon de dinero.
+     * @author fchiappano
+     */
+    public void openDrawer();
 }
