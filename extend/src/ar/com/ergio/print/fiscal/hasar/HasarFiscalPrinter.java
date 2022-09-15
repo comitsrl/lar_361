@@ -751,6 +751,23 @@ public abstract class HasarFiscalPrinter extends BasicFiscalPrinter implements H
 		return printerStatusCodes;
 	}
 
+    /**
+     * Apertura de cajon de dinero.
+     *
+     * @author fchiappano
+     */
+    public void openDrawer()
+    {
+        try
+        {
+            execute(cmdOpenDrawer());
+        }
+        catch (FiscalPrinterIOException e)
+        {
+            e.printStackTrace();
+        }
+    } // openDrawer
+
 	/*
 	 * FIXME - @emmie
 	 * Es necesario refactorizar los métodos printDocument(), ya que en los mismos hay mucho código

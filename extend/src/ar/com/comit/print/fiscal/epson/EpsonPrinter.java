@@ -224,12 +224,8 @@ public class EpsonPrinter extends BasicFiscalPrinter
 
         // @fchiappano ejecutar la apertura de cajon si corresponde.
         if (invoice.isAperturaCajon())
-        {
-            JSONObject aperturaCajon = new JSONObject();
-            aperturaCajon.put("openDrawer", true);
-            aperturaCajon.put("printerName", impresora);
-            fiscalComm.sendMessage(aperturaCajon.toString());
-        }
+            openDrawer();
+
 
         // Se indica al manejador de eventos que la impresión ha finalizado.
         firePrintEnded();
@@ -750,5 +746,14 @@ public class EpsonPrinter extends BasicFiscalPrinter
     {
         return null;
     }
+
+    @Override
+    public void openDrawer()
+    {
+        JSONObject aperturaCajon = new JSONObject();
+        aperturaCajon.put("openDrawer", true);
+        aperturaCajon.put("printerName", impresora);
+        fiscalComm.sendMessage(aperturaCajon.toString());
+    } // openDrawer
 
 } // EpsonPrinter
