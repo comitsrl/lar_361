@@ -18,6 +18,7 @@ package ar.com.ergio.model;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -331,6 +332,47 @@ import ar.com.ergio.util.LAR_Utils;
     				return msg;
     		}
     	//}
+
+        // @fchiappano Verificar si el tipo de documento admite fecha futura.
+        if ((po.get_TableName().equals(MOrder.Table_Name) || po.get_TableName().equals(MInvoice.Table_Name)
+                || po.get_TableName().equals(MInOut.Table_Name))
+                && (type == ModelValidator.TYPE_BEFORE_NEW || (type == ModelValidator.TYPE_BEFORE_CHANGE)))
+        {
+            boolean permiteFF = true;
+            boolean esFechaFutura = false;
+            boolean esNuevo = (type == ModelValidator.TYPE_BEFORE_NEW);
+
+            // Ordenes
+            if (po.get_TableName().equals(MOrder.Table_Name)
+                    && (esNuevo || po.is_ValueChanged(MOrder.COLUMNNAME_DateOrdered)))
+            {
+                MOrder orden = (MOrder) po;
+                permiteFF = ((MDocType) orden.getC_DocTypeTarget()).get_ValueAsBoolean("Permite_Fecha_Futura");
+                esFechaFutura = orden.getDateOrdered().after(new Timestamp(System.currentTimeMillis()));
+            }
+            // Facturas
+            else if (po.get_TableName().equals(MInvoice.Table_Name)
+                    && (esNuevo || po.is_ValueChanged(MInvoice.COLUMNNAME_DateInvoiced)))
+            {
+                MInvoice invoice = (MInvoice) po;
+                permiteFF = ((MDocType) invoice.getC_DocTypeTarget()).get_ValueAsBoolean("Permite_Fecha_Futura");
+                esFechaFutura = invoice.getDateInvoiced().after(new Timestamp(System.currentTimeMillis()));
+            }
+            // Remitos
+            else if (po.get_TableName().equals(MInOut.Table_Name)
+                    && (esNuevo || po.is_ValueChanged(MInOut.COLUMNNAME_MovementDate)))
+            {
+                MInOut remito = (MInOut) po;
+                permiteFF = ((MDocType) remito.getC_DocType()).get_ValueAsBoolean("Permite_Fecha_Futura");
+                esFechaFutura = remito.getMovementDate().after(new Timestamp(System.currentTimeMillis()));
+            }
+
+            if (!permiteFF && esFechaFutura)
+            {
+                msg = "El tipo de documento seleccionado no admite fechas futuras.";
+                return msg;
+            }
+        }
 
         return null;
      }
