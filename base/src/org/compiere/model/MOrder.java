@@ -1036,7 +1036,7 @@ public class MOrder extends X_C_Order implements DocAction
         // @fchiappano guardar tasa de cambio en la orden, solo si cambio la
         // moneda o la fecha de orden y se trata de moneda extrajera.
 		int monedaPredeterminada_ID = LAR_Utils.getMonedaPredeterminada(p_ctx, getAD_Client_ID(), get_TrxName());
-        if ((is_ValueChanged("C_Currency_ID") || is_ValueChanged("DateOrdered") || is_ValueChanged("Source_Invoice_ID")) && getC_Currency_ID() != monedaPredeterminada_ID)
+        if ((is_ValueChanged("C_Currency_ID") || is_ValueChanged("DateOrdered") || is_ValueChanged("Source_Invoice_ID") || is_ValueChanged(COLUMNNAME_C_DocTypeTarget_ID)) && getC_Currency_ID() != monedaPredeterminada_ID)
         {
             // @fchiappano No permitir cambiar de una moneda extranjera a otra,
             // sin pasar por la moneda pesos antes.
