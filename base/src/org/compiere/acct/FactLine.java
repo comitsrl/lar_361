@@ -29,6 +29,7 @@ import org.compiere.model.MAcctSchemaElement;
 import org.compiere.model.MConversionRate;
 import org.compiere.model.MCurrency;
 import org.compiere.model.MFactAcct;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MMovement;
 import org.compiere.model.MRevenueRecognitionPlan;
 import org.compiere.model.X_C_AcctSchema_Element;
@@ -713,6 +714,55 @@ public final class FactLine extends X_Fact_Acct
 			getDateAcct(), C_ConversionType_ID, m_doc.getAD_Client_ID(), AD_Org_ID));
 		return true;
 	}	//	convert
+
+    /**
+     * Convert to Accounted Currency
+     *
+     * @return true if converted
+     */
+    public boolean convertCreditNote()
+    {
+        // Document has no currency
+        if (getC_Currency_ID() == Doc.NO_CURRENCY)
+            setC_Currency_ID(m_acctSchema.getC_Currency_ID());
+
+        if (m_acctSchema.getC_Currency_ID() == getC_Currency_ID())
+        {
+            setAmtAcctDr(getAmtSourceDr());
+            setAmtAcctCr(getAmtSourceCr());
+            return true;
+        }
+        // Get Conversion Type from Line or Header
+        int C_ConversionType_ID = 0;
+        int AD_Org_ID = 0;
+        if (m_docLine != null) // get from line
+        {
+            C_ConversionType_ID = m_docLine.getC_ConversionType_ID();
+            AD_Org_ID = m_docLine.getAD_Org_ID();
+        }
+        if (C_ConversionType_ID == 0) // get from header
+        {
+            if (m_doc == null)
+            {
+                log.severe("No Document VO");
+                return false;
+            }
+            C_ConversionType_ID = m_doc.getC_ConversionType_ID();
+            if (AD_Org_ID == 0)
+                AD_Org_ID = m_doc.getAD_Org_ID();
+        }
+
+        int sourceInvoice_ID = ((MInvoice) m_doc.getPO()).get_ValueAsInt("Source_Invoice_ID");
+        MInvoice invoice = new MInvoice(p_ctx, sourceInvoice_ID, get_TrxName());
+
+        setAmtAcctDr(MConversionRate.convert(getCtx(), getAmtSourceDr(), getC_Currency_ID(), m_acctSchema.getC_Currency_ID(),
+                        invoice.getDateAcct(), C_ConversionType_ID, m_doc.getAD_Client_ID(), AD_Org_ID));
+        if (getAmtAcctDr() == null)
+            return false;
+        setAmtAcctCr(MConversionRate.convert(getCtx(), getAmtSourceCr(), getC_Currency_ID(), m_acctSchema.getC_Currency_ID(),
+                invoice.getDateAcct(), C_ConversionType_ID, m_doc.getAD_Client_ID(), AD_Org_ID));
+        return true;
+    } // convert
 
 	/**
 	 * 	Get Account

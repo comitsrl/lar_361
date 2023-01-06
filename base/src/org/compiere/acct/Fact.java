@@ -144,7 +144,13 @@ public final class Fact
 				+ " - " + toString());			
 		}
 		//  Convert
-		line.convert();
+        // @fchiappano si se trata de una nota de credito, realizar la
+        // conversion de moneda, considerando la factura origen.
+        if (m_doc.getDocumentType().equals(m_doc.DOCTYPE_ARCredit)
+                || m_doc.getDocumentType().equals(m_doc.DOCTYPE_APCredit))
+            line.convertCreditNote();
+        else
+		    line.convert();
 		//  Optionally overwrite Acct Amount
 		if (docLine != null 
 			&& (docLine.getAmtAcctDr() != null || docLine.getAmtAcctCr() != null))
