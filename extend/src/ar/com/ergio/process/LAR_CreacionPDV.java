@@ -113,21 +113,21 @@ public class LAR_CreacionPDV extends SvrProcess
         int lar_DocumentLetter_B_ID = 1000001; // FC - B
 
         final MDocType tipoFacturaA = crearDocumento("Factura", "A", MDocType.DOCBASETYPE_ARInvoice, gl_Category_ARI_ID,
-                pos, lar_DocumentLetter_A_ID, "");
+                pos, lar_DocumentLetter_A_ID, "", "F");
         final MDocType tipoFacturaB = crearDocumento("Factura", "B", MDocType.DOCBASETYPE_ARInvoice, gl_Category_ARI_ID,
-                pos, lar_DocumentLetter_B_ID, "");
+                pos, lar_DocumentLetter_B_ID, "", "F");
 
         // Nota de Crédito A y B
         final MDocType tipoNotaCreditoA = crearDocumento("Nota de Crédito", "A", MDocType.DOCBASETYPE_ARCreditMemo,
-                gl_Category_ARI_ID, pos, lar_DocumentLetter_A_ID, "NC");
+                gl_Category_ARI_ID, pos, lar_DocumentLetter_A_ID, "NC", "C");
         final MDocType tipoNotaCreditoB = crearDocumento("Nota de Crédito", "B", MDocType.DOCBASETYPE_ARCreditMemo,
-                gl_Category_ARI_ID, pos, lar_DocumentLetter_B_ID, "NC");
+                gl_Category_ARI_ID, pos, lar_DocumentLetter_B_ID, "NC", "C");
 
         // Nota de Débito A y B
         final MDocType tipoNotaDebitoA = crearDocumento("Nota de Débito", "A", MDocType.DOCBASETYPE_ARInvoice,
-                gl_Category_ARI_ID, pos, lar_DocumentLetter_A_ID, "ND");
+                gl_Category_ARI_ID, pos, lar_DocumentLetter_A_ID, "ND", null);
         final MDocType tipoNotaDebitoB = crearDocumento("Nota de Débito", "B", MDocType.DOCBASETYPE_ARInvoice,
-                gl_Category_ARI_ID, pos, lar_DocumentLetter_B_ID, "ND");
+                gl_Category_ARI_ID, pos, lar_DocumentLetter_B_ID, "ND", null);
 
         // si es fiscal se asigna la impresora fiscal
         if (p_EsFiscal)
@@ -163,7 +163,7 @@ public class LAR_CreacionPDV extends SvrProcess
         if (p_CrearRemito)
         {
             tipoRemitoX = crearDocumento("Remito", "X", MDocType.DOCBASETYPE_MaterialDelivery,
-                    gl_Category_MM_ID, pos, null, "Rem");
+                    gl_Category_MM_ID, pos, null, "Rem", null);
         }
         else
         {
@@ -176,7 +176,7 @@ public class LAR_CreacionPDV extends SvrProcess
         if (p_CrearRecibo)
         {
             tipoRecibo = crearDocumento("Recibo", "X", MDocType.DOCBASETYPE_ARReceipt, gl_Category_MM_ID,
-                    pos, null, "Rec");
+                    pos, null, "Rec", null);
         }
         else
         {
@@ -186,7 +186,7 @@ public class LAR_CreacionPDV extends SvrProcess
         // POSOrder
         // a este tipo de documento hay que asignar las referencia de factura A y remito X
         // 1000001 es la categoria none para la compañia distinta de System
-        final MDocType tipoPDV = crearDocumento("Orden PDV", "", MDocType.DOCBASETYPE_SalesOrder, 1000001, pos, null, "PDV");
+        final MDocType tipoPDV = crearDocumento("Orden PDV", "", MDocType.DOCBASETYPE_SalesOrder, 1000001, pos, null, "PDV", null);
         tipoPDV.setC_DocTypeInvoice_ID(tipoFacturaA.getC_DocType_ID());
         tipoPDV.setC_DocTypeShipment_ID(tipoRemitoX.getC_DocType_ID());
         tipoPDV.setDocSubTypeSO(MDocType.DOCSUBTYPESO_POSOrder);
@@ -277,7 +277,7 @@ public class LAR_CreacionPDV extends SvrProcess
      * @throws Exception
      */
     private MDocType crearDocumento(final String tipo, final String letra, final String docBaseType,
-            final int gl_Category_ID, final MPOS pos, final Integer lar_DocumentLetter_ID, final String abreviatura) throws Exception
+            final int gl_Category_ID, final MPOS pos, final Integer lar_DocumentLetter_ID, final String abreviatura, final String fiscalDocument) throws Exception
     {
         final String sufijo = String.format("%s%04d", letra, p_NroPDV);
         final String nombre = String.format("%s%s %s", tipo, p_EsMiles ? " Miles" : "", sufijo);
@@ -306,6 +306,8 @@ public class LAR_CreacionPDV extends SvrProcess
         documento.set_ValueOfColumn("C_POS_ID", pos.getC_POS_ID());
         // Asignar Letra
         documento.set_ValueOfColumn("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
+        // @fchiappano asignar el tipo de documento fiscal.
+        documento.set_ValueOfColumn("FiscalDocument", fiscalDocument);
         documento.saveEx();
         return documento;
     } // crearDocumento
