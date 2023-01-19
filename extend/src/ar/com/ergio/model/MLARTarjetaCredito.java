@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
+import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.ValueNamePair;
@@ -100,7 +101,15 @@ public class MLARTarjetaCredito extends X_LAR_Tarjeta_Credito
                     tipoName = ((ValueNamePair) tipo).getName();
             }
 
-            setDescription(getName() + "_" + tipoName.toUpperCase());
+            int terminalPostnet_ID = get_ValueAsInt("LAR_TerminalPostnet_ID");
+            String terminalName = "";
+            if (terminalPostnet_ID > 0)
+            {
+                String sql = "SELECT NroEstablecimiento FROM LAR_TerminalPostnet WHERE LAR_TerminalPostnet_ID = ?";
+                terminalName = DB.getSQLValueString(get_TrxName(), sql, terminalPostnet_ID);
+            }
+
+            setDescription(getName() + "_" + tipoName.toUpperCase() + " (" + terminalName + ")");
         }
 
         return true;
