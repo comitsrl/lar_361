@@ -9,9 +9,7 @@ CREATE TABLE IF NOT EXISTS LAR_TerminalPosnet
     Updated timestamp without time zone NOT NULL DEFAULT now(),
     UpdatedBy numeric(10,0) NOT NULL,
     Name character varying(60) COLLATE pg_catalog."default" NOT NULL,
-	Description character varying(255) COLLATE pg_catalog."default",
-    Marca character varying(60) COLLATE pg_catalog."default",
-    Modelo character varying(60) COLLATE pg_catalog."default",
+    Description character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT LAR_TerminalPosnet_pkey PRIMARY KEY (LAR_TerminalPosnet_ID),
     CONSTRAINT LARTerminalPosnet_isactive_check CHECK (isactive = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))
 )
@@ -202,26 +200,6 @@ INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,I
 -- 23/01/2023 17:32:18 ART
 -- ADP #2: Migracion de datos
 INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3005296 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
-;
-
--- 23/01/2023 17:32:18 ART
--- ADP #2: Migracion de datos
-INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3005297,3000256,'LAR',0,'N','N','N','N',60,'N',10,'N',3000303,'N','Y','N','Marca','Marca',TO_DATE('2023-01-23 17:32:18','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2023-01-23 17:32:18','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 23/01/2023 17:32:18 ART
--- ADP #2: Migracion de datos
-INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3005297 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
-;
-
--- 23/01/2023 17:32:18 ART
--- ADP #2: Migracion de datos
-INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,Updated,CreatedBy,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3005298,3000256,'LAR',0,'N','N','N','N',60,'N',10,'N',3000304,'N','Y','N','Modelo','Modelo',TO_DATE('2023-01-23 17:32:18','YYYY-MM-DD HH24:MI:SS'),100,0,0,'Y',TO_DATE('2023-01-23 17:32:18','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 23/01/2023 17:32:18 ART
--- ADP #2: Migracion de datos
-INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3005298 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
 -- 23/01/2023 17:34:35 ART
@@ -611,26 +589,6 @@ INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLi
 -- 23/01/2023 17:45:12 ART
 -- ADP #2: Migracion de datos
 INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3008067 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 23/01/2023 17:45:12 ART
--- ADP #2: Migracion de datos
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3008068,60,'Y','N','N',3005297,'N','Y',3000281,'N','LAR','Marca',100,0,'Y',TO_DATE('2023-01-23 17:45:12','YYYY-MM-DD HH24:MI:SS'),0,TO_DATE('2023-01-23 17:45:12','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 23/01/2023 17:45:12 ART
--- ADP #2: Migracion de datos
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3008068 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
-;
-
--- 23/01/2023 17:45:13 ART
--- ADP #2: Migracion de datos
-INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,IsActive,Created,AD_Client_ID,Updated,CreatedBy) VALUES ('N',3008069,60,'Y','N','N',3005298,'N','Y',3000281,'N','LAR','Modelo',100,0,'Y',TO_DATE('2023-01-23 17:45:12','YYYY-MM-DD HH24:MI:SS'),0,TO_DATE('2023-01-23 17:45:12','YYYY-MM-DD HH24:MI:SS'),100)
-;
-
--- 23/01/2023 17:45:13 ART
--- ADP #2: Migracion de datos
-INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3008069 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
 -- 23/01/2023 17:45:13 ART
