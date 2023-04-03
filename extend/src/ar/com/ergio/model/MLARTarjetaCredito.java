@@ -101,11 +101,11 @@ public class MLARTarjetaCredito extends X_LAR_Tarjeta_Credito
                     tipoName = ((ValueNamePair) tipo).getName();
             }
 
-            int terminalPostnet_ID = get_ValueAsInt("LAR_TerminalPostnet_ID");
+            int terminalPostnet_ID = get_ValueAsInt("LAR_NroEstablecimiento_ID");
             String terminalName = "";
             if (terminalPostnet_ID > 0)
             {
-                String sql = "SELECT NroEstablecimiento FROM LAR_TerminalPostnet WHERE LAR_TerminalPostnet_ID = ?";
+                String sql = "SELECT NroEstablecimiento FROM LAR_NroEstablecimiento WHERE LAR_NroEstablecimiento_ID = ?";
                 terminalName = DB.getSQLValueString(get_TrxName(), sql, terminalPostnet_ID);
             }
 
