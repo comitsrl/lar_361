@@ -1439,7 +1439,10 @@ public class MInOut extends X_M_InOut implements DocAction
 							get_TrxName()))
 						{
 							String lastError = CLogger.retrieveErrorString("");
-							m_processMsg = "Cannot correct Inventory (MA) - " + lastError;
+                            m_processMsg = "No es posible actualizar el Inventario (MA) - " + lastError
+                                    + "\n Producto: " + sLine.getM_Product().getValue() + "_"
+                                    + sLine.getM_Product().getName() + "\n"
+                                    + "Cantidad Faltante: " + QtyMA;
 							return DocAction.STATUS_Invalid;
 						}
 						if (!sameWarehouse) {
@@ -1451,7 +1454,9 @@ public class MInOut extends X_M_InOut implements DocAction
 									ma.getM_AttributeSetInstance_ID(), reservationAttributeSetInstance_ID,
 									Env.ZERO, reservedDiff, orderedDiff, get_TrxName()))
 								{
-									m_processMsg = "Cannot correct Inventory (MA) in order warehouse";
+									m_processMsg = "No es posible actualizar el Inventario (MA) en Orden de Deposito"
+									        + "\n Producto: " + sLine.getM_Product().getValue() + "_"
+		                                    + sLine.getM_Product().getName();
 									return DocAction.STATUS_Invalid;
 								}
 						}
@@ -1463,7 +1468,9 @@ public class MInOut extends X_M_InOut implements DocAction
 						mtrx.setM_InOutLine_ID(sLine.getM_InOutLine_ID());
 						if (!mtrx.save())
 						{
-							m_processMsg = "Could not create Material Transaction (MA)";
+							m_processMsg = "No se puede crear el Movimiento de Stock (MA)"
+							        + "\n Producto: " + sLine.getM_Product().getValue() + "_"
+                                    + sLine.getM_Product().getName();
 							return DocAction.STATUS_Invalid;
 						}
 					}
@@ -1481,7 +1488,9 @@ public class MInOut extends X_M_InOut implements DocAction
 						sLine.getM_AttributeSetInstance_ID(), reservationAttributeSetInstance_ID,
 						Qty, reservedDiff, orderedDiff, get_TrxName()))
 					{
-						m_processMsg = "Cannot correct Inventory";
+						m_processMsg = "No es posible actualizar el Inventario"
+						        + "\n Producto: " + sLine.getM_Product().getValue() + "_"
+                                + sLine.getM_Product().getName();
 						return DocAction.STATUS_Invalid;
 					}
 					if (!sameWarehouse) {
@@ -1493,7 +1502,9 @@ public class MInOut extends X_M_InOut implements DocAction
 								sLine.getM_AttributeSetInstance_ID(), reservationAttributeSetInstance_ID,
 								Env.ZERO, QtySO.negate(), QtyPO.negate(), get_TrxName()))
 							{
-								m_processMsg = "Cannot correct Inventory";
+								m_processMsg = "No es posible actualizar el Inventario"
+								        + "\n Producto: " + sLine.getM_Product().getValue() + "_"
+	                                    + sLine.getM_Product().getName();
 								return DocAction.STATUS_Invalid;
 							}
 					}
@@ -1505,7 +1516,7 @@ public class MInOut extends X_M_InOut implements DocAction
 					mtrx.setM_InOutLine_ID(sLine.getM_InOutLine_ID());
 					if (!mtrx.save())
 					{
-						m_processMsg = CLogger.retrieveErrorString("Could not create Material Transaction");
+						m_processMsg = CLogger.retrieveErrorString("No se puede crear el Movimiento de Stock");
 						return DocAction.STATUS_Invalid;
 					}
 				}
@@ -1529,7 +1540,7 @@ public class MInOut extends X_M_InOut implements DocAction
 				}
 				if (!oLine.save())
 				{
-					m_processMsg = "Could not update Order Line";
+					m_processMsg = "No se puede actualizar la Línea de la Orden. ID: " + oLine.getC_OrderLine_ID();
 					return DocAction.STATUS_Invalid;
 				}
 				else
@@ -1549,7 +1560,7 @@ public class MInOut extends X_M_InOut implements DocAction
                 }
                 if (!rmaLine.save())
                 {
-                    m_processMsg = "Could not update RMA Line";
+                    m_processMsg = "No se puede actualizar la Línea de RMA. ID: " + rmaLine.get_ID();
                     return DocAction.STATUS_Invalid;
                 }
             }
@@ -1577,7 +1588,7 @@ public class MInOut extends X_M_InOut implements DocAction
 					MAsset asset = new MAsset (this, sLine, deliveryCount);
 					if (!asset.save(get_TrxName()))
 					{
-						m_processMsg = "Could not create Asset";
+						m_processMsg = "No se puede crear el Activo";
 						return DocAction.STATUS_Invalid;
 					}
 					info.append(asset.getValue());
@@ -1633,7 +1644,7 @@ public class MInOut extends X_M_InOut implements DocAction
 						isNewMatchPO = true;
 					if (!po.save(get_TrxName()))
 					{
-						m_processMsg = "Could not create PO Matching";
+						m_processMsg = "No se puede crear la relación con la Orden";
 						return DocAction.STATUS_Invalid;
 					}
 					if (isNewMatchPO)
@@ -1661,7 +1672,7 @@ public class MInOut extends X_M_InOut implements DocAction
 							isNewMatchPO = true;
 						if (!po.save(get_TrxName()))
 						{
-							m_processMsg = "Could not create PO(Inv) Matching";
+							m_processMsg = "No se puede crear la relación con la Orden (Inv)";
 							return DocAction.STATUS_Invalid;
 						}
 						if (isNewMatchPO)
@@ -1842,8 +1853,7 @@ public class MInOut extends X_M_InOut implements DocAction
                 final int currentNext = seq.getCurrentNext();
 
                 // @fchiappano Comprobar que el siguiente número de la secuencia
-                // coincida
-                // con el devuelto por afip.
+                // coincida con el devuelto por afip.
                 if (currentNext != get_ValueAsInt("FiscalReceiptNumber"))
                     seq.setFiscalDocTypeNextNroComprobante(get_ValueAsInt("FiscalReceiptNumber"));
             }
