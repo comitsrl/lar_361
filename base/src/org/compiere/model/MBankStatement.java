@@ -923,7 +923,13 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
             + "                        + (SELECT (C_BankStatement.ScrutinizedCreditCardAmt - (COALESCE(Sum(TrxAmt),0)))"
             + "                             FROM C_BankStatementLine sl"
             + "                             JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)"
-            + "                            WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN ('D', 'C'))) - C_BankStatement.SaldoInicial)"
+            + "                            WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID AND p.TenderType IN ('D', 'C')))"
+            +                        " + (SELECT (C_BankStatement.ScrutinizedBilleteraDigital - (COALESCE(Sum(TrxAmt),0)))"
+            +                             " FROM C_BankStatementLine sl"
+            +                             " JOIN C_Payment p ON (sl.C_Payment_ID = p.C_Payment_ID)"
+            +                            " WHERE (C_BankStatement.C_BankStatement_ID = sl.C_BankStatement_ID"
+            +                              " AND p.TenderType = 'Q'))"
+            +                        " - C_BankStatement.SaldoInicial)"
             + " WHERE C_BankStatement_ID=" + getC_BankStatement_ID();
 
         DB.executeUpdate(sql, get_TrxName());
