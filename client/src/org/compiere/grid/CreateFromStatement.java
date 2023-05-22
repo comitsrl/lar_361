@@ -78,9 +78,12 @@ public class CreateFromStatement extends CreateFrom
 			Object AmtFrom, Object AmtTo, Object DocType, Object TenderType, Object TipoTarjeta, Object TipoTarjetaDebito, String AuthCode)
 	{
 		StringBuffer sql = new StringBuffer("WHERE p.Processed='Y' AND p.IsReconciled='N'"
-		+ " AND p.DocStatus IN ('CO','CL','RE','VO') AND p.PayAmt<>0" 
+		+ " AND p.DocStatus IN ('CO','CL','RE','VO') AND p.PayAmt<>0"
+        // @fchiappano Se agrega condición C_BPartner_ID != null, para evitar que se 
+		// visualicen movimientos mal generados tras una desconexión con el servidor.
+        + " AND p.C_BPartner_ID IS NOT NULL"
 		+ " AND p.C_BankAccount_ID = ?");
-		
+
 	    sql.append( " AND NOT EXISTS (SELECT * FROM C_BankStatementLine l " 
 		//	Voided Bank Statements have 0 StmtAmt
 			+ "WHERE p.C_Payment_ID=l.C_Payment_ID AND l.StmtAmt <> 0)");
