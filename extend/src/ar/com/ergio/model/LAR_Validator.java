@@ -42,7 +42,6 @@ import org.compiere.model.MOrderLine;
 import org.compiere.model.MPOS;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
-import org.compiere.model.MSequence;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.model.ModelValidationEngine;
@@ -825,7 +824,7 @@ import ar.com.ergio.util.LAR_Utils;
     {
         final Properties ctx = po.getCtx();
         PO revPo = null;
-        MSequence seq = null;
+        // MSequence seq = null;
         // Corrije el nro de documento de la factura anulada y su reversa asociada
         if (po.get_TableName().equals(MInvoice.Table_Name))
         {
@@ -841,12 +840,16 @@ import ar.com.ergio.util.LAR_Utils;
             // Intenta recuperar la secuencia "definitiva". Si no tiene, intenta
             // recupera la secuencia "normal". Si no tiene, no sea hace nada debido
             // a que le documento NO tiene secuencia configurada
+
+            /* @fchiappano Se comenta codigo, ya no que es necesario actualizar la secuencia
+             * al anular un documento (mucho menos restarle uno a la secuencia,
+             * ya que se puede estar anulando un documento que no sea el ultimo generado).
             int ad_Sequence_ID = invoice.getC_DocType().getDefiniteSequence_ID();
             if (ad_Sequence_ID == 0)
                 ad_Sequence_ID = invoice.getC_DocType().getDocNoSequence_ID();
 
             if (ad_Sequence_ID != 0)
-                seq = new MSequence(ctx, ad_Sequence_ID, invoice.get_TrxName());
+                seq = new MSequence(ctx, ad_Sequence_ID, invoice.get_TrxName()); */
 
             // Redefine los nros de documento y las descripciones de las facturas
             String revDocumentNo = "Rev-" + invoice.getDocumentNo() + "-" + invoice.getC_Invoice_ID();
@@ -857,8 +860,8 @@ import ar.com.ergio.util.LAR_Utils;
             invoice.setDescription("(" + revDocumentNo + "<-)");
 
             // Si la secuencia es automática, retrocede la numeración
-            if (seq != null && seq.isAutoSequence())
-                seq.setCurrentNext(seq.getCurrentNext() - 1);
+            /* if (seq != null && seq.isAutoSequence())
+                seq.setCurrentNext(seq.getCurrentNext() - 1); */
         }
         // Corrije el nro de documento del remito anulado y su reverso asociado
         if (po.get_TableName().equals(MInOut.Table_Name))
@@ -874,12 +877,16 @@ import ar.com.ergio.util.LAR_Utils;
 
             // Intenta recuperar la secuencia "definitiva". En caso que sea nula,
             // recupera la secuencia "normal"
+
+            /* @fchiappano Se comenta codigo, ya no que es necesario actualizar la secuencia
+             * al anular un documento (mucho menos restarle uno a la secuencia,
+             * ya que se puede estar anulando un documento que no sea el ultimo generado).
             int AD_Sequence_ID = shipment.getC_DocType().getDefiniteSequence_ID();
             if (AD_Sequence_ID == 0)
                 AD_Sequence_ID = shipment.getC_DocType().getDocNoSequence_ID();
 
             if (AD_Sequence_ID != 0)
-                seq = new MSequence(ctx, AD_Sequence_ID, shipment.get_TrxName());
+                seq = new MSequence(ctx, AD_Sequence_ID, shipment.get_TrxName()); */
 
             String revDocumentNo = "Rev-" + shipment.getDocumentNo() + "-" + shipment.getM_InOut_ID();
             String voidDocumentNo = "Anu-" + shipment.getDocumentNo() + "-" + shipment.getM_InOut_ID();
@@ -889,8 +896,8 @@ import ar.com.ergio.util.LAR_Utils;
             shipment.setDescription("(" + revDocumentNo + "<-)");
 
             // Si encontró una secuencia, y la misma es automática, retrocede la numeración
-            if (seq != null && seq.isAutoSequence())
-                seq.setCurrentNext(seq.getCurrentNext() - 1);
+            /*if (seq != null && seq.isAutoSequence())
+                seq.setCurrentNext(seq.getCurrentNext() - 1);*/
         }
         // @fchiappano Corrije el nro de documento del cobro/pago y su reverso asociado.
         if (po.get_TableName().equals(MPayment.Table_Name))
@@ -908,12 +915,16 @@ import ar.com.ergio.util.LAR_Utils;
             // recupera la secuencia "normal". Si no tiene, no sea hace nada
             // debido
             // a que le documento NO tiene secuencia configurada
+
+            /* @fchiappano Se comenta codigo, ya no que es necesario actualizar la secuencia
+             * al anular un documento (mucho menos restarle uno a la secuencia,
+             * ya que se puede estar anulando un documento que no sea el ultimo generado).
             int ad_Sequence_ID = payment.getC_DocType().getDefiniteSequence_ID();
             if (ad_Sequence_ID == 0)
                 ad_Sequence_ID = payment.getC_DocType().getDocNoSequence_ID();
 
             if (ad_Sequence_ID != 0)
-                seq = new MSequence(ctx, ad_Sequence_ID, payment.get_TrxName());
+                seq = new MSequence(ctx, ad_Sequence_ID, payment.get_TrxName());*/
 
             // @fchiappano recuperar solo el nro de documento del cobro/pago.
             String documentno = payment.getDocumentNo().replaceAll("[^\\d.]", "");
@@ -927,8 +938,8 @@ import ar.com.ergio.util.LAR_Utils;
             payment.setDescription("(" + revDocumentNo + "<-)");
 
             // Si la secuencia es automática, retrocede la numeración
-            if (seq != null && seq.isAutoSequence())
-                seq.setCurrentNext(seq.getCurrentNext() - 1);
+            /*if (seq != null && seq.isAutoSequence())
+                seq.setCurrentNext(seq.getCurrentNext() - 1);*/
         }
         // @fchiappano Corrije el nro de documento de la orden (no tiene reverso).
         if (po.get_TableName().equals(MOrder.Table_Name))
@@ -939,12 +950,16 @@ import ar.com.ergio.util.LAR_Utils;
             // recupera la secuencia "normal". Si no tiene, no sea hace nada
             // debido
             // a que le documento NO tiene secuencia configurada
+
+            /* @fchiappano Se comenta codigo, ya no que es necesario actualizar la secuencia
+             * al anular un documento (mucho menos restarle uno a la secuencia,
+             * ya que se puede estar anulando un documento que no sea el ultimo generado).
             int ad_Sequence_ID = order.getC_DocType().getDefiniteSequence_ID();
             if (ad_Sequence_ID == 0)
                 ad_Sequence_ID = order.getC_DocType().getDocNoSequence_ID();
 
             if (ad_Sequence_ID != 0)
-                seq = new MSequence(ctx, ad_Sequence_ID, order.get_TrxName());
+                seq = new MSequence(ctx, ad_Sequence_ID, order.get_TrxName());*/
 
             // @fchiappano recuperar solo el nro de documento del cobro/pago.
             String documentno = order.getDocumentNo().replaceAll("[^\\d.]", "");
@@ -954,8 +969,8 @@ import ar.com.ergio.util.LAR_Utils;
             order.setDocumentNo(voidDocumentNo);
 
             // Si la secuencia es automática, retrocede la numeración
-            if (seq != null && seq.isAutoSequence())
-                seq.setCurrentNext(seq.getCurrentNext() - 1);
+            /*if (seq != null && seq.isAutoSequence())
+                seq.setCurrentNext(seq.getCurrentNext() - 1);*/
         }
         // Guarda los cambios realizados sobre los nros de documento
         // y las reversiones de las secuencias.
@@ -966,8 +981,8 @@ import ar.com.ergio.util.LAR_Utils;
         if (po.is_Changed() && !po.save())
             return "Error al guardar el documento anulado";
 
-        if (seq != null && seq.is_Changed() && !seq.save())
-            return "Error al guardar la secuencia";
+        /*if (seq != null && seq.is_Changed() && !seq.save())
+            return "Error al guardar la secuencia";*/
 
         return null;
     }
