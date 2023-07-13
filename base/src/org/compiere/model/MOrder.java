@@ -2132,14 +2132,15 @@ public class MOrder extends X_C_Order implements DocAction
         {
             // @fchiappano capturar el error desde la MInvoice.
             m_processMsg = invoice.getProcessMsg();
-            throw new AdempiereException("Failed when processing document - " + m_processMsg);
+            return null;
+            // throw new AdempiereException("Failed when processing document - " + m_processMsg);
         }
 		// end added
         // @fchiappano Controlar errores al guardar la factura.
         if (!invoice.save(get_TrxName()))
         {
             m_processMsg = "Error al Guardar Factura. Documento N°: " + invoice.getDocumentNo();
-            throw new AdempiereException("Failed when processing document - " + m_processMsg);
+            return null;
         }
 		setC_CashLine_ID(invoice.getC_CashLine_ID());
 		if (!DOCSTATUS_Completed.equals(invoice.getDocStatus()))
