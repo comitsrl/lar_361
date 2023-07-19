@@ -239,13 +239,15 @@ public class CreateFromStatement extends CreateFrom
 		
 		String sql = "SELECT p.DateTrx,p.C_Payment_ID,p.DocumentNo, p.C_Currency_ID,c.ISO_Code, p.PayAmt,"
 			+ "currencyConvert(p.PayAmt,p.C_Currency_ID,ba.C_Currency_ID,pay.DateAcct,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"
-			+ " bp.Name, rt.Name, p.A_Name, p.CheckNo, pay.Fecha_Venc_Cheque, p.R_PnRef, pay.NroCuotas "
+			+ " bp.Name, rt.Name, p.A_Name, p.CheckNo, pay.Fecha_Venc_Cheque, tc.Name, td.Name, p.R_PnRef, pay.NroCuotas "
 			+ "FROM C_BankAccount ba"
 			+ " INNER JOIN C_Payment_v p ON (p.C_BankAccount_ID=ba.C_BankAccount_ID)"
 			+ " INNER JOIN C_Payment pay ON (p.C_Payment_ID=pay.C_Payment_ID)"
 			+ " INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID)"
 			+ " INNER JOIN AD_Ref_List r ON (r.Value=p.TenderType AND r.AD_Reference_ID=214)"
 			+ " INNER JOIN AD_Ref_List_Trl rt ON (rt.AD_Ref_List_ID=r.AD_Ref_List_ID)"
+			+ "  LEFT JOIN LAR_Tarjeta_Credito tc ON (pay.LAR_Tarjeta_Credito_ID = tc.LAR_Tarjeta_Credito_ID)"
+			+ "  LEFT JOIN LAR_Tarjeta_Credito td ON (pay.LAR_Tarjeta_Debito_ID = td.LAR_Tarjeta_Credito_ID)"
 			+ " LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID) ";
 
 		sql = sql + getSQLWhere(DocumentNo, BPartner, DateFrom, DateTo, AmtFrom, AmtTo, DocType, TenderType, TipoTarjeta, TipoTarjetaDebito, AuthCode) + " ORDER BY p.DateTrx";
@@ -274,8 +276,10 @@ public class CreateFromStatement extends CreateFrom
 				line.add(rs.getString(10));         //  8-A_Name
 				line.add(rs.getString(11));         //  9-CheckNo
 				line.add(rs.getTimestamp(12));      // 10-Fecha Venc.
-				line.add(rs.getString(13));         // 11-Nro Posnet
-				line.add(rs.getInt(14));            // 12-NroCuotas
+				line.add(rs.getString(13));         // 11-Tarjeta Credito
+				line.add(rs.getString(14));         // 12-Tarjeta Debito
+				line.add(rs.getString(15));         // 13-Nro Posnet
+				line.add(rs.getInt(16));            // 14-NroCuotas
 				data.add(line);
 			}
 		}
@@ -312,8 +316,10 @@ public class CreateFromStatement extends CreateFrom
 		miniTable.setColumnClass(8, String.class, true);        //  8-A_Name
 		miniTable.setColumnClass(9, String.class, true);        //  9-CheckNo
 		miniTable.setColumnClass(10, Timestamp.class, true);    // 10-FechaVenc,
-		miniTable.setColumnClass(11, String.class, true);       // 11-NroPostnet
-		miniTable.setColumnClass(12, Integer.class, true);      // 12-NroCuota
+		miniTable.setColumnClass(11, String.class, true);       // 11-Tarjeta Credito
+		miniTable.setColumnClass(12, String.class, true);       // 12-Tarjeta Debito
+		miniTable.setColumnClass(13, String.class, true);       // 13-NroPostnet
+		miniTable.setColumnClass(14, Integer.class, true);      // 14-NroCuota
 		//  Table UI
 		miniTable.autoSize();
 	}
@@ -376,6 +382,8 @@ public class CreateFromStatement extends CreateFrom
 		columnNames.add(Msg.translate(Env.getCtx(), "A_Name"));
 		columnNames.add(Msg.translate(Env.getCtx(), "CheckNo"));
 		columnNames.add(Msg.translate(Env.getCtx(), "Fecha_Venc_Cheque"));
+		columnNames.add("Tarjeta Crédito");
+		columnNames.add("Tarjeta Débito");
 		columnNames.add(Msg.translate(Env.getCtx(), "R_PnRef"));
 		columnNames.add("Nro. Cuotas");
 	    
