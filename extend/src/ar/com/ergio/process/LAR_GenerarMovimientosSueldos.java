@@ -95,7 +95,7 @@ public class LAR_GenerarMovimientosSueldos extends SvrProcess
         {
             X_C_UserRemuneration sueldoEmp = sueldos[x];
             MLARRegistroRemuneraciones movSueldo = new MLARRegistroRemuneraciones(getCtx(), 0, get_TrxName());
-            movSueldo.setIsManual(false);
+                        movSueldo.setIsManual(false);
             movSueldo.setC_Remuneration_ID(c_RemunerationID);
             movSueldo.setC_Period_ID(c_periodID);
             movSueldo.setImporte(sueldoEmp.getGrossRAmt());
@@ -107,6 +107,24 @@ public class LAR_GenerarMovimientosSueldos extends SvrProcess
             if (!movSueldo.save(get_TrxName()))
                 throw new AdempiereUserError("No fue posible guardar el movimiento: " + empleado.getName());
 
+            BigDecimal totalRAmt = (BigDecimal) sueldoEmp.get_Value("TotalRAmt");
+            boolean hayDiff = (totalRAmt != BigDecimal.ZERO
+                    && (totalRAmt.subtract(sueldoEmp.getGrossRAmt()).compareTo(BigDecimal.ZERO) >= 0));
+            if (hayDiff)
+            {
+                MLARRegistroRemuneraciones movDiffSueldo = new MLARRegistroRemuneraciones(getCtx(), 0, get_TrxName());
+                final int remuneracion_Diff =  MSysConfig.getIntValue("LAR_Diff_C_Remuneration_ID", 0, Env.getAD_Client_ID(getCtx()));
+                movDiffSueldo.setC_Remuneration_ID(remuneracion_Diff);
+                movDiffSueldo.setC_Period_ID(c_periodID);
+                movDiffSueldo.setImporte(totalRAmt.subtract(sueldoEmp.getGrossRAmt()));
+                movDiffSueldo.setC_BPartner_ID(empleado.getC_BPartner_ID());
+                movDiffSueldo.setDescription("Diferencia Sueldo");
+                movDiffSueldo.setProcessed(true);
+
+                if (!movDiffSueldo.save(get_TrxName()))
+                    throw new AdempiereUserError("No fue posible guardar el movimiento por la diferencia: " + empleado.getName());
+            }
+
             if (generar_SAC)
             {
                 MLARRegistroRemuneraciones movSAC = new MLARRegistroRemuneraciones(getCtx(), 0, get_TrxName());
@@ -114,11 +132,26 @@ public class LAR_GenerarMovimientosSueldos extends SvrProcess
                 movSAC.setC_Period_ID(c_periodID);
                 movSAC.setImporte(sueldoEmp.getGrossRAmt().divide(new BigDecimal(2), RoundingMode.HALF_UP));
                 movSAC.setC_BPartner_ID(empleado.getC_BPartner_ID());
-                movSueldo.setDescription("SAC");
+                movSAC.setDescription("SAC");
                 movSAC.setProcessed(true);
 
                 if (!movSAC.save(get_TrxName()))
                     throw new AdempiereUserError("No fue posible guardar el movimiento SAC: " + empleado.getName());
+
+                if (hayDiff)
+                {
+                    MLARRegistroRemuneraciones movDiffSAC = new MLARRegistroRemuneraciones(getCtx(), 0, get_TrxName());
+                    final int remuneracion_SACDiff =  MSysConfig.getIntValue("LAR_DiffSAC_C_Remuneration_ID", 0, Env.getAD_Client_ID(getCtx()));
+                    movDiffSAC.setC_Remuneration_ID(remuneracion_SACDiff);
+                    movDiffSAC.setC_Period_ID(c_periodID);
+                    movDiffSAC.setImporte(totalRAmt.subtract(sueldoEmp.getGrossRAmt()).divide(new BigDecimal(2), RoundingMode.HALF_UP));
+                    movDiffSAC.setC_BPartner_ID(empleado.getC_BPartner_ID());
+                    movDiffSAC.setDescription("Diferencia SAC");
+                    movDiffSAC.setProcessed(true);
+
+                    if (!movDiffSAC.save(get_TrxName()))
+                        throw new AdempiereUserError("No fue posible guardar el movimiento por diferencia SAC: " + empleado.getName());
+                }
             }
 
         } // Recorrer las remuneraciones de los empleados
