@@ -24,10 +24,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
+import org.compiere.model.MBPartner;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MOrder;
-import org.compiere.model.MOrderLine;
 import org.compiere.model.MRMA;
 import org.compiere.model.MRMALine;
 import org.compiere.model.MStorage;
@@ -37,6 +38,9 @@ import org.compiere.model.Query;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
+import org.compiere.util.Env;
+
+import ar.com.ergio.util.LAR_Utils;
 
 /**
  * Modelo de Clase para ventana Ordenes de Garantía.
@@ -48,9 +52,11 @@ public class MLAROrdenGarantia extends X_LAR_OrdenGarantia implements DocAction,
     /** Process Message */
     private String m_processMsg = null;
     // @fchiappano Tipos de documento para entregas y devolución.
-    final static int c_DocType_Salida_ID = 4000066;
-    final static int c_DocType_Ingreso_ID = 4000067;
-    final static int c_DocType_Orden_Devolucion_ID = 1000123;
+    final static int c_DocType_Salida_ID = MSysConfig.getIntValue("LAR_OG_TipoDoc_Egreso", 0, Env.getAD_Client_ID(Env.getCtx()));
+    final static int c_DocType_Ingreso_ID = MSysConfig.getIntValue("LAR_OG_TipoDoc_Ingreso", 0, Env.getAD_Client_ID(Env.getCtx()));
+    final static int c_DocType_Orden_Devolucion_ID = MSysConfig.getIntValue("LAR_OG_TipoDoc_OrdenDevolucion", 0, Env.getAD_Client_ID(Env.getCtx()));
+    final static int c_Order_Presupuesto_Generico_ID = MSysConfig.getIntValue("LAR_OG_PresupuestoGenerico", 0, Env.getAD_Client_ID(Env.getCtx()));
+    final static int c_Charge_ID = 1000051;
 
     private static final long serialVersionUID = -3656070525865255215L;
 
@@ -83,15 +89,11 @@ public class MLAROrdenGarantia extends X_LAR_OrdenGarantia implements DocAction,
         // los plazos de garantía.
         if (getC_Invoice_ID() > 0)
         {
-            int meses = 0 - MSysConfig.getIntValue("LAR_MesesDeGarantia", 0, getAD_Client_ID());
+            int meses = 0 - ((MBPartner) getC_BPartner()).get_ValueAsInt("MesesGarantia");
 
             if (meses != 0)
             {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(getFechaCambio().getTime());
-                calendar.add(Calendar.MONTH, meses);
-
-                Timestamp fechaLimite = new Timestamp(calendar.getTimeInMillis());
+                Timestamp fechaLimite = LAR_Utils.sumarTiempo(Calendar.MONTH, meses, getFechaCambio());
 
                 if (fechaLimite.after(getC_Invoice().getDateInvoiced()))
                 {
@@ -148,7 +150,24 @@ public class MLAROrdenGarantia extends X_LAR_OrdenGarantia implements DocAction,
         }
 
         // @fchiappano Crear remito de salida de Mercaderia.
-        MInOut remitoSalida = new MInOut((MOrder) getC_Order(), c_DocType_Salida_ID, getFechaCambio());
+        MInOut remitoSalida = null;
+
+        if (getC_Order_ID() > 0)
+        {
+            remitoSalida = new MInOut((MOrder) getC_Order(), c_DocType_Salida_ID, getFechaCambio());
+        }
+        else
+        {
+            remitoSalida = new MInOut(p_ctx, 0, get_TrxName());
+            remitoSalida.setAD_Org_ID(getAD_Org_ID());
+            remitoSalida.setC_BPartner_ID(getC_BPartner_ID());
+            remitoSalida.setC_BPartner_Location_ID(getC_BPartner_Location_ID(getC_BPartner_ID()));
+            remitoSalida.setIsSOTrx(true);
+            remitoSalida.setC_DocType_ID(c_DocType_Salida_ID);
+            remitoSalida.setMovementType(MInOut.MOVEMENTTYPE_CustomerShipment);
+            remitoSalida.setC_Order_ID(c_Order_Presupuesto_Generico_ID);
+        }
+
         remitoSalida.setM_Warehouse_ID(getM_WareHouseSalida_ID());
         remitoSalida.setMovementDate(getFechaCambio());
         remitoSalida.set_ValueOfColumn("LAR_OrdenGarantia_ID", get_ID());
@@ -164,14 +183,14 @@ public class MLAROrdenGarantia extends X_LAR_OrdenGarantia implements DocAction,
         // remitos generados no modifiquen la cantidad reservada).
         MRMA ordenDevolucion = new MRMA(p_ctx, 0, get_TrxName());
         ordenDevolucion.setC_BPartner_ID(getC_BPartner_ID());
-        ordenDevolucion.setM_InOut_ID(remitoSalida.getM_InOut_ID());
+        ordenDevolucion.setInOut_ID(remitoSalida.getM_InOut_ID());
         ordenDevolucion.setAD_Org_ID(getAD_Org_ID());
         ordenDevolucion.setName(new Timestamp(System.currentTimeMillis()) + getC_BPartner().getName());
-        ordenDevolucion.setC_Currency_ID(getC_Order().getC_Currency_ID());
-        ordenDevolucion.setC_Order_ID(getC_Order_ID());
-        ordenDevolucion.setIsSOTrx(getC_Order().isSOTrx());
+        ordenDevolucion.setC_Currency_ID(remitoSalida.getC_Order().getC_Currency_ID());
+        ordenDevolucion.setC_Order_ID(remitoSalida.getC_Order_ID());
+        ordenDevolucion.setIsSOTrx(true);
         ordenDevolucion.setC_DocType_ID(c_DocType_Orden_Devolucion_ID);
-        ordenDevolucion.setSalesRep_ID(getC_Order().getSalesRep_ID());
+        ordenDevolucion.setSalesRep_ID(remitoSalida.getC_Order().getSalesRep_ID());
         // ordenDevolucion.setM_RMAType_ID(tipoRMA_ID);
         ordenDevolucion.saveEx(get_TrxName());
 
@@ -192,14 +211,18 @@ public class MLAROrdenGarantia extends X_LAR_OrdenGarantia implements DocAction,
             rmaLine.setAD_Org_ID(getAD_Org_ID());
             rmaLine.setM_RMA_ID(ordenDevolucion.getM_RMA_ID());
             rmaLine.setQty(linea.getCantidad());
-            rmaLine.setM_InOutLine_ID(getM_InOutLine_ID(linea.getC_OrderLine_ID()));
+            if (linea.getC_OrderLine_ID() > 0)
+                rmaLine.setM_InOutLine_ID(getM_InOutLine_ID(linea.getC_OrderLine_ID()));
+            else
+                rmaLine.setC_Charge_ID(c_Charge_ID);
             rmaLine.saveEx(get_TrxName());
 
             //
             MInOutLine rLinea = new MInOutLine(remitoSalida);
-            rLinea.setOrderLine((MOrderLine) linea.getC_OrderLine(), M_Locator_ID, linea.getCantidad());
+            rLinea.setM_Locator_ID(M_Locator_ID);
+            rLinea.setM_Product_ID(linea.getM_Product_ID());
+            rLinea.setC_UOM_ID(linea.getC_UOM_ID());
             rLinea.setQty(linea.getCantidad());
-            rLinea.set_ValueOfColumn("C_OrderLine_ID", null);
             rLinea.setM_RMALine_ID(rmaLine.get_ID());
             rLinea.setIsInvoiced(true);
 
@@ -232,7 +255,21 @@ public class MLAROrdenGarantia extends X_LAR_OrdenGarantia implements DocAction,
         ordenDevolucion.saveEx(get_TrxName());
 
         // @fchiappano Crear Remito de ingreso (devolución del cliente).
-        MInOut remitoIngreso = new MInOut((MOrder) getC_Order(), c_DocType_Ingreso_ID, getFechaCambio());
+        MInOut remitoIngreso = null;
+
+        if (getC_Order_ID() > 0)
+            remitoIngreso = new MInOut((MOrder) getC_Order(), c_DocType_Ingreso_ID, getFechaCambio());
+        else
+        {
+            remitoIngreso = new MInOut(p_ctx, 0, get_TrxName());
+            remitoIngreso.setAD_Org_ID(getAD_Org_ID());
+            remitoIngreso.setC_BPartner_ID(getC_BPartner_ID());
+            remitoIngreso.setC_BPartner_Location_ID(getC_BPartner_Location_ID(getC_BPartner_ID()));
+            remitoIngreso.setIsSOTrx(true);
+            remitoIngreso.setC_DocType_ID(c_DocType_Ingreso_ID);
+            remitoIngreso.setMovementType(MInOut.MOVEMENTTYPE_CustomerReturns);
+            remitoIngreso.setC_Order_ID(c_Order_Presupuesto_Generico_ID);
+        }
         remitoIngreso.setM_Warehouse_ID(getM_WareHouseIngreso_ID());
         remitoIngreso.setMovementDate(getFechaCambio());
         remitoIngreso.set_ValueOfColumn("LAR_OrdenGarantia_ID", get_ID());
@@ -256,11 +293,12 @@ public class MLAROrdenGarantia extends X_LAR_OrdenGarantia implements DocAction,
             }
             //
             MInOutLine rLinea = new MInOutLine(remitoIngreso);
-            rLinea.setOrderLine((MOrderLine) linea.getC_OrderLine(), M_Locator_ID, linea.getCantidad());
+            rLinea.setM_Locator_ID(M_Locator_ID);
+            rLinea.setM_Product_ID(linea.getM_Product_ID());
+            rLinea.setC_UOM_ID(linea.getC_UOM_ID());
             rLinea.setQty(linea.getCantidad());
-            rLinea.setIsInvoiced(true);
-            rLinea.set_ValueOfColumn("C_OrderLine_ID", null);
             rLinea.setM_RMALine_ID(linea.getM_RMALine_ID());
+            rLinea.setIsInvoiced(true);
 
             if (!rLinea.save(get_TrxName()))
             {
@@ -447,4 +485,25 @@ public class MLAROrdenGarantia extends X_LAR_OrdenGarantia implements DocAction,
             return 0;
 
     } // getM_InOutLine_ID
+
+    private int getC_BPartner_Location_ID(final int c_BPartner_ID)
+    {
+        int c_BPartner_Location_ID = 0;
+        MBPartnerLocation[] direcciones = MBPartnerLocation.getForBPartner(p_ctx, c_BPartner_ID, get_TrxName());
+
+        for (MBPartnerLocation direccion : direcciones)
+        {
+            if (direccion.isActive() && direccion.isShipTo())
+            {
+                c_BPartner_Location_ID = direccion.get_ID();
+                break;
+            }
+        }
+
+        if (c_BPartner_Location_ID == 0 && direcciones.length > 0)
+            c_BPartner_Location_ID = direcciones[0].get_ID();
+
+        return c_BPartner_Location_ID;
+
+    } // getC_BPartner_Location_ID
 } // MLAROrdenGarantia

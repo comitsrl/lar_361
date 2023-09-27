@@ -2,9 +2,9 @@
 
 -- DROP TABLE IF EXISTS adempiere.LAR_OrdenGarantia;
 
-CREATE TABLE IF NOT EXISTS adempiere.LAR_OrdenGarantia
+CREATE TABLE IF NOT EXISTS adempiere.lar_ordengarantia
 (
-    LAR_OrdenGarantia_ID numeric(10,0) NOT NULL,
+    lar_ordengarantia_id numeric(10,0) NOT NULL,
     ad_client_id numeric(10,0) NOT NULL,
     ad_org_id numeric(10,0) NOT NULL,
     isactive character(1) COLLATE pg_catalog."default" NOT NULL DEFAULT 'Y'::bpchar,
@@ -12,22 +12,23 @@ CREATE TABLE IF NOT EXISTS adempiere.LAR_OrdenGarantia
     createdby numeric(10,0) NOT NULL,
     updated timestamp without time zone NOT NULL DEFAULT now(),
     updatedby numeric(10,0) NOT NULL,
-    DocumentNO character varying(30) COLLATE pg_catalog."default" NOT NULL,
-    Description character varying(255) COLLATE pg_catalog."default",
-    FechaCambio timestamp without time zone NOT NULL,
-    M_WareHouseSalida_ID numeric(10,0) NOT NULL,
-	M_WareHouseIngreso_ID numeric(10,0) NOT NULL,
-    C_BPartner_ID numeric(10,0) NOT NULL,
-    DocStatus character(2) COLLATE pg_catalog."default" NOT NULL,
-    DocAction character(2) COLLATE pg_catalog."default" NOT NULL,
-    Processing character(1) COLLATE pg_catalog."default",
-    Processed character(1) COLLATE pg_catalog."default" NOT NULL DEFAULT 'N'::bpchar,
-    C_DocType_ID numeric(10,0) NOT NULL,
-    C_Invoice_ID numeric(10,0) NOT NULL,
-	C_Order_ID numeric(10,0) NOT NULL,
-    CONSTRAINT LAR_OrdenGarantia_pkey PRIMARY KEY (LAR_OrdenGarantia_ID),
-    CONSTRAINT adclient_larordengarantia FOREIGN KEY (AD_Client_ID)
-        REFERENCES adempiere.ad_client (AD_Client_ID) MATCH SIMPLE
+    documentno character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    description character varying(255) COLLATE pg_catalog."default",
+    fechacambio timestamp without time zone NOT NULL,
+    m_warehousesalida_id numeric(10,0) NOT NULL,
+    m_warehouseingreso_id numeric(10,0) NOT NULL,
+    c_bpartner_id numeric(10,0) NOT NULL,
+    docstatus character(2) COLLATE pg_catalog."default" NOT NULL,
+    docaction character(2) COLLATE pg_catalog."default" NOT NULL,
+    processing character(1) COLLATE pg_catalog."default",
+    processed character(1) COLLATE pg_catalog."default" NOT NULL DEFAULT 'N'::bpchar,
+    c_doctype_id numeric(10,0) NOT NULL,
+    c_invoice_id numeric(10,0),
+    c_order_id numeric(10,0),
+    m_rma_id numeric(10,0),
+    CONSTRAINT lar_ordengarantia_pkey PRIMARY KEY (lar_ordengarantia_id),
+    CONSTRAINT adclient_larordengarantia FOREIGN KEY (ad_client_id)
+        REFERENCES adempiere.ad_client (ad_client_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT adorg_larordengarantia FOREIGN KEY (ad_org_id)
@@ -38,24 +39,28 @@ CREATE TABLE IF NOT EXISTS adempiere.LAR_OrdenGarantia
         REFERENCES adempiere.c_doctype (c_doctype_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT cinvoice_larordengarantia FOREIGN KEY (C_Invoice_ID)
-        REFERENCES adempiere.C_Invoice (C_Invoice_ID) MATCH SIMPLE
+    CONSTRAINT cbpartner_larordengarantia FOREIGN KEY (c_bpartner_id)
+        REFERENCES adempiere.c_bpartner (c_bpartner_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT corder_larordengarantia FOREIGN KEY (C_Order_ID)
-        REFERENCES adempiere.C_Order (C_Order_ID) MATCH SIMPLE
+    CONSTRAINT cinvoice_larordengarantia FOREIGN KEY (c_invoice_id)
+        REFERENCES adempiere.c_invoice (c_invoice_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT cbpartner_larordengarantia FOREIGN KEY (C_BPartner_ID)
-        REFERENCES adempiere.C_BPartner (C_BPartner_ID) MATCH SIMPLE
+    CONSTRAINT corder_larordengarantia FOREIGN KEY (c_order_id)
+        REFERENCES adempiere.c_order (c_order_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT mwarehouseingreso_larordengarantia FOREIGN KEY (M_WareHouseSalida_ID)
-        REFERENCES adempiere.M_WareHouse (M_WareHouse_ID) MATCH SIMPLE
+    CONSTRAINT mrmra_larordengarantia FOREIGN KEY (m_rma_id)
+        REFERENCES adempiere.m_rma (m_rma_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-	CONSTRAINT mwarehousesalida_larordengarantia FOREIGN KEY (M_WareHouseIngreso_ID)
-        REFERENCES adempiere.M_WareHouse (M_WareHouse_ID) MATCH SIMPLE
+    CONSTRAINT mwarehouseingreso_larordengarantia FOREIGN KEY (m_warehousesalida_id)
+        REFERENCES adempiere.m_warehouse (m_warehouse_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT mwarehousesalida_larordengarantia FOREIGN KEY (m_warehouseingreso_id)
+        REFERENCES adempiere.m_warehouse (m_warehouse_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT larordengarantia_isactive_check CHECK (isactive = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))
@@ -63,16 +68,16 @@ CREATE TABLE IF NOT EXISTS adempiere.LAR_OrdenGarantia
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS adempiere.LAR_OrdenGarantia
+ALTER TABLE IF EXISTS adempiere.lar_ordengarantia
     OWNER to adempiere;
 
 -- Table: adempiere.LAR_OrdenGarantiaLine
 
 -- DROP TABLE IF EXISTS adempiere.LAR_OrdenGarantiaLine;
 
-CREATE TABLE IF NOT EXISTS adempiere.LAR_OrdenGarantiaLine
+CREATE TABLE IF NOT EXISTS adempiere.lar_ordengarantialine
 (
-    LAR_OrdenGarantiaLine_ID numeric(10,0) NOT NULL,
+    lar_ordengarantialine_id numeric(10,0) NOT NULL,
     ad_client_id numeric(10,0) NOT NULL,
     ad_org_id numeric(10,0) NOT NULL,
     isactive character(1) COLLATE pg_catalog."default" NOT NULL DEFAULT 'Y'::bpchar,
@@ -80,14 +85,15 @@ CREATE TABLE IF NOT EXISTS adempiere.LAR_OrdenGarantiaLine
     createdby numeric(10,0) NOT NULL,
     updated timestamp without time zone NOT NULL DEFAULT now(),
     updatedby numeric(10,0) NOT NULL,
-    LAR_OrdenGarantia_ID numeric(10,0) NOT NULL,
+    lar_ordengarantia_id numeric(10,0) NOT NULL,
     line numeric(10,0) NOT NULL,
     description character varying(255) COLLATE pg_catalog."default",
-    M_Product_ID numeric(10,0),
+    m_product_id numeric(10,0),
     c_uom_id numeric(10,0) NOT NULL,
     cantidad numeric NOT NULL DEFAULT 0,
-    c_orderline_id numeric(10,0) NOT NULL,
-    CONSTRAINT LAR_OrdenGarantiaLine_pkey PRIMARY KEY (LAR_OrdenGarantiaLine_ID),
+    c_orderline_id numeric(10,0),
+    m_rmaline_id numeric(10,0),
+    CONSTRAINT lar_ordengarantialine_pkey PRIMARY KEY (lar_ordengarantialine_id),
     CONSTRAINT adclient_larordengarantialine FOREIGN KEY (ad_client_id)
         REFERENCES adempiere.ad_client (ad_client_id) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -100,25 +106,30 @@ CREATE TABLE IF NOT EXISTS adempiere.LAR_OrdenGarantiaLine
         REFERENCES adempiere.c_orderline (c_orderline_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-	CONSTRAINT mproduct_larordengarantialine FOREIGN KEY (M_Product_ID)
-        REFERENCES adempiere.M_Product (M_Product_ID) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
     CONSTRAINT cuom_larordengarantialine FOREIGN KEY (c_uom_id)
         REFERENCES adempiere.c_uom (c_uom_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT larordengarantia_larordengarantialine FOREIGN KEY (LAR_OrdenGarantia_ID)
-        REFERENCES adempiere.LAR_OrdenGarantia (LAR_OrdenGarantia_ID) MATCH SIMPLE
+    CONSTRAINT larordengarantia_larordengarantialine FOREIGN KEY (lar_ordengarantia_id)
+        REFERENCES adempiere.lar_ordengarantia (lar_ordengarantia_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT LAR_OrdenGarantiaLine_isactive_check CHECK (isactive = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))
+    CONSTRAINT mproduct_larordengarantialine FOREIGN KEY (m_product_id)
+        REFERENCES adempiere.m_product (m_product_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT mrmraline_larordengarantia FOREIGN KEY (m_rmaline_id)
+        REFERENCES adempiere.m_rmaline (m_rmaline_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT lar_ordengarantialine_isactive_check CHECK (isactive = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]))
 )
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS adempiere.LAR_OrdenGarantiaLine
+ALTER TABLE IF EXISTS adempiere.lar_ordengarantialine
     OWNER to adempiere;
+
 -- Index: LAR_OrdenGarantiaLine_unique
 
 -- DROP INDEX IF EXISTS adempiere.LAR_OrdenGarantiaLine_unique;
@@ -139,6 +150,11 @@ ALTER TABLE LAR_OrdenGarantia ADD CONSTRAINT mrmra_larordengarantia FOREIGN KEY 
 ALTER TABLE LAR_OrdenGarantiaLine ADD COLUMN M_RMALine_ID numeric(10,0);
 ALTER TABLE LAR_OrdenGarantiaLine ADD CONSTRAINT mrmraline_larordengarantia FOREIGN KEY (M_RMALine_ID)
         REFERENCES adempiere.M_RMALine (M_RMALine_ID) MATCH SIMPLE;
+
+ALTER TABLE C_BPartner ADD COLUMN MesesGarantia numeric(3,0) NOT NULL DEFAULT 14;
+
+ALTER TABLE LAR_OrdenGarantiaLine ADD COLUMN FechaBorne timestamp without time zone;
+ALTER TABLE LAR_OrdenGarantiaLine ADD COLUMN FechaCaja timestamp without time zone;
 
 -- 15/08/2023 21:52:28 ART
 -- ISSUE #160: Ventana de Ordenes de Garantía.
@@ -4252,6 +4268,431 @@ UPDATE AD_Column SET AD_Val_Rule_ID=189,Updated=TO_TIMESTAMP('2023-08-28 17:58:3
 -- 28/08/2023 17:58:46 ART
 -- ISSUE #160: Ventana de Ordenes de Garantía.
 UPDATE AD_Column SET AD_Val_Rule_ID=189,Updated=TO_TIMESTAMP('2023-08-28 17:58:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005590
+;
+
+-- 25/09/2023 18:01:36 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET IsMandatory='N',Updated=TO_TIMESTAMP('2023-09-25 18:01:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005598
+;
+
+-- 25/09/2023 18:01:49 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET IsMandatory='N',Updated=TO_TIMESTAMP('2023-09-25 18:01:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005599
+;
+
+-- 25/09/2023 18:02:02 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET IsMandatory='N',Updated=TO_TIMESTAMP('2023-09-25 18:02:02','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005614
+;
+
+-- 25/09/2023 19:44:43 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2023-09-25 19:44:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3008829
+;
+
+-- 25/09/2023 19:45:23 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2023-09-25 19:45:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3008826
+;
+
+-- 25/09/2023 19:46:05 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET DefaultValue='@#Date@',Updated=TO_TIMESTAMP('2023-09-25 19:46:05','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3008826
+;
+
+-- 25/09/2023 19:47:13 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2023-09-25 19:47:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3008819
+;
+
+-- 25/09/2023 19:47:18 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET IsReadOnly='Y',Updated=TO_TIMESTAMP('2023-09-25 19:47:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3008820
+;
+
+-- 25/09/2023 19:48:22 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET IsMandatory='Y',Updated=TO_TIMESTAMP('2023-09-25 19:48:22','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005610
+;
+
+-- 25/09/2023 19:48:52 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_TIMESTAMP('2023-09-25 19:48:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005610
+;
+
+-- 25/09/2023 19:49:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_TIMESTAMP('2023-09-25 19:49:17','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005588
+;
+
+-- 25/09/2023 19:59:06 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET DefaultValue='4000065',Updated=TO_TIMESTAMP('2023-09-25 19:59:06','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3008825
+;
+
+-- 25/09/2023 20:42:12 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3001402,'mesesgarantia','LAR','mesesgarantia','mesesgarantia',0,TO_TIMESTAMP('2023-09-25 20:42:12','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2023-09-25 20:42:12','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)
+;
+
+-- 25/09/2023 20:42:12 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001402 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 25/09/2023 20:42:13 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3005618,291,'LAR',0,'Y','N','N','N',3,'N',22,'N',3001402,'N','Y','N','mesesgarantia','mesesgarantia',100,TO_TIMESTAMP('2023-09-25 20:42:12','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2023-09-25 20:42:12','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 25/09/2023 20:42:13 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3005618 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 25/09/2023 20:42:56 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element SET ColumnName='MesesGarantia', Name='Meses de Garantía', PrintName='Meses de Garantía',Updated=TO_TIMESTAMP('2023-09-25 20:42:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001402
+;
+
+-- 25/09/2023 20:42:56 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001402
+;
+
+-- 25/09/2023 20:42:56 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET ColumnName='MesesGarantia', Name='Meses de Garantía', Description=NULL, Help=NULL WHERE AD_Element_ID=3001402
+;
+
+-- 25/09/2023 20:42:56 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Process_Para SET ColumnName='MesesGarantia', Name='Meses de Garantía', Description=NULL, Help=NULL, AD_Element_ID=3001402 WHERE UPPER(ColumnName)='MESESGARANTIA' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 25/09/2023 20:42:56 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Process_Para SET ColumnName='MesesGarantia', Name='Meses de Garantía', Description=NULL, Help=NULL WHERE AD_Element_ID=3001402 AND IsCentrallyMaintained='Y'
+;
+
+-- 25/09/2023 20:42:56 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET Name='Meses de Garantía', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001402) AND IsCentrallyMaintained='Y'
+;
+
+-- 25/09/2023 20:42:56 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_PrintFormatItem SET PrintName='Meses de Garantía', Name='Meses de Garantía' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3001402)
+;
+
+-- 25/09/2023 20:43:03 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element_Trl SET Name='Meses de Garantía',PrintName='Meses de Garantía',Updated=TO_TIMESTAMP('2023-09-25 20:43:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001402 AND AD_Language='es_AR'
+;
+
+-- 25/09/2023 20:43:18 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column_Trl SET Name='Meses de Garantía',Updated=TO_TIMESTAMP('2023-09-25 20:43:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005618 AND AD_Language='es_AR'
+;
+
+-- 25/09/2023 20:44:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3009242,10,'Y','N','N',3005507,'N','Y',223,'N','LAR','LAR_Fecha_Ingreso',100,0,TO_TIMESTAMP('2023-09-25 20:44:17','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2023-09-25 20:44:17','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 25/09/2023 20:44:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3009242 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 25/09/2023 20:44:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3009243,10,'Y','N','N',3005508,'N','Y',223,'N','LAR','LAR_Vacaciones_Dias_Corridos',100,0,TO_TIMESTAMP('2023-09-25 20:44:17','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2023-09-25 20:44:17','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 25/09/2023 20:44:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3009243 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 25/09/2023 20:44:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3009244,10,'Y','N','N',3005509,'N','Y',223,'N','LAR','LAR_Vacaciones_Dias_Habiles',100,0,TO_TIMESTAMP('2023-09-25 20:44:17','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2023-09-25 20:44:17','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 25/09/2023 20:44:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3009244 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 25/09/2023 20:44:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3009245,3,'Y','N','N',3005618,'N','Y',223,'N','LAR','Meses de Garantía',100,0,TO_TIMESTAMP('2023-09-25 20:44:17','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2023-09-25 20:44:17','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 25/09/2023 20:44:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3009245 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 25/09/2023 20:44:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3009242
+;
+
+-- 25/09/2023 20:44:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3009243
+;
+
+-- 25/09/2023 20:44:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3009244
+;
+
+-- 25/09/2023 20:44:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=0,IsDisplayed='N' WHERE AD_Field_ID=3009245
+;
+
+-- 25/09/2023 21:06:36 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Val_Rule (Code,Type,AD_Val_Rule_ID,EntityType,Name,CreatedBy,UpdatedBy,Updated,AD_Client_ID,IsActive,AD_Org_ID,Created) VALUES ('C_Invoice.DateInvoiced >= (SELECT (@Fecha@ - interval ''1 month'' * (SELECT MesesGarantia FROM C_BPartner WHERE C_BPartner_ID = @C_BPartner_ID@)))','S',3000141,'LAR','C_Invoice Meses de Garantía',100,100,TO_TIMESTAMP('2023-09-25 21:06:36','YYYY-MM-DD HH24:MI:SS'),0,'Y',0,TO_TIMESTAMP('2023-09-25 21:06:36','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 25/09/2023 21:08:41 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET AD_Val_Rule_ID=3000141,Updated=TO_TIMESTAMP('2023-09-25 21:08:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005598
+;
+
+-- 25/09/2023 21:12:45 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Val_Rule SET Code='C_Invoice.DateInvoiced >= (SELECT (@FechaCambio@ - interval ''1 month'' * (SELECT MesesGarantia FROM C_BPartner WHERE C_BPartner_ID = @C_BPartner_ID@)))',Updated=TO_TIMESTAMP('2023-09-25 21:12:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000141
+;
+
+-- 25/09/2023 21:17:08 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Val_Rule SET Code='C_Invoice.DateInvoiced::DATE >= (SELECT (@FechaCambio@::DATE - interval ''1 month'' * (SELECT MesesGarantia FROM C_BPartner WHERE C_BPartner_ID = @C_BPartner_ID@)))',Updated=TO_TIMESTAMP('2023-09-25 21:17:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000141
+;
+
+-- 25/09/2023 21:23:50 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Val_Rule SET Code='C_Invoice.DateInvoiced::DATE >= (SELECT (''@FechaCambio@''::DATE - interval ''1 month'' * (SELECT MesesGarantia FROM C_BPartner WHERE C_BPartner_ID = @C_BPartner_ID@)))',Updated=TO_TIMESTAMP('2023-09-25 21:23:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000141
+;
+
+-- 26/09/2023 0:10:47 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_SysConfig SET Value='4136632', Description='ID del presupuesto generico utilizado en la generación de Ordenes de Garantía, que no estan vinculadas con una venta realizada por la compañia (venta de terceros/revendedores).', Name='LAR_OG_PresupuestoGenerico',Updated=TO_TIMESTAMP('2023-09-26 00:10:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_SysConfig_ID=3000085
+;
+
+-- 26/09/2023 0:12:59 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_SysConfig (AD_SysConfig_ID,EntityType,ConfigurationLevel,Value,Description,Name,AD_Client_ID,AD_Org_ID,Created,Updated,CreatedBy,UpdatedBy,IsActive) VALUES (3000086,'LAR','C','4000067','ID del tipo de documento utilizado para la generación de remitos de ingreso, dentro de la Orden de Garantías.','LAR_OG_TipoDoc_Ingreso',1000000,0,TO_TIMESTAMP('2023-09-26 00:12:57','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2023-09-26 00:12:57','YYYY-MM-DD HH24:MI:SS'),100,100,'Y')
+;
+
+-- 26/09/2023 0:14:02 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_SysConfig (AD_SysConfig_ID,EntityType,ConfigurationLevel,Value,Description,Name,AD_Client_ID,AD_Org_ID,Created,Updated,CreatedBy,UpdatedBy,IsActive) VALUES (3000087,'LAR','C','4000066','ID del tipo de documento utilizado para la generación de remitos de egreso, dentro de la Orden de Garantías.','LAR_OG_TipoDoc_Egreso',1000000,0,TO_TIMESTAMP('2023-09-26 00:14:02','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2023-09-26 00:14:02','YYYY-MM-DD HH24:MI:SS'),100,100,'Y')
+;
+
+-- 26/09/2023 0:15:48 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_SysConfig (AD_SysConfig_ID,EntityType,ConfigurationLevel,Value,Description,Name,AD_Client_ID,AD_Org_ID,Created,Updated,CreatedBy,UpdatedBy,IsActive) VALUES (3000088,'LAR','C','1000123','ID del tipo de documento utilizado para la generación de la Orden de Devolución (RMA), utilizada dentro de la Orden de Garantía.','LAR_OG_TipoDoc_OrdenDevolucion',1000000,0,TO_TIMESTAMP('2023-09-26 00:15:48','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2023-09-26 00:15:48','YYYY-MM-DD HH24:MI:SS'),100,100,'Y')
+;
+
+-- 26/09/2023 0:30:16 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3001403,'fechaborne','LAR','fechaborne','fechaborne',0,TO_TIMESTAMP('2023-09-26 00:30:15','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2023-09-26 00:30:15','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)
+;
+
+-- 26/09/2023 0:30:16 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001403 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 26/09/2023 0:30:16 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3005619,3000269,'LAR',0,'N','N','N','N',29,'N',16,'N',3001403,'N','Y','N','fechaborne','fechaborne',100,TO_TIMESTAMP('2023-09-26 00:30:15','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2023-09-26 00:30:15','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 26/09/2023 0:30:16 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3005619 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 26/09/2023 0:30:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,AD_Client_ID,Created,Updated,IsActive,CreatedBy,UpdatedBy,AD_Org_ID) VALUES (3001404,'fechacaja','LAR','fechacaja','fechacaja',0,TO_TIMESTAMP('2023-09-26 00:30:16','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2023-09-26 00:30:16','YYYY-MM-DD HH24:MI:SS'),'Y',100,100,0)
+;
+
+-- 26/09/2023 0:30:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID, Help,PO_Description,PO_Help,Name,Description,PrintName,PO_PrintName,PO_Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Element_ID, t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Element t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Element_ID=3001404 AND NOT EXISTS (SELECT * FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
+;
+
+-- 26/09/2023 0:30:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Name,ColumnName,CreatedBy,Updated,AD_Client_ID,AD_Org_ID,IsActive,Created,UpdatedBy) VALUES (3005620,3000269,'LAR',0,'N','N','N','N',29,'N',16,'N',3001404,'N','Y','N','fechacaja','fechacaja',100,TO_TIMESTAMP('2023-09-26 00:30:16','YYYY-MM-DD HH24:MI:SS'),0,0,'Y',TO_TIMESTAMP('2023-09-26 00:30:16','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 26/09/2023 0:30:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID, Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Column_ID, t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Column t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Column_ID=3005620 AND NOT EXISTS (SELECT * FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
+;
+
+-- 26/09/2023 0:30:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element SET ColumnName='FechaBorne', Name='Fecha Borne', PrintName='Fecha Borne',Updated=TO_TIMESTAMP('2023-09-26 00:30:54','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001403
+;
+
+-- 26/09/2023 0:30:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001403
+;
+
+-- 26/09/2023 0:30:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET ColumnName='FechaBorne', Name='Fecha Borne', Description=NULL, Help=NULL WHERE AD_Element_ID=3001403
+;
+
+-- 26/09/2023 0:30:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Process_Para SET ColumnName='FechaBorne', Name='Fecha Borne', Description=NULL, Help=NULL, AD_Element_ID=3001403 WHERE UPPER(ColumnName)='FECHABORNE' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 26/09/2023 0:30:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Process_Para SET ColumnName='FechaBorne', Name='Fecha Borne', Description=NULL, Help=NULL WHERE AD_Element_ID=3001403 AND IsCentrallyMaintained='Y'
+;
+
+-- 26/09/2023 0:30:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET Name='Fecha Borne', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001403) AND IsCentrallyMaintained='Y'
+;
+
+-- 26/09/2023 0:30:54 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_PrintFormatItem SET PrintName='Fecha Borne', Name='Fecha Borne' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3001403)
+;
+
+-- 26/09/2023 0:30:59 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element_Trl SET Name='Fecha Borne',PrintName='Fecha Borne',Updated=TO_TIMESTAMP('2023-09-26 00:30:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001403 AND AD_Language='es_AR'
+;
+
+-- 26/09/2023 0:31:20 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column_Trl SET Name='Fecha Borne',Updated=TO_TIMESTAMP('2023-09-26 00:31:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005619 AND AD_Language='es_AR'
+;
+
+-- 26/09/2023 0:31:28 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET AD_Reference_ID=15,Updated=TO_TIMESTAMP('2023-09-26 00:31:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005619
+;
+
+-- 26/09/2023 0:32:30 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element SET ColumnName='FechaCaja', Name='Fecha Caja', PrintName='Fecha Caja',Updated=TO_TIMESTAMP('2023-09-26 00:32:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001404
+;
+
+-- 26/09/2023 0:32:30 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element_Trl SET IsTranslated='N' WHERE AD_Element_ID=3001404
+;
+
+-- 26/09/2023 0:32:30 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET ColumnName='FechaCaja', Name='Fecha Caja', Description=NULL, Help=NULL WHERE AD_Element_ID=3001404
+;
+
+-- 26/09/2023 0:32:30 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Process_Para SET ColumnName='FechaCaja', Name='Fecha Caja', Description=NULL, Help=NULL, AD_Element_ID=3001404 WHERE UPPER(ColumnName)='FECHACAJA' AND IsCentrallyMaintained='Y' AND AD_Element_ID IS NULL
+;
+
+-- 26/09/2023 0:32:30 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Process_Para SET ColumnName='FechaCaja', Name='Fecha Caja', Description=NULL, Help=NULL WHERE AD_Element_ID=3001404 AND IsCentrallyMaintained='Y'
+;
+
+-- 26/09/2023 0:32:30 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET Name='Fecha Caja', Description=NULL, Help=NULL WHERE AD_Column_ID IN (SELECT AD_Column_ID FROM AD_Column WHERE AD_Element_ID=3001404) AND IsCentrallyMaintained='Y'
+;
+
+-- 26/09/2023 0:32:30 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_PrintFormatItem SET PrintName='Fecha Caja', Name='Fecha Caja' WHERE IsCentrallyMaintained='Y' AND EXISTS (SELECT * FROM AD_Column c WHERE c.AD_Column_ID=AD_PrintFormatItem.AD_Column_ID AND c.AD_Element_ID=3001404)
+;
+
+-- 26/09/2023 0:32:36 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Element_Trl SET Name='Fecha Caja',PrintName='Fecha Caja',Updated=TO_TIMESTAMP('2023-09-26 00:32:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Element_ID=3001404 AND AD_Language='es_AR'
+;
+
+-- 26/09/2023 0:32:42 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET AD_Reference_ID=15, Name='Fecha Caja', ColumnName='FechaCaja',Updated=TO_TIMESTAMP('2023-09-26 00:32:42','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005620
+;
+
+-- 26/09/2023 0:32:47 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column_Trl SET Name='Fecha Caja',Updated=TO_TIMESTAMP('2023-09-26 00:32:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005620 AND AD_Language='es_AR'
+;
+
+-- 26/09/2023 0:33:06 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3009246,29,'Y','N','N',3005619,'N','Y',3000302,'N','LAR','Fecha Borne',100,0,TO_TIMESTAMP('2023-09-26 00:33:06','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2023-09-26 00:33:06','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 26/09/2023 0:33:06 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3009246 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 26/09/2023 0:33:06 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field (IsEncrypted,AD_Field_ID,DisplayLength,IsDisplayed,IsSameLine,IsHeading,AD_Column_ID,IsFieldOnly,IsCentrallyMaintained,AD_Tab_ID,IsReadOnly,EntityType,Name,UpdatedBy,AD_Org_ID,Created,IsActive,AD_Client_ID,CreatedBy,Updated) VALUES ('N',3009247,29,'Y','N','N',3005620,'N','Y',3000302,'N','LAR','Fecha Caja',100,0,TO_TIMESTAMP('2023-09-26 00:33:06','YYYY-MM-DD HH24:MI:SS'),'Y',0,100,TO_TIMESTAMP('2023-09-26 00:33:06','YYYY-MM-DD HH24:MI:SS'))
+;
+
+-- 26/09/2023 0:33:06 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Field_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Field t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Field_ID=3009247 AND NOT EXISTS (SELECT * FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+-- 26/09/2023 0:34:33 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2023-09-26 00:34:33','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009247
+;
+
+-- 26/09/2023 0:35:50 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3009246
+;
+
+-- 26/09/2023 0:35:50 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3009247
+;
+
+-- 26/09/2023 0:35:50 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3008834
+;
+
+-- 26/09/2023 0:35:52 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3008834
+;
+
+-- 26/09/2023 0:35:52 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3009246
+;
+
+-- 26/09/2023 0:35:52 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3009247
 ;
 
 -- Registración de script
