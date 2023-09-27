@@ -1000,6 +1000,10 @@ import ar.com.ergio.util.LAR_Utils;
         final MOrder order = new MOrder(Env.getCtx(), shipment.getC_Order_ID(), trx);
         final MDocType dt = new MDocType(Env.getCtx(), order.getC_DocType_ID(), trx);
 
+        // @fchiappano si el remito proviene de una orden de garantia, no anular la orden de remito, ya que el remito esta totalmente disociado de la venta.
+        if (shipment.get_ValueAsInt("LAR_OrdenGarantia_ID") > 0)
+            return null;
+
         // Controla si el tipo de la orden es "Orden de Remito"
         // ("Orden de Remito" <=> "Warehouse Order")
         if (dt.getDocSubTypeSO() != null) // Se chequea que la irden tenga seteado un SubTipo de Doc OV

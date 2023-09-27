@@ -323,10 +323,15 @@ public class MRMA extends X_M_RMA implements DocAction
 		
 		for (MRMALine line : lines)
 		{
-			if (!line.checkQty()) {
-				m_processMsg = "@AmtReturned>Shipped@";
-				return DocAction.STATUS_Invalid;
-			}
+		    // @fchiappano solo realizar este chequeo, si la linea tiene una linea de remito asociada.
+            if (line.getM_InOutLine_ID() > 0)
+            {
+                if (!line.checkQty())
+                {
+                    m_processMsg = "@AmtReturned>Shipped@";
+                    return DocAction.STATUS_Invalid;
+                }
+            }
 		}
 
         // Updates Amount
