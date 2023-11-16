@@ -143,14 +143,6 @@ ALTER TABLE M_InOut ADD COLUMN LAR_OrdenGarantia_ID numeric(10,0);
 ALTER TABLE M_InOut ADD CONSTRAINT larordengarantia_minout FOREIGN KEY (LAR_OrdenGarantia_ID)
         REFERENCES adempiere.LAR_OrdenGarantia (LAR_OrdenGarantia_ID) MATCH SIMPLE;
 
-ALTER TABLE LAR_OrdenGarantia ADD COLUMN M_RMA_ID numeric(10,0);
-ALTER TABLE LAR_OrdenGarantia ADD CONSTRAINT mrmra_larordengarantia FOREIGN KEY (M_RMA_ID)
-        REFERENCES adempiere.M_RMA (M_RMA_ID) MATCH SIMPLE;
-
-ALTER TABLE LAR_OrdenGarantiaLine ADD COLUMN M_RMALine_ID numeric(10,0);
-ALTER TABLE LAR_OrdenGarantiaLine ADD CONSTRAINT mrmraline_larordengarantia FOREIGN KEY (M_RMALine_ID)
-        REFERENCES adempiere.M_RMALine (M_RMALine_ID) MATCH SIMPLE;
-
 ALTER TABLE C_BPartner ADD COLUMN MesesGarantia numeric(3,0) NOT NULL DEFAULT 14;
 
 ALTER TABLE LAR_OrdenGarantiaLine ADD COLUMN FechaBorne timestamp without time zone;
@@ -4693,6 +4685,54 @@ UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3009246
 -- 26/09/2023 0:35:52 ART
 -- ISSUE #160: Ventana de Ordenes de Garantía.
 UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3009247
+;
+
+ALTER TABLE LAR_OrdenGarantiaLine ALTER COLUMN FechaBorne TYPE character varying(60);
+ALTER TABLE LAR_OrdenGarantiaLine ALTER COLUMN FechaCaja TYPE character varying(60);
+
+-- 27/09/2023 12:22:23 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Val_Rule SET Code='C_Invoice.DocStatus = ''CO'' AND C_Invoice.DateInvoiced::DATE >= (SELECT (''@FechaCambio@''::DATE - interval ''1 month'' * (SELECT MesesGarantia FROM C_BPartner WHERE C_BPartner_ID = @C_BPartner_ID@)))',Updated=TO_DATE('2023-09-27 12:22:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000141
+;
+
+-- 27/09/2023 12:24:32 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Val_Rule SET Code='C_Invoice.DateInvoiced::DATE >= (SELECT (''@FechaCambio@''::DATE - interval ''1 month'' * (SELECT MesesGarantia FROM C_BPartner WHERE C_BPartner_ID = @C_BPartner_ID@)))',Updated=TO_DATE('2023-09-27 12:24:32','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Val_Rule_ID=3000141
+;
+
+-- 27/09/2023 12:27:09 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Reference (AD_Reference_ID,ValidationType,EntityType,IsOrderByValue,Name,AD_Client_ID,AD_Org_ID,CreatedBy,Updated,IsActive,Created,UpdatedBy) VALUES (3000167,'T','LAR','N','C_Invoice Completas',0,0,100,TO_DATE('2023-09-27 12:27:09','YYYY-MM-DD HH24:MI:SS'),'Y',TO_DATE('2023-09-27 12:27:09','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 27/09/2023 12:27:09 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Reference_Trl (AD_Language,AD_Reference_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Reference_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Reference t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Reference_ID=3000167 AND NOT EXISTS (SELECT * FROM AD_Reference_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Reference_ID=t.AD_Reference_ID)
+;
+
+-- 27/09/2023 12:28:10 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+INSERT INTO AD_Ref_Table (IsValueDisplayed,WhereClause,AD_Table_ID,AD_Reference_ID,AD_Key,AD_Display,EntityType,CreatedBy,Created,Updated,AD_Client_ID,UpdatedBy,AD_Org_ID,IsActive) VALUES ('N','C_Invoice.DocStatus = ''CO''',318,3000167,3484,3492,'LAR',100,TO_DATE('2023-09-27 12:28:10','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2023-09-27 12:28:10','YYYY-MM-DD HH24:MI:SS'),0,100,0,'Y')
+;
+
+-- 27/09/2023 12:28:27 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET AD_Reference_Value_ID=3000167,Updated=TO_DATE('2023-09-27 12:28:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005598
+;
+
+-- 27/09/2023 13:17:40 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET MandatoryLogic='@C_Order_ID@ > 0',Updated=TO_DATE('2023-09-27 13:17:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005614
+;
+
+-- 27/09/2023 13:21:03 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET FieldLength=60, AD_Reference_ID=10,Updated=TO_DATE('2023-09-27 13:21:03','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005619
+;
+
+-- 27/09/2023 13:21:17 ART
+-- ISSUE #160: Ventana de Ordenes de Garantía.
+UPDATE AD_Column SET FieldLength=60, AD_Reference_ID=10,Updated=TO_DATE('2023-09-27 13:21:17','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005620
 ;
 
 -- Registración de script
