@@ -143,14 +143,6 @@ ALTER TABLE M_InOut ADD COLUMN LAR_OrdenGarantia_ID numeric(10,0);
 ALTER TABLE M_InOut ADD CONSTRAINT larordengarantia_minout FOREIGN KEY (LAR_OrdenGarantia_ID)
         REFERENCES adempiere.LAR_OrdenGarantia (LAR_OrdenGarantia_ID) MATCH SIMPLE;
 
-ALTER TABLE LAR_OrdenGarantia ADD COLUMN M_RMA_ID numeric(10,0);
-ALTER TABLE LAR_OrdenGarantia ADD CONSTRAINT mrmra_larordengarantia FOREIGN KEY (M_RMA_ID)
-        REFERENCES adempiere.M_RMA (M_RMA_ID) MATCH SIMPLE;
-
-ALTER TABLE LAR_OrdenGarantiaLine ADD COLUMN M_RMALine_ID numeric(10,0);
-ALTER TABLE LAR_OrdenGarantiaLine ADD CONSTRAINT mrmraline_larordengarantia FOREIGN KEY (M_RMALine_ID)
-        REFERENCES adempiere.M_RMALine (M_RMALine_ID) MATCH SIMPLE;
-
 ALTER TABLE C_BPartner ADD COLUMN MesesGarantia numeric(3,0) NOT NULL DEFAULT 14;
 
 ALTER TABLE LAR_OrdenGarantiaLine ADD COLUMN FechaBorne timestamp without time zone;
