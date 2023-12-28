@@ -26,6 +26,7 @@ import org.compiere.model.MInvoice;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
 import org.compiere.process.DocumentEngine;
+import org.compiere.util.DB;
 
 /**
  * Modelo de clases para certificados de disposición final.
@@ -109,6 +110,15 @@ public class MLARDisposicionFinal extends X_LAR_DisposicionFinal implements DocA
     @Override
     public String completeIt()
     {
+        String sql = "SELECT COUNT(LAR_DisposicionFinalLine) FROM LAR_DisposicionFinalLine WHERE LAR_DisposicionFinal_ID = ?";
+        int count = DB.getSQLValue(get_TrxName(), sql, getLAR_DisposicionFinal_ID());
+
+        if (count <= 0)
+        {
+            m_processMsg = "No se encontraron Líneas cargadas en el documento.";
+            return DOCSTATUS_Invalid;
+        }
+
         setDocAction(DocAction.ACTION_Close);
         setProcessed(true);
 
