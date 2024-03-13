@@ -155,6 +155,17 @@ public class EpsonPrinter extends BasicFiscalPrinter
         if (percepcion != null)
             encabezado.put("percepciones", percepcion);
 
+        // @fchiappano Agregar Pagos.
+        boolean esCC = false;
+        List<Payment> pagos = invoice.getPayments();
+
+        if (pagos.size() == 1 && pagos.get(0).getDescription().equals("Cuenta Corriente"))
+        {
+            esCC = true;
+            JSONArray jsPagos = getDocumentPagos(invoice);
+            encabezado.put("pagos", jsPagos);
+        }
+
         // @fchiappano Agregar el nombre de la impresora.
         printTicketJSON.put("printerName", impresora);
         printTicketJSON.put("printTicket", encabezado);
@@ -167,9 +178,7 @@ public class EpsonPrinter extends BasicFiscalPrinter
         setMessage(invoice);
 
         // @fchiapppano Armado del ticket no fiscal para cuentas corrientes.
-        List<Payment> pagos = invoice.getPayments();
-
-        if (pagos.size() == 1 && pagos.get(0).getDescription().equals("Cuenta Corriente"))
+        if (esCC)
         {
             String lineaGuion =     "------------------------------------------------";
             String lineaGuionBajo = "________________________________________________";
@@ -553,6 +562,25 @@ public class EpsonPrinter extends BasicFiscalPrinter
         }
 
         return null;
+    } // getDocumentPercepcion
+
+    /**
+     * Recuperar pagos.
+     *
+     * @author fchiappano
+     * @return JSONArray con pagos
+     */
+    private JSONArray getDocumentPagos(Document invoice)
+    {
+        JSONArray jsonPagos = new JSONArray();
+
+        JSONObject pagosOject = new JSONObject();
+        pagosOject.put("ds", "CUENTA_CORRIENTE");
+        pagosOject.put("importe", invoice.getTotal());
+
+        jsonPagos.add(pagosOject);
+
+        return jsonPagos;
     } // getDocumentPercepcion
 
     /**
