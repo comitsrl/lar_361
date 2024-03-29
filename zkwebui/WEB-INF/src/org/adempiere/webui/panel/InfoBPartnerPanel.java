@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Checkbox;
@@ -42,10 +43,10 @@ import org.compiere.util.Msg;
 import org.compiere.util.Util;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zkex.zul.Borderlayout;
-import org.zkoss.zkex.zul.Center;
-import org.zkoss.zkex.zul.North;
-import org.zkoss.zkex.zul.South;
+import org.zkoss.zul.Borderlayout;
+import org.zkoss.zul.Center;
+import org.zkoss.zul.North;
+import org.zkoss.zul.South;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Separator;
 import org.zkoss.zul.Vbox;
@@ -572,5 +573,11 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
     {
         
     }
+
+	@Override
+	public String getSortDirection(Comparator cmpr) {
+		// TODO Auto-generated method stub
+		return "natural";
+	}
 	
 }

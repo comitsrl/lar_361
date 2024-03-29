@@ -94,6 +94,8 @@ import ar.com.ergio.model.MLARRetiroCaja;
  */
 public class LoginPanel extends Window implements EventListener
 {
+	
+	private static final String ON_LOAD_TOKEN = "onLoadToken";
 	/**
 	 *
 	 */
@@ -120,10 +122,11 @@ public class LoginPanel extends Window implements EventListener
         init();
         this.setId("loginPanel");
 
-        AuFocus auf = new AuFocus(txtUserId);
-        Clients.response(auf);
-
-        BrowserToken.load(this.getUuid());
+        txtUserId.setEnabled(false);
+        txtPassword.setEnabled(false);
+        lstLanguage.setEnabled(false);
+        Events.echoEvent(ON_LOAD_TOKEN, this, null);
+        this.addEventListener(ON_LOAD_TOKEN, this);          
 
         // @fchiappano Agegar las implementaciones de ventanas del tipo
         // CreateFrom, en el mapeo de tablas de ZK.
@@ -221,7 +224,7 @@ public class LoginPanel extends Window implements EventListener
         div.appendChild(pnlButtons);
         this.appendChild(div);
 
-        this.addEventListener(TokenEvent.ON_USER_TOKEN, new EventListener() {
+        txtUserId.addEventListener(TokenEvent.ON_USER_TOKEN, new EventListener() {
 
 			@Override
 			public void onEvent(Event event) throws Exception {
@@ -336,7 +339,7 @@ public class LoginPanel extends Window implements EventListener
         {
             validateLogin();
         }
-        if (event.getName().equals(Events.ON_SELECT))
+        else if (event.getName().equals(Events.ON_SELECT))
         {
             if(eventComp.getId().equals(lstLanguage.getId())) {
             	String langName = (String) lstLanguage.getSelectedItem().getLabel();
@@ -344,12 +347,23 @@ public class LoginPanel extends Window implements EventListener
             }
         }
         // Elaine 2009/02/06 - initial language
-        if (event.getName().equals(Events.ON_CHANGE))
+        else if (event.getName().equals(Events.ON_CHANGE))
         {
         	if(eventComp.getId().equals(txtUserId.getId()))
         	{
         		onUserIdChange();
         	}
+        }
+        else if (event.getName().equals(ON_LOAD_TOKEN)) 
+        {
+        	BrowserToken.load(txtUserId);
+        	
+        	txtUserId.setEnabled(true);
+            txtPassword.setEnabled(true);
+            lstLanguage.setEnabled(true);
+            
+        	AuFocus auf = new AuFocus(txtUserId);
+            Clients.response(auf);
         }
         //
     }
@@ -447,7 +461,7 @@ public class LoginPanel extends Window implements EventListener
 
             Locales.setThreadLocal(language.getLocale());
 
-            Clients.response("zkLocaleJavaScript", new AuScript(null, ZkFns.outLocaleJavaScript()));
+           // Clients.response("zkLocaleJavaScript", new AuScript(null, ZkFns.outLocaleJavaScript()));
             String timeoutText = getUpdateTimeoutTextScript();
             if (!Strings.isEmpty(timeoutText))
             	Clients.response("zkLocaleJavaScript2", new AuScript(null, timeoutText));

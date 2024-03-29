@@ -39,6 +39,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -77,10 +78,10 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zkex.zul.Borderlayout;
-import org.zkoss.zkex.zul.Center;
-import org.zkoss.zkex.zul.North;
-import org.zkoss.zkex.zul.South;
+import org.zkoss.zul.Borderlayout;
+import org.zkoss.zul.Center;
+import org.zkoss.zul.North;
+import org.zkoss.zul.South;
 
 /**
  * Search Product and return selection
@@ -1450,6 +1451,12 @@ public class InfoProductPanel extends InfoPanel implements EventListener
 			M_AttributeSet_ID = Integer.parseInt(itemAS.getValue().toString());
 
 		return M_AttributeSet_ID;
+	}
+
+	@Override
+	public String getSortDirection(Comparator cmpr) {
+		// TODO Auto-generated method stub
+		return "natural";
 	}
     
 }	//	InfoProduct
