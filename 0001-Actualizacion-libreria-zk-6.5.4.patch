@@ -1,0 +1,383 @@
+From cc8c44ac75fc82943308e45c475e65a9a81dfec7 Mon Sep 17 00:00:00 2001
+From: sim4s <santi.imas37@gmail.com>
+Date: Fri, 29 Mar 2024 02:59:34 -0300
+Subject: [PATCH] Actualizacion libreria zk-6.5.4
+
+Primeros cambios hechos para que concuerde con cambios hechos en
+proyecto adempiere. No Estan basados en los commits de Idempiere
+---
+ .../webui/apps/form/WAllocation.java          |  8 ++---
+ .../webui/apps/form/WCreateFromPaymentUI.java |  4 +--
+ .../apps/form/WCreateFromStatementUI.java     |  4 +--
+ .../adempiere/webui/component/NumberBox.java  |  2 +-
+ .../webui/panel/AbstractADWindowPanel.java    | 18 +++++-----
+ .../webui/panel/InfoBPartnerPanel.java        | 15 +++++---
+ .../webui/panel/InfoProductPanel.java         | 15 +++++---
+ .../org/adempiere/webui/panel/LoginPanel.java | 30 +++++++++++-----
+ .../adempiere/webui/panel/WAttachment.java    | 36 +++++++++----------
+ .../adempiere/webui/window/ZkJRViewer.java    |  6 ++--
+ 10 files changed, 80 insertions(+), 58 deletions(-)
+
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WAllocation.java b/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WAllocation.java
+index 02d8d2e..62c07b6 100755
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WAllocation.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WAllocation.java
+@@ -54,10 +54,10 @@ import org.compiere.util.Msg;
+ import org.compiere.util.Trx;
+ import org.zkoss.zk.ui.event.Event;
+ import org.zkoss.zk.ui.event.EventListener;
+-import org.zkoss.zkex.zul.Borderlayout;
+-import org.zkoss.zkex.zul.Center;
+-import org.zkoss.zkex.zul.North;
+-import org.zkoss.zkex.zul.South;
++import org.zkoss.zul.Borderlayout;
++import org.zkoss.zul.Center;
++import org.zkoss.zul.North;
++import org.zkoss.zul.South;
+ import org.zkoss.zul.Separator;
+ import org.zkoss.zul.Space;
+ 
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WCreateFromPaymentUI.java b/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WCreateFromPaymentUI.java
+index 1e9a8c7..9f6e812 100644
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WCreateFromPaymentUI.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WCreateFromPaymentUI.java
+@@ -41,8 +41,8 @@ import org.compiere.util.Msg;
+ import org.zkoss.zk.ui.event.Event;
+ import org.zkoss.zk.ui.event.EventListener;
+ import org.zkoss.zk.ui.event.Events;
+-import org.zkoss.zkex.zul.Borderlayout;
+-import org.zkoss.zkex.zul.Center;
++import org.zkoss.zul.Borderlayout;
++import org.zkoss.zul.Center;
+ import org.zkoss.zul.Hbox;
+ 
+ /**
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WCreateFromStatementUI.java b/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WCreateFromStatementUI.java
+index fc41654..7f3389d 100755
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WCreateFromStatementUI.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/apps/form/WCreateFromStatementUI.java
+@@ -52,8 +52,8 @@ import org.compiere.util.Msg;
+ import org.zkoss.zk.ui.event.Event;
+ import org.zkoss.zk.ui.event.EventListener;
+ import org.zkoss.zk.ui.event.Events;
+-import org.zkoss.zkex.zul.Borderlayout;
+-import org.zkoss.zkex.zul.Center;
++import org.zkoss.zul.Borderlayout;
++import org.zkoss.zul.Center;
+ import org.zkoss.zul.Hbox;
+ 
+ public class WCreateFromStatementUI extends CreateFromStatement implements EventListener, SystemIDs
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/component/NumberBox.java b/zkwebui/WEB-INF/src/org/adempiere/webui/component/NumberBox.java
+index eb33e56..1dd72d3 100644
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/component/NumberBox.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/component/NumberBox.java
+@@ -147,7 +147,7 @@ public class NumberBox extends Div
+     public void setValue(Object value)
+     {
+     	if (value == null)
+-    		decimalBox.setValue(null);
++    		 decimalBox.setValue((BigDecimal) null);
+     	else if (value instanceof BigDecimal)
+     		decimalBox.setValue((BigDecimal) value);
+     	else if (value instanceof Number)
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/AbstractADWindowPanel.java b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/AbstractADWindowPanel.java
+index 4cfff3d..779d75f 100644
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/AbstractADWindowPanel.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/AbstractADWindowPanel.java
+@@ -1798,12 +1798,10 @@ public abstract class AbstractADWindowPanel extends AbstractUIPart implements To
+ 				AD_Process_ID,table_ID, record_ID, true);
+ 		if (dialog.isValid()) {
+ 			dialog.setPosition("center");
+-			try {
+-				dialog.setPage(this.getComponent().getPage());
+-				dialog.doModal();
+-			}
+-			catch (InterruptedException e) {
+-			}
++			
++			dialog.setPage(this.getComponent().getPage());
++			dialog.doModal();
++			
+ 		}
+ 	}
+ 
+@@ -2268,14 +2266,14 @@ public abstract class AbstractADWindowPanel extends AbstractUIPart implements To
+ 		m_uiLocked = true;
+ 
+ 		if (Executions.getCurrent() != null)
+-			Clients.showBusy(null, true);
++			Clients.showBusy(null);
+ 		else
+ 		{
+ 			try {
+ 				//get full control of desktop
+ 				Executions.activate(getComponent().getDesktop(), 500);
+ 				try {
+-					Clients.showBusy(null, true);
++					Clients.showBusy(null);
+                 } catch(Error ex){
+                 	throw ex;
+                 } finally{
+@@ -2307,7 +2305,7 @@ public abstract class AbstractADWindowPanel extends AbstractUIPart implements To
+ 			{
+ 				updateUI(pi);
+ 			}
+-			Clients.showBusy(null, false);
++			Clients.clearBusy();
+ 		}
+ 		else
+ 		{
+@@ -2319,7 +2317,7 @@ public abstract class AbstractADWindowPanel extends AbstractUIPart implements To
+ 					{
+ 						updateUI(pi);
+ 					}
+-                	Clients.showBusy(null, false);
++                	Clients.clearBusy();
+                 } catch(Error ex){
+                 	throw ex;
+                 } finally{
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/InfoBPartnerPanel.java b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/InfoBPartnerPanel.java
+index 0859f18..e4fd509 100644
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/InfoBPartnerPanel.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/InfoBPartnerPanel.java
+@@ -21,6 +21,7 @@ import java.math.BigDecimal;
+ import java.sql.PreparedStatement;
+ import java.sql.SQLException;
+ import java.util.ArrayList;
++import java.util.Comparator;
+ 
+ import org.adempiere.webui.apps.AEnv;
+ import org.adempiere.webui.component.Checkbox;
+@@ -42,10 +43,10 @@ import org.compiere.util.Msg;
+ import org.compiere.util.Util;
+ import org.zkoss.zk.ui.event.EventListener;
+ import org.zkoss.zk.ui.event.Events;
+-import org.zkoss.zkex.zul.Borderlayout;
+-import org.zkoss.zkex.zul.Center;
+-import org.zkoss.zkex.zul.North;
+-import org.zkoss.zkex.zul.South;
++import org.zkoss.zul.Borderlayout;
++import org.zkoss.zul.Center;
++import org.zkoss.zul.North;
++import org.zkoss.zul.South;
+ import org.zkoss.zul.Div;
+ import org.zkoss.zul.Separator;
+ import org.zkoss.zul.Vbox;
+@@ -572,5 +573,11 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
+     {
+         
+     }
++
++	@Override
++	public String getSortDirection(Comparator cmpr) {
++		// TODO Auto-generated method stub
++		return "natural";
++	}
+ 	
+ }
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/InfoProductPanel.java b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/InfoProductPanel.java
+index e8f7758..2b7e02d 100755
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/InfoProductPanel.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/InfoProductPanel.java
+@@ -39,6 +39,7 @@ import java.sql.ResultSet;
+ import java.sql.SQLException;
+ import java.sql.Timestamp;
+ import java.util.ArrayList;
++import java.util.Comparator;
+ import java.util.Vector;
+ import java.util.logging.Level;
+ 
+@@ -77,10 +78,10 @@ import org.zkoss.zk.ui.Component;
+ import org.zkoss.zk.ui.event.Event;
+ import org.zkoss.zk.ui.event.EventListener;
+ import org.zkoss.zk.ui.event.Events;
+-import org.zkoss.zkex.zul.Borderlayout;
+-import org.zkoss.zkex.zul.Center;
+-import org.zkoss.zkex.zul.North;
+-import org.zkoss.zkex.zul.South;
++import org.zkoss.zul.Borderlayout;
++import org.zkoss.zul.Center;
++import org.zkoss.zul.North;
++import org.zkoss.zul.South;
+ 
+ /**
+  * Search Product and return selection
+@@ -1451,5 +1452,11 @@ public class InfoProductPanel extends InfoPanel implements EventListener
+ 
+ 		return M_AttributeSet_ID;
+ 	}
++
++	@Override
++	public String getSortDirection(Comparator cmpr) {
++		// TODO Auto-generated method stub
++		return "natural";
++	}
+     
+ }	//	InfoProduct
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/LoginPanel.java b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/LoginPanel.java
+index ffb1abc..ad79934 100755
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/LoginPanel.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/LoginPanel.java
+@@ -94,6 +94,8 @@ import ar.com.ergio.model.MLARRetiroCaja;
+  */
+ public class LoginPanel extends Window implements EventListener
+ {
++	
++	private static final String ON_LOAD_TOKEN = "onLoadToken";
+ 	/**
+ 	 *
+ 	 */
+@@ -120,10 +122,11 @@ public class LoginPanel extends Window implements EventListener
+         init();
+         this.setId("loginPanel");
+ 
+-        AuFocus auf = new AuFocus(txtUserId);
+-        Clients.response(auf);
+-
+-        BrowserToken.load(this.getUuid());
++        txtUserId.setEnabled(false);
++        txtPassword.setEnabled(false);
++        lstLanguage.setEnabled(false);
++        Events.echoEvent(ON_LOAD_TOKEN, this, null);
++        this.addEventListener(ON_LOAD_TOKEN, this);          
+ 
+         // @fchiappano Agegar las implementaciones de ventanas del tipo
+         // CreateFrom, en el mapeo de tablas de ZK.
+@@ -221,7 +224,7 @@ public class LoginPanel extends Window implements EventListener
+         div.appendChild(pnlButtons);
+         this.appendChild(div);
+ 
+-        this.addEventListener(TokenEvent.ON_USER_TOKEN, new EventListener() {
++        txtUserId.addEventListener(TokenEvent.ON_USER_TOKEN, new EventListener() {
+ 
+ 			@Override
+ 			public void onEvent(Event event) throws Exception {
+@@ -336,7 +339,7 @@ public class LoginPanel extends Window implements EventListener
+         {
+             validateLogin();
+         }
+-        if (event.getName().equals(Events.ON_SELECT))
++        else if (event.getName().equals(Events.ON_SELECT))
+         {
+             if(eventComp.getId().equals(lstLanguage.getId())) {
+             	String langName = (String) lstLanguage.getSelectedItem().getLabel();
+@@ -344,13 +347,24 @@ public class LoginPanel extends Window implements EventListener
+             }
+         }
+         // Elaine 2009/02/06 - initial language
+-        if (event.getName().equals(Events.ON_CHANGE))
++        else if (event.getName().equals(Events.ON_CHANGE))
+         {
+         	if(eventComp.getId().equals(txtUserId.getId()))
+         	{
+         		onUserIdChange();
+         	}
+         }
++        else if (event.getName().equals(ON_LOAD_TOKEN)) 
++        {
++        	BrowserToken.load(txtUserId);
++        	
++        	txtUserId.setEnabled(true);
++            txtPassword.setEnabled(true);
++            lstLanguage.setEnabled(true);
++            
++        	AuFocus auf = new AuFocus(txtUserId);
++            Clients.response(auf);
++        }
+         //
+     }
+ 
+@@ -447,7 +461,7 @@ public class LoginPanel extends Window implements EventListener
+ 
+             Locales.setThreadLocal(language.getLocale());
+ 
+-            Clients.response("zkLocaleJavaScript", new AuScript(null, ZkFns.outLocaleJavaScript()));
++           // Clients.response("zkLocaleJavaScript", new AuScript(null, ZkFns.outLocaleJavaScript()));
+             String timeoutText = getUpdateTimeoutTextScript();
+             if (!Strings.isEmpty(timeoutText))
+             	Clients.response("zkLocaleJavaScript2", new AuScript(null, timeoutText));
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/WAttachment.java b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/WAttachment.java
+index 755969d..0f241a6 100755
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/panel/WAttachment.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/panel/WAttachment.java
+@@ -38,17 +38,17 @@ import org.compiere.util.Msg;
+ import org.compiere.util.ValueNamePair;
+ import org.zkoss.util.media.AMedia;
+ import org.zkoss.util.media.Media;
+-import org.zkoss.zk.au.AuScript;
++import org.zkoss.zk.au.out.AuScript;
+ import org.zkoss.zk.au.out.AuEcho;
+ import org.zkoss.zk.ui.Executions;
+ import org.zkoss.zk.ui.event.Event;
+ import org.zkoss.zk.ui.event.EventListener;
+ import org.zkoss.zk.ui.event.Events;
+ import org.zkoss.zk.ui.util.Clients;
+-import org.zkoss.zkex.zul.Borderlayout;
+-import org.zkoss.zkex.zul.Center;
+-import org.zkoss.zkex.zul.North;
+-import org.zkoss.zkex.zul.South;
++import org.zkoss.zul.Borderlayout;
++import org.zkoss.zul.Center;
++import org.zkoss.zul.North;
++import org.zkoss.zul.South;
+ import org.zkoss.zul.Div;
+ import org.zkoss.zul.Filedownload;
+ import org.zkoss.zul.Fileupload;
+@@ -535,26 +535,22 @@ public class WAttachment extends Window implements EventListener
+ 		
+ 		Media media = null;
+ 		
+-		try 
++		
++		media = Fileupload.get(true); 
++		
++		if (media != null)
+ 		{
+-			media = Fileupload.get(true); 
+-			
+-			if (media != null)
+-			{
+ //				pdfViewer.setContent(media);
+-				;
+-			}
+-			else 
+-			{
+-				preview.setVisible(true);
+-				preview.invalidate();
+-				return;
+-			}
++			;
+ 		}
+-		catch (InterruptedException e) 
++		else 
+ 		{
+-			log.log(Level.WARNING, e.getLocalizedMessage(), e);
++			preview.setVisible(true);
++			preview.invalidate();
++			return;
+ 		}
++		
++		
+ 	
+ 		String fileName = media.getName(); 
+ 		log.config(fileName);
+diff --git a/zkwebui/WEB-INF/src/org/adempiere/webui/window/ZkJRViewer.java b/zkwebui/WEB-INF/src/org/adempiere/webui/window/ZkJRViewer.java
+index a7a5731..cd19dda 100755
+--- a/zkwebui/WEB-INF/src/org/adempiere/webui/window/ZkJRViewer.java
++++ b/zkwebui/WEB-INF/src/org/adempiere/webui/window/ZkJRViewer.java
+@@ -34,9 +34,9 @@ import org.zkoss.zk.ui.Executions;
+ import org.zkoss.zk.ui.event.Event;
+ import org.zkoss.zk.ui.event.EventListener;
+ import org.zkoss.zk.ui.event.Events;
+-import org.zkoss.zkex.zul.Borderlayout;
+-import org.zkoss.zkex.zul.Center;
+-import org.zkoss.zkex.zul.North;
++import org.zkoss.zul.Borderlayout;
++import org.zkoss.zul.Center;
++import org.zkoss.zul.North;
+ import org.zkoss.zul.Iframe;
+ import org.zkoss.zul.Listitem;
+ import org.zkoss.zul.Tab;
+-- 
+2.44.0
+

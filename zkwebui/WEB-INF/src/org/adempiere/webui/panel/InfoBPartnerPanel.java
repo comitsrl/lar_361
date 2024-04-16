@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Checkbox;
@@ -201,13 +200,13 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 	
 	private void init()
 	{
-		fieldCUIT.setWidth("100%");
-		fieldContact.setWidth("100%");
-		fieldPhone.setWidth("100%");
+		fieldCUIT.setHflex("1");
+		fieldContact.setHflex("1");    
+		fieldPhone.setHflex("1");
 		
-		fieldName.setWidth("100%");
-		fieldEMail.setWidth("100%");
-		fieldPostal.setWidth("100%");
+		fieldName.setHflex("1");
+		fieldEMail.setHflex("1");
+		fieldPostal.setHflex("1");
 		
 		Grid grid = GridFactory.newGridLayout();
 		
@@ -249,7 +248,6 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 
         Center center = new Center();
 		layout.appendChild(center);
-		center.setFlex(true);
 		Div div = new Div();
 		div.appendChild(contentPanel);
 		if (isLookup())
@@ -259,14 +257,16 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
         contentPanel.setVflex(true);
 		div.setStyle("width :100%; height: 100%");
 		center.appendChild(div);
+		div.setVflex("1");
+		div.setHflex("1");
 
 		South south = new South();
 		layout.appendChild(south);
 		southBody = new Vbox();
-		southBody.setWidth("100%");
+		southBody.setWidth("1");
 		south.appendChild(southBody);
-		southBody.appendChild(confirmPanel);
 		southBody.appendChild(new Separator());
+		southBody.appendChild(confirmPanel);
 		southBody.appendChild(statusBar);
         		
 	}	
@@ -573,11 +573,4 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
     {
         
     }
-
-	@Override
-	public String getSortDirection(Comparator cmpr) {
-		// TODO Auto-generated method stub
-		return "natural";
-	}
-	
 }

@@ -150,7 +150,6 @@ public class WBPartner extends Window implements EventListener, ValueChangeListe
 		this.setBorder("normal");
 		this.setClosable(true);
 		this.setTitle("Socio del Negocio");
-		this.setAttribute("mode", "modal");
 		this.appendChild(centerPanel);
 		this.appendChild(confirmPanel);
 		
