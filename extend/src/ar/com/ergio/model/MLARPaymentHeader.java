@@ -100,6 +100,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     final static private int regionRioNegroID = 224;
     // @fchiappano Cargo diferencia de cambio compras.
     final static private int cargoDifCambioCompras = 1000191;
+    // @mzuniga Remuneraciones Principales
+    final static private int remuneracionPrincipal_ID = 4000000;
 
     /**
      * Recupera la cabecera de pagos relacionada con el id de la factura dada
@@ -1057,6 +1059,48 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             }
         }
 
+        // Documentos RRHH
+        // Si Validan adelantos revisar saldo disponible
+        MDocType docType = new MDocType(getCtx(), this.getC_DocType_ID(), get_TrxName());
+        if (docType.get_ValueAsBoolean("EsDocumentoRRHH") && (docType.get_ValueAsBoolean("ValidaAdelantosSueldo")))
+        {
+            BigDecimal sumPagos = Env.ZERO;
+            for (int p = 0; p < pays.length; p++)
+                    sumPagos = sumPagos.add(pays[p].getPayAmt());
+
+            final MBPartner bp = new MBPartner(getCtx(), getC_BPartner_ID(), get_TrxName());
+
+            // Recuperar importe Sueldo
+            BigDecimal sueldo = recuperarSueldo(bp);
+
+            // Sumar pagos realizados en el período Actual
+            BigDecimal adelantos = sumaAdelantos(bp);
+
+            // Si hay error al recuperar el importe pagado
+            if (adelantos.compareTo(Env.ZERO) < 0)
+            {
+                m_processMsg = "No se pudo recuperar el importe de adelantos acumualdos en el periodo actual.";
+                return DocAction.STATUS_Invalid;
+            }
+
+            // Si el importe a pagar supera el disponible
+            BigDecimal disponible = sueldo.subtract(adelantos);
+            if (disponible.compareTo(Env.ZERO) < 0 )
+            {
+                m_processMsg = "El empleado no tiene importe disponible para adelantos.";
+                return DocAction.STATUS_Invalid;
+            }
+
+            BigDecimal saldo = disponible.subtract(sumPagos);
+            // Si se supera el diponible,devolver error con el disponible y estado inválido
+            if (saldo.compareTo(Env.ZERO) < 0 )
+            {
+                m_processMsg = "El importe supera el disponible para adelantos. Importe Disponible: " + disponible;
+                return DocAction.STATUS_Invalid;
+            }
+        } // Documentos RRHH
+
+
         // Recibos: Validar que la suma de los Pagos Retención sea >=
         // que la suma del importe abierto (impago) de las facturas
         // @begin
@@ -1106,6 +1150,98 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             setDocAction(DOCACTION_Complete);
         return DocAction.STATUS_InProgress;
     }
+
+    /**
+    * Obtener RemuneracionActual Empleado
+    *
+    * @param BPartner
+    * @return Sueldo actual del empleado
+    */
+    private BigDecimal recuperarSueldo(MBPartner bp)
+    {
+        BigDecimal sueldo =  Env.ZERO;
+
+        String sql = "SELECT COALESCE(GrossRAmt, 0) AS GrossRAmt"
+                   + " FROM C_UserRemuneration"
+                   + " WHERE IsActive = 'Y'"
+                   + " AND ValidFrom <= ?"
+                   + " AND C_Remuneration_ID =?"
+                   + " AND AD_User_ID = (SELECT AD_User_ID FROM AD_User WHERE C_BPartner_ID =?)"
+                   + " ORDER BY ValidFrom DESC"
+                   + " FETCH FIRST 1 ROW ONLY";
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try
+        {
+            pstmt = DB.prepareStatement(sql, get_TrxName());
+            pstmt.setTimestamp(1, getDateTrx());
+            pstmt.setInt(2, remuneracionPrincipal_ID);
+            pstmt.setInt(3, bp.getC_BPartner_ID());
+            rs = pstmt.executeQuery();
+
+            if (rs.next())
+                sueldo = rs.getBigDecimal("GrossRAmt");
+            return sueldo;
+        } catch (Exception e)
+        {
+            log.log(Level.SEVERE, sql, e);
+            return null;
+        } finally
+        {
+            DB.close(rs, pstmt);
+            rs = null;
+            pstmt = null;
+        }
+    } // recuperarSueldo
+
+    /**
+     * Calcula el importe de adelantos acumulados
+     * para el empleado en el mes corriente
+     *
+     * @param bp
+     *        Empleado.
+     * @return Importe pagado acumulado
+     *         -1 si hay error
+     */
+    public BigDecimal sumaAdelantos(MBPartner bp)
+{
+    BigDecimal impPagado = Env.ZERO;
+    try
+    {
+        String sqlMNS = "SELECT COALESCE(SUM(COALESCE(PayHeaderTotalAmt, 0)), 0) AS pagado "
+                      + "FROM LAR_PaymentHeader "
+                      + "WHERE C_BPartner_ID = ? "
+                      + "AND DocStatus IN ('CO', 'CL') "
+                      + "AND date_part('month', DateTrx) = date_part('month', ?::timestamp)"
+                      + "AND date_part('year', DateTrx) = date_part('year', ?::timestamp)";
+        PreparedStatement pstmtMNS = DB.prepareStatement(sqlMNS, get_TrxName());
+
+        pstmtMNS.setInt(1, bp.getC_BPartner_ID());
+        pstmtMNS.setTimestamp(2, getDateTrx());
+        pstmtMNS.setTimestamp(3, getDateTrx());
+
+        ResultSet rsMNS = pstmtMNS.executeQuery();
+        if (rsMNS.next())
+        {
+            impPagado = rsMNS.getBigDecimal("pagado");
+        } else
+        {
+            log.warning("No es posible recuperar los pagos realizados en el mes corriente para el empleado: "
+                    + bp.getName());
+            rsMNS.close();
+            pstmtMNS.close();
+            return new BigDecimal (-1);
+        }
+        rsMNS.close();
+        pstmtMNS.close();
+    } catch (SQLException e)
+    {
+        log.log(Level.SEVERE, "", e);
+        return new BigDecimal (-1);
+    }
+    return impPagado;
+} // sumaAdelantos
 
     @Override
     public boolean approveIt()
