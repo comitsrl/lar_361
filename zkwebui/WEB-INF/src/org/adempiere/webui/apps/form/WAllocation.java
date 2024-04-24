@@ -72,7 +72,7 @@ import ar.com.ergio.util.LAR_Utils;
  * Contributor : Fabian Aguilar - OFBConsulting - Multiallocation
  */
 public class WAllocation extends Allocation
-	implements IFormController, EventListener, WTableModelListener, ValueChangeListener, SystemIDs
+	implements IFormController, EventListener<Event>, WTableModelListener, ValueChangeListener, SystemIDs
 {
 	
 	/**

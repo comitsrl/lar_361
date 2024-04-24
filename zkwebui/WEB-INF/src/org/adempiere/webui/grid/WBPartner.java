@@ -65,7 +65,7 @@ import ar.com.ergio.util.LAR_Utils;
  *
  */
 
-public class WBPartner extends Window implements EventListener, ValueChangeListener
+public class WBPartner extends Window implements EventListener<Event>, ValueChangeListener
 {
 	/**
 	 * 
