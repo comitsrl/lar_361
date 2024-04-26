@@ -41,8 +41,8 @@ import org.compiere.util.Msg;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zkex.zul.Borderlayout;
-import org.zkoss.zkex.zul.Center;
+import org.zkoss.zul.Borderlayout;
+import org.zkoss.zul.Center;
 import org.zkoss.zul.Hbox;
 
 /**
@@ -55,7 +55,7 @@ import org.zkoss.zul.Hbox;
  *           clase LoginPanel, para evitar problemas de dependencias en la
  *           generación del zkcustomization.jar.
  */
-public class WCreateFromPaymentUI extends CreateFromPayment implements EventListener, SystemIDs
+public class WCreateFromPaymentUI extends CreateFromPayment implements EventListener<Event>, SystemIDs
 {
     private static final long serialVersionUID = 1L;
 
@@ -257,5 +257,10 @@ public class WCreateFromPaymentUI extends CreateFromPayment implements EventList
     {
         window.dispose();
     } // closeWindow
+
+	@Override
+	public Object getWindow() {
+		return window;
+	}
 
 } // WCreateFromPayment

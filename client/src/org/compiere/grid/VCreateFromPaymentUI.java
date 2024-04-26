@@ -336,4 +336,9 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
     {
         dialog.dispose();
     }
+
+	@Override
+	public Object getWindow() {		
+		return dialog;
+	}
 } // VCreateFromPaymentUI

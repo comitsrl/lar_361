@@ -36,9 +36,13 @@ import java.util.logging.Level;
 
 import javax.servlet.ServletRequest;
 
+import org.adempiere.webui.AdempiereWebUI;
 import org.adempiere.webui.component.Window;
+import org.adempiere.webui.desktop.IDesktop;
 import org.adempiere.webui.session.SessionManager;
 import org.adempiere.webui.theme.ThemeManager;
+import org.adempiere.webui.util.IServerPushCallback;
+import org.adempiere.webui.util.ServerPushTemplate;
 import org.compiere.acct.Doc;
 import org.compiere.model.GridWindowVO;
 import org.compiere.model.Lookup;
@@ -56,6 +60,7 @@ import org.compiere.util.Ini;
 import org.compiere.util.Language;
 import org.zkoss.web.servlet.Servlets;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 
@@ -87,15 +92,6 @@ public final class AEnv
 	{
 		SessionManager.getAppDesktop().showWindow(window, "center");
 	}   //  showCenterScreen
-
-	/**
-	 *	Position window in center of the screen
-	 * 	@param window Window to position
-	 */
-	public static void positionCenterScreen(Window window)
-	{
-		showCenterScreen(window);
-	}	//	positionCenterScreen
 
 	/**
 	 *  Show in the center of the screen.
@@ -741,5 +737,53 @@ public final class AEnv
 		if (header.length() == 0)
 			header = ThemeManager.getBrowserTitle();
 		return header;
+	}
+	
+	/**
+	 * Execute synchronous task in UI thread.
+	 * @param runnable
+	 */
+	public static void executeDesktopTask(final Runnable runnable) {
+		Desktop desktop = getDesktop();
+		ServerPushTemplate template = new ServerPushTemplate(desktop);
+		template.execute(new IServerPushCallback() {
+			@Override
+			public void updateUI() {
+				runnable.run();
+			}
+		});
+	}
+	
+	/**
+	 * Execute asynchronous task in UI thread.
+	 * @param runnable
+	 */
+	public static void executeAsyncDesktopTask(final Runnable runnable) {
+		Desktop desktop = getDesktop();
+		ServerPushTemplate template = new ServerPushTemplate(desktop);
+		template.executeAsync(new IServerPushCallback() {
+			@Override
+			public void updateUI() {
+				runnable.run();
+			}
+		});
+	}
+	
+	/**
+	 * Get current desktop
+	* @return Desktop
+	*/
+	public static Desktop getDesktop() {
+		boolean inUIThread = Executions.getCurrent() != null;
+		return inUIThread ? Executions.getCurrent().getDesktop()
+				: (Desktop) Env.getCtx().get(AdempiereWebUI.ZK_DESKTOP_SESSION_KEY);
+	}
+	
+	/**
+	 * @return true if running on a tablet
+	 */
+	public static boolean isTablet() {
+		IDesktop appDesktop = SessionManager.getAppDesktop();
+		return appDesktop != null ? appDesktop.getClientInfo().tablet : false;
 	}
 }	//	AEnv

@@ -40,12 +40,13 @@ import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zkex.zul.Borderlayout;
-import org.zkoss.zkex.zul.Center;
-import org.zkoss.zkex.zul.North;
-import org.zkoss.zkex.zul.South;
+import org.zkoss.zul.Borderlayout;
+import org.zkoss.zul.Center;
+import org.zkoss.zul.North;
+import org.zkoss.zul.South;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Separator;
 import org.zkoss.zul.Vbox;
@@ -61,7 +62,7 @@ import org.zkoss.zul.Vbox;
 */
 
 
-public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTableModelListener
+public class InfoBPartnerPanel extends InfoPanel implements EventListener<Event>, WTableModelListener
 {
 	/**
 	 * 
@@ -200,13 +201,13 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 	
 	private void init()
 	{
-		fieldCUIT.setWidth("100%");
-		fieldContact.setWidth("100%");
-		fieldPhone.setWidth("100%");
+		fieldCUIT.setHflex("1");
+		fieldContact.setHflex("1");    
+		fieldPhone.setHflex("1");
 		
-		fieldName.setWidth("100%");
-		fieldEMail.setWidth("100%");
-		fieldPostal.setWidth("100%");
+		fieldName.setHflex("1");
+		fieldEMail.setHflex("1");
+		fieldPostal.setHflex("1");
 		
 		Grid grid = GridFactory.newGridLayout();
 		
@@ -248,7 +249,6 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
 
         Center center = new Center();
 		layout.appendChild(center);
-		center.setFlex(true);
 		Div div = new Div();
 		div.appendChild(contentPanel);
 		if (isLookup())
@@ -258,14 +258,16 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
         contentPanel.setVflex(true);
 		div.setStyle("width :100%; height: 100%");
 		center.appendChild(div);
+		div.setVflex("1");
+		div.setHflex("1");
 
 		South south = new South();
 		layout.appendChild(south);
 		southBody = new Vbox();
-		southBody.setWidth("100%");
+		southBody.setWidth("1");
 		south.appendChild(southBody);
-		southBody.appendChild(confirmPanel);
 		southBody.appendChild(new Separator());
+		southBody.appendChild(confirmPanel);
 		southBody.appendChild(statusBar);
         		
 	}	
@@ -572,5 +574,4 @@ public class InfoBPartnerPanel extends InfoPanel implements EventListener, WTabl
     {
         
     }
-	
 }

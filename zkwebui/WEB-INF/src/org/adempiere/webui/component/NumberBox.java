@@ -103,7 +103,8 @@ public class NumberBox extends Div
 		decimalBox = new Decimalbox();
 		// @fchiappano Acción que reemplaza automaticamente el punto por la coma decimal.
 		// (función en archivo comitsrl.js del módulo zkwebui)
-		decimalBox.setAction("onkeypress:reemplazarPuntoPorComa(event)");
+		// santi - comentamos porque falla luego de actualizar zk 6.5.4
+		//decimalBox.setAction("onkeypress:reemplazarPuntoPorComa(event)");
     	if (integral)
     		decimalBox.setScale(0);
         // @fchiappano estilo alineado a la derecha.
@@ -126,9 +127,7 @@ public class NumberBox extends Div
         btn.setStyle("text-align: center;");
         appendChild(popup);
      
-        String style = AEnv.isFirefox2() ? "display: inline" : "display: inline-block"; 
-        style = style + ";white-space:nowrap";
-        this.setStyle(style);	     
+        LayoutUtils.addSclass(".number-box", this);   
     }
     
     /**
@@ -147,7 +146,7 @@ public class NumberBox extends Div
     public void setValue(Object value)
     {
     	if (value == null)
-    		decimalBox.setValue(null);
+    		 decimalBox.setValue((BigDecimal) null);
     	else if (value instanceof BigDecimal)
     		decimalBox.setValue((BigDecimal) value);
     	else if (value instanceof Number)
@@ -215,7 +214,7 @@ public class NumberBox extends Div
         String separator = Character.toString(separatorChar);
 
         txtCalc = new Textbox();
-        txtCalc.setAction("onKeyPress : return calc.validate('" + 
+        txtCalc.setWidgetListener("onKeyPress", "return calc.validate('" + 
         		decimalBox.getId() + "','" + txtCalc.getId() 
                 + "'," + integral + "," + (int)separatorChar + ", event);");
         txtCalc.setMaxlength(250);
@@ -229,27 +228,27 @@ public class NumberBox extends Div
         Button btnAC = new Button();
         btnAC.setWidth("40px");
         btnAC.setLabel("AC");
-        btnAC.setAction("onClick : calc.clearAll('" + txtCalcId + "')");
+        btnAC.setWidgetListener("onClick", "calc.clearAll('" + txtCalcId + "')");
 
         Button btn7 = new Button();
         btn7.setWidth("30px");
         btn7.setLabel("7");
-        btn7.setAction("onClick : calc.append('" + txtCalcId + "', '7')");
+        btn7.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '7')");
 
         Button btn8 = new Button();
         btn8.setWidth("30px");
         btn8.setLabel("8");
-        btn8.setAction("onClick : calc.append('" + txtCalcId + "', '8')");
+        btn8.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '8')");
 
         Button btn9 = new Button();
         btn9.setWidth("30px");
         btn9.setLabel("9");
-        btn9.setAction("onClick : calc.append('" + txtCalcId + "', '9')");
+        btn9.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '9')");
 
         Button btnMultiply = new Button();
         btnMultiply.setWidth("30px");
         btnMultiply.setLabel("*");
-        btnMultiply.setAction("onClick : calc.append('" + txtCalcId + "', ' * ')");
+        btnMultiply.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', ' * ')");
 
         row1.appendChild(btnAC);
         row1.appendChild(btn7);
@@ -262,27 +261,27 @@ public class NumberBox extends Div
         Button btnC = new Button();
         btnC.setWidth("40px");
         btnC.setLabel("C");
-        btnC.setAction("onClick : calc.clear('" + txtCalcId + "')");
+        btnC.setWidgetListener("onClick", "calc.clear('" + txtCalcId + "')");
         
         Button btn4 = new Button();
         btn4.setWidth("30px");
         btn4.setLabel("4");
-        btn4.setAction("onClick : calc.append('" + txtCalcId + "', '4')");
+        btn4.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '4')");
 
         Button btn5 = new Button();
         btn5.setWidth("30px");
         btn5.setLabel("5");
-        btn5.setAction("onClick : calc.append('" + txtCalcId + "', '5')");
+        btn5.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '5')");
 
         Button btn6 = new Button();
         btn6.setWidth("30px");
         btn6.setLabel("6");
-        btn6.setAction("onClick : calc.append('" + txtCalcId + "', '6')");
+        btn6.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '6')");
         
         Button btnDivide = new Button();
         btnDivide.setWidth("30px");
         btnDivide.setLabel("/");
-        btnDivide.setAction("onClick : calc.append('" + txtCalcId + "', ' / ')");
+        btnDivide.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', ' / ')");
 
         row2.appendChild(btnC);
         row2.appendChild(btn4);
@@ -295,27 +294,27 @@ public class NumberBox extends Div
         Button btnModulo = new Button();
         btnModulo.setWidth("40px");
         btnModulo.setLabel("%");
-        btnModulo.setAction("onClick : calc.percentage('" + decimalBox.getId() + "','" + txtCalcId + "','" + separator + "')");
+        btnModulo.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', ' % ')");
 
         Button btn1 = new Button();
         btn1.setWidth("30px");
         btn1.setLabel("1");
-        btn1.setAction("onClick : calc.append('" + txtCalcId + "', '1')");
+        btn1.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '1')");
 
         Button btn2 = new Button();
         btn2.setWidth("30px");
         btn2.setLabel("2");
-        btn2.setAction("onClick : calc.append('" + txtCalcId + "', '2')");
+        btn2.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '2')");
 
         Button btn3 = new Button();
         btn3.setWidth("30px");
         btn3.setLabel("3");
-        btn3.setAction("onClick : calc.append('" + txtCalcId + "', '3')");
+        btn3.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '3')");
 
         Button btnSubstract = new Button();
         btnSubstract.setWidth("30px");
         btnSubstract.setLabel("-");
-        btnSubstract.setAction("onClick : calc.append('" + txtCalcId + "', ' - ')");
+        btnSubstract.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', ' - ')");
 
         row3.appendChild(btnModulo);
         row3.appendChild(btn1);
@@ -333,24 +332,24 @@ public class NumberBox extends Div
         Button btn0 = new Button();
         btn0.setWidth("30px");
         btn0.setLabel("0");
-        btn0.setAction("onClick : calc.append('" + txtCalcId + "', '0')");
+        btn0.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '0')");
 
         Button btnDot = new Button();
         btnDot.setWidth("30px");
         btnDot.setLabel(separator);
         btnDot.setDisabled(integral);
-        btnDot.setAction("onClick : calc.append('" + txtCalcId + "', '" + separator + "')");
+        btnDot.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', '" + separator + "')");
 
         Button btnEqual = new Button();
         btnEqual.setWidth("30px");
         btnEqual.setLabel("=");
-        btnEqual.setAction("onClick : calc.evaluate('" + decimalBox.getId() + "','" 
+        btnEqual.setWidgetListener("onClick", "calc.evaluate('" + decimalBox.getId() + "','"
                 + txtCalcId + "','" + separator + "')");
         
         Button btnAdd = new Button();
         btnAdd.setWidth("30px");
         btnAdd.setLabel("+");
-        btnAdd.setAction("onClick : calc.append('" + txtCalcId + "', ' + ')");
+        btnAdd.setWidgetListener("onClick", "calc.append('" + txtCalcId + "', ' + ')");
 
         row4.appendChild(btnCurrency);
         row4.appendChild(btnDot);
@@ -421,7 +420,7 @@ public class NumberBox extends Div
     }
 
 	@Override
-	public boolean addEventListener(String evtnm, EventListener listener)
+	public boolean addEventListener(String evtnm, EventListener<?> listener)
 	{
 	     if(Events.ON_CLICK.equals(evtnm))
 	     {

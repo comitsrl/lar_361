@@ -54,10 +54,10 @@ import org.compiere.util.Msg;
 import org.compiere.util.Trx;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zkex.zul.Borderlayout;
-import org.zkoss.zkex.zul.Center;
-import org.zkoss.zkex.zul.North;
-import org.zkoss.zkex.zul.South;
+import org.zkoss.zul.Borderlayout;
+import org.zkoss.zul.Center;
+import org.zkoss.zul.North;
+import org.zkoss.zul.South;
 import org.zkoss.zul.Separator;
 import org.zkoss.zul.Space;
 
@@ -72,7 +72,7 @@ import ar.com.ergio.util.LAR_Utils;
  * Contributor : Fabian Aguilar - OFBConsulting - Multiallocation
  */
 public class WAllocation extends Allocation
-	implements IFormController, EventListener, WTableModelListener, ValueChangeListener, SystemIDs
+	implements IFormController, EventListener<Event>, WTableModelListener, ValueChangeListener, SystemIDs
 {
 	
 	/**
@@ -269,9 +269,10 @@ public class WAllocation extends Allocation
 		center.setStyle("border: none");
 		//
 		center = new Center();
-		center.setFlex(true);
 		mainLayout.appendChild(center);
 		center.appendChild(infoPanel);
+		infoPanel.setHflex("1");
+		infoPanel.setVflex("1");
 		
 		infoPanel.setStyle("border: none");
 		infoPanel.setWidth("100%");
@@ -285,9 +286,10 @@ public class WAllocation extends Allocation
 		north.setSplittable(true);
 		center = new Center();
 		center.setStyle("border: none");
-		center.setFlex(true);
 		infoPanel.appendChild(center);
 		center.appendChild(invoicePanel);
+		invoicePanel.setHflex("1");
+		invoicePanel.setVflex("1");
 	}   //  jbInit
 
 	/**

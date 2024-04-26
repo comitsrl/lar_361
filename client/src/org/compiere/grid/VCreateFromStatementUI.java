@@ -409,4 +409,9 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
 	{
 		dialog.dispose();
 	}
+
+	@Override
+	public Object getWindow() {
+		return dialog;
+	}
 }
