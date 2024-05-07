@@ -1209,12 +1209,16 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     BigDecimal impPagado = Env.ZERO;
     try
     {
-        String sqlMNS = "SELECT COALESCE(SUM(COALESCE(PayHeaderTotalAmt, 0)), 0) AS pagado "
-                      + "FROM LAR_PaymentHeader "
-                      + "WHERE C_BPartner_ID = ? "
-                      + "AND DocStatus IN ('CO', 'CL') "
-                      + "AND date_part('month', DateTrx) = date_part('month', ?::timestamp)"
-                      + "AND date_part('year', DateTrx) = date_part('year', ?::timestamp)";
+        String sqlMNS = "SELECT COALESCE(SUM(COALESCE(PayHeaderTotalAmt, 0)), 0) AS pagado " + "FROM LAR_PaymentHeader "
+                + "WHERE C_BPartner_ID = ? " + "AND DocStatus IN ('CO', 'CL') "
+                + "AND date_part('month', DateTrx) = date_part('month', ?::timestamp) "
+                + "AND date_part('year', DateTrx) = date_part('year', ?::timestamp) "
+                + "AND C_DocType_ID IN "
+                +    "(SELECT C_DocType_ID FROM C_DocType "
+                +    "WHERE EsDocumentoRRHH='Y' AND AD_Org_ID IN "
+                +        "(SELECT o.AD_Org_ID FROM AD_OrgInfo oi "
+                +        "JOIN AD_ORG o ON o.AD_Org_ID = oi.AD_Org_ID "
+                +        "WHERE o.AD_Client_ID=1000000 AND oi.IsMiles='N' AND o.IsSummary='N'))";
         PreparedStatement pstmtMNS = DB.prepareStatement(sqlMNS, get_TrxName());
 
         pstmtMNS.setInt(1, bp.getC_BPartner_ID());
