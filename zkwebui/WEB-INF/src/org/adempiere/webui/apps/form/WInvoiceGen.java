@@ -46,7 +46,7 @@ import org.zkoss.zul.Space;
  * Generate Invoice (manual) view class
  * 
  */
-public class WInvoiceGen extends InvoiceGen implements IFormController, EventListener<Event>, ValueChangeListener
+public class WInvoiceGen extends InvoiceGen implements IFormController, EventListener, ValueChangeListener
 {
 	private WGenForm form;
 	

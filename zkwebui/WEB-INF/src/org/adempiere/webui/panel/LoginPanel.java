@@ -23,7 +23,6 @@
 
 package org.adempiere.webui.panel;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -63,7 +62,6 @@ import org.compiere.util.Login;
 import org.compiere.util.Msg;
 import org.zkoss.lang.Strings;
 import org.zkoss.util.Locales;
-import org.zkoss.web.Attributes;
 import org.zkoss.zhtml.Div;
 import org.zkoss.zhtml.Table;
 import org.zkoss.zhtml.Td;
@@ -96,8 +94,6 @@ import ar.com.ergio.model.MLARRetiroCaja;
  */
 public class LoginPanel extends Window implements EventListener
 {
-	
-	private static final String ON_LOAD_TOKEN = "onLoadToken";
 	/**
 	 *
 	 */
@@ -124,11 +120,10 @@ public class LoginPanel extends Window implements EventListener
         init();
         this.setId("loginPanel");
 
-        txtUserId.setEnabled(false);
-        txtPassword.setEnabled(false);
-        lstLanguage.setEnabled(false);
-        Events.echoEvent(ON_LOAD_TOKEN, this, null);
-        this.addEventListener(ON_LOAD_TOKEN, this);          
+        AuFocus auf = new AuFocus(txtUserId);
+        Clients.response(auf);
+
+        BrowserToken.load(this.getUuid());
 
         // @fchiappano Agegar las implementaciones de ventanas del tipo
         // CreateFrom, en el mapeo de tablas de ZK.
@@ -226,7 +221,7 @@ public class LoginPanel extends Window implements EventListener
         div.appendChild(pnlButtons);
         this.appendChild(div);
 
-        txtUserId.addEventListener(TokenEvent.ON_USER_TOKEN, new EventListener() {
+        this.addEventListener(TokenEvent.ON_USER_TOKEN, new EventListener() {
 
 			@Override
 			public void onEvent(Event event) throws Exception {
@@ -341,7 +336,7 @@ public class LoginPanel extends Window implements EventListener
         {
             validateLogin();
         }
-        else if (event.getName().equals(Events.ON_SELECT))
+        if (event.getName().equals(Events.ON_SELECT))
         {
             if(eventComp.getId().equals(lstLanguage.getId())) {
             	String langName = (String) lstLanguage.getSelectedItem().getLabel();
@@ -349,23 +344,12 @@ public class LoginPanel extends Window implements EventListener
             }
         }
         // Elaine 2009/02/06 - initial language
-        else if (event.getName().equals(Events.ON_CHANGE))
+        if (event.getName().equals(Events.ON_CHANGE))
         {
         	if(eventComp.getId().equals(txtUserId.getId()))
         	{
         		onUserIdChange();
         	}
-        }
-        else if (event.getName().equals(ON_LOAD_TOKEN)) 
-        {
-        	BrowserToken.load(txtUserId);
-        	
-        	txtUserId.setEnabled(true);
-            txtPassword.setEnabled(true);
-            lstLanguage.setEnabled(true);
-            
-        	AuFocus auf = new AuFocus(txtUserId);
-            Clients.response(auf);
         }
         //
     }
@@ -444,9 +428,7 @@ public class LoginPanel extends Window implements EventListener
         		}
         	}
         }
-        
-        Session currSess = Executions.getCurrent().getDesktop().getSession();
-        
+
         KeyNamePair rolesKNPairs[] = login.getRoles(userId, userPassword);
         if(rolesKNPairs == null || rolesKNPairs.length == 0)
             throw new WrongValueException("User Id or Password invalid!!!");
@@ -463,24 +445,19 @@ public class LoginPanel extends Window implements EventListener
 
             Env.setContext(ctx, UserPreference.LANGUAGE_NAME, language.getName()); // Elaine 2009/02/06
 
-            Locale locale = language.getLocale();
-            currSess.setAttribute(Attributes.PREFERRED_LOCALE, locale);
-            try {
-            	Clients.reloadMessages(locale);
-            } catch (IOException e) {
-            	logger.log(Level.WARNING, e.getLocalizedMessage(), e);
-            }
-            Locales.setThreadLocal(locale);
-            
+            Locales.setThreadLocal(language.getLocale());
+
+            Clients.response("zkLocaleJavaScript", new AuScript(null, ZkFns.outLocaleJavaScript()));
             String timeoutText = getUpdateTimeoutTextScript();
             if (!Strings.isEmpty(timeoutText))
-            	Clients.response("browserTimeoutScript", new AuScript(null, timeoutText));
+            	Clients.response("zkLocaleJavaScript2", new AuScript(null, timeoutText));
         }
 
 		// This temporary validation code is added to check the reported bug
 		// [ adempiere-ZK Web Client-2832968 ] User context lost?
 		// https://sourceforge.net/tracker/?func=detail&atid=955896&aid=2832968&group_id=176962
-		// it's harmless, if there is no bug then this must never fail     
+		// it's harmless, if there is no bug then this must never fail
+        Session currSess = Executions.getCurrent().getDesktop().getSession();
         currSess.setAttribute("Check_AD_User_ID", Env.getAD_User_ID(ctx));
 		// End of temporary code for [ adempiere-ZK Web Client-2832968 ] User context lost?
 

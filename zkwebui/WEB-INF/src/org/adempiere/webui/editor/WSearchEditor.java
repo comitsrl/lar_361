@@ -28,7 +28,6 @@ import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Searchbox;
 import org.adempiere.webui.event.ContextMenuEvent;
 import org.adempiere.webui.event.ContextMenuListener;
-import org.adempiere.webui.event.DialogEvents;
 import org.adempiere.webui.event.ValueChangeEvent;
 import org.adempiere.webui.event.ValueChangeListener;
 import org.adempiere.webui.grid.WBPartner;
@@ -52,7 +51,6 @@ import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 
 /**
@@ -69,6 +67,7 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 	private String				m_tableName = null;
 	private String				m_keyColumnName = null;
 	private String 				columnName;
+	private WEditorPopupMenu	popupMenu;
     private Object              value;
     private InfoPanel			infoPanel = null;
 
@@ -157,25 +156,33 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
                 
 		if (columnName.equals("C_BPartner_ID"))
 		{
-			popupMenu = new WEditorPopupMenu(true, true, isShowPreference(), true, true);
+			popupMenu = new WEditorPopupMenu(true, true, true, true, true);
 			getComponent().setButtonImage("/images/BPartner10.png");
 		}
 		else if (columnName.equals("M_Product_ID"))
 		{
-			popupMenu = new WEditorPopupMenu(true, true, isShowPreference(), false, false);
+			popupMenu = new WEditorPopupMenu(true, true, true, false, false);
 			getComponent().setButtonImage("/images/Product10.png");
 		}
 		else
 		{
-			popupMenu = new WEditorPopupMenu(true, true, isShowPreference(), false, false);
+			popupMenu = new WEditorPopupMenu(true, true, true, false, false);
 			getComponent().setButtonImage("/images/PickOpen10.png");
 		}
-				
-		addChangeLogMenu(popupMenu);
+		
+		getComponent().getTextbox().setContext(popupMenu.getId());
+		if (gridField != null && gridField.getGridTab() != null)
+		{
+			WFieldRecordInfo.addMenu(popupMenu);
+		}
 
 		return;
 	}
 
+	public WEditorPopupMenu getPopupMenu()
+	{
+	   	return popupMenu;
+	}
 
 	@Override
 	public void setValue(Object value)
@@ -289,7 +296,7 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 		}
 		else if (WEditorPopupMenu.PREFERENCE_EVENT.equals(evt.getContextEvent()))
 		{
-			if (isShowPreference())
+			if (MRole.getDefault().isShowPreference())
 				ValuePreference.start (this.getGridField(), getValue());
 			return;
 		}
@@ -440,7 +447,7 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 	
 	private void actionBPartner (boolean newRecord)
 	{
-		final WBPartner vbp = new WBPartner (lookup.getWindowNo());
+		WBPartner vbp = new WBPartner (lookup.getWindowNo());
 		int BPartner_ID = 0;
 		
 		//  if update, get current value
@@ -455,28 +462,22 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 		vbp.loadBPartner (BPartner_ID);
 		
 		
-		final int finalBPartner_ID = BPartner_ID;
-		vbp.addEventListener(DialogEvents.ON_WINDOW_CLOSE, new EventListener<Event>() {
-			@Override
-			public void onEvent(Event event) throws Exception {
-				// get result
-				int result = vbp.getC_BPartner_ID();
-
-				if (result == 0					//	0 = not saved
-					&& result == finalBPartner_ID)	//	the same
-					return;
-
-				//  Maybe new BPartner - put in cache
-				lookup.getDirect(new Integer(result), false, true);
-				setValue(new Integer(result));
-				actionCombo (new Integer(result));      //  data binding
-
-				//setValue(getValue());				
-			}
-		});
-
 		vbp.setVisible(true);
 		AEnv.showWindow(vbp);
+		
+		//  get result
+		int result = vbp.getC_BPartner_ID();
+		
+		if (result == 0					//	0 = not saved
+			&& result == BPartner_ID)	//	the same
+			return;
+		
+		//  Maybe new BPartner - put in cache
+		lookup.getDirect(new Integer(result), false, true);
+		setValue(new Integer(result));
+		actionCombo (new Integer(result));      //  data binding
+		
+		//setValue(getValue());
 	}	//	actionBPartner
 	
 	private void actionButton(String queryValue)
@@ -491,6 +492,8 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 		 *  - Window closed                 -> ignore       => result == null && !cancalled
 		 */
 
+		Object result[] = null;			
+		boolean cancelled = false;	
         // @fchiappano variable que determinara la multiseleccion.
         boolean multipleSelection = false;
 
@@ -521,45 +524,20 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 			int M_PriceList_ID = Env.getContextAsInt(Env.getCtx(), lookup.getWindowNo(), "M_PriceList_ID");
 
 			//	Show Info
-			final InfoProductPanel ip = new InfoProductPanel (lookup.getWindowNo(),
+			InfoProductPanel ip = new InfoProductPanel (lookup.getWindowNo(),
 					M_Warehouse_ID, M_PriceList_ID, true, queryValue, whereClause);
 
 			ip.setVisible(true);
 			ip.setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "InfoProduct")));
 			ip.setStyle("border: 2px");
 			ip.setClosable(true);
-			//ip.setAttribute("mode", "modal");
+			ip.setAttribute("mode", "modal");
 			ip.addValueChangeListener(this);
 			infoPanel = ip;
-			ip.addEventListener(DialogEvents.ON_WINDOW_CLOSE, new EventListener<Event>() {
-
-				@Override
-				public void onEvent(Event event) throws Exception {
-					boolean cancelled = ip.isCancelled();
-					Object[] result = ip.getSelectedKeys();
-
-					infoPanel = null;
-					//  Result
-					if (result != null && result.length > 0)
-					{
-						//ensure data binding happen
-						if (result.length > 1)
-							actionCombo (result);
-						else
-							actionCombo (result[0]);
-					}
-					else if (cancelled)
-					{
-						log.config(getColumnName() + " - Result = null (cancelled)");
-						actionCombo(null);
-					}
-					else
-					{
-						log.config(getColumnName() + " - Result = null (not cancelled)");
-					}
-				}
-			});
 			AEnv.showWindow(ip);
+			
+			cancelled = ip.isCancelled();
+			result = ip.getSelectedKeys();
 		}
 		else if (col.equals("C_BPartner_ID"))
 		{
@@ -578,38 +556,13 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
 			ip.setTitle(Util.cleanAmp(Msg.getMsg(Env.getCtx(), "InfoBPartner")));
 			ip.setStyle("border: 2px");
 			ip.setClosable(true);
-			//ip.setAttribute("mode", "modal");
+			ip.setAttribute("mode", "modal");
 			ip.addValueChangeListener(this);
 			infoPanel = ip;
-			ip.addEventListener(DialogEvents.ON_WINDOW_CLOSE, new EventListener<Event>() {
-
-				@Override
-				public void onEvent(Event event) throws Exception {
-					boolean cancelled = ip.isCancelled();
-					Object[] result = ip.getSelectedKeys();
-
-					infoPanel = null;
-					//  Result
-					if (result != null && result.length > 0)
-					{
-						//ensure data binding happen
-						if (result.length > 1)
-							actionCombo (result);
-						else
-							actionCombo (result[0]);
-					}
-					else if (cancelled)
-					{
-						log.config(getColumnName() + " - Result = null (cancelled)");
-						actionCombo(null);
-					}
-					else
-					{
-						log.config(getColumnName() + " - Result = null (not cancelled)");
-					}
-				}
-			});
 			AEnv.showWindow(ip);
+
+			cancelled = ip.isCancelled();
+			result = ip.getSelectedKeys();
 		}
         // @fchiappano Instanciar InfoInvoice y permitir multiselección.
         else if (col.equals("C_Invoice_ID"))
@@ -638,35 +591,10 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
             ii.setAttribute("mode", "modal");
             ii.addValueChangeListener(this);
             infoPanel = ii;
-            ii.addEventListener(DialogEvents.ON_WINDOW_CLOSE, new EventListener<Event>() {
+            AEnv.showWindow(ii);
 
-    			@Override
-    			public void onEvent(Event event) throws Exception {
-    				boolean cancelled = ii.isCancelled();
-    				Object[] result = ii.getSelectedKeys();
-
-    				infoPanel = null;
-    				//  Result
-    				if (result != null && result.length > 0)
-    				{
-    					//ensure data binding happen
-    					if (result.length > 1)
-    						actionCombo (result);
-    					else
-    						actionCombo (result[0]);
-    				}
-    				else if (cancelled)
-    				{
-    					log.config(getColumnName() + " - Result = null (cancelled)");
-    					actionCombo(null);
-    				}
-    				else
-    				{
-    					log.config(getColumnName() + " - Result = null (not cancelled)");
-    				}
-    			}
-    		});
-    		AEnv.showWindow(ii);
+            cancelled = ii.isCancelled();
+            result = ii.getSelectedKeys();
         }
 		else	//	General Info
 		{
@@ -676,42 +604,40 @@ public class WSearchEditor extends WEditor implements ContextMenuListener, Value
             if (queryValue.length() == 0 && getComponent().getText().length() > 0)
                 queryValue = getComponent().getText();
 
-			final InfoPanel ig = InfoPanel.create(lookup.getWindowNo(), m_tableName,m_keyColumnName,queryValue, false, whereClause);
+			InfoPanel ig = InfoPanel.create(lookup.getWindowNo(), m_tableName,m_keyColumnName,queryValue, false, whereClause);
 			ig.setVisible(true);
 			ig.setStyle("border: 2px");
-			ig.setClosable(true);			
+			ig.setClosable(true);
+			ig.setAttribute("mode", "modal");
 			ig.addValueChangeListener(this);
 			infoPanel = ig;
-			ig.addEventListener(DialogEvents.ON_WINDOW_CLOSE, new EventListener<Event>() {
-
-				@Override
-				public void onEvent(Event event) throws Exception {
-					boolean cancelled = ig.isCancelled();
-					Object[] result = ig.getSelectedKeys();
-
-					infoPanel = null;
-					//  Result
-					if (result != null && result.length > 0)
-					{
-						//ensure data binding happen
-						if (result.length > 1)
-							actionCombo (result);
-						else
-							actionCombo (result[0]);
-					}
-					else if (cancelled)
-					{
-						log.config(getColumnName() + " - Result = null (cancelled)");
-						actionCombo(null);
-					}
-					else
-					{
-						log.config(getColumnName() + " - Result = null (not cancelled)");
-					}
-				}
-			});
 			AEnv.showWindow(ig);
-		}		
+
+			cancelled = ig.isCancelled();
+			result = ig.getSelectedKeys();
+
+		}
+
+		infoPanel = null;
+		//  Result
+		if (result != null && result.length > 0)
+		{
+			//ensure data binding happen
+			if (result.length > 1)
+				actionCombo (result);
+			else
+				actionCombo (result[0]);
+		}
+		else if (cancelled)
+		{
+			log.config(getColumnName() + " - Result = null (cancelled)");
+			actionCombo(null);
+		}
+		else
+		{
+			log.config(getColumnName() + " - Result = null (not cancelled)");
+		}
+		
 	}
 
 	/**

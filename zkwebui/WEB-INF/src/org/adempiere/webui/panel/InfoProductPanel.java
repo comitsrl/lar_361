@@ -61,7 +61,6 @@ import org.adempiere.webui.component.Tabpanels;
 import org.adempiere.webui.component.Tabs;
 import org.adempiere.webui.component.Textbox;
 import org.adempiere.webui.component.WListbox;
-import org.adempiere.webui.event.DialogEvents;
 import org.adempiere.webui.session.SessionManager;
 import org.compiere.minigrid.ColumnInfo;
 import org.compiere.minigrid.IDColumn;
@@ -78,10 +77,10 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zul.Borderlayout;
-import org.zkoss.zul.Center;
-import org.zkoss.zul.North;
-import org.zkoss.zul.South;
+import org.zkoss.zkex.zul.Borderlayout;
+import org.zkoss.zkex.zul.Center;
+import org.zkoss.zkex.zul.North;
+import org.zkoss.zkex.zul.South;
 
 /**
  * Search Product and return selection
@@ -92,7 +91,7 @@ import org.zkoss.zul.South;
  * @author Elaine
  * @version	InfoPayment.java Adempiere Swing UI 3.4.1
  */
-public class InfoProductPanel extends InfoPanel implements EventListener<Event>
+public class InfoProductPanel extends InfoPanel implements EventListener
 {
 	/**
 	 * 
@@ -452,24 +451,20 @@ public class InfoProductPanel extends InfoPanel implements EventListener<Event>
         else
         	borderlayout.setStyle("border: none; position: absolute");
         Center center = new Center();
-        //true will conflict with listbox scrolling
-        center.setAutoscroll(false);
+        center.setAutoscroll(true);
+        center.setFlex(true);
 		borderlayout.appendChild(center);
 		center.appendChild(contentPanel);
-		contentPanel.setVflex("1");
-		contentPanel.setHflex("1");
 		South south = new South();
 		int detailHeight = (height * 25 / 100);
 		south.setHeight(detailHeight + "px");
 		south.setCollapsible(true);
 		south.setSplittable(true);
+		south.setFlex(true);
 		south.setTitle(Msg.translate(Env.getCtx(), "WarehouseStock"));
 		south.setTooltiptext(Msg.translate(Env.getCtx(), "WarehouseStock"));
 		borderlayout.appendChild(south);
-		tabbedPane.setSclass("info-product-tabbedpane");
 		south.appendChild(tabbedPane);
-		tabbedPane.setVflex("1");
-		tabbedPane.setHflex("1");
 
         Borderlayout mainPanel = new Borderlayout();
         mainPanel.setWidth("100%");
@@ -1019,19 +1014,13 @@ public class InfoProductPanel extends InfoPanel implements EventListener<Event>
 	 */
 	private void cmd_InfoPAttribute()
 	{
-		final InfoPAttributePanel ia = new InfoPAttributePanel(this);
-		ia.addEventListener(DialogEvents.ON_WINDOW_CLOSE, new EventListener<Event>() {
-
-			@Override
-			public void onEvent(Event event) throws Exception {
-				m_pAttributeWhere = ia.getWhereClause();
-				if (m_pAttributeWhere != null)
-				{
-					executeQuery();
-					renderItems();
-				}
-			}
-		});
+		InfoPAttributePanel ia = new InfoPAttributePanel(this);
+		m_pAttributeWhere = ia.getWhereClause();
+		if (m_pAttributeWhere != null)
+		{
+			executeQuery();
+			renderItems();
+		}
 	}	//	cmdInfoAttribute
 
 	/**
@@ -1240,18 +1229,12 @@ public class InfoProductPanel extends InfoPanel implements EventListener<Event>
 				M_Warehouse_ID = ((Integer)warehouse.getValue()).intValue();
 
 			String title = warehouse.getLabel() + " - " + productName;
-			final InfoPAttributeInstancePanel pai = new InfoPAttributeInstancePanel(this, title,
+			InfoPAttributeInstancePanel pai = new InfoPAttributeInstancePanel(this, title,
 				M_Warehouse_ID, 0, productInteger.intValue(), m_C_BPartner_ID);
-			pai.addEventListener(DialogEvents.ON_WINDOW_CLOSE, new EventListener<Event>() {
-				
-				@Override
-				public void onEvent(Event event) throws Exception {
-					m_M_AttributeSetInstance_ID = pai.getM_AttributeSetInstance_ID();
-					m_M_Locator_ID = pai.getM_Locator_ID();
-					if (m_M_AttributeSetInstance_ID != -1)
-						dispose(true);
-				}
-			});
+			m_M_AttributeSetInstance_ID = pai.getM_AttributeSetInstance_ID();
+			m_M_Locator_ID = pai.getM_Locator_ID();
+			if (m_M_AttributeSetInstance_ID != -1)
+				dispose(true);
 			return;
 		}
 		//
@@ -1468,4 +1451,5 @@ public class InfoProductPanel extends InfoPanel implements EventListener<Event>
 
 		return M_AttributeSet_ID;
 	}
+    
 }	//	InfoProduct

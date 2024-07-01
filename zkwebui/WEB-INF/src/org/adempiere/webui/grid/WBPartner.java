@@ -65,7 +65,7 @@ import ar.com.ergio.util.LAR_Utils;
  *
  */
 
-public class WBPartner extends Window implements EventListener<Event>, ValueChangeListener
+public class WBPartner extends Window implements EventListener, ValueChangeListener
 {
 	/**
 	 * 
@@ -150,6 +150,7 @@ public class WBPartner extends Window implements EventListener<Event>, ValueChan
 		this.setBorder("normal");
 		this.setClosable(true);
 		this.setTitle("Socio del Negocio");
+		this.setAttribute("mode", "modal");
 		this.appendChild(centerPanel);
 		this.appendChild(confirmPanel);
 		

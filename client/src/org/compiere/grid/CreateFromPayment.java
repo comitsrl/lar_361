@@ -39,7 +39,7 @@ import ar.com.ergio.model.X_LAR_RetiroCajaLine;
  *
  * @author fchiappano
  */
-public abstract class CreateFromPayment extends CreateFrom
+public class CreateFromPayment extends CreateFrom
 {
     /**
      * Protected Constructor

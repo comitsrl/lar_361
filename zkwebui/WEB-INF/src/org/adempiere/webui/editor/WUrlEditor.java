@@ -17,7 +17,6 @@
 
 package org.adempiere.webui.editor;
 
-import org.adempiere.webui.ValuePreference;
 import org.adempiere.webui.component.Urlbox;
 import org.adempiere.webui.event.ContextMenuEvent;
 import org.adempiere.webui.event.ContextMenuListener;
@@ -34,16 +33,20 @@ public class WUrlEditor extends WEditor implements ContextMenuListener
 {
 	private static final String[] LISTENER_EVENTS = {Events.ON_CLICK, Events.ON_CHANGE, Events.ON_OK};
 	private String oldValue;
-	
+	private WEditorPopupMenu popupMenu;
 
 	public WUrlEditor(GridField gridField)
 	{
 		super(new Urlbox(), gridField);
 		getComponent().setButtonImage("/images/Online10.png");
 		
-		popupMenu = new WEditorPopupMenu(false, false, isShowPreference());
+		popupMenu = new WEditorPopupMenu(false, false, true);
 		popupMenu.addMenuListener(this);
-		addChangeLogMenu(popupMenu);
+		if (gridField != null && gridField.getGridTab() != null)
+		{
+			WFieldRecordInfo.addMenu(popupMenu);
+		}
+		getComponent().setContext(popupMenu.getId());
 	}
 
 
@@ -152,11 +155,6 @@ public class WUrlEditor extends WEditor implements ContextMenuListener
 		{
 			WFieldRecordInfo.start(gridField);
 		}
-		else if (WEditorPopupMenu.PREFERENCE_EVENT.equals(evt.getContextEvent()))
-			{
-				if (isShowPreference())
-				ValuePreference.start(getGridField(), getValue());
-			}
 	}
 
 

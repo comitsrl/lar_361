@@ -42,7 +42,7 @@ import org.compiere.util.Msg;
  *  @author Teo Sarca, www.arhipac.ro
  * 			<li>BF [ 2007837 ] VCreateFrom.save() should run in trx
  */
-public abstract class CreateFromStatement extends CreateFrom 
+public class CreateFromStatement extends CreateFrom 
 {
 	public MBankAccount bankAccount;
 	
