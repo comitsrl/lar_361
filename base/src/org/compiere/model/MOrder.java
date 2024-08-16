@@ -984,7 +984,7 @@ public class MOrder extends X_C_Order implements DocAction
 		{
 			int ii = DB.getSQLValueEx(null,
 				"SELECT M_PriceList_ID FROM M_PriceList "
-				+ "WHERE AD_Client_ID=? AND IsSOPriceList=? AND IsActive=?"
+				+ "WHERE AD_Client_ID=? AND IsSOPriceList=? AND IsActive=? "
 				+ "ORDER BY IsDefault DESC", getAD_Client_ID(), isSOTrx(), true);
 			if (ii != 0)
 				setM_PriceList_ID (ii);
@@ -1590,7 +1590,8 @@ public class MOrder extends X_C_Order implements DocAction
 		//	Force same WH for all but SO/PO
 		int header_M_Warehouse_ID = getM_Warehouse_ID();
 		if (MDocType.DOCSUBTYPESO_StandardOrder.equals(dt.getDocSubTypeSO())
-			|| MDocType.DOCBASETYPE_PurchaseOrder.equals(dt.getDocBaseType()))
+		    || MDocType.DOCSUBTYPESO_POSOrder.equals(dt.getDocSubTypeSO())
+		    || MDocType.DOCBASETYPE_PurchaseOrder.equals(dt.getDocBaseType()))
 			header_M_Warehouse_ID = 0;		//	don't enforce
 		
 		BigDecimal Volume = Env.ZERO;
@@ -1880,12 +1881,14 @@ public class MOrder extends X_C_Order implements DocAction
 		
 		//	Create SO Shipment - Force Shipment
 		MInOut shipment = null;
-		if (MDocType.DOCSUBTYPESO_OnCreditOrder.equals(DocSubTypeSO)		//	(W)illCall(I)nvoice
+		if ((MDocType.DOCSUBTYPESO_OnCreditOrder.equals(DocSubTypeSO)		//	(W)illCall(I)nvoice
 			|| MDocType.DOCSUBTYPESO_WarehouseOrder.equals(DocSubTypeSO)	//	(W)illCall(P)ickup	
 			|| MDocType.DOCSUBTYPESO_POSOrder.equals(DocSubTypeSO)			//	(W)alkIn(R)eceipt
 			|| MDocType.DOCSUBTYPESO_PrepayOrder.equals(DocSubTypeSO)
 			//@mzuniga También se crea Shipment si la orden es Devolución de Material
 			|| MDocType.DOCSUBTYPESO_ReturnMaterial.equals(DocSubTypeSO))
+            // @fchiappano Si la orden fue marcada a reparto, no se crea el remito.
+            && !get_ValueAsBoolean("A_Reparto"))
 		{
 			if (!DELIVERYRULE_Force.equals(getDeliveryRule()))
 			{
@@ -1991,8 +1994,15 @@ public class MOrder extends X_C_Order implements DocAction
 			MOrderLine oLine = oLines[i];
 			//
 			MInOutLine ioLine = new MInOutLine(shipment);
-			//	Qty = Ordered - Delivered
-			BigDecimal MovementQty = oLine.getQtyOrdered().subtract(oLine.getQtyDelivered()); 
+			//	Qty = Ordered - Delivered // @fchiappano restarle tambien la cantidad a reparto.
+            BigDecimal MovementQty = oLine.getQtyOrdered().subtract(oLine.getQtyDelivered())
+                    .subtract((BigDecimal) oLine.get_Value("Cant_Reparto"));
+
+            // @fchiappano si la cantidad del movimiento quedo en cero, no crear
+            // linea de remito y seguir la siguente linea de OV.
+            if (MovementQty.compareTo(Env.ZERO) == 0)
+                continue;
+
 			//	Location
 			int M_Locator_ID = MStorage.getM_Locator_ID (oLine.getM_Warehouse_ID(), 
 					oLine.getM_Product_ID(), oLine.getM_AttributeSetInstance_ID(), 

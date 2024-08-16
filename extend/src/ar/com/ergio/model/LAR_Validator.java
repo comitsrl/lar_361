@@ -17,7 +17,10 @@
 package ar.com.ergio.model;
 
 import java.math.BigDecimal;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
@@ -92,6 +95,19 @@ import ar.com.ergio.util.LAR_Utils;
          else  {
              log.info("Initializing global validator: "+this.toString());
          }
+         // JDBC Driver Version
+         String version = "<x.y>";
+         Driver driver = null;
+         try
+         {
+             driver = DriverManager.getDriver(DB.getConnectionRO().getMetaData().getURL());
+             version = driver.getMajorVersion() + "." + driver.getMinorVersion();
+         }
+         catch (SQLException e)
+         {
+             log.log(Level.SEVERE, "No se pudo cargar el driver" + e, e);
+         }
+         log.info("Driver JDBC Version: " + version);
 
          //  Tables to be monitored
          engine.addModelChange(MBPartner.Table_Name, this);
