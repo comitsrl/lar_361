@@ -531,9 +531,11 @@ import ar.com.ergio.util.LAR_Utils;
              if (msg != null)
                  return msg;
 
+             /* @fchiappano Se comenta codigo, ya que no es necesario anular la OV cuando se anula un remito,
+              * por mas que la misma sea una WarehouseOrder.
              msg = voidWarehouseOrder((MInOut) po);
              if (msg != null)
-                 return msg;
+                 return msg; */
 
          }
         // @fchiappano Despues de anular un cobro/pago (payment), agregar

@@ -35,6 +35,323 @@ ALTER TABLE C_Order ADD COLUMN A_Reparto character(1) COLLATE pg_catalog."defaul
 ALTER TABLE C_Order ADD CONSTRAINT c_order_a_reparto_check CHECK (a_reparto = ANY (ARRAY['Y'::bpchar, 'N'::bpchar]));
 ALTER TABLE C_OrderLine ADD COLUMN Cant_Reparto numeric NOT NULL DEFAULT 0;
 
+-- Se agrega campo deposito en la vista que recupera los datos de la grilla del pos.
+CREATE OR REPLACE VIEW adempiere.c_order_linetax_v
+ AS
+ SELECT ol.ad_client_id,
+    ol.ad_org_id,
+    ol.isactive,
+    ol.created,
+    ol.createdby,
+    ol.updated,
+    ol.updatedby,
+    'en_US'::text AS ad_language,
+    ol.c_order_id,
+    ol.c_orderline_id,
+    ol.c_tax_id,
+    t.taxindicator,
+    ol.c_bpartner_id,
+    ol.c_bpartner_location_id,
+    bp.name AS bpname,
+    bpl.c_location_id,
+    ol.line,
+    p.m_product_id,
+    po.vendorproductno,
+        CASE
+            WHEN ol.qtyordered <> 0::numeric OR ol.m_product_id IS NOT NULL THEN ol.qtyordered
+            ELSE NULL::numeric
+        END AS qtyordered,
+        CASE
+            WHEN ol.qtyentered <> 0::numeric OR ol.m_product_id IS NOT NULL THEN ol.qtyentered
+            ELSE NULL::numeric
+        END AS qtyentered,
+        CASE
+            WHEN ol.qtyentered <> 0::numeric OR ol.m_product_id IS NOT NULL THEN uom.uomsymbol
+            ELSE NULL::character varying
+        END AS uomsymbol,
+    COALESCE(c.name, (p.name::text || productattribute(ol.m_attributesetinstance_id)::text)::character varying, ol.description) AS name,
+        CASE
+            WHEN COALESCE(c.name, p.name) IS NOT NULL THEN ol.description
+            ELSE NULL::character varying
+        END AS description,
+    p.documentnote,
+    p.upc,
+    p.sku,
+    COALESCE(pp.vendorproductno, p.value) AS productvalue,
+    ra.description AS resourcedescription,
+        CASE
+            WHEN i.isdiscountprinted = 'Y'::bpchar AND ol.pricelist <> 0::numeric THEN ol.pricelist
+            ELSE NULL::numeric
+        END AS pricelist,
+        CASE
+            WHEN i.isdiscountprinted = 'Y'::bpchar AND ol.pricelist <> 0::numeric AND ol.qtyentered <> 0::numeric THEN ol.pricelist * ol.qtyordered / ol.qtyentered
+            ELSE NULL::numeric
+        END AS priceenteredlist,
+        CASE
+            WHEN i.isdiscountprinted = 'Y'::bpchar AND ol.pricelist > ol.priceactual AND ol.pricelist <> 0::numeric THEN (ol.pricelist - ol.priceactual) / ol.pricelist * 100::numeric
+            ELSE NULL::numeric
+        END AS discount,
+        CASE
+            WHEN ol.priceactual <> 0::numeric OR ol.m_product_id IS NOT NULL THEN
+            CASE
+                WHEN i.istaxincluded = 'Y'::bpchar THEN ol.priceactual
+                ELSE round(ol.priceactual * ((( SELECT COALESCE(t_1.rate, 0::numeric) AS "coalesce"
+                   FROM c_tax t_1
+                  WHERE t_1.c_tax_id = ol.c_tax_id)) / 100::numeric + 1::numeric), 2)
+            END
+            ELSE NULL::numeric
+        END AS priceactual,
+        CASE
+            WHEN ol.priceentered <> 0::numeric OR ol.m_product_id IS NOT NULL THEN ol.priceentered
+            ELSE NULL::numeric
+        END AS priceentered,
+        CASE
+            WHEN ol.linenetamt <> 0::numeric OR ol.m_product_id IS NOT NULL THEN
+            CASE
+                WHEN i.istaxincluded = 'Y'::bpchar THEN ol.linenetamt
+                ELSE round(ol.linenetamt * ((( SELECT COALESCE(t_1.rate, 0::numeric) AS "coalesce"
+                   FROM c_tax t_1
+                  WHERE t_1.c_tax_id = ol.c_tax_id)) / 100::numeric + 1::numeric), 2)
+            END
+            ELSE NULL::numeric
+        END AS linenetamt,
+    p.description AS productdescription,
+    p.imageurl,
+    ol.c_campaign_id,
+    ol.c_project_id,
+    ol.c_activity_id,
+    ol.c_projectphase_id,
+    ol.c_projecttask_id,
+	w.Name AS WareHouseName
+   FROM c_orderline ol
+     JOIN c_uom uom ON ol.c_uom_id = uom.c_uom_id
+     JOIN c_order i ON ol.c_order_id = i.c_order_id
+     LEFT JOIN m_product p ON ol.m_product_id = p.m_product_id
+     LEFT JOIN m_product_po po ON p.m_product_id = po.m_product_id AND i.c_bpartner_id = po.c_bpartner_id
+     LEFT JOIN s_resourceassignment ra ON ol.s_resourceassignment_id = ra.s_resourceassignment_id
+     LEFT JOIN c_charge c ON ol.c_charge_id = c.c_charge_id
+     LEFT JOIN c_bpartner_product pp ON ol.m_product_id = pp.m_product_id AND i.c_bpartner_id = pp.c_bpartner_id
+     JOIN c_bpartner bp ON ol.c_bpartner_id = bp.c_bpartner_id
+     JOIN c_bpartner_location bpl ON ol.c_bpartner_location_id = bpl.c_bpartner_location_id
+     LEFT JOIN c_tax t ON ol.c_tax_id = t.c_tax_id
+	 JOIN M_WareHouse w ON ol.M_WareHouse_ID = w.M_WareHouse_ID
+UNION
+ SELECT ol.ad_client_id,
+    ol.ad_org_id,
+    ol.isactive,
+    ol.created,
+    ol.createdby,
+    ol.updated,
+    ol.updatedby,
+    'en_US'::text AS ad_language,
+    ol.c_order_id,
+    ol.c_orderline_id,
+    ol.c_tax_id,
+    NULL::character varying AS taxindicator,
+    NULL::numeric AS c_bpartner_id,
+    NULL::numeric AS c_bpartner_location_id,
+    NULL::character varying AS bpname,
+    NULL::numeric AS c_location_id,
+    ol.line + bl.line / 100::numeric AS line,
+    p.m_product_id,
+    po.vendorproductno,
+        CASE
+            WHEN bl.isqtypercentage = 'N'::bpchar THEN ol.qtyordered * bl.qtybom
+            ELSE ol.qtyordered * (bl.qtybatch / 100::numeric)
+        END AS qtyordered,
+        CASE
+            WHEN bl.isqtypercentage = 'N'::bpchar THEN ol.qtyentered * bl.qtybom
+            ELSE ol.qtyentered * (bl.qtybatch / 100::numeric)
+        END AS qtyentered,
+    uom.uomsymbol,
+    p.name,
+    bl.description,
+    p.documentnote,
+    p.upc,
+    p.sku,
+    p.value AS productvalue,
+    NULL::character varying AS resourcedescription,
+    NULL::numeric AS pricelist,
+    NULL::numeric AS priceenteredlist,
+    NULL::numeric AS discount,
+    NULL::numeric AS priceactual,
+    NULL::numeric AS priceentered,
+    NULL::numeric AS linenetamt,
+    p.description AS productdescription,
+    p.imageurl,
+    ol.c_campaign_id,
+    ol.c_project_id,
+    ol.c_activity_id,
+    ol.c_projectphase_id,
+    ol.c_projecttask_id,
+	NULL::character varying AS WareHouseName
+   FROM pp_product_bom b
+     JOIN c_orderline ol ON b.m_product_id = ol.m_product_id
+     JOIN c_order i ON ol.c_order_id = i.c_order_id
+     JOIN m_product bp ON bp.m_product_id = ol.m_product_id AND bp.isbom = 'Y'::bpchar AND bp.isverified = 'Y'::bpchar AND bp.isinvoiceprintdetails = 'Y'::bpchar
+     JOIN pp_product_bomline bl ON bl.pp_product_bom_id = b.pp_product_bom_id
+     JOIN m_product p ON p.m_product_id = bl.m_product_id
+     LEFT JOIN m_product_po po ON p.m_product_id = po.m_product_id AND i.c_bpartner_id = po.c_bpartner_id
+     JOIN c_uom uom ON p.c_uom_id = uom.c_uom_id
+UNION
+ SELECT c_order.ad_client_id,
+    c_order.ad_org_id,
+    c_order.isactive,
+    c_order.created,
+    c_order.createdby,
+    c_order.updated,
+    c_order.updatedby,
+    'en_US'::text AS ad_language,
+    c_order.c_order_id,
+    NULL::numeric AS c_orderline_id,
+    NULL::numeric AS c_tax_id,
+    NULL::character varying AS taxindicator,
+    NULL::numeric AS c_bpartner_id,
+    NULL::numeric AS c_bpartner_location_id,
+    NULL::character varying AS bpname,
+    NULL::numeric AS c_location_id,
+    NULL::numeric AS line,
+    NULL::numeric AS m_product_id,
+    NULL::character varying AS vendorproductno,
+    NULL::numeric AS qtyordered,
+    NULL::numeric AS qtyentered,
+    NULL::character varying AS uomsymbol,
+    NULL::character varying AS name,
+    NULL::character varying AS description,
+    NULL::character varying AS documentnote,
+    NULL::character varying AS upc,
+    NULL::character varying AS sku,
+    NULL::character varying AS productvalue,
+    NULL::character varying AS resourcedescription,
+    NULL::numeric AS pricelist,
+    NULL::numeric AS priceenteredlist,
+    NULL::numeric AS discount,
+    NULL::numeric AS priceactual,
+    NULL::numeric AS priceentered,
+    NULL::numeric AS linenetamt,
+    NULL::character varying AS productdescription,
+    NULL::character varying AS imageurl,
+    NULL::numeric AS c_campaign_id,
+    NULL::numeric AS c_project_id,
+    NULL::numeric AS c_activity_id,
+    NULL::numeric AS c_projectphase_id,
+    NULL::numeric AS c_projecttask_id,
+	NULL::character varying AS WareHouseName
+   FROM c_order
+UNION
+ SELECT ot.ad_client_id,
+    ot.ad_org_id,
+    ot.isactive,
+    ot.created,
+    ot.createdby,
+    ot.updated,
+    ot.updatedby,
+    'en_US'::text AS ad_language,
+    ot.c_order_id,
+    NULL::numeric AS c_orderline_id,
+    ot.c_tax_id,
+    t.taxindicator,
+    NULL::numeric AS c_bpartner_id,
+    NULL::numeric AS c_bpartner_location_id,
+    NULL::character varying AS bpname,
+    NULL::numeric AS c_location_id,
+    NULL::numeric AS line,
+    NULL::numeric AS m_product_id,
+    NULL::character varying AS vendorproductno,
+    NULL::numeric AS qtyordered,
+    NULL::numeric AS qtyentered,
+    NULL::character varying AS uomsymbol,
+    t.name,
+    NULL::character varying AS description,
+    NULL::character varying AS documentnote,
+    NULL::character varying AS upc,
+    NULL::character varying AS sku,
+    NULL::character varying AS productvalue,
+    NULL::character varying AS resourcedescription,
+    NULL::numeric AS pricelist,
+    NULL::numeric AS priceenteredlist,
+    NULL::numeric AS discount,
+        CASE
+            WHEN ot.istaxincluded = 'Y'::bpchar THEN ot.taxamt
+            ELSE ot.taxbaseamt
+        END AS priceactual,
+        CASE
+            WHEN ot.istaxincluded = 'Y'::bpchar THEN ot.taxamt
+            ELSE ot.taxbaseamt
+        END AS priceentered,
+        CASE
+            WHEN ot.istaxincluded = 'Y'::bpchar THEN NULL::numeric
+            ELSE ot.taxamt
+        END AS linenetamt,
+    NULL::character varying AS productdescription,
+    NULL::character varying AS imageurl,
+    NULL::numeric AS c_campaign_id,
+    NULL::numeric AS c_project_id,
+    NULL::numeric AS c_activity_id,
+    NULL::numeric AS c_projectphase_id,
+    NULL::numeric AS c_projecttask_id,
+	NULL::character varying AS WareHouseName
+   FROM c_ordertax ot
+     JOIN c_tax t ON ot.c_tax_id = t.c_tax_id
+UNION
+ SELECT op.ad_client_id,
+    op.ad_org_id,
+    op.isactive,
+    op.created,
+    op.createdby,
+    op.updated,
+    op.updatedby,
+    'en_US'::text AS ad_language,
+    op.c_order_id,
+    NULL::numeric AS c_orderline_id,
+    op.c_tax_id,
+    t.taxindicator,
+    NULL::numeric AS c_bpartner_id,
+    NULL::numeric AS c_bpartner_location_id,
+    NULL::character varying AS bpname,
+    NULL::numeric AS c_location_id,
+    NULL::numeric AS line,
+    NULL::numeric AS m_product_id,
+    NULL::character varying AS vendorproductno,
+    NULL::numeric AS qtyordered,
+    NULL::numeric AS qtyentered,
+    NULL::character varying AS uomsymbol,
+    t.name,
+    NULL::character varying AS description,
+    NULL::character varying AS documentnote,
+    NULL::character varying AS upc,
+    NULL::character varying AS sku,
+    NULL::character varying AS productvalue,
+    NULL::character varying AS resourcedescription,
+    NULL::numeric AS pricelist,
+    NULL::numeric AS priceenteredlist,
+    NULL::numeric AS discount,
+        CASE
+            WHEN op.istaxincluded = 'Y'::bpchar THEN op.taxamt
+            ELSE op.taxbaseamt
+        END AS priceactual,
+        CASE
+            WHEN op.istaxincluded = 'Y'::bpchar THEN op.taxamt
+            ELSE op.taxbaseamt
+        END AS priceentered,
+        CASE
+            WHEN op.istaxincluded = 'Y'::bpchar THEN NULL::numeric
+            ELSE op.taxamt
+        END AS linenetamt,
+    NULL::character varying AS productdescription,
+    NULL::character varying AS imageurl,
+    NULL::numeric AS c_campaign_id,
+    NULL::numeric AS c_project_id,
+    NULL::numeric AS c_activity_id,
+    NULL::numeric AS c_projectphase_id,
+    NULL::numeric AS c_projecttask_id,
+	NULL::character varying AS WareHouseName
+   FROM lar_orderperception op
+     JOIN c_tax t ON op.c_tax_id = t.c_tax_id;
+
+ALTER TABLE adempiere.c_order_linetax_v
+    OWNER TO adempiere;
+
 -- 14/08/2024 9:09:13 ART
 -- ISSUE #126: Funcionalidad de Reparto/Entrega Diferida.
 INSERT INTO AD_ModelValidator (ModelValidationClass,EntityType,AD_ModelValidator_ID,SeqNo,Name,CreatedBy,AD_Client_ID,AD_Org_ID,Created,Updated,UpdatedBy,IsActive) VALUES ('ar.com.ergio.model.LAR_ValidatorOrder','LAR',3000008,0,'Model Validator para Localizacion Argentina (Ordenes)',100,0,0,TO_TIMESTAMP('2024-08-14 09:09:12','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2024-08-14 09:09:12','YYYY-MM-DD HH24:MI:SS'),100,'Y')
