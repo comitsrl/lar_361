@@ -47,6 +47,7 @@ import org.compiere.model.MQuery;
 import org.compiere.model.MTable;
 import org.compiere.model.PrintInfo;
 import org.compiere.print.MPrintFormat;
+import org.compiere.print.ReportCtl;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.ProcessInfoUtil;
 import org.compiere.util.CLogger;
@@ -341,7 +342,8 @@ public class WGenForm extends ADForm implements EventListener, WTableModelListen
 		//	OK to print
 		if (FDialog.ask(getWindowNo(), this, genForm.getAskPrintMsg()))
 		{
-			Clients.showBusy("Processing...", true);
+		    // @fchiappano se comenta este mensaje de "procesando", ya que no permite dar el ok al levantar un proceso jasper.
+			// Clients.showBusy("Processing...", true);
 			Clients.response(new AuEcho(this, "onPrint", null));			
 		}	//	OK to print
 	}
@@ -364,13 +366,16 @@ public class WGenForm extends ADForm implements EventListener, WTableModelListen
 				//	Engine
 				PrintInfo info = new PrintInfo(table.getTableName(),table.get_Table_ID(), RecordID);               
 				re = new ReportEngine(Env.getCtx(), format, query, info);
+				pdfList.add(re.getPDF());
 			}
-			else
-			{	
-				re = ReportEngine.get (Env.getCtx(), genForm.getReportEngineType(), RecordID);
-			}	
-			
-			pdfList.add(re.getPDF());				
+            else
+            {
+                // re = ReportEngine.get(Env.getCtx(), genForm.getReportEngineType(), RecordID);
+                // @fchiappano Se cambia la forma de levantar los formatos de
+                // impresión, para que funcionen aquellos que tengan un proceso
+                // jasper asociado.
+                ReportCtl.startDocumentPrint(genForm.getReportEngineType(), RecordID, null, getWindowNo(), false);
+            }
 		}
 		
 		if (pdfList.size() > 1) {
