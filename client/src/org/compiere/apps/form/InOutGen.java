@@ -66,6 +66,7 @@ public class InOutGen extends GenForm implements SystemIDs
 		miniTable.addColumn("AD_Org_ID");
 		miniTable.addColumn("C_DocType_ID");
 		miniTable.addColumn("DocumentNo");
+		miniTable.addColumn("InvDocumentNo");
 		miniTable.addColumn("C_BPartner_ID");
 		miniTable.addColumn("DateOrdered");
 		miniTable.addColumn("TotalLines");
@@ -77,9 +78,10 @@ public class InOutGen extends GenForm implements SystemIDs
 		miniTable.setColumnClass(1, String.class, true, Msg.translate(Env.getCtx(), "AD_Org_ID"));
 		miniTable.setColumnClass(2, String.class, true, Msg.translate(Env.getCtx(), "C_DocType_ID"));
 		miniTable.setColumnClass(3, String.class, true, Msg.translate(Env.getCtx(), "DocumentNo"));
-		miniTable.setColumnClass(4, String.class, true, Msg.translate(Env.getCtx(), "C_BPartner_ID"));
-		miniTable.setColumnClass(5, Timestamp.class, true, Msg.translate(Env.getCtx(), "DateOrdered"));
-		miniTable.setColumnClass(6, BigDecimal.class, true, Msg.translate(Env.getCtx(), "TotalLines"));
+		miniTable.setColumnClass(4, String.class, true, "N° Factura");
+		miniTable.setColumnClass(5, String.class, true, Msg.translate(Env.getCtx(), "C_BPartner_ID"));
+		miniTable.setColumnClass(6, Timestamp.class, true, Msg.translate(Env.getCtx(), "DateOrdered"));
+		miniTable.setColumnClass(7, BigDecimal.class, true, Msg.translate(Env.getCtx(), "TotalLines"));
 		//
 		miniTable.autoSize();
 	}
@@ -92,12 +94,13 @@ public class InOutGen extends GenForm implements SystemIDs
 	{
 	//  Create SQL
         StringBuffer sql = new StringBuffer(
-            "SELECT C_Order_ID, o.Name, dt.Name, DocumentNo, bp.Name, DateOrdered, TotalLines "
-            + "FROM M_InOut_Candidate_v ic, AD_Org o, C_BPartner bp, C_DocType dt "
-            + "WHERE ic.AD_Org_ID=o.AD_Org_ID"
-            + " AND ic.C_BPartner_ID=bp.C_BPartner_ID"
-            + " AND ic.C_DocType_ID=dt.C_DocType_ID"
-            + " AND ic.AD_Client_ID=?");
+            "SELECT ic.C_Order_ID, o.Name, dt.Name, ic.DocumentNo, i.DocumentNo, bp.Name, ic.DateOrdered, ic.TotalLines "
+            + "FROM M_InOut_Candidate_v ic "
+            + "JOIN AD_Org o ON ic.AD_Org_ID=o.AD_Org_ID "
+            + "JOIN C_BPartner bp ON ic.C_BPartner_ID=bp.C_BPartner_ID "
+            + "JOIN C_DocType dt ON ic.C_DocType_ID=dt.C_DocType_ID "
+            + "LEFT JOIN C_Invoice i ON ic.C_Order_ID = i.C_Order_ID "
+            + "WHERE ic.AD_Client_ID=?");
 
         if (m_M_Warehouse_ID != null)
             sql.append(" AND ic.M_Warehouse_ID=").append(m_M_Warehouse_ID);
@@ -112,12 +115,12 @@ public class InOutGen extends GenForm implements SystemIDs
         {
             if (sql.length() > 0)
                 sql.append(" AND ");
-            sql.append("C_Order_ID").append(lockedIDs);
+            sql.append("ic.C_Order_ID").append(lockedIDs);
         }
         /* eng - Exclude locked records; @Trifon */
           
         //
-        sql.append(" ORDER BY o.Name,bp.Name,DateOrdered");
+        sql.append(" ORDER BY o.Name,bp.Name,ic.DateOrdered");
         
         return sql.toString();
 	}
@@ -200,9 +203,10 @@ public class InOutGen extends GenForm implements SystemIDs
 				miniTable.setValueAt(rs.getString(2), row, 1);              //  Org
 				miniTable.setValueAt(rs.getString(3), row, 2);              //  DocType
 				miniTable.setValueAt(rs.getString(4), row, 3);              //  Doc No
-				miniTable.setValueAt(rs.getString(5), row, 4);              //  BPartner
-				miniTable.setValueAt(rs.getTimestamp(6), row, 5);           //  DateOrdered
-				miniTable.setValueAt(rs.getBigDecimal(7), row, 6);          //  TotalLines
+				miniTable.setValueAt(rs.getString(5), row, 4);              //  Nro Factura
+				miniTable.setValueAt(rs.getString(6), row, 5);              //  BPartner
+				miniTable.setValueAt(rs.getTimestamp(7), row, 6);           //  DateOrdered
+				miniTable.setValueAt(rs.getBigDecimal(8), row, 7);          //  TotalLines
 				//  prepare next
 				row++;
 			}
