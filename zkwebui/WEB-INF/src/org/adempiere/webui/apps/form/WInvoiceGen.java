@@ -156,9 +156,11 @@ public class WInvoiceGen extends InvoiceGen implements IFormController, EventLis
         if (MSysConfig.getBooleanValue("ERGIO_InvoiceGen_Login_ORG_and_PDV", true, Env.getAD_Client_ID(Env.getCtx())))
         {
             // Muestra PDVS disponibles para la Organización con que se logueó
-            MLookup posL = MLookupFactory.get(Env.getCtx(), form.getWindowNo(),
-                    3000068 /* C_Invoice.C_POS_ID */, DisplayType.Table, Env.getLanguage(Env.getCtx()), "C_POS_ID",
-                    3000022 /* LAR_POS_ID Login Org */, false, "");
+//            MLookup posL = MLookupFactory.get(Env.getCtx(), form.getWindowNo(),
+//                    3000068 /* C_Invoice.C_POS_ID */, DisplayType.Table, Env.getLanguage(Env.getCtx()), "C_POS_ID",
+//                    3000022 /* LAR_POS_ID Login Org */, false, "");
+
+            MLookup posL = MLookupFactory.get(Env.getCtx(), form.getWindowNo(), 0, 3000068, DisplayType.TableDir);
 
             fPOS = new WTableDirEditor("C_POS_ID", true, false, true, posL);
         }
