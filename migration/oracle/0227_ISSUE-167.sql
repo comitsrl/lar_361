@@ -122,7 +122,11 @@ CREATE OR REPLACE VIEW adempiere.c_order_linetax_v
     ol.c_activity_id,
     ol.c_projectphase_id,
     ol.c_projecttask_id,
-	w.Name AS WareHouseName
+    w.name AS warehousename,
+		CASE
+            WHEN ol.Cant_Reparto <> 0::numeric THEN 'Y'
+            ELSE 'N'
+        END AS reparto
    FROM c_orderline ol
      JOIN c_uom uom ON ol.c_uom_id = uom.c_uom_id
      JOIN c_order i ON ol.c_order_id = i.c_order_id
@@ -134,7 +138,7 @@ CREATE OR REPLACE VIEW adempiere.c_order_linetax_v
      JOIN c_bpartner bp ON ol.c_bpartner_id = bp.c_bpartner_id
      JOIN c_bpartner_location bpl ON ol.c_bpartner_location_id = bpl.c_bpartner_location_id
      LEFT JOIN c_tax t ON ol.c_tax_id = t.c_tax_id
-	 JOIN M_WareHouse w ON ol.M_WareHouse_ID = w.M_WareHouse_ID
+     JOIN m_warehouse w ON ol.m_warehouse_id = w.m_warehouse_id
 UNION
  SELECT ol.ad_client_id,
     ol.ad_org_id,
@@ -184,7 +188,8 @@ UNION
     ol.c_activity_id,
     ol.c_projectphase_id,
     ol.c_projecttask_id,
-	NULL::character varying AS WareHouseName
+    NULL::character varying AS warehousename,
+	NULL::character varying AS reparto
    FROM pp_product_bom b
      JOIN c_orderline ol ON b.m_product_id = ol.m_product_id
      JOIN c_order i ON ol.c_order_id = i.c_order_id
@@ -236,7 +241,8 @@ UNION
     NULL::numeric AS c_activity_id,
     NULL::numeric AS c_projectphase_id,
     NULL::numeric AS c_projecttask_id,
-	NULL::character varying AS WareHouseName
+    NULL::character varying AS warehousename,
+	NULL::character varying AS reparto
    FROM c_order
 UNION
  SELECT ot.ad_client_id,
@@ -290,7 +296,8 @@ UNION
     NULL::numeric AS c_activity_id,
     NULL::numeric AS c_projectphase_id,
     NULL::numeric AS c_projecttask_id,
-	NULL::character varying AS WareHouseName
+    NULL::character varying AS warehousename,
+	NULL::character varying AS reparto
    FROM c_ordertax ot
      JOIN c_tax t ON ot.c_tax_id = t.c_tax_id
 UNION
@@ -345,7 +352,8 @@ UNION
     NULL::numeric AS c_activity_id,
     NULL::numeric AS c_projectphase_id,
     NULL::numeric AS c_projecttask_id,
-	NULL::character varying AS WareHouseName
+    NULL::character varying AS warehousename,
+	NULL::character varying AS reparto
    FROM lar_orderperception op
      JOIN c_tax t ON op.c_tax_id = t.c_tax_id;
 

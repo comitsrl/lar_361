@@ -51,7 +51,9 @@ public class InOutGen extends GenForm implements SystemIDs
 	
 	public Object 			m_M_Warehouse_ID = null;
 	public Object 			m_C_BPartner_ID = null;
-	
+    // @fchiappano Deposito destino
+    public Object           m_M_WarehouseTransaccion_ID = null;
+
 	public void dynInit() throws Exception
 	{
 		setTitle("InOutGenerateInfo");
@@ -99,7 +101,13 @@ public class InOutGen extends GenForm implements SystemIDs
             + "JOIN AD_Org o ON ic.AD_Org_ID=o.AD_Org_ID "
             + "JOIN C_BPartner bp ON ic.C_BPartner_ID=bp.C_BPartner_ID "
             + "JOIN C_DocType dt ON ic.C_DocType_ID=dt.C_DocType_ID "
-            + "LEFT JOIN C_Invoice i ON ic.C_Order_ID = i.C_Order_ID "
+            + "LEFT JOIN LATERAL ( "
+            +                    "SELECT Documentno "
+            +                      "FROM C_Invoice "
+            +                     "WHERE ic.C_Order_ID = C_Order_ID "
+            +                       "AND DocStatus IN ('CO', 'CL') "
+            +                     "ORDER BY DateInvoiced "
+            +                     "FETCH FIRST 1 ROW ONLY) i ON true "
             + "WHERE ic.AD_Client_ID=?");
 
         if (m_M_Warehouse_ID != null)
@@ -360,7 +368,18 @@ public class InOutGen extends GenForm implements SystemIDs
 			log.log(Level.SEVERE, msg);
 			return info;
 		}
-		
+
+        // @fchiappano agregar parametro - M_WarehouseTransaccion_ID=x
+        ip = new MPInstancePara(instance, 40);
+        ip.setParameter("M_WarehouseTransaccion_ID", Integer.parseInt(m_M_WarehouseTransaccion_ID.toString()));
+        if (!ip.save())
+        {
+            String msg = "No Parameter added"; // not translated
+            info = msg;
+            log.log(Level.SEVERE, msg);
+            return info;
+        }
+
 		setTrx(trx);
 		setProcessInfo(pi);
 		
@@ -378,4 +397,16 @@ public class InOutGen extends GenForm implements SystemIDs
 			return -1;
 		return ((Integer)m_M_Warehouse_ID);
 	}
+
+    public void setM_WarehouseTransaccion_ID(Object value)
+    {
+        this.m_M_WarehouseTransaccion_ID = value;
+    }
+
+    public int getM_WarehouseTransaccion_ID()
+    {
+        if (m_M_WarehouseTransaccion_ID == null)
+            return -1;
+        return ((Integer) m_M_WarehouseTransaccion_ID);
+    }
 }

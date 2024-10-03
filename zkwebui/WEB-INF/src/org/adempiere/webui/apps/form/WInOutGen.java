@@ -61,7 +61,12 @@ public class WInOutGen extends InOutGen implements IFormController, EventListene
 	private Listbox  cmbDocType = ListboxFactory.newDropdownListbox();
 	private Label   lDocAction = new Label();
 	private WTableDirEditor docAction;
-	
+
+    // @fchiappano Nuevo campo deposito de transaccion (desde donde efectivamente se va
+    // descontar la mercaderia).
+    private Label lWarehouseTransaccion = new Label();
+    private WTableDirEditor fWarehouseTransaccion;
+
 	public WInOutGen()
 	{
 		log.info("");
@@ -108,12 +113,17 @@ public class WInOutGen extends InOutGen implements IFormController, EventListene
 		
 		row = new Row();
 		form.getParameterPanel().getRows().appendChild(row);
-		row.appendChild(lDocType.rightAlign());
-		row.appendChild(cmbDocType);
+        row.appendChild(lWarehouseTransaccion.rightAlign());
+        row.appendChild(fWarehouseTransaccion.getComponent());
 		row.appendChild(new Space());
 		row.appendChild(lDocAction.rightAlign());
 		row.appendChild(docAction.getComponent());
 		row.appendChild(new Space());
+
+        row = new Row();
+        form.getParameterPanel().getRows().appendChild(row);
+        row.appendChild(lDocType.rightAlign());
+        row.appendChild(cmbDocType);
 	}	//	jbInit
 
 	/**
@@ -149,7 +159,16 @@ public class WInOutGen extends InOutGen implements IFormController, EventListene
 		cmbDocType.addItem(new KeyNamePair(MRMA.Table_ID, Msg.translate(Env.getCtx(), "VendorRMA")));
 		cmbDocType.addActionListener(this);
 		cmbDocType.setSelectedIndex(0);
-		
+
+        // @fchiappano Campo Deposito de Transacción (deposito que se utilizara en el remito).
+		// Columna: M_InOut.M_WhareHouse_ID
+        MLookup warehouseL = MLookupFactory.get(Env.getCtx(), form.getWindowNo(), 0, 3798, DisplayType.TableDir);
+        fWarehouseTransaccion = new WTableDirEditor("M_WarehouseTransaccion_ID", true, false, true, warehouseL);
+        lWarehouseTransaccion.setText("Deposito de Transacción");
+        fWarehouseTransaccion.addValueChangeListener(this);
+        fWarehouseTransaccion.setValue(Env.getContextAsInt(Env.getCtx(), "#M_Warehouse_ID"));
+        setM_WarehouseTransaccion_ID(fWarehouseTransaccion.getValue());
+
 		form.getStatusBar().setStatusLine(Msg.getMsg(Env.getCtx(), "InOutGenerateSel"));//@@
 	}	//	fillPicks
     
@@ -213,6 +232,8 @@ public class WInOutGen extends InOutGen implements IFormController, EventListene
 		log.info(e.getPropertyName() + "=" + e.getNewValue());
 		if (e.getPropertyName().equals("M_Warehouse_ID"))
 			setM_Warehouse_ID(e.getNewValue());
+        if (e.getPropertyName().equals("M_WarehouseTransaccion_ID"))
+            setM_WarehouseTransaccion_ID(e.getNewValue());
 		if (e.getPropertyName().equals("C_BPartner_ID"))
 		{
 			m_C_BPartner_ID = e.getNewValue();

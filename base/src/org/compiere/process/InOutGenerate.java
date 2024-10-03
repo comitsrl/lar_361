@@ -72,6 +72,9 @@ public class InOutGenerate extends SvrProcess
 	/**	Last BP Location		*/
 	private int			m_lastC_BPartner_Location_ID = -1;
 
+    /** @fchiappano Deposito transaccion */
+    private int         p_M_WarehouseTransaccion_ID = 0;
+
 	/** The Query sql			*/
 	private String 		m_sql = null;
 
@@ -111,6 +114,8 @@ public class InOutGenerate extends SvrProcess
 				p_docAction = (String)para[i].getParameter();
 			else if (name.equals("MovementDate"))
                 p_DateShipped = (Timestamp)para[i].getParameter();
+			else if (name.equals("M_WarehouseTransaccion_ID"))
+                p_M_WarehouseTransaccion_ID = para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 			
@@ -296,7 +301,16 @@ public class InOutGenerate extends SvrProcess
 					//	Stored Product
 					String MMPolicy = product.getMMPolicy();
 
-					MStorage[] storages = getStorages(line.getM_Warehouse_ID(),
+                    // @fchiappano Determinar desde donde descontar la mercaderia.
+					// Si se selecciono un deposito de transacción, utilizar este deposito.
+					// En caso contrario, utilizar el desposito de la linea de la orden, como es habitual.
+                    int m_Warehouse_ID;
+                    if (p_M_WarehouseTransaccion_ID > 0)
+                        m_Warehouse_ID = p_M_WarehouseTransaccion_ID;
+                    else
+                        m_Warehouse_ID = line.getM_Warehouse_ID();
+
+					MStorage[] storages = getStorages(m_Warehouse_ID,
 							 line.getM_Product_ID(), line.getM_AttributeSetInstance_ID(),
 							 minGuaranteeDate, MClient.MMPOLICY_FiFo.equals(MMPolicy));
 					
@@ -431,7 +445,11 @@ public class InOutGenerate extends SvrProcess
 		if (m_shipment == null)
 		{
 			m_shipment = new MInOut (order, 0, m_movementDate);
-			m_shipment.setM_Warehouse_ID(orderLine.getM_Warehouse_ID());	//	sets Org too
+            // @fchiappano Chequear si se selecciono un deposito de transacción.
+            if (p_M_WarehouseTransaccion_ID > 0)
+                m_shipment.setM_Warehouse_ID(p_M_WarehouseTransaccion_ID);
+            else
+                m_shipment.setM_Warehouse_ID(orderLine.getM_Warehouse_ID());	//	sets Org too
 			if (order.getC_BPartner_ID() != orderLine.getC_BPartner_ID())
 				m_shipment.setC_BPartner_ID(orderLine.getC_BPartner_ID());
 			if (order.getC_BPartner_Location_ID() != orderLine.getC_BPartner_Location_ID())
