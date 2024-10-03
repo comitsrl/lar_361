@@ -9,7 +9,6 @@ import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
 import org.compiere.util.CLogger;
-import org.compiere.util.DB;
 
 /**
  * Validador de Localización Argentina, que solo se encargara monitoriar los Modelos de clase MOrder y MOrderLine.
@@ -41,6 +40,7 @@ public class LAR_ValidatorOrder implements ModelValidator
             log.info(client.toString());
         }
 
+        engine.addModelChange(MOrder.Table_Name, this);
         engine.addDocValidate(MOrder.Table_Name, this);
     } // initialize
 
@@ -60,7 +60,14 @@ public class LAR_ValidatorOrder implements ModelValidator
     @Override
     public String modelChange(PO po, int type) throws Exception
     {
-        // TODO Auto-generated method stub
+        if (type == TYPE_BEFORE_CHANGE || type == TYPE_BEFORE_NEW)
+        {
+            MOrder orden = (MOrder) po;
+
+            if (orden.getC_DocTypeTarget().getDocSubTypeSO() != null)
+                orden.setOrderType(orden.getC_DocTypeTarget().getDocSubTypeSO());
+        }
+
         return null;
     }
 
@@ -106,11 +113,6 @@ public class LAR_ValidatorOrder implements ModelValidator
                 {
                     orden.set_ValueOfColumn("A_Reparto", true);
                     orden.saveEx();
-//                    String sql = "UPDATE C_Order SET A_Reparto = 'Y' WHERE C_Order_ID = " + orden.getC_Order_ID();
-//                    int result = DB.executeUpdate(sql, orden.get_TrxName());
-//
-//                    if (result < 0)
-//                        return "ERROR al modificar condición Entrega Diferida/Reparto en Orden de Venta.";
                 }
             }
         }
