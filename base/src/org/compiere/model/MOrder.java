@@ -2001,7 +2001,10 @@ public class MOrder extends X_C_Order implements DocAction
             // @fchiappano si la cantidad del movimiento quedo en cero, no crear
             // linea de remito y seguir la siguente linea de OV.
             if (MovementQty.compareTo(Env.ZERO) == 0)
+            {
+                set_Value("A_Reparto", true);
                 continue;
+            }
 
 			//	Location
 			int M_Locator_ID = MStorage.getM_Locator_ID (oLine.getM_Warehouse_ID(), 
@@ -2065,7 +2068,7 @@ public class MOrder extends X_C_Order implements DocAction
 		}
 		
 		//	If we have a Shipment - use that as a base
-		if (shipment != null)
+		if (shipment != null && !get_ValueAsBoolean("A_Reparto"))
 		{
 			if (!INVOICERULE_AfterDelivery.equals(getInvoiceRule()))
 				setInvoiceRule(INVOICERULE_AfterDelivery);
