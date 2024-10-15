@@ -1100,7 +1100,8 @@ public class Allocation
                     // notacredito_ID es mayor a cero, quiere decir que
                     // anteriorrmente, se asigno una nota de credito y se debe
                     // generar la vinculación cruzada.
-                    if (factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARInvoice)
+                    if ((factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_ARInvoice)
+                            || factura.getC_DocType().getDocBaseType().equals(MDocType.DOCBASETYPE_APInvoice))
                             && notaCredito_ID > 0)
                     {
                         aLine.set_ValueOfColumn("NotaCredito_ID", notaCredito_ID);
