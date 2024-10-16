@@ -69,6 +69,7 @@ public class InOutGen extends GenForm implements SystemIDs
 		miniTable.addColumn("C_DocType_ID");
 		miniTable.addColumn("DocumentNo");
 		miniTable.addColumn("InvDocumentNo");
+		miniTable.addColumn("DocumentNoOC");
 		miniTable.addColumn("C_BPartner_ID");
 		miniTable.addColumn("DateOrdered");
 		miniTable.addColumn("TotalLines");
@@ -81,9 +82,10 @@ public class InOutGen extends GenForm implements SystemIDs
 		miniTable.setColumnClass(2, String.class, true, Msg.translate(Env.getCtx(), "C_DocType_ID"));
 		miniTable.setColumnClass(3, String.class, true, Msg.translate(Env.getCtx(), "DocumentNo"));
 		miniTable.setColumnClass(4, String.class, true, "N° Factura");
-		miniTable.setColumnClass(5, String.class, true, Msg.translate(Env.getCtx(), "C_BPartner_ID"));
-		miniTable.setColumnClass(6, Timestamp.class, true, Msg.translate(Env.getCtx(), "DateOrdered"));
-		miniTable.setColumnClass(7, BigDecimal.class, true, Msg.translate(Env.getCtx(), "TotalLines"));
+		miniTable.setColumnClass(5, String.class, true, "N° OC");
+		miniTable.setColumnClass(6, String.class, true, Msg.translate(Env.getCtx(), "C_BPartner_ID"));
+		miniTable.setColumnClass(7, Timestamp.class, true, Msg.translate(Env.getCtx(), "DateOrdered"));
+		miniTable.setColumnClass(8, BigDecimal.class, true, Msg.translate(Env.getCtx(), "TotalLines"));
 		//
 		miniTable.autoSize();
 	}
@@ -96,7 +98,7 @@ public class InOutGen extends GenForm implements SystemIDs
 	{
 	//  Create SQL
         StringBuffer sql = new StringBuffer(
-            "SELECT ic.C_Order_ID, o.Name, dt.Name, ic.DocumentNo, i.DocumentNo, bp.Name, ic.DateOrdered, ic.TotalLines "
+            "SELECT ic.C_Order_ID, o.Name, dt.Name, ic.DocumentNo, i.DocumentNo, ic.POReference, bp.Name, ic.DateOrdered, ic.TotalLines "
             + "FROM M_InOut_Candidate_v ic "
             + "JOIN AD_Org o ON ic.AD_Org_ID=o.AD_Org_ID "
             + "JOIN C_BPartner bp ON ic.C_BPartner_ID=bp.C_BPartner_ID "
@@ -212,9 +214,10 @@ public class InOutGen extends GenForm implements SystemIDs
 				miniTable.setValueAt(rs.getString(3), row, 2);              //  DocType
 				miniTable.setValueAt(rs.getString(4), row, 3);              //  Doc No
 				miniTable.setValueAt(rs.getString(5), row, 4);              //  Nro Factura
-				miniTable.setValueAt(rs.getString(6), row, 5);              //  BPartner
-				miniTable.setValueAt(rs.getTimestamp(7), row, 6);           //  DateOrdered
-				miniTable.setValueAt(rs.getBigDecimal(8), row, 7);          //  TotalLines
+				miniTable.setValueAt(rs.getString(6), row, 5);              //  Nro Orden de Compra
+				miniTable.setValueAt(rs.getString(7), row, 6);              //  BPartner
+				miniTable.setValueAt(rs.getTimestamp(8), row, 7);           //  DateOrdered
+				miniTable.setValueAt(rs.getBigDecimal(9), row, 8);          //  TotalLines
 				//  prepare next
 				row++;
 			}
