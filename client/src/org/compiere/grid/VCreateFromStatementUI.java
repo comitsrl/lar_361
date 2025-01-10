@@ -267,13 +267,13 @@ public class VCreateFromStatementUI extends CreateFromStatement implements Actio
     	parameterBankPanel.add(tipoTarjetaLabel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0
                 ,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
         if(tipoTarjetaField!=null)
-            parameterBankPanel.add(tipoTarjetaField, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0
+            parameterBankPanel.add(tipoTarjetaField, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0
                     ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
 
         parameterBankPanel.add(tipoTarjetaDebitoLabel, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0
                 ,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
         if(tipoTarjetaDebitoField!=null)
-            parameterBankPanel.add(tipoTarjetaDebitoField, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0
+            parameterBankPanel.add(tipoTarjetaDebitoField, new GridBagConstraints(3, 2, 3, 1, 0.0, 0.0
                     ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
     	
     	parameterBankPanel.add(BPartner_idLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0
