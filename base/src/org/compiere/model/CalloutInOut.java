@@ -340,7 +340,9 @@ public class CalloutInOut extends CalloutEngine
 				//	Org
 				Integer ii = new Integer(rs.getInt(1));
 				int AD_Org_ID = Env.getContextAsInt(ctx, WindowNo, "AD_Org_ID");
-				if (AD_Org_ID != ii.intValue())
+				// @fchiappano se toma en consideración tambien, la org principal.
+				MOrgInfo orgI = MOrgInfo.get(ctx, AD_Org_ID);
+				if (AD_Org_ID != ii.intValue() && orgI.get_ValueAsInt("AD_OrgPrincipal_ID") != ii.intValue())
 					mTab.setValue("AD_Org_ID", ii);
 				//	Locator
 				ii = new Integer(rs.getInt(2));
