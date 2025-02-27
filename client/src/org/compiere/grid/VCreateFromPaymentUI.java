@@ -30,6 +30,7 @@ import javax.swing.table.DefaultTableModel;
 import org.compiere.apps.ADialog;
 import org.compiere.apps.AEnv;
 import org.compiere.apps.ConfirmPanel;
+import org.compiere.grid.ed.VCheckBox;
 import org.compiere.grid.ed.VDate;
 import org.compiere.grid.ed.VNumber;
 import org.compiere.model.GridTab;
@@ -116,6 +117,13 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
     protected VDate dateToField = new VDate("DateTo", false, false, true, DisplayType.Date,
             Msg.translate(Env.getCtx(), "DateTo"));
 
+    // @fchiappano Filtros para e-cheqs
+    private VCheckBox eCheq = new VCheckBox("EsElectronico", false, false, true,
+            Msg.translate(Env.getCtx(), "EsElectronico"), "", false);
+    private CLabel fechaVencLabel = new CLabel(Msg.translate(Env.getCtx(), "Fecha_Venc_Cheque"));
+    protected VDate fechaVencField = new VDate("Fecha_Venc_Cheque", false, false, true, DisplayType.Date,
+            Msg.translate(Env.getCtx(), "Fecha_Venc_Cheque"));
+
     /**
      * Dynamic Init
      * 
@@ -175,6 +183,10 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
         amtToLabel.setLabelFor(amtToField);
         amtToField.setToolTipText(Msg.translate(Env.getCtx(), "AmtTo"));
 
+        eCheq.setSelected(false);
+        fechaVencLabel.setLabelFor(fechaVencField);
+        fechaVencField.setToolTipText(Msg.translate(Env.getCtx(), "Fecha_Venc_Cheque"));
+
         CPanel parameterPanel = dialog.getParameterPanel();
         parameterPanel.setLayout(new BorderLayout());
 
@@ -203,6 +215,10 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
             parameterBankPanel.add(checkNoField, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
 
+        // @fchiappano CUARTA LINEA - PRIMERA COLUMNA.
+        parameterBankPanel.add(eCheq, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+                GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
+
         // @fchiappano PRIMERA LINEA - SEGUNDA COLUMNA
         parameterBankPanel.add(nameLabel, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
                 GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
@@ -225,6 +241,13 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
                 GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
         parameterBankPanel.add(amtFromField, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
+
+        // @fchiappano CUARTA LINEA - SEGUNDA COLUMNA
+        parameterBankPanel.add(fechaVencLabel, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
+                GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+        parameterBankPanel.add(fechaVencField, new GridBagConstraints(3, 3, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 5, 5), 0, 0));
+
         // @fchiappano TERCER LINEA - TERCER COLUMNA
         parameterBankPanel.add(amtToLabel, new GridBagConstraints(4, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST,
                 GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
@@ -290,7 +313,7 @@ public class VCreateFromPaymentUI extends CreateFromPayment implements ActionLis
     {
         loadTableOIS(getPaymentData(documentNoField.getText(), nameField.getText(), dateFromField.getValue(),
                 dateToField.getValue(), amtFromField.getValue(), amtToField.getValue(), routingNoField.getText(),
-                checkNoField.getText()));
+                checkNoField.getText(), eCheq.isSelected(), fechaVencField.getValue()));
     } // loadPayments
 
     protected void loadTableOIS(Vector<?> data)

@@ -72,7 +72,7 @@ public class CreateFromPayment extends CreateFrom
      * @return sql where clause
      */
     public String getSQLWhere(String documentNo, String name, Object dateFrom, Object dateTo, Object amtFrom,
-            Object amtTo, String routingNo, String checkNo)
+            Object amtTo, String routingNo, String checkNo, boolean eCheq, Object fechaVenc)
     {
         StringBuffer sql = new StringBuffer("WHERE ");
 
@@ -117,6 +117,12 @@ public class CreateFromPayment extends CreateFrom
         if (checkNo.length() > 0)
             sql.append(" AND p.CheckNo LIKE ?");
 
+        // @fchiappano filtros para echeq
+        if (eCheq)
+            sql.append(" AND pa.EsElectronico = ?");
+        if (fechaVenc != null)
+            sql.append(" AND TRUNC(pa.Fecha_Venc_Cheque) = ?");
+
         log.fine(sql.toString());
         return sql.toString();
     } // getSQLWhere
@@ -129,7 +135,7 @@ public class CreateFromPayment extends CreateFrom
      * @throws SQLException
      */
     void setParameters(PreparedStatement pstmt, boolean forCount, String documentNo, String name, Object dateFrom,
-            Object dateTo, Object amtFrom, Object amtTo, String routingNo, String checkNo) throws SQLException
+            Object dateTo, Object amtFrom, Object amtTo, String routingNo, String checkNo, boolean eCheq, Object fechaVenc) throws SQLException
     {
         int index = 1;
 
@@ -177,6 +183,14 @@ public class CreateFromPayment extends CreateFrom
         if (checkNo.length() > 0)
             pstmt.setString(index++, getSQLText(checkNo));
 
+        // @fchiappano paremetros para e-cheqs
+        if (eCheq)
+            pstmt.setString(index++, "Y");
+        if (fechaVenc != null)
+        {
+            Timestamp venc = (Timestamp) fechaVenc;
+            pstmt.setTimestamp(index++, venc);
+        }
     } // setParameters
 
     /**
@@ -195,47 +209,48 @@ public class CreateFromPayment extends CreateFrom
     } // getSQLText
 
     protected Vector<Vector<Object>> getPaymentData(String documentNo, String name, Object dateFrom, Object dateTo,
-            Object amtFrom, Object amtTo, String routingNo, String checkNo)
+            Object amtFrom, Object amtTo, String routingNo, String checkNo, boolean eCheq, Object fechaVenc)
     {
         Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 
         String sql = "SELECT ba.C_BankAccount_ID, ba.Name, p.A_Name, p.DateTrx, p.C_Payment_ID, p.DocumentNo, p.RoutingNo,"
                    +       " p.CheckNo, p.IsReceipt, c.C_Currency_ID, c.ISO_Code, p.PayAmt,"
                    +       " currencyConvert(p.PayAmt, p.C_Currency_ID, ba.C_Currency_ID, pa.DateAcct, p.C_ConversionType_ID, p.AD_Client_ID, p.AD_Org_ID),"
-                   +       " p.IsAllocated, pa.Fecha_Venc_Cheque"
+                   +       " p.IsAllocated, pa.Fecha_Venc_Cheque, pa.EsElectronico"
                    +  " FROM C_Payment_v p"
                    +  " JOIN C_Payment pa ON p.C_Payment_ID = pa.C_Payment_ID"
                    +  " JOIN C_BankAccount ba ON (p.C_BankAccount_ID = ba.C_BankAccount_ID)"
                    +  " JOIN C_Currency c ON (p.C_Currency_ID = c.C_Currency_ID) ";
 
-        sql = sql + getSQLWhere(documentNo, name, dateFrom, dateTo, amtFrom, amtTo, routingNo, checkNo) + " ORDER BY p.DateTrx";
+        sql = sql + getSQLWhere(documentNo, name, dateFrom, dateTo, amtFrom, amtTo, routingNo, checkNo, eCheq, fechaVenc) + " ORDER BY p.DateTrx";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try
         {
             pstmt = DB.prepareStatement(sql.toString(), null);
-            setParameters(pstmt, false, documentNo, name, dateFrom, dateTo, amtFrom, amtTo, routingNo, checkNo);
+            setParameters(pstmt, false, documentNo, name, dateFrom, dateTo, amtFrom, amtTo, routingNo, checkNo, eCheq, fechaVenc);
             rs = pstmt.executeQuery();
             while (rs.next())
             {
                 Vector<Object> line = new Vector<Object>(6);
                 line.add(new Boolean(false)); // 0-Selection
                 line.add(rs.getString(3)); // 1- Nombre
-                line.add(rs.getTimestamp(15)); // 2- Fecha Vencimiento.
-                line.add(rs.getString(7)); // 3-Banco-Sucursal
-                line.add(rs.getString(8)); // 4-CheckNo
-                line.add(rs.getBigDecimal(12)); // 5-Total del Pago
-                line.add(rs.getBigDecimal(13)); // 6-Convertido
+                line.add(rs.getBoolean(16)); // 2- ECheq
+                line.add(rs.getTimestamp(15)); // 3- Fecha Vencimiento.
+                line.add(rs.getString(7)); // 4-Banco-Sucursal
+                line.add(rs.getString(8)); // 5-CheckNo
+                line.add(rs.getBigDecimal(12)); // 6-Total del Pago
+                line.add(rs.getBigDecimal(13)); // 7-Convertido
                 KeyNamePair pp = new KeyNamePair(rs.getInt(10), rs.getString(11));
-                line.add(pp); // 7-Moneda
-                line.add(rs.getTimestamp(4)); // 8- DateTrx
-                line.add(rs.getString(9).equals("Y")); // 9-Es Recibo.
+                line.add(pp); // 8-Moneda
+                line.add(rs.getTimestamp(4)); // 9- DateTrx
+                line.add(rs.getString(9).equals("Y")); // 10-Es Recibo.
                 pp = new KeyNamePair(rs.getInt(5), rs.getString(6));
-                line.add(pp); // 10-C_Payment_ID
+                line.add(pp); // 11-C_Payment_ID
                 pp = new KeyNamePair(rs.getInt(1), rs.getString(2));
-                line.add(pp); // 11-C_BankAccout_ID
-                line.add(rs.getString(14).equals("Y")); // 12- Asignado
+                line.add(pp); // 12-C_BankAccout_ID
+                line.add(rs.getString(14).equals("Y")); // 13- Asignado
                 data.add(line);
             }
         }
@@ -262,17 +277,18 @@ public class CreateFromPayment extends CreateFrom
     {
         miniTable.setColumnClass(0, Boolean.class, false); // 0-Seleccion
         miniTable.setColumnClass(1, String.class, true); // 1-Nombre
-        miniTable.setColumnClass(2, Timestamp.class, true); // 2-Fecha Vencimiento
-        miniTable.setColumnClass(3, String.class, true); // 3-Banco-Sucursal
-        miniTable.setColumnClass(4, String.class, true); // 4-Nro de Cheque
-        miniTable.setColumnClass(5, BigDecimal.class, true); // 5-Total del pago
-        miniTable.setColumnClass(6, BigDecimal.class, true); // 6-Convertido,
-        miniTable.setColumnClass(7, String.class, true); // 7-Moneda
-        miniTable.setColumnClass(8, Timestamp.class, true); // 8-Fecha Transacción
-        miniTable.setColumnClass(9, Boolean.class, true); // 9-Es Cobro
-        miniTable.setColumnClass(10, String.class, true); // 10-Nro Documento
-        miniTable.setColumnClass(11, String.class, true); // 11- Cuenta Bancaria / Caja.
-        miniTable.setColumnClass(12, Boolean.class, true); // 12-Asignado
+        miniTable.setColumnClass(2, Boolean.class, true); // 2-Electronico
+        miniTable.setColumnClass(3, Timestamp.class, true); // 3-Fecha Vencimiento
+        miniTable.setColumnClass(4, String.class, true); // 4-Banco-Sucursal
+        miniTable.setColumnClass(5, String.class, true); // 5-Nro de Cheque
+        miniTable.setColumnClass(6, BigDecimal.class, true); // 6-Total del pago
+        miniTable.setColumnClass(7, BigDecimal.class, true); // 7-Convertido,
+        miniTable.setColumnClass(8, String.class, true); // 8-Moneda
+        miniTable.setColumnClass(9, Timestamp.class, true); // 9-Fecha Transacción
+        miniTable.setColumnClass(10, Boolean.class, true); // 10-Es Cobro
+        miniTable.setColumnClass(11, String.class, true); // 11-Nro Documento
+        miniTable.setColumnClass(12, String.class, true); // 12- Cuenta Bancaria / Caja.
+        miniTable.setColumnClass(13, Boolean.class, true); // 13-Asignado
         // Table UI
         miniTable.autoSize();
     } // configureMiniTable
@@ -283,6 +299,7 @@ public class CreateFromPayment extends CreateFrom
         Vector<String> columnNames = new Vector<String>(12);
         columnNames.add(Msg.getMsg(Env.getCtx(), "Select"));
         columnNames.add(Msg.getElement(Env.getCtx(), "A_Name"));
+        columnNames.add("E-Cheq");
         columnNames.add("Venc. Cheque");
         columnNames.add("Banco - Sucursal");
         columnNames.add(Msg.translate(Env.getCtx(), "CheckNo"));
@@ -334,14 +351,14 @@ public class CreateFromPayment extends CreateFrom
             if (((Boolean) miniTable.getValueAt(i, 0)).booleanValue())
             {
                 String a_Name = (String) miniTable.getValueAt(i, 1); // 1-A_Name
-                Timestamp trxDate = (Timestamp) miniTable.getValueAt(i, 8); // 8-DateTrx
-                KeyNamePair pp = (KeyNamePair) miniTable.getValueAt(i, 10); // 10-C_Payment_ID
+                Timestamp trxDate = (Timestamp) miniTable.getValueAt(i, 9); // 9-DateTrx
+                KeyNamePair pp = (KeyNamePair) miniTable.getValueAt(i, 11); // 11-C_Payment_ID
                 int c_Payment_ID = pp.getKey();
-                String routingNo = (String) miniTable.getValueAt(i, 3); // 3-RoutingNo
-                String checkNo = (String) miniTable.getValueAt(i, 4); // 4-CheckNo
-                pp = (KeyNamePair) miniTable.getValueAt(i, 7); // 7-Currency
+                String routingNo = (String) miniTable.getValueAt(i, 4); // 4-RoutingNo
+                String checkNo = (String) miniTable.getValueAt(i, 5); // 5-CheckNo
+                pp = (KeyNamePair) miniTable.getValueAt(i, 8); // 8-Currency
                 int c_Currency_ID = pp.getKey();
-                BigDecimal trxAmt = (BigDecimal) miniTable.getValueAt(i, 6); // 6-Conv-Amt
+                BigDecimal trxAmt = (BigDecimal) miniTable.getValueAt(i, 7); // 7-Conv-Amt
 
                 log.fine("Line Date=" + trxDate + ", Payment=" + c_Payment_ID + ", Currency=" + c_Currency_ID + ", Amt="
                         + trxAmt);
@@ -383,12 +400,12 @@ public class CreateFromPayment extends CreateFrom
         {
             if (((Boolean) miniTable.getValueAt(i, 0)).booleanValue())
             {
-                Timestamp trxDate = (Timestamp) miniTable.getValueAt(i, 8); // 3-DateTrx
-                KeyNamePair pp = (KeyNamePair) miniTable.getValueAt(i, 10); // 4-C_Payment_ID
+                Timestamp trxDate = (Timestamp) miniTable.getValueAt(i, 9); // 9-DateTrx
+                KeyNamePair pp = (KeyNamePair) miniTable.getValueAt(i, 11); // 11-C_Payment_ID
                 int c_Payment_ID = pp.getKey();
-                pp = (KeyNamePair) miniTable.getValueAt(i, 7); // 7-Currency
+                pp = (KeyNamePair) miniTable.getValueAt(i, 8); // 8-Currency
                 int c_Currency_ID = pp.getKey();
-                BigDecimal trxAmt = (BigDecimal) miniTable.getValueAt(i, 6); // 9-Conv-Amt
+                BigDecimal trxAmt = (BigDecimal) miniTable.getValueAt(i, 7); // 7-Conv-Amt
 
                 log.fine("Line Date=" + trxDate + ", Payment=" + c_Payment_ID + ", Currency=" + c_Currency_ID + ", Amt="
                         + trxAmt);
