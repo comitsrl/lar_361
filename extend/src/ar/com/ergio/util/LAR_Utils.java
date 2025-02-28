@@ -22,8 +22,12 @@ import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.compiere.model.I_M_PriceList;
 import org.compiere.model.MClient;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MOrgInfo;
+import org.compiere.model.MPriceList;
+import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -263,5 +267,38 @@ public final class LAR_Utils {
         calendar.add(atributo, cantSuma);
         return new Timestamp(calendar.getTimeInMillis());
     } // sumarTiempo
+
+    /**
+     * Recuperar Lista de precios por defecto de la organización.
+     *
+     * @author fchiappano
+     * @param ctx
+     * @param IsSOPriceList
+     * @param AD_Client_ID
+     * @param AD_Org_ID
+     * @param trxName
+     * @return
+     */
+    public static MPriceList getPriceListDefaultOrg (Properties ctx, boolean IsSOPriceList, int AD_Client_ID, int AD_Org_ID, String trxName)
+    {
+        AD_Org_ID = getAD_OrgParent_ID(ctx, AD_Org_ID, trxName);
+
+        final String whereClause = "IsSOPriceList=? AND AD_Client_ID=? AND AD_Org_ID=?";
+        MPriceList listaDefault = new Query(ctx, I_M_PriceList.Table_Name, whereClause, trxName)
+                    .setParameters(true, AD_Client_ID, AD_Org_ID)
+                    .setOnlyActiveRecords(true)
+                    .first();
+
+        return listaDefault;
+    } // getPriceListDefaultOrg
+
+    public static int getAD_OrgParent_ID(Properties ctx, int AD_Org_ID, String trxName)
+    {
+        int ad_OrgParent_ID = MOrgInfo.get(ctx, AD_Org_ID, trxName).get_ValueAsInt("Parent_Org_ID");
+        if (ad_OrgParent_ID > 0)
+            AD_Org_ID = ad_OrgParent_ID;
+
+        return AD_Org_ID;
+    } //  getAD_Org_ID
 
 } // LAR_Utils

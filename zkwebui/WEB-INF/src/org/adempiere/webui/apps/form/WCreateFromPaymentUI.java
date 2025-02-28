@@ -20,6 +20,7 @@ import java.util.logging.Level;
 
 import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Button;
+import org.adempiere.webui.component.Checkbox;
 import org.adempiere.webui.component.ConfirmPanel;
 import org.adempiere.webui.component.Grid;
 import org.adempiere.webui.component.GridFactory;
@@ -44,6 +45,7 @@ import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zkex.zul.Borderlayout;
 import org.zkoss.zkex.zul.Center;
 import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Space;
 
 /**
  * Clase de implementación grafica para la WebUI, de la ventana
@@ -112,6 +114,13 @@ public class WCreateFromPaymentUI extends CreateFromPayment implements EventList
     protected WDateEditor dateToField = new WDateEditor("DateTo", false, false, true,
             Msg.translate(Env.getCtx(), "DateTo"));
 
+    // @fchiappano filtros de búsqueda para e-cheq
+    protected Checkbox eCheq = new Checkbox();
+    protected Label fechaVencLabel = new Label(Msg.translate(Env.getCtx(), "Fecha_Venc_Cheque"));
+    protected WDateEditor fechaVencField = new WDateEditor("Fecha_Venc_Cheque", false, false, true,
+            Msg.translate(Env.getCtx(), "Fecha_Venc_Cheque"));
+
+
     /**
      * Dynamic Init
      *
@@ -130,7 +139,7 @@ public class WCreateFromPaymentUI extends CreateFromPayment implements EventList
         window.getConfirmPanel().addButton(refreshButton);
         window.setTitle(getTitle());
 
-        loadBankAccount();
+        loadPayments();
 
         return true;
     } // dynInit
@@ -142,6 +151,10 @@ public class WCreateFromPaymentUI extends CreateFromPayment implements EventList
 
         amtFromField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "AmtFrom"));
         amtToField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "AmtTo"));
+
+        fechaVencField.getComponent().setTooltiptext(Msg.translate(Env.getCtx(), "Fecha_Venc_Cheque"));
+        eCheq.setText(Msg.translate(Env.getCtx(), "EsElectronico"));
+        eCheq.setSelected(false);
 
         Borderlayout parameterLayout = new Borderlayout();
         parameterLayout.setHeight("130px");
@@ -186,6 +199,13 @@ public class WCreateFromPaymentUI extends CreateFromPayment implements EventList
         hbox.appendChild(amtToLabel.rightAlign());
         hbox.appendChild(amtToField.getComponent());
         row.appendChild(hbox);
+
+        // @fchiappano Cuarta Linea: filtros de e-cheq
+        row = rows.newRow();
+        row.appendChild(new Space());
+        row.appendChild(eCheq);
+        row.appendChild(fechaVencLabel.rightAlign());
+        row.appendChild(fechaVencField.getComponent());
     } // zkInit
 
     /**
@@ -200,16 +220,16 @@ public class WCreateFromPaymentUI extends CreateFromPayment implements EventList
         log.config("Action=" + e.getTarget().getId());
         if (e.getTarget().equals(window.getConfirmPanel().getButton(ConfirmPanel.A_REFRESH)))
         {
-            loadBankAccount();
+            loadPayments();
             window.tableChanged(null);
         }
     } // onEvent
 
-    protected void loadBankAccount()
+    protected void loadPayments()
     {
         loadTableOIS(getPaymentData(documentNoField.getValue().toString(), nameField.getValue().toString(),
                 dateFromField.getValue(), dateToField.getValue(), amtFromField.getValue(), amtToField.getValue(),
-                routingNoField.getValue().toString(), checkNoField.getValue().toString()));
+                routingNoField.getValue().toString(), checkNoField.getValue().toString(), eCheq.isChecked(), fechaVencField.getValue()));
     } // loadBankAccount
 
     protected void loadTableOIS(Vector<?> data)

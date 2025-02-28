@@ -137,7 +137,9 @@ public class WAllocation extends Allocation
 	private Checkbox autoWriteOff = new Checkbox();
 	private Label organizationLabel = new Label();
 	private WTableDirEditor organizationPick;
-	
+
+    private Checkbox isSOTrx = new Checkbox();
+
 	private Panel southPanel = new Panel();
 
 	/**
@@ -172,7 +174,11 @@ public class WAllocation extends Allocation
 		multiCurrency.setText(Msg.getMsg(Env.getCtx(), "MultiCurrency"));
 		multiCurrency.addActionListener(this);
 		allocCurrencyLabel.setText(".");
-		
+        // @emmie - Separar transacciones de venta y de compras
+        isSOTrx.setSelected(!"N".equals(Env.getContext(Env.getCtx(), form.getWindowNo(), "IsSOTrx")));
+        isSOTrx.setText(Msg.translate(Env.getCtx(), "IsSOTrx"));
+        isSOTrx.addActionListener(this);
+
 		organizationLabel.setText(Msg.translate(Env.getCtx(), "AD_Org_ID"));
 		
 		North north = new North();
@@ -204,7 +210,7 @@ public class WAllocation extends Allocation
 		row = rows.newRow();
 		row.appendChild(new Space());
 		row.appendChild(autoWriteOff);
-		row.appendChild(new Space());
+		row.appendChild(isSOTrx);
 		row.appendChild(new Space());
 		row.appendChild(new Space());
 		row.appendChild(new Space());
@@ -337,7 +343,7 @@ public class WAllocation extends Allocation
 	public void onEvent(Event e)
 	{
 		log.config("");
-		if (e.getTarget().equals(multiCurrency))
+		if (e.getTarget().equals(multiCurrency) || e.getTarget().equals(isSOTrx))
 			loadBPartner();
 		//	Allocate
 		else if (e.getTarget().equals(allocateButton))
@@ -441,7 +447,7 @@ public class WAllocation extends Allocation
 	{
 		checkBPartner();
 		
-		Vector<Vector<Object>> data = getPaymentData(multiCurrency.isSelected(), dateField.getValue(), paymentTable);
+		Vector<Vector<Object>> data = getPaymentData(multiCurrency.isSelected(), isSOTrx.isSelected(), dateField.getValue(), paymentTable);
 		Vector<String> columnNames = getPaymentColumnNames(multiCurrency.isSelected());
 		
 		paymentTable.clear();
@@ -456,7 +462,7 @@ public class WAllocation extends Allocation
 		setPaymentColumnClass(paymentTable, multiCurrency.isSelected());
 		//
 
-		data = getInvoiceData(multiCurrency.isSelected(), dateField.getValue(), invoiceTable);
+		data = getInvoiceData(multiCurrency.isSelected(), isSOTrx.isSelected(), dateField.getValue(), invoiceTable);
 		columnNames = getInvoiceColumnNames(multiCurrency.isSelected());
 		
 		invoiceTable.clear();
