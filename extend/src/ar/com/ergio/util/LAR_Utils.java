@@ -134,15 +134,19 @@ public final class LAR_Utils {
      */
     public static boolean checkDuplicateCUIT(final String cuit, final int C_BPartner_ID)
     {
+        // @fchiappano eliminar guiones tanto del cuit recibido como parametro,
+        // como de los existentes en BD antes de realizar la comparación.
+        String cuitFormateado = cuit.replaceAll("[^0-9]", "");
+
         int cant = 0;
-        String sql = "SELECT COUNT(*) FROM C_BPartner WHERE taxid = ?";
+        String sql = "SELECT COUNT(*) FROM C_BPartner WHERE regexp_replace(taxid, '[^0-9]', '', 'g') = ?";
         if (C_BPartner_ID > 0)
         {
             sql = sql + " AND C_BPartner_ID!=?";
-            cant = DB.getSQLValue(null, sql, cuit, C_BPartner_ID);
+            cant = DB.getSQLValue(null, sql, cuitFormateado, C_BPartner_ID);
         }
         else
-            cant = DB.getSQLValue(null, sql, cuit);
+            cant = DB.getSQLValue(null, sql, cuitFormateado);
         return cant > 0;
     } // checkDuplicateCUIT
 
