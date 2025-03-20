@@ -2897,12 +2897,13 @@ public final class MPayment extends X_C_Payment
                     sql = "SELECT stm.EsCierreCaja"
                         +  " FROM C_BankStatementLine stml"
                         +  " JOIN C_BankStatement stm ON stml.C_BankStatement_ID = stm.C_BankStatement_ID"
-                        + " WHERE C_BankStatementLine_ID = ?";
+                        + " WHERE stm.DocStatus NOT IN ('VO')"
+                        +   " AND C_BankStatementLine_ID = ?";
 
                     String esCierreCaja = DB.getSQLValueString(get_TrxName(), sql, C_BankStatementLine_ID);
                     if (esCierreCaja.equals("N"))
                     {
-                        m_processMsg = "No se puede anular el cobro, ya que el mismo ya fue conciliado en una cuenta bancaria.";
+                        m_processMsg = "No se puede anular el cobro, ya que el mismo fue conciliado en una cuenta bancaria.";
                         return false;
                     }
                 }
