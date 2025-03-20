@@ -349,7 +349,7 @@ public class MLARRetiroCaja extends X_LAR_RetiroCaja implements DocAction, DocOp
 
             // Si se trata de una transferencia o un deposito, revierto el cobro
             // de la caja/cuenta destino.
-            if (isTransferencia() || get_ValueAsBoolean("Deposito") || get_ValueAsBoolean("TransferenciaBancaria"))
+            if (isTransferencia() || get_ValueAsBoolean("Deposito") || get_ValueAsBoolean("TransferenciaBancaria") || get_ValueAsBoolean("ExtraccionBancaria"))
             {
                 MPayment cobro = new MPayment(p_ctx, linea.getCobro_ID(), get_TrxName());
 
