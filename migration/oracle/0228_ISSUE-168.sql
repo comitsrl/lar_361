@@ -72,77 +72,77 @@ UPDATE AD_Column_Trl SET Name='Crear Orden de Pago',Updated=TO_DATE('2025-02-28 
 
 -- 28/02/2025 0:35:27 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process (AD_Process_ID,IsDirectPrint,IsReport,AccessLevel,IsBetaFunctionality,IsServerProcess,ShowHelp,EntityType,Statistic_Seconds,Statistic_Count,Classname,CopyFromProcess,Value,Name,AD_Org_ID,AD_Client_ID,UpdatedBy,CreatedBy,Updated,Created,IsActive) VALUES (3000594,'N','N','3','N','N','Y','LAR',0,0,'ar.com.ergio.process.LAR_GenerarOrdenPago','N','LAR_GenerarOP','LAR_GenerarOP',0,0,100,100,TO_DATE('2025-02-28 00:35:26','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:35:26','YYYY-MM-DD HH24:MI:SS'),'Y')
+INSERT INTO AD_Process (AD_Process_ID,IsDirectPrint,IsReport,AccessLevel,IsBetaFunctionality,IsServerProcess,ShowHelp,EntityType,Statistic_Seconds,Statistic_Count,Classname,CopyFromProcess,Value,Name,AD_Org_ID,AD_Client_ID,UpdatedBy,CreatedBy,Updated,Created,IsActive) VALUES (5000594,'N','N','3','N','N','Y','LAR',0,0,'ar.com.ergio.process.LAR_GenerarOrdenPago','N','LAR_GenerarOP','LAR_GenerarOP',0,0,100,100,TO_DATE('2025-02-28 00:35:26','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:35:26','YYYY-MM-DD HH24:MI:SS'),'Y')
 ;
 
 -- 28/02/2025 0:35:27 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Trl (AD_Language,AD_Process_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_ID=3000594 AND NOT EXISTS (SELECT * FROM AD_Process_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_ID=t.AD_Process_ID)
+INSERT INTO AD_Process_Trl (AD_Language,AD_Process_ID, Help,Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_ID, t.Help,t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_ID=5000594 AND NOT EXISTS (SELECT * FROM AD_Process_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_ID=t.AD_Process_ID)
 ;
 
 -- 28/02/2025 0:39:16 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,Help,AD_Process_ID,CreatedBy,IsCentrallyMaintained,AD_Reference_ID,AD_Val_Rule_ID,SeqNo,IsMandatory,AD_Element_ID,EntityType,Name,ColumnName,Description,IsActive,AD_Client_ID,UpdatedBy,Updated,Created,AD_Org_ID,IsEncrypted) VALUES ('N',3001045,0,'The Bank Account identifies an account at this Bank.',3000594,100,'Y',19,3000004,10,'N',836,'LAR','Bank Account','C_BankAccount_ID','Account at the Bank','Y',0,100,TO_DATE('2025-02-28 00:39:16','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:39:16','YYYY-MM-DD HH24:MI:SS'),0,'N')
+INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,Help,AD_Process_ID,CreatedBy,IsCentrallyMaintained,AD_Reference_ID,AD_Val_Rule_ID,SeqNo,IsMandatory,AD_Element_ID,EntityType,Name,ColumnName,Description,IsActive,AD_Client_ID,UpdatedBy,Updated,Created,AD_Org_ID,IsEncrypted) VALUES ('N',5001045,0,'The Bank Account identifies an account at this Bank.',5000594,100,'Y',19,3000004,10,'N',836,'LAR','Bank Account','C_BankAccount_ID','Account at the Bank','Y',0,100,TO_DATE('2025-02-28 00:39:16','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:39:16','YYYY-MM-DD HH24:MI:SS'),0,'N')
 ;
 
 -- 28/02/2025 0:39:16 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=3001045 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
+INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=5001045 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
 ;
 
 -- 28/02/2025 0:40:00 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Name='Caja',Description=NULL,Help=NULL,Updated=TO_DATE('2025-02-28 00:40:00','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3001045 AND AD_Language='es_AR'
+UPDATE AD_Process_Para_Trl SET IsTranslated='Y',Name='Caja',Description=NULL,Help=NULL,Updated=TO_DATE('2025-02-28 00:40:00','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=5001045 AND AD_Language='es_AR'
 ;
 
 -- 28/02/2025 0:40:07 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-UPDATE AD_Process_Para SET IsCentrallyMaintained='N',Updated=TO_DATE('2025-02-28 00:40:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3001045
+UPDATE AD_Process_Para SET IsCentrallyMaintained='N',Updated=TO_DATE('2025-02-28 00:40:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=5001045
 ;
 
 -- 28/02/2025 0:42:34 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-UPDATE AD_Process_Para SET Help=NULL, Name='Caja', Description=NULL,Updated=TO_DATE('2025-02-28 00:42:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=3001045
+UPDATE AD_Process_Para SET Help=NULL, Name='Caja', Description=NULL,Updated=TO_DATE('2025-02-28 00:42:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Process_Para_ID=5001045
 ;
 
 -- 28/02/2025 0:42:34 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-UPDATE AD_Process_Para_Trl SET IsTranslated='N' WHERE AD_Process_Para_ID=3001045
+UPDATE AD_Process_Para_Trl SET IsTranslated='N' WHERE AD_Process_Para_ID=5001045
 ;
 
 -- 28/02/2025 0:44:22 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,AD_Process_ID,CreatedBy,IsCentrallyMaintained,AD_Reference_ID,AD_Val_Rule_ID,SeqNo,IsMandatory,EntityType,Name,ColumnName,IsActive,AD_Client_ID,UpdatedBy,Updated,Created,AD_Org_ID,IsEncrypted) VALUES ('N',3001046,0,3000594,100,'N',19,3000002,20,'N','LAR','Tipo de Documento','C_DocType_ID','Y',0,100,TO_DATE('2025-02-28 00:44:21','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:44:21','YYYY-MM-DD HH24:MI:SS'),0,'N')
+INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,AD_Process_ID,CreatedBy,IsCentrallyMaintained,AD_Reference_ID,AD_Val_Rule_ID,SeqNo,IsMandatory,EntityType,Name,ColumnName,IsActive,AD_Client_ID,UpdatedBy,Updated,Created,AD_Org_ID,IsEncrypted) VALUES ('N',5001046,0,5000594,100,'N',19,3000002,20,'N','LAR','Tipo de Documento','C_DocType_ID','Y',0,100,TO_DATE('2025-02-28 00:44:21','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:44:21','YYYY-MM-DD HH24:MI:SS'),0,'N')
 ;
 
 -- 28/02/2025 0:44:22 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=3001046 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
+INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=5001046 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
 ;
 
 -- 28/02/2025 0:48:07 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,AD_Process_ID,CreatedBy,IsCentrallyMaintained,AD_Reference_ID,AD_Val_Rule_ID,SeqNo,IsMandatory,AD_Reference_Value_ID,AD_Element_ID,EntityType,Name,ColumnName,IsActive,AD_Client_ID,UpdatedBy,Updated,Created,AD_Org_ID,IsEncrypted) VALUES ('N',3001047,0,3000594,100,'Y',18,3000118,30,'N',3000054,3000368,'LAR','Tipo de Depósito Directo','LAR_Deposito_Directo_ID','Y',0,100,TO_DATE('2025-02-28 00:48:07','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:48:07','YYYY-MM-DD HH24:MI:SS'),0,'N')
+INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,AD_Process_ID,CreatedBy,IsCentrallyMaintained,AD_Reference_ID,AD_Val_Rule_ID,SeqNo,IsMandatory,AD_Reference_Value_ID,AD_Element_ID,EntityType,Name,ColumnName,IsActive,AD_Client_ID,UpdatedBy,Updated,Created,AD_Org_ID,IsEncrypted) VALUES ('N',5001047,0,5000594,100,'Y',18,3000118,30,'N',3000054,3000368,'LAR','Tipo de Depósito Directo','LAR_Deposito_Directo_ID','Y',0,100,TO_DATE('2025-02-28 00:48:07','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:48:07','YYYY-MM-DD HH24:MI:SS'),0,'N')
 ;
 
 -- 28/02/2025 0:48:07 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=3001047 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
+INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=5001047 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
 ;
 
 -- 28/02/2025 0:49:50 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,AD_Process_ID,CreatedBy,IsCentrallyMaintained,AD_Reference_ID,SeqNo,IsMandatory,EntityType,Name,ColumnName,IsActive,AD_Client_ID,UpdatedBy,Updated,Created,AD_Org_ID,IsEncrypted) VALUES ('N',3001057,0,3000594,100,'N',20,40,'N','LAR','Completar','Completar','Y',0,100,TO_DATE('2025-02-28 00:49:49','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:49:49','YYYY-MM-DD HH24:MI:SS'),0,'N')
+INSERT INTO AD_Process_Para (IsRange,AD_Process_Para_ID,FieldLength,AD_Process_ID,CreatedBy,IsCentrallyMaintained,AD_Reference_ID,SeqNo,IsMandatory,EntityType,Name,ColumnName,IsActive,AD_Client_ID,UpdatedBy,Updated,Created,AD_Org_ID,IsEncrypted) VALUES ('N',5001057,0,5000594,100,'N',20,40,'N','LAR','Completar','Completar','Y',0,100,TO_DATE('2025-02-28 00:49:49','YYYY-MM-DD HH24:MI:SS'),TO_DATE('2025-02-28 00:49:49','YYYY-MM-DD HH24:MI:SS'),0,'N')
 ;
 
 -- 28/02/2025 0:49:50 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=3001057 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
+INSERT INTO AD_Process_Para_Trl (AD_Language,AD_Process_Para_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Process_Para_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Process_Para t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Process_Para_ID=5001057 AND NOT EXISTS (SELECT * FROM AD_Process_Para_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Process_Para_ID=t.AD_Process_Para_ID)
 ;
 
 -- 28/02/2025 0:50:37 ART
 -- ISSUE #168: Generación automatica de OP, desde Factura Proveedor.
-UPDATE AD_Column SET AD_Process_ID=3000594,Updated=TO_DATE('2025-02-28 00:50:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005801
+UPDATE AD_Column SET AD_Process_ID=5000594,Updated=TO_DATE('2025-02-28 00:50:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005801
 ;
 
 -- 28/02/2025 0:51:01 ART
