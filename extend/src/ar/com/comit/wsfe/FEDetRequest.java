@@ -59,15 +59,25 @@ public class FEDetRequest  implements java.io.Serializable {
 
     private String monId;
 
-    private double monCotiz;
+    private Double monCotiz;
 
-    private CbteAsoc[] cbtesAsoc;
+    private java.lang.String canMisMonExt;
 
-    private Tributo[] tributos;
+    private int condicionIVAReceptorId;
 
-    private AlicIva[] iva;
+    private ar.com.comit.wsfe.CbteAsoc[] cbtesAsoc;
 
-    private Opcional[] opcionales;
+    private ar.com.comit.wsfe.Tributo[] tributos;
+
+    private ar.com.comit.wsfe.AlicIva[] iva;
+
+    private ar.com.comit.wsfe.Opcional[] opcionales;
+
+    private ar.com.comit.wsfe.Comprador[] compradores;
+
+    private ar.com.comit.wsfe.Periodo periodoAsoc;
+
+    private ar.com.comit.wsfe.Actividad[] actividades;
 
     public FEDetRequest() {
     }
@@ -85,15 +95,20 @@ public class FEDetRequest  implements java.io.Serializable {
            double impOpEx,
            double impTrib,
            double impIVA,
-           String fchServDesde,
-           String fchServHasta,
-           String fchVtoPago,
-           String monId,
-           double monCotiz,
-           CbteAsoc[] cbtesAsoc,
-           Tributo[] tributos,
-           AlicIva[] iva,
-           Opcional[] opcionales) {
+           java.lang.String fchServDesde,
+           java.lang.String fchServHasta,
+           java.lang.String fchVtoPago,
+           java.lang.String monId,
+           Double monCotiz,
+           java.lang.String canMisMonExt,
+           int condicionIVAReceptorId,
+           ar.com.comit.wsfe.CbteAsoc[] cbtesAsoc,
+           ar.com.comit.wsfe.Tributo[] tributos,
+           ar.com.comit.wsfe.AlicIva[] iva,
+           ar.com.comit.wsfe.Opcional[] opcionales,
+           ar.com.comit.wsfe.Comprador[] compradores,
+           ar.com.comit.wsfe.Periodo periodoAsoc,
+           ar.com.comit.wsfe.Actividad[] actividades) {
            this.concepto = concepto;
            this.docTipo = docTipo;
            this.docNro = docNro;
@@ -111,10 +126,15 @@ public class FEDetRequest  implements java.io.Serializable {
            this.fchVtoPago = fchVtoPago;
            this.monId = monId;
            this.monCotiz = monCotiz;
+           this.canMisMonExt = canMisMonExt;
+           this.condicionIVAReceptorId = condicionIVAReceptorId;
            this.cbtesAsoc = cbtesAsoc;
            this.tributos = tributos;
            this.iva = iva;
            this.opcionales = opcionales;
+           this.compradores = compradores;
+           this.periodoAsoc = periodoAsoc;
+           this.actividades = actividades;
     }
 
 
@@ -443,7 +463,7 @@ public class FEDetRequest  implements java.io.Serializable {
      *
      * @return monCotiz
      */
-    public double getMonCotiz() {
+    public Double getMonCotiz() {
         return monCotiz;
     }
 
@@ -455,6 +475,46 @@ public class FEDetRequest  implements java.io.Serializable {
      */
     public void setMonCotiz(double monCotiz) {
         this.monCotiz = monCotiz;
+    }
+
+
+    /**
+     * Gets the canMisMonExt value for this FEDetRequest.
+     * 
+     * @return canMisMonExt
+     */
+    public java.lang.String getCanMisMonExt() {
+        return canMisMonExt;
+    }
+
+
+    /**
+     * Sets the canMisMonExt value for this FEDetRequest.
+     * 
+     * @param canMisMonExt
+     */
+    public void setCanMisMonExt(java.lang.String canMisMonExt) {
+        this.canMisMonExt = canMisMonExt;
+    }
+
+
+    /**
+     * Gets the condicionIVAReceptorId value for this FEDetRequest.
+     * 
+     * @return condicionIVAReceptorId
+     */
+    public int getCondicionIVAReceptorId() {
+        return condicionIVAReceptorId;
+    }
+
+
+    /**
+     * Sets the condicionIVAReceptorId value for this FEDetRequest.
+     * 
+     * @param condicionIVAReceptorId
+     */
+    public void setCondicionIVAReceptorId(int condicionIVAReceptorId) {
+        this.condicionIVAReceptorId = condicionIVAReceptorId;
     }
 
 
@@ -537,8 +597,68 @@ public class FEDetRequest  implements java.io.Serializable {
         this.opcionales = opcionales;
     }
 
-    private Object __equalsCalc = null;
-    public synchronized boolean equals(Object obj) {
+
+    /**
+     * Gets the compradores value for this FEDetRequest.
+     * 
+     * @return compradores
+     */
+    public ar.com.comit.wsfe.Comprador[] getCompradores() {
+        return compradores;
+    }
+
+
+    /**
+     * Sets the compradores value for this FEDetRequest.
+     * 
+     * @param compradores
+     */
+    public void setCompradores(ar.com.comit.wsfe.Comprador[] compradores) {
+        this.compradores = compradores;
+    }
+
+
+    /**
+     * Gets the periodoAsoc value for this FEDetRequest.
+     * 
+     * @return periodoAsoc
+     */
+    public ar.com.comit.wsfe.Periodo getPeriodoAsoc() {
+        return periodoAsoc;
+    }
+
+
+    /**
+     * Sets the periodoAsoc value for this FEDetRequest.
+     * 
+     * @param periodoAsoc
+     */
+    public void setPeriodoAsoc(ar.com.comit.wsfe.Periodo periodoAsoc) {
+        this.periodoAsoc = periodoAsoc;
+    }
+
+
+    /**
+     * Gets the actividades value for this FEDetRequest.
+     * 
+     * @return actividades
+     */
+    public ar.com.comit.wsfe.Actividad[] getActividades() {
+        return actividades;
+    }
+
+
+    /**
+     * Sets the actividades value for this FEDetRequest.
+     * 
+     * @param actividades
+     */
+    public void setActividades(ar.com.comit.wsfe.Actividad[] actividades) {
+        this.actividades = actividades;
+    }
+
+    private java.lang.Object __equalsCalc = null;
+    public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof FEDetRequest)) return false;
         FEDetRequest other = (FEDetRequest) obj;
         if (obj == null) return false;
@@ -575,8 +695,14 @@ public class FEDetRequest  implements java.io.Serializable {
             ((this.monId==null && other.getMonId()==null) ||
              (this.monId!=null &&
               this.monId.equals(other.getMonId()))) &&
-            this.monCotiz == other.getMonCotiz() &&
-            ((this.cbtesAsoc==null && other.getCbtesAsoc()==null) ||
+            ((this.monCotiz==null && other.getMonCotiz()==null) || 
+             (this.monCotiz!=null &&
+              this.monCotiz.equals(other.getMonCotiz()))) &&
+            ((this.canMisMonExt==null && other.getCanMisMonExt()==null) || 
+             (this.canMisMonExt!=null &&
+              this.canMisMonExt.equals(other.getCanMisMonExt()))) &&
+            this.condicionIVAReceptorId == other.getCondicionIVAReceptorId() &&
+            ((this.cbtesAsoc==null && other.getCbtesAsoc()==null) || 
              (this.cbtesAsoc!=null &&
               java.util.Arrays.equals(this.cbtesAsoc, other.getCbtesAsoc()))) &&
             ((this.tributos==null && other.getTributos()==null) ||
@@ -587,7 +713,16 @@ public class FEDetRequest  implements java.io.Serializable {
               java.util.Arrays.equals(this.iva, other.getIva()))) &&
             ((this.opcionales==null && other.getOpcionales()==null) ||
              (this.opcionales!=null &&
-              java.util.Arrays.equals(this.opcionales, other.getOpcionales())));
+              java.util.Arrays.equals(this.opcionales, other.getOpcionales()))) &&
+            ((this.compradores==null && other.getCompradores()==null) || 
+             (this.compradores!=null &&
+              java.util.Arrays.equals(this.compradores, other.getCompradores()))) &&
+            ((this.periodoAsoc==null && other.getPeriodoAsoc()==null) || 
+             (this.periodoAsoc!=null &&
+              this.periodoAsoc.equals(other.getPeriodoAsoc()))) &&
+            ((this.actividades==null && other.getActividades()==null) || 
+             (this.actividades!=null &&
+              java.util.Arrays.equals(this.actividades, other.getActividades())));
         __equalsCalc = null;
         return _equals;
     }
@@ -625,7 +760,13 @@ public class FEDetRequest  implements java.io.Serializable {
         if (getMonId() != null) {
             _hashCode += getMonId().hashCode();
         }
-        _hashCode += new Double(getMonCotiz()).hashCode();
+        if (getMonCotiz() != null) {
+            _hashCode += getMonCotiz().hashCode();
+        }
+        if (getCanMisMonExt() != null) {
+            _hashCode += getCanMisMonExt().hashCode();
+        }
+        _hashCode += getCondicionIVAReceptorId();
         if (getCbtesAsoc() != null) {
             for (int i=0;
                  i<Array.getLength(getCbtesAsoc());
@@ -663,7 +804,32 @@ public class FEDetRequest  implements java.io.Serializable {
             for (int i=0;
                  i<Array.getLength(getOpcionales());
                  i++) {
-                Object obj = Array.get(getOpcionales(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getOpcionales(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
+        }
+        if (getCompradores() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getCompradores());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getCompradores(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
+        }
+        if (getPeriodoAsoc() != null) {
+            _hashCode += getPeriodoAsoc().hashCode();
+        }
+        if (getActividades() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getActividades());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getActividades(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -785,6 +951,20 @@ public class FEDetRequest  implements java.io.Serializable {
         elemField.setFieldName("monCotiz");
         elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "MonCotiz"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "double"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("canMisMonExt");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "CanMisMonExt"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("condicionIVAReceptorId");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "CondicionIVAReceptorId"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
@@ -818,6 +998,29 @@ public class FEDetRequest  implements java.io.Serializable {
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setItemQName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Opcional"));
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("compradores");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Compradores"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Comprador"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        elemField.setItemQName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Comprador"));
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("periodoAsoc");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "PeriodoAsoc"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Periodo"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("actividades");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Actividades"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Actividad"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        elemField.setItemQName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "Actividad"));
         typeDesc.addFieldDesc(elemField);
     }
 

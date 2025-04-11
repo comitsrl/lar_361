@@ -45,11 +45,16 @@ public class FECAEDetRequest  extends FEDetRequest  implements java.io.Serializa
            java.lang.String fchServHasta,
            java.lang.String fchVtoPago,
            java.lang.String monId,
-           double monCotiz,
-           CbteAsoc[] cbtesAsoc,
-           Tributo[] tributos,
-           AlicIva[] iva,
-           Opcional[] opcionales) {
+           java.lang.Double monCotiz,
+           java.lang.String canMisMonExt,
+           int condicionIVAReceptorId,
+           ar.com.comit.wsfe.CbteAsoc[] cbtesAsoc,
+           ar.com.comit.wsfe.Tributo[] tributos,
+           ar.com.comit.wsfe.AlicIva[] iva,
+           ar.com.comit.wsfe.Opcional[] opcionales,
+           ar.com.comit.wsfe.Comprador[] compradores,
+           ar.com.comit.wsfe.Periodo periodoAsoc,
+           ar.com.comit.wsfe.Actividad[] actividades) {
         super(
             concepto,
             docTipo,
@@ -68,10 +73,15 @@ public class FECAEDetRequest  extends FEDetRequest  implements java.io.Serializa
             fchVtoPago,
             monId,
             monCotiz,
+            canMisMonExt,
+            condicionIVAReceptorId,
             cbtesAsoc,
             tributos,
             iva,
-            opcionales);
+            opcionales,
+            compradores,
+            periodoAsoc,
+            actividades);
     }
 
     private java.lang.Object __equalsCalc = null;
