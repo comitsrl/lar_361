@@ -27,6 +27,8 @@ package ar.com.comit.wsfe;
 public class FECAEADetRequest  extends FEDetRequest  implements java.io.Serializable {
     private java.lang.String CAEA;
 
+    private java.lang.String cbteFchHsGen;
+
     public FECAEADetRequest() {
     }
 
@@ -47,12 +49,18 @@ public class FECAEADetRequest  extends FEDetRequest  implements java.io.Serializ
            java.lang.String fchServHasta,
            java.lang.String fchVtoPago,
            java.lang.String monId,
-           double monCotiz,
-           CbteAsoc[] cbtesAsoc,
-           Tributo[] tributos,
-           AlicIva[] iva,
-           Opcional[] opcionales,
-           java.lang.String CAEA) {
+           java.lang.Double monCotiz,
+           java.lang.String canMisMonExt,
+           int condicionIVAReceptorId,
+           ar.com.comit.wsfe.CbteAsoc[] cbtesAsoc,
+           ar.com.comit.wsfe.Tributo[] tributos,
+           ar.com.comit.wsfe.AlicIva[] iva,
+           ar.com.comit.wsfe.Opcional[] opcionales,
+           ar.com.comit.wsfe.Comprador[] compradores,
+           ar.com.comit.wsfe.Periodo periodoAsoc,
+           ar.com.comit.wsfe.Actividad[] actividades,
+           java.lang.String CAEA,
+           java.lang.String cbteFchHsGen) {
         super(
             concepto,
             docTipo,
@@ -71,11 +79,17 @@ public class FECAEADetRequest  extends FEDetRequest  implements java.io.Serializ
             fchVtoPago,
             monId,
             monCotiz,
+            canMisMonExt,
+            condicionIVAReceptorId,
             cbtesAsoc,
             tributos,
             iva,
-            opcionales);
+            opcionales,
+            compradores,
+            periodoAsoc,
+            actividades);
         this.CAEA = CAEA;
+        this.cbteFchHsGen = cbteFchHsGen;
     }
 
 
@@ -98,6 +112,26 @@ public class FECAEADetRequest  extends FEDetRequest  implements java.io.Serializ
         this.CAEA = CAEA;
     }
 
+
+    /**
+     * Gets the cbteFchHsGen value for this FECAEADetRequest.
+     * 
+     * @return cbteFchHsGen
+     */
+    public java.lang.String getCbteFchHsGen() {
+        return cbteFchHsGen;
+    }
+
+
+    /**
+     * Sets the cbteFchHsGen value for this FECAEADetRequest.
+     * 
+     * @param cbteFchHsGen
+     */
+    public void setCbteFchHsGen(java.lang.String cbteFchHsGen) {
+        this.cbteFchHsGen = cbteFchHsGen;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof FECAEADetRequest)) return false;
@@ -112,7 +146,10 @@ public class FECAEADetRequest  extends FEDetRequest  implements java.io.Serializ
         _equals = super.equals(obj) &&
             ((this.CAEA==null && other.getCAEA()==null) ||
              (this.CAEA!=null &&
-              this.CAEA.equals(other.getCAEA())));
+              this.CAEA.equals(other.getCAEA()))) &&
+            ((this.cbteFchHsGen==null && other.getCbteFchHsGen()==null) || 
+             (this.cbteFchHsGen!=null &&
+              this.cbteFchHsGen.equals(other.getCbteFchHsGen())));
         __equalsCalc = null;
         return _equals;
     }
@@ -127,6 +164,9 @@ public class FECAEADetRequest  extends FEDetRequest  implements java.io.Serializ
         if (getCAEA() != null) {
             _hashCode += getCAEA().hashCode();
         }
+        if (getCbteFchHsGen() != null) {
+            _hashCode += getCbteFchHsGen().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -140,6 +180,13 @@ public class FECAEADetRequest  extends FEDetRequest  implements java.io.Serializ
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("CAEA");
         elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "CAEA"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("cbteFchHsGen");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://ar.gov.afip.dif.FEV1/", "CbteFchHsGen"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

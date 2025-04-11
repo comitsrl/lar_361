@@ -41,6 +41,7 @@ import org.compiere.model.MTax;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.globalqss.model.X_LCO_TaxIdType;
+import org.globalqss.model.X_LCO_TaxPayerType;
 
 import ar.com.comit.wsfe.AlicIva;
 import ar.com.comit.wsfe.CbteAsoc;
@@ -199,7 +200,7 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
                 nroComprobante + 1, fechaComprobante, factura.getGrandTotal().setScale(2, RoundingMode.HALF_UP).doubleValue(), Env.ZERO.doubleValue(),
                 factura.getTotalLines().setScale(2, RoundingMode.HALF_UP).doubleValue(), Env.ZERO.doubleValue(), total_Tributos.setScale(2, RoundingMode.HALF_UP).doubleValue(),
                 total_Impuesto.setScale(2, RoundingMode.HALF_UP).doubleValue(), fechaActual, fechaActual, fechaVecPago, getCodMoneda(), getCotizacion(),
-                array_asoc, array_trib, array_imp, array_opc);
+                null, getCodContribuyente(), array_asoc, array_trib, array_imp, array_opc, null, null, null);
 
         return detRequest;
     } // getFECAEDetRequest
@@ -272,6 +273,19 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         MCurrency moneda = (MCurrency) factura.getC_Currency();
         return moneda.get_ValueAsString("WSFECode");
     } // getCodMoneda
+
+    /**
+     * Obtener Codigo WSFE del tipo contribuyente
+     *
+     * @return WSFE CODE
+     */
+    private int getCodContribuyente()
+    {
+        MBPartner sdn = (MBPartner) factura.getC_BPartner();
+        int LCO_TaxPayerType_ID = sdn.get_ValueAsInt("LCO_TaxPayerType_ID");
+        X_LCO_TaxPayerType taxPayer = new X_LCO_TaxPayerType(ctx, LCO_TaxPayerType_ID, factura.get_TrxName());
+        return taxPayer.get_ValueAsInt("WSFECode");
+    } // getCodContribuyente
 
     /**
      * Obtener cotización de moneda extrajera.
@@ -488,19 +502,19 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         catch (AxisFault e)
         {
             e.printStackTrace();
-            msgError = "Error de conexión con Servicio Web de AFIP: \n" + e.getMessage();
+            msgError = "Error de conexión con Servicio Web de ARCA: \n" + e.getMessage();
             return msgError;
         }
         catch (RemoteException e)
         {
             e.printStackTrace();
-            msgError = "Error de conexión con Servicio Web de AFIP: \n" + e.getMessage();
+            msgError = "Error de conexión con Servicio Web de ARCA: \n" + e.getMessage();
             return msgError;
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            msgError = "Error de conexión con Servicio Web de AFIP: \n" + e.getMessage();
+            msgError = "Error de conexión con Servicio Web de ARCA: \n" + e.getMessage();
             return msgError;
         }
 

@@ -2093,7 +2093,8 @@ public class MInvoice extends X_C_Invoice implements DocAction
                         if (mensaje != null && !mensaje.equals(""))
                         {
                             setcaeerror("Observación: " + mensaje);
-                            setDescription((getDescription() == null ? " " : getDescription() + " ||") + " AFIP Obs: " + mensaje);
+                            // @fchiappano no setear las observaciones en la descripcion de la factura, ya que este campo los clientes lo utilizan para otros fines.
+                            // setDescription((getDescription() == null ? " " : getDescription() + " ||") + " AFIP Obs: " + mensaje);
                             info.append("Aprobado con Observaciones: " + mensaje);
                         }
 
