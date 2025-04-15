@@ -809,7 +809,7 @@ import ar.com.ergio.util.LAR_Utils;
                     // Recupera la configuraciones
                     final MBPartner bp = new MBPartner(header.getCtx(), header.getC_BPartner_ID(), header.get_TrxName());
                     final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, dt.isSOTrx(),
-                            header.get_TrxName(), null, header.getDateTrx());
+                            header.get_TrxName(), null, header.getDateTrx(), null);
                     boolean generar = false;
                     for (final WithholdingConfig wc : configs)
                         if (wc.isCalcFromPayment())
