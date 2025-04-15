@@ -84,7 +84,7 @@ public class LAR_CalcularPercepcion
             if (!order.isSOTrx())
                 return null;
 
-            final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, true, order.get_TrxName(), order, order.getDateOrdered());
+            final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, true, order.get_TrxName(), order, order.getDateOrdered(), null);
 
             deleteWhithholdingLine(order);
             // Se recorren las configuraciones recuperadas

@@ -92,8 +92,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     // Coeficiente IVA 21%
     private static final BigDecimal coef_IVA = Env.ONE.add(alicuotaIVAGral.divide(Env.ONEHUNDRED)
             .setScale(2, BigDecimal.ROUND_HALF_EVEN));
-    // Coeficiente IVA 21%
-    private static final BigDecimal alicuotaRetReducida = new BigDecimal(80);
     // Categoría de IVA Responsable Inscirpto
     final static private int responsableInscripto = 1000000;
     // C_SalesRegion_ID para Río Negro
@@ -209,11 +207,11 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         updateHeaderWithholding(getLAR_PaymentHeader_ID(), get_TrxName());
         this.load(get_TrxName());
 
-
+        final MPaymentAllocate[] facturas = getInvoices(get_TrxName());
         // Recupera la configuración y calcula
         final MBPartner bp = new MBPartner(getCtx(), getC_BPartner_ID(), get_TrxName());
         final WithholdingConfig[] configs = WithholdingConfig.getConfig(bp, dt.isSOTrx(),
-                get_TrxName(), null, getDateTrx());
+                get_TrxName(), null, getDateTrx(), facturas);
 
         // Si se recuperó correctamente la configuración
         if (configs != null)
@@ -245,7 +243,6 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 BigDecimal impMinNoSujeto = wc.getPaymentThresholdMin();
                 BigDecimal impRetMin = wc.getThresholdMin();
                 // Se calcula el importe a retener según el tipo de retención
-                final MPaymentAllocate[] facturas = getInvoices(get_TrxName());
                 BigDecimal totalOP = getPayHeaderTotalAmt();
                 impSujetoaRet = Env.ZERO;
                 BigDecimal aliquot = wc.getAliquot();
@@ -448,17 +445,13 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     }// Es retención de Ganancias
 
                     // Es retención de IVA
-                    // MOrgInfo orgI = new MOrgInfo(new MOrg(Env.getCtx(),
-                    // Env.getAD_Org_ID(Env.getCtx()), this.get_TrxName()));
                     // La organización está configurada como Responsable Inscripto
-                    else if (wc.isUseOrgTaxPayerType())// no recupera correctamente el
-                                                       // loc_taxpayertype_id desde orgInfo &&
-                                                       // orgI.get_ValueAsInt("LCO_TaxPayerType_ID")
-                                                       // == responsableInscripto)
+                    else if (wc.isUseOrgTaxPayerType())
                     {
                         // Recupera la categoría de IVA del SdN
                         final int bpTaxPaxerTypeID = bp.get_ValueAsInt("LCO_TaxPayerType_ID");
-                        // Si el SdN no es Responsable Inscripto o no existen facturas en la OP
+                        // Si el SdN no es Responsable Inscripto o no existen
+                        // facturas en la OP
                         // no se genera retención de IVA.
                         if (bpTaxPaxerTypeID != responsableInscripto && facturas.length <= 0)
                             continue;
@@ -468,47 +461,31 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             for (final MPaymentAllocate mp : facturas)
                             {
                                 MInvoice factura = mp.getInvoice();
-                                MDocType doc = new MDocType(Env.getCtx(),
-                                        factura.getC_DocType_ID(), this.get_TrxName());
                                 MInvoiceTax[] impFactura = factura.getTaxes(false);
                                 // Se recorren los impuestos de la factura
                                 for (final MInvoiceTax impuesto : impFactura)
                                 {
-                                    MTax tax = new MTax(Env.getCtx(), impuesto.getC_Tax_ID(),
-                                            this.get_TrxName());
-                                    // Se recupera la letra del tipo de documento
-                                    // si es letra M se retiene el 100% y supera el mínimo
-                                    String letra = recuperaLetra(doc
-                                            .get_ValueAsInt("LAR_DocumentLetter_ID"));
-                                    // Si el cálculo esta configurado como Documento se asume
-                                    // que es retención por tipo de doc M
-                                    if (wc.getBaseType().equals("D"))
-                                    {
-                                        if (letra.equals("M")
-                                                && (factura.getGrandTotal().compareTo(
-                                                        wc.getPaymentThresholdMin()) > 0))
-                                        {
-                                            aliquot = wc.getAliquot();
-                                            if (tax.getName().contains("IVA"))
-                                                impSujetoaRet = impSujetoaRet.add(impuesto
-                                                        .getTaxAmt());
-                                        } else
+                                    MTax tax = new MTax(Env.getCtx(), impuesto.getC_Tax_ID(), this.get_TrxName());
+                                    // Si se utiliza el tipo de documento
+                                    if (wc.isUseDocumentType())
+                                        if (wc.getc_DocTypeInvoice_ID() != factura.getC_DocType_ID())
                                             continue;
-                                    } else if (tax.getName().contains("IVA"))
+                                    // Si el cálculo está configurado como
+                                    // Impuesto
+                                    aliquot = wc.getAliquot();
+                                    if (wc.getBaseType().equals("T"))
                                     {
-                                        impSujetoaRet = impSujetoaRet.add(impuesto.getTaxAmt());
-                                        // Si es alicuota reducida
-                                        if (tax.getRate().compareTo(alicuotaIVAGral) < 0)
-                                            aliquot = alicuotaRetReducida;
-                                        // Si no es reducida, se utiliza la
-                                        // alicuota de la configuración
+                                        if (impuesto.getTaxAmt().compareTo(wc.getPaymentThresholdMin()) > 0)
+                                        {
+                                            if (tax.getName().contains("IVA"))
+                                                impSujetoaRet = impSujetoaRet.add(impuesto.getTaxAmt());
+                                        }
                                         else
-                                            aliquot = wc.getAliquot();
+                                            continue;
                                     }
                                     // Se calcula y acumula la retención
                                     impRetencion = impRetencion.add(impSujetoaRet.multiply(aliquot)
-                                            .divide(Env.ONEHUNDRED)
-                                            .setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                                            .divide(Env.ONEHUNDRED).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                                 } // Se recorren los impuestos de la factura
                             } // Se recorren las facturas de la OP
                         }
@@ -523,8 +500,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             }
                         }
                         // Exenciones % e importe fijo
-                        BigDecimal impExentoDesc = impRetencion.multiply(porcExencion)
-                                .divide(Env.ONEHUNDRED).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                        BigDecimal impExentoDesc = impRetencion.multiply(porcExencion).divide(Env.ONEHUNDRED)
+                                .setScale(2, BigDecimal.ROUND_HALF_EVEN);
                         impRetencion = impRetencion.subtract(impExentoDesc).subtract(impExencion);
                         // Se chequea si el importe de la retención supera
                         // el importe a pagar

@@ -57,8 +57,8 @@ public class LCO_CalloutWithholding extends CalloutEngine
 		log.info("");
 		int wht_id = ((Integer) mTab.getValue("LCO_WithholdingType_ID")).intValue();
 		
-		String sql = "SELECT IsUseBPISIC, IsUseBPTaxPayerType, IsUseBPCity, IsUseOrgISIC, IsUseOrgTaxPayerType, IsUseOrgCity, IsUseWithholdingCategory, IsUseProductTaxCategory, LAR_UsaTipoGananciasBP "
-			           + "FROM LCO_WithholdingRuleConf WHERE LCO_WithholdingType_ID=?";		//	#1
+        String sql = "SELECT IsUseBPISIC, IsUseBPTaxPayerType, IsUseBPCity, IsUseOrgISIC, IsUseOrgTaxPayerType, IsUseOrgCity, IsUseWithholdingCategory, IsUseProductTaxCategory, LAR_UsaTipoGananciasBP, IsUseDocumentType, IsUseShipmentRegion "
+                + "FROM LCO_WithholdingRuleConf WHERE LCO_WithholdingType_ID=?"; // #1
 
 		try
 		{
@@ -77,6 +77,10 @@ public class LCO_CalloutWithholding extends CalloutEngine
 				mTab.setValue("IsUseProductTaxCategory", rs.getString("IsUseProductTaxCategory"));
 				// @mzuniga Se agrega la configuración para Retención de Ganancias 
 				mTab.setValue("LAR_UsaTipoGananciasBP", rs.getString("LAR_UsaTipoGananciasBP"));
+                // @mzuniga Se agrega la configuración para Tipo de Documento
+                mTab.setValue("IsUseDocumentType", rs.getString("IsUseDocumentType"));
+                // @mzuniga Se agrega la configuración para Provincia Remito
+                mTab.setValue("IsUseShipmentRegion", rs.getString("IsUseShipmentRegion"));
 			} else {
 				mTab.setValue("IsUseBPISIC", "N");
 				mTab.setValue("IsUseBPTaxPayerType", "N");
@@ -87,6 +91,8 @@ public class LCO_CalloutWithholding extends CalloutEngine
 				mTab.setValue("IsUseWithholdingCategory", "N");
 				mTab.setValue("IsUseProductTaxCategory", "N");
 				mTab.setValue("LAR_UsaTipoGananciasBP", "N");
+                mTab.setValue("IsUseDocumentType", "N");
+                mTab.setValue("IsUseShipmentRegion", "N");
 				log.warning("Rule not configured for withholding type");
 			}
 			rs.close();

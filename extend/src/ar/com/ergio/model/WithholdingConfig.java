@@ -30,6 +30,7 @@ import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MTax;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -66,12 +67,15 @@ class WithholdingConfig
     private boolean isUseBPISIC;
     private boolean usaTipoGananciasBP;
     private boolean isUseOrgTaxPayerType;
+    private boolean isUseDocumentType;
+    private boolean isUseShipmentRegion;
+    private int c_DocTypeInvoice_ID;
     private String baseType;
 
     private WithholdingConfig(final BigDecimal aliquot, final BigDecimal rate,
             final BigDecimal paymentThresholdMin, final BigDecimal thresholdMin, final BigDecimal thresholdMax, final BigDecimal amountRefunded, final boolean isCalcFromPayment,
-            final int lco_WithholdingRule_ID, final int lco_WithholdingType_ID, final int c_Tax_ID,
-            final int c_DocType_ID, final int c_TaxCategory_ID, final boolean isUseBPISIC, final boolean usaTipoGananciasBP, final boolean isUseOrgTaxPayerType, final String baseType)
+            final int lco_WithholdingRule_ID, final int lco_WithholdingType_ID, final int c_Tax_ID, final int c_DocTypeInvoice_ID,
+            final int c_DocType_ID, final int c_TaxCategory_ID, final boolean isUseBPISIC, final boolean usaTipoGananciasBP, final boolean isUseOrgTaxPayerType, final boolean isUseDocumentType,  final String baseType)
     {
         this.aliquot = aliquot;
         this.rate = rate;
@@ -82,12 +86,14 @@ class WithholdingConfig
         this.isCalcFromPayment = isCalcFromPayment;
         this.lco_WithholdingRule_ID = lco_WithholdingRule_ID;
         this.lco_WithholdingType_ID = lco_WithholdingType_ID;
-        this.c_Tax_ID = c_Tax_ID; 
+        this.c_Tax_ID = c_Tax_ID;
+        this.c_DocTypeInvoice_ID = c_DocTypeInvoice_ID;
         this.c_DocType_ID = c_DocType_ID; 
         this.c_TaxCategory_ID = c_TaxCategory_ID;
         this.isUseBPISIC = isUseBPISIC;
         this.usaTipoGananciasBP = usaTipoGananciasBP;
         this.isUseOrgTaxPayerType = isUseOrgTaxPayerType;
+        this.isUseDocumentType = isUseDocumentType;
         this.baseType = baseType;
     }
 
@@ -97,7 +103,7 @@ class WithholdingConfig
      *  @param isSOTrx 
      *  @return Configuraciones de retención
      */
-    public static WithholdingConfig[] getConfig(final MBPartner bp, boolean isSOTrx, String trxName, MOrder order, Timestamp dateTrx)
+    public static WithholdingConfig[] getConfig(final MBPartner bp, boolean isSOTrx, String trxName, MOrder order, Timestamp dateTrx, MPaymentAllocate[] facturas)
     {
         log.info("");
         final List<WithholdingConfig> list = new ArrayList<WithholdingConfig>();
@@ -114,6 +120,11 @@ class WithholdingConfig
             if (bp_taxpayertype_int != null)
                 bp_taxpayertype_id = bp_taxpayertype_int.intValue();
             String lar_tipoganancias = bp.get_ValueAsString("LAR_TipoGanancias");
+            int c_doctypeinvoice_id = 0;
+            if (facturas != null && facturas.length > 0)
+            {
+                c_doctypeinvoice_id = facturas[0].getC_Invoice().getC_DocType_ID();
+            }
 
             /*
              * No se utiliza la dirección del BP en los tipos de retenciones/percepciones que
@@ -151,7 +162,6 @@ class WithholdingConfig
                         trxName);
                 X_LCO_WithholdingRuleConf wrc = null;
                 log.info("Withholding Type: " + wt.getLCO_WithholdingType_ID() + "/" + wt.getName());
-
                 // look the conf fields
                 String sqlrc = "SELECT * " + " FROM LCO_WithholdingRuleConf "
                         + " WHERE LCO_WithholdingType_ID = ? AND IsActive = 'Y'";
@@ -190,6 +200,8 @@ class WithholdingConfig
                     sqlr.append(" AND LCO_Org_City_ID = ? ");
                 if (wrc.get_ValueAsBoolean("LAR_UsaTipoGananciasBP"))
                     sqlr.append(" AND LAR_TipoGananciasBP = ? ");
+                if (wrc.isUseDocumentType())
+                    sqlr.append(" AND C_DocTypeInvoice_ID = ? ");
 
                 if (isSOTrx)
                 {
@@ -321,6 +333,16 @@ class WithholdingConfig
                     }
                     pstmtr.setString(idxpar, lar_tipoganancias);
                 }
+                if (wrc.isUseDocumentType())
+                {
+                    idxpar++;
+                    pstmtr.setInt(idxpar, c_doctypeinvoice_id);
+                    if (c_doctypeinvoice_id <= 0)
+                    {
+                        log.warning("No existen facturas ingresadas en la Orden de Pago");
+                        return null;
+                    }
+                }
 
                 ResultSet rsr = pstmtr.executeQuery();
                 while (rsr.next())
@@ -356,9 +378,11 @@ class WithholdingConfig
                             wc.getThresholdmin(), wc.getThresholdMax(), wc.getAmountRefunded(),
                             wc.isCalcOnPayment(), wr.getLCO_WithholdingRule_ID(),
                             wr.getLCO_WithholdingType_ID(), wc.getC_Tax_ID(),
+                            wr.get_ValueAsInt("C_DocTypeInvoice_ID"),
                             wrc.get_ValueAsInt("C_DocType_ID"), wr.getC_TaxCategory_ID(),
                             wrc.isUseBPISIC(), wrc.get_ValueAsBoolean("LAR_UsaTipoGananciasBP"),
-                            wrc.get_ValueAsBoolean("IsUseOrgTaxPayerType"), wc.getBaseType());
+                            wrc.get_ValueAsBoolean("IsUseOrgTaxPayerType"),
+                            wrc.get_ValueAsBoolean("isUseDocumentType"), wc.getBaseType());
 
                     if (!list.add(config))
                     {
@@ -441,7 +465,10 @@ class WithholdingConfig
     {
         return c_DocType_ID;
     }
-
+    public int getc_DocTypeInvoice_ID()
+    {
+        return c_DocTypeInvoice_ID;
+    }
     public int getC_TaxCategory_ID()
     {
         return c_TaxCategory_ID;
@@ -462,6 +489,16 @@ class WithholdingConfig
         return isUseOrgTaxPayerType;
     }
 
+    public boolean isUseDocumentType()
+    {
+        return isUseDocumentType;
+    }
+
+    public boolean isUseShipmentRegion()
+    {
+        return isUseShipmentRegion;
+    }
+
     public String getBaseType()
     {
         return baseType;
@@ -477,6 +514,7 @@ class WithholdingConfig
         sb.append(",C_DocType_ID=").append(c_DocType_ID);
         sb.append(",C_TaxCategory_ID=").append(c_TaxCategory_ID);
         sb.append(",C_Tax_ID=").append(c_Tax_ID);
+        sb.append(",C_DocTypeInvoice_ID=").append(c_DocTypeInvoice_ID);
         sb.append("]");
         return sb.toString();
     } // toString
