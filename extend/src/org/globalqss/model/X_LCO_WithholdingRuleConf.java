@@ -112,6 +112,40 @@ public class X_LCO_WithholdingRuleConf extends PO implements I_LCO_WithholdingRu
 		return false;
 	}
 
+    /**
+     * Get isUseDocumentType.
+     *
+     * @return isUseDocumentType
+     */
+    public boolean isUseDocumentType()
+    {
+        Object oo = get_Value("IsUseDocumentType");
+        if (oo != null)
+        {
+            if (oo instanceof Boolean)
+                return ((Boolean) oo).booleanValue();
+            return "Y".equals(oo);
+        }
+        return false;
+     }
+
+    /**
+     * Get isUseShipmentRegion
+     *
+     * @return isUseShipmentRegion
+     */
+    public boolean isUseShipmentRegion()
+    {
+        Object oo = get_Value("IsUseShipmentRegion");
+        if (oo != null)
+        {
+            if (oo instanceof Boolean)
+                return ((Boolean) oo).booleanValue();
+            return "Y".equals(oo);
+        }
+        return false;
+    }
+
 	/** Set Is Use BP Tax Payer Type.
 		@param IsUseBPTaxPayerType Is Use BP Tax Payer Type	  */
 	public void setIsUseBPTaxPayerType (boolean IsUseBPTaxPayerType)

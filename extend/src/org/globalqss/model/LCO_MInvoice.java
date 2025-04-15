@@ -29,7 +29,9 @@ import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MLocation;
+import org.compiere.model.MOrder;
 import org.compiere.model.MOrgInfo;
+import org.compiere.model.MInOut;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MTax;
 import org.compiere.util.DB;
@@ -99,7 +101,37 @@ public class LCO_MInvoice extends MInvoice
 				org_taxpayertype_id = org_taxpayertype_int.intValue();
 			MLocation ol = MLocation.get(getCtx(), oi.getC_Location_ID(), get_TrxName());
 			int org_city_id = ol.getC_City_ID();
+            // Se recupera la dirección desde el remito de entrega
+            MLocation shl;
+            int provincia_id = 0;
+            if (getC_Order_ID() != 0)
+            {
+                MOrder ord = new MOrder(getCtx(), getC_Order_ID(), get_TrxName());
+                MInOut[] shipments = (ord.getShipments() == null ? null : ord.getShipments());
 
+                if (shipments != null && shipments.length > 0)
+                {
+                    MInOut firstShipment = shipments[0]; // Obtener el primer elemento
+                    log.config("Primer Remito recuperado: " + firstShipment);
+                    int mInOut_ID = firstShipment.getM_InOut_ID();
+                    MInOut sh = new MInOut(getCtx(), mInOut_ID, get_TrxName());
+                    shl = MLocation.get(getCtx(), sh.getC_BPartner_Location().getC_Location_ID(), get_TrxName());
+                    provincia_id = shl.getC_Region_ID();
+                }
+                else
+                // Si no existe remitos se utiliza la dirección de la factura
+                {
+                    log.config("No hay remitos disponibles.");
+                    shl = MLocation.get(getCtx(), getC_BPartner_Location().getC_Location_ID(), get_TrxName());
+                    provincia_id = shl.getC_Region_ID();
+                }
+            }
+            // Si no existe orden para recuperar remitos se utiliza la dirección de la factura
+            else
+            {
+                shl = MLocation.get(getCtx(), getC_BPartner_Location().getC_Location_ID(), get_TrxName());
+                provincia_id = shl.getC_Region_ID();
+            }
 			// Search withholding types applicable depending on IsSOTrx
 			String sqlt = "SELECT LCO_WithholdingType_ID "
 				+ " FROM LCO_WithholdingType "
@@ -148,8 +180,8 @@ public class LCO_MInvoice extends MInvoice
 					sqlr.append(" AND LCO_Org_TaxPayerType_ID = ? ");
 				if (wrc.isUseBPCity())
 					sqlr.append(" AND LCO_BP_City_ID = ? ");
-				if (wrc.isUseOrgCity())
-					sqlr.append(" AND LCO_Org_City_ID = ? ");
+                if (wrc.isUseShipmentRegion())
+                    sqlr.append(" AND C_Region_ID = ? ");
 
 				// Add withholding categories of lines
 				if (wrc.isUseWithholdingCategory()) {
@@ -252,6 +284,12 @@ public class LCO_MInvoice extends MInvoice
 					if (org_city_id <= 0)
 						log.warning("Possible configuration error org city is used but not set");
 				}
+                if (wrc.isUseShipmentRegion()) {
+                    idxpar++;
+                    pstmtr.setInt(idxpar, provincia_id);
+                    if (provincia_id <= 0)
+                        log.warning("Possible configuration error Shipment Region is used but not set");
+                }
 
 				ResultSet rsr = pstmtr.executeQuery();
 				while (rsr.next())
