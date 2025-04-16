@@ -895,42 +895,46 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 		}
 		return true;
 	} // beforeSave
-
-	/**
-	 * @param success
-	 */
+	
 	@Override
-	protected boolean afterDelete(boolean success)
-	{
-		if(success)
+	protected boolean beforeDelete() {
+		if(getDocStatus().equals(DOCSTATUS_Drafted))
 		{
-            // Se eliminan los pagos asociados a la cabecera
-            final MPayment[] pays = getPayments(get_TrxName());
-            for (int i = 0; i < pays.length; i++)
-            {
-                if (!pays[i].delete(false, get_TrxName()))
-                {
-                    String msg = "No se pudo eliminar alguno de los pagos cargados en el documento que"
-                            + "se está eliminando. Se cancelará la operación";
-                    log.saveError("Error: ", msg);
-                    return false;
-                }
-            }
-            // Se eliminan los registros de facturas asociados a la cabecera
-            final MPaymentAllocate[] facturas = getInvoices(get_TrxName());
-            for (int i = 0; i < facturas.length; i++)
-            {
-                if (!facturas[i].delete(false, get_TrxName()))
-                {
-                    String msg = "No se pudo eliminar alguno de las facturas cargadas en el documento que"
-                            + "se está eliminando. Se cancelará la operación";
-                    log.saveError("Error: ", msg);
-                    return false;
-                }
-            }
-        }
-        return success;
-	} // afterDelete
+			// Recuperamos los Pagos asociados a la cabecera
+	        final MPayment[] pays = getPayments(get_TrxName());
+	        // Se eliminan los pagos asociados a la cabecera
+	        for (int i = 0; i < pays.length; i++)
+	        {
+	            if (!pays[i].delete(false, get_TrxName()))
+	            {
+	                String msg = "No se pudo eliminar alguno de los pagos cargados en el documento que"
+	                        + "se está eliminando. Se cancelará la operación";
+	                log.saveError("Error: ", msg);
+	                return false;
+	            }
+	        }
+	        // Se eliminan los registros de facturas asociados a la cabecera
+	        final MPaymentAllocate[] facturas = getInvoices(get_TrxName());
+	        for (int i = 0; i < facturas.length; i++)
+	        {
+	            if (!facturas[i].delete(false, get_TrxName()))
+	            {
+	                String msg = "No se pudo eliminar alguno de las facturas cargadas en el documento que"
+	                        + "se está eliminando. Se cancelará la operación";
+	                log.saveError("Error: ", msg);
+	                return false;
+	            }
+	        }
+		}
+		else
+		{
+			String msg = "No se pudo eliminar la Cabecera debido a que no se encuentra en Estado Borrador"
+                    + "Se cancelará la operación";
+            log.saveError("Error: ", msg);
+            return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Devuelve un array con todos los payments vinculados a la cabecera
@@ -1315,6 +1319,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                 for (final MLARPaymentWithholding c : certificados)
                     c.setProcessed(true);
         }
+        	
         return DocAction.STATUS_Completed;
     } // completeIt
 
@@ -2194,5 +2199,5 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             pstmt = null;
         }
     } // deletePagosDifCambio
-
+    
 }	//	MLARPaymentHeader
