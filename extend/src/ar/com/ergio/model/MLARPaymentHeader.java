@@ -1311,14 +1311,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         setDocAction(DOCACTION_Close);
         setProcessed(true);
 
-        // Marca los Certificados de Retención como Procesados
-        if (!isReceipt())
-        {
-            final MLARPaymentWithholding[] certificados = MLARPaymentWithholding.get(this);
-            if (certificados.length > 0)
-                for (final MLARPaymentWithholding c : certificados)
-                    c.setProcessed(true);
-        }
+		// Marca los Certificados de Retención como Procesados
+		// Y actualiza el numero de documento del certificado.
+		if (!isReceipt())
+			actualizarCertificado();
         	
         return DocAction.STATUS_Completed;
     } // completeIt
@@ -2199,5 +2195,31 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             pstmt = null;
         }
     } // deletePagosDifCambio
+    
+	public void actualizarCertificado() {
+		final MLARPaymentWithholding[] certificados = MLARPaymentWithholding.get(this);
+		if (certificados.length > 0)
+			for (final MLARPaymentWithholding c : certificados) {
+				// Recuperamos el documentNo y extraemos el tipo de retencion
+				String tipoRet = c.get_ValueAsString("Documentno");
+				String[] parts = tipoRet.split("-");
+				tipoRet = parts[parts.length - 1];
+				Timestamp date = getDateTrx();
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(date);
+				int year = calendar.get(Calendar.YEAR);
+				MOrg org = new MOrg(getCtx(), getAD_Org_ID(), get_TrxName());
+				String nroCert = "";
+				// Si parts < 5 el numero de documento temporal no tenia un tipo de retencion.
+				if (parts.length >= 5)
+					nroCert = org.getDescription() + "-" + year + "-" + this.getDocumentNo() + "-" + tipoRet;
+				else
+					nroCert = org.getDescription() + "-" + year + "-" + this.getDocumentNo();
+				// Seteamos el documentNo del certificado con la secuencia definitiva
+				c.set_CustomColumn("Documentno", nroCert);
+				c.setProcessed(true);
+				c.saveEx(get_TrxName());
+			}
+	} // actualizarCertificado
     
 }	//	MLARPaymentHeader
