@@ -1,11 +1,15 @@
 package ar.com.ergio.process;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MCashBook;
 import org.compiere.model.MDocType;
 import org.compiere.model.MOrg;
 import org.compiere.model.MPOS;
 import org.compiere.model.MSequence;
+import org.compiere.model.X_AD_Document_Action_Access;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
@@ -27,6 +31,8 @@ public class LAR_CreacionPDV extends SvrProcess
     private int p_C_DocType_InOut_ID;
     private boolean p_CrearRecibo;
     private int p_C_DocType_Payment_ID;
+    private int p_AD_Role_ID;
+    private List<MDocType> docTypes = new ArrayList<MDocType>();
 
     @Override
     protected void prepare()
@@ -91,6 +97,10 @@ public class LAR_CreacionPDV extends SvrProcess
             {
                 p_C_DocType_Payment_ID = para[i].getParameterAsInt();
             }
+            else if (name.equals("AD_Role_ID"))
+            {
+                p_AD_Role_ID = para[i].getParameterAsInt();
+            }
         }
     } // prepare
 
@@ -100,6 +110,9 @@ public class LAR_CreacionPDV extends SvrProcess
         // Creacion de Punto de Venta (C_POS)
         final MPOS pos = crearPuntoVenta();
 
+        // Acciones en Permisos de Rol
+        final int DOCACTION_Completar = 178;
+        final int DOCACTION_Anular = 182; 
         // -------------------------------------------------------------------------------
         // Creacion de los Tipos de Documento asociados
         // -------------------------------------------------------------------------------
@@ -192,6 +205,20 @@ public class LAR_CreacionPDV extends SvrProcess
         tipoPDV.setDocSubTypeSO(MDocType.DOCSUBTYPESO_POSOrder);
         // @fchiappano Guardar tipo de orden de venta despues de modificarlo.
         tipoPDV.saveEx();
+        
+     // Asignamos permisos de accion a los tipos de documento
+        if(p_AD_Role_ID >0)
+        {
+            for(MDocType doctype : docTypes)
+            {
+                asignarPermisos(doctype, p_AD_Role_ID, DOCACTION_Completar);
+                if(doctype.getDocBaseType().equals(MDocType.DOCBASETYPE_MaterialDelivery)
+                        || doctype.getDocBaseType().equals(MDocType.DOCBASETYPE_ARReceipt))
+                {
+                    asignarPermisos(doctype, p_AD_Role_ID, DOCACTION_Anular);
+                }
+            }
+        }
 
         // Finalizacion de la configuracion la Terminal PDV
         pos.setC_DocType_ID(tipoPDV.getC_DocType_ID());
@@ -308,7 +335,12 @@ public class LAR_CreacionPDV extends SvrProcess
         documento.set_ValueOfColumn("LAR_DocumentLetter_ID", lar_DocumentLetter_ID);
         // @fchiappano asignar el tipo de documento fiscal.
         documento.set_ValueOfColumn("FiscalDocument", fiscalDocument);
+        //seteamos la organizacion
+        documento.setAD_Org_ID(p_AD_Org_ID);
         documento.saveEx();
+        
+        // Agregamos el documento creado a una lista
+        docTypes.add(documento);
         return documento;
     } // crearDocumento
 
@@ -339,6 +371,8 @@ public class LAR_CreacionPDV extends SvrProcess
         secuencia.setDescription(nombre);
         secuencia.setDecimalPattern("00000000");
         secuencia.setCurrentNext(1);
+        //seteamos la organizacion
+        secuencia.setAD_Org_ID(p_AD_Org_ID);
         secuencia.saveEx();
         return secuencia.getAD_Sequence_ID();
     }
@@ -384,4 +418,21 @@ public class LAR_CreacionPDV extends SvrProcess
         }
         return cashBook.getC_CashBook_ID();
     } // crearCashBook
+
+	/**
+	 * Asignamos permisos al rol para un determinado tipo de documento
+	 * 
+	 * @param doctype
+	 * @param AD_Role_ID
+	 * @param action     - AD_Ref_List_ID
+	 */
+	public void asignarPermisos(MDocType doctype, int AD_Role_ID, int action) {
+		X_AD_Document_Action_Access docActionAccess = new X_AD_Document_Action_Access(getCtx(), 0, get_TrxName());
+		docActionAccess.setAD_Org_ID(0);
+		docActionAccess.setAD_Role_ID(AD_Role_ID);
+		docActionAccess.setC_DocType_ID(doctype.getC_DocType_ID());
+		docActionAccess.setAD_Ref_List_ID(action);
+		docActionAccess.saveEx();
+
+	}
 }

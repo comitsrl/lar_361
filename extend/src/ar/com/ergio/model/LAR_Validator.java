@@ -277,7 +277,7 @@ import ar.com.ergio.util.LAR_Utils;
 
         // Despues de modificar un pago, se actualiza la retención y el total de al cabecera
         if (po.get_TableName().equals(MPayment.Table_Name) &&
-                (type == TYPE_AFTER_NEW || type == TYPE_AFTER_CHANGE || type == TYPE_AFTER_DELETE)
+                (type == TYPE_AFTER_NEW || type == TYPE_AFTER_CHANGE || type == TYPE_BEFORE_DELETE)
             )
         {
             msg = clearPaymentWithholdingFromPayments((MPayment) po, type);
@@ -621,7 +621,7 @@ import ar.com.ergio.util.LAR_Utils;
         {
             BigDecimal curWithholdingAmt = header.getWithholdingAmt();
             // Solo se borran las retenciones si existen retenciones previas
-            if (!curWithholdingAmt.equals(Env.ZERO))
+            if (curWithholdingAmt.compareTo(Env.ZERO) != 0)
             {
                 header.BorrarCertificadosdeRetenciondelHeader();
                 header.BorrarPagosRetenciondelHeader();
@@ -652,12 +652,12 @@ import ar.com.ergio.util.LAR_Utils;
         // de la columna por consistencia, debería llamarse "EsRetenciónEfectuada"
         if (payment.get_ValueAsBoolean("EsRetencionIIBB"))
         {
-            if (type == TYPE_AFTER_DELETE)
+            if (type == TYPE_BEFORE_DELETE)
             {
                 // Recupera y borra el Certificado de Retención asociado al Pago Retención que se está borrando
                 final int c_Payment_ID = payment.getC_Payment_ID();
                 log.info("Borra el certificado de retenci\u00f3n asociado al pago: " + c_Payment_ID);
-                String sql = "DELETE FROM C_PaymentWithholding WHERE C_Payment_ID=?";
+                String sql = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
                 PreparedStatement pstmt = null;
                 try
                 {
@@ -682,7 +682,7 @@ import ar.com.ergio.util.LAR_Utils;
                         .is_ValueChanged(MPayment.COLUMNNAME_PayAmt)
                 // Unicamente se considera el cambio si el nuevo TT es Cheque de Terceros
                 || (payment.is_ValueChanged(MPayment.COLUMNNAME_TenderType) && payment
-                        .getTenderType().equals("Z")))))
+                        .getTenderType().equals("Z")))) || type == TYPE_BEFORE_DELETE)
         {
             int lar_PaymentHeader_ID = payment.get_ValueAsInt("LAR_PaymentHeader_ID");
             if (lar_PaymentHeader_ID == 0)
@@ -693,7 +693,7 @@ import ar.com.ergio.util.LAR_Utils;
             BigDecimal curWithholdingAmt = header.getWithholdingAmt();
 
             // Si existe retención calculada se borran los Certificados y Pagos Retención
-            if (!curWithholdingAmt.equals(Env.ZERO))
+            if (curWithholdingAmt.compareTo(Env.ZERO) != 0)
             {
                 header.BorrarCertificadosdeRetenciondelHeader();
                 header.BorrarPagosRetenciondelHeader();
@@ -727,7 +727,7 @@ import ar.com.ergio.util.LAR_Utils;
 
         // Existe retención calculada
         final BigDecimal curWithholdingAmt = header.getWithholdingAmt();
-        if ((!curWithholdingAmt.equals(Env.ZERO)
+        if ((curWithholdingAmt.compareTo(Env.ZERO) != 0
                 && type == TYPE_AFTER_NEW)
                 || type == TYPE_AFTER_DELETE
                 // seleccionó otra factura
@@ -735,7 +735,7 @@ import ar.com.ergio.util.LAR_Utils;
                         .is_ValueChanged(MPayment.COLUMNNAME_C_Invoice_ID))))
         {
             // Si existe retención calculada se borran los Certificados y Pagos Retención
-            if (!curWithholdingAmt.equals(Env.ZERO))
+            if (curWithholdingAmt.compareTo(Env.ZERO) != 0)
             {
                 header.BorrarCertificadosdeRetenciondelHeader();
                 header.BorrarPagosRetenciondelHeader();
