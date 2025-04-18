@@ -336,12 +336,8 @@ class WithholdingConfig
                 if (wrc.isUseDocumentType())
                 {
                     idxpar++;
-                    pstmtr.setInt(idxpar, c_doctypeinvoice_id);
                     if (c_doctypeinvoice_id <= 0)
-                    {
-                        log.warning("No existen facturas ingresadas en la Orden de Pago");
-                        return null;
-                    }
+                    pstmtr.setInt(idxpar, c_doctypeinvoice_id);
                 }
 
                 ResultSet rsr = pstmtr.executeQuery();
