@@ -1703,7 +1703,13 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);
         MOrg org = new MOrg(getCtx(), getAD_Org_ID(), get_TrxName());
-        String nroCert = org.getDescription() + "-" + year + "-" + docNo;
+        MPayment pagoRet = new MPayment(getCtx(), c_Payment_ID, get_TrxName());
+        String nroDocSec = DB.getDocumentNo(pagoRet.getC_DocType_ID(), get_TrxName(), false, pagoRet);
+        String nroCert = "";
+        if (nroDocSec != null)
+            nroCert = org.get_ValueAsString("LAR_CodigoCentroEmisor") + "-" + year + "-" + nroDocSec;
+        else
+            nroCert = org.get_ValueAsString("LAR_CodigoCentroEmisor") + "-" + year + "-" + docNo;
         pwh.set_CustomColumn("Documentno", nroCert);
         pwh.setLAR_PaymentHeader_ID(getLAR_PaymentHeader_ID());
         pwh.setC_Tax_ID(wc.getC_Tax_ID());
@@ -2195,26 +2201,29 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             pstmt = null;
         }
     } // deletePagosDifCambio
-    
+
+    /**
+     * Genera el número de certificado con la secuencia definitiva.
+     * Marca el registro como procesado y lo guarda.
+     *
+     * @author Sim4s
+     */
 	public void actualizarCertificado() {
 		final MLARPaymentWithholding[] certificados = MLARPaymentWithholding.get(this);
 		if (certificados.length > 0)
 			for (final MLARPaymentWithholding c : certificados) {
-				// Recuperamos el documentNo y extraemos el tipo de retencion
-				String tipoRet = c.get_ValueAsString("Documentno");
-				String[] parts = tipoRet.split("-");
-				tipoRet = parts[parts.length - 1];
 				Timestamp date = getDateTrx();
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime(date);
 				int year = calendar.get(Calendar.YEAR);
 				MOrg org = new MOrg(getCtx(), getAD_Org_ID(), get_TrxName());
 				String nroCert = "";
-				// Si parts < 5 el numero de documento temporal no tenia un tipo de retencion.
-				if (parts.length >= 5)
-					nroCert = org.getDescription() + "-" + year + "-" + this.getDocumentNo() + "-" + tipoRet;
-				else
-					nroCert = org.getDescription() + "-" + year + "-" + this.getDocumentNo();
+                MPayment pagoRet = new MPayment(getCtx(), c.get_ValueAsInt("C_Payment_ID"), get_TrxName());
+                String nroDocSec = DB.getDocumentNo(pagoRet.getC_DocType_ID(), get_TrxName(), true, pagoRet);
+                if (nroDocSec != null)
+                    nroCert = org.get_ValueAsString("LAR_CodigoCentroEmisor") + "-" + year + "-" + nroDocSec;
+                else
+                    nroCert = org.get_ValueAsString("LAR_CodigoCentroEmisor") + "-" + year + "-" + this.getDocumentNo();
 				// Seteamos el documentNo del certificado con la secuencia definitiva
 				c.set_CustomColumn("Documentno", nroCert);
 				c.setProcessed(true);
