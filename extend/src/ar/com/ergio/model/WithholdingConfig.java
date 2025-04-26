@@ -337,6 +337,9 @@ class WithholdingConfig
                 {
                     idxpar++;
                     if (c_doctypeinvoice_id <= 0)
+                    {
+                        log.warning("No existe documento ingresado para la retenci\\u00f3n");
+                    }
                     pstmtr.setInt(idxpar, c_doctypeinvoice_id);
                 }
 
