@@ -32,6 +32,8 @@ public class LAR_CreacionPDV extends SvrProcess
     private boolean p_CrearRecibo;
     private int p_C_DocType_Payment_ID;
     private int p_AD_Role_ID;
+    private int p_AD_PrintFormat_ID;
+    private boolean p_EsMiPyME;
     private List<MDocType> docTypes = new ArrayList<MDocType>();
 
     @Override
@@ -101,6 +103,14 @@ public class LAR_CreacionPDV extends SvrProcess
             {
                 p_AD_Role_ID = para[i].getParameterAsInt();
             }
+            else if(name.equals("AD_PrintFormat_ID"))
+            {
+            	p_AD_PrintFormat_ID = para[i].getParameterAsInt();
+            }
+            else if (name.equals("EsMiPyME"))
+            {
+            	p_EsMiPyME = para[i].getParameterAsBoolean();
+            }
         }
     } // prepare
 
@@ -153,16 +163,50 @@ public class LAR_CreacionPDV extends SvrProcess
             configuracionEsFiscal(tipoNotaDebitoA, "D");
             configuracionEsFiscal(tipoNotaDebitoB, "D");
         }
+
+        // Configuracion de Documentos Electronicos
         if (p_EsElectronico)
         {
-            // 201=Factura Electronica A, 202=Nota de Debito Electronica A, 203=Nota de Credito Electronica A,
-            // 206=Factura Electronica B, 207=Nota de Debito Electronica B, 208=Nota de Debito ElectronicaB
             configuracionEsElectronico(tipoFacturaA, "001");
             configuracionEsElectronico(tipoFacturaB, "006");
             configuracionEsElectronico(tipoNotaCreditoA, "003");
             configuracionEsElectronico(tipoNotaCreditoB, "008");
             configuracionEsElectronico(tipoNotaDebitoA, "002");
             configuracionEsElectronico(tipoNotaDebitoB, "007");
+
+            // MiPyME
+            if (p_EsMiPyME)
+            {
+            	// Factura Electrónica A-B
+            	final MDocType tipoFacturaA_MiPyME = crearDocumento("Factura de Crédito Electrónica", "A", MDocType.DOCBASETYPE_ARInvoice, gl_Category_ARI_ID,
+                        pos, lar_DocumentLetter_A_ID, "FCE", "F");
+            	// 201=Factura Electronica A
+            	configuracionEsElectronico(tipoFacturaA_MiPyME, "201");
+                final MDocType tipoFacturaB_MiPyME = crearDocumento("Factura de Crédito Electrónica", "B", MDocType.DOCBASETYPE_ARInvoice, gl_Category_ARI_ID,
+                        pos, lar_DocumentLetter_B_ID, "FCE", "F");
+                // 206=Factura Electronica B
+                configuracionEsElectronico(tipoFacturaB_MiPyME, "201");
+
+                // Nota de Crédito Electrónica A-B
+                final MDocType tipoNotaCreditoA_MiPyME = crearDocumento("Nota de Crédito Electrónica", "A", MDocType.DOCBASETYPE_ARCreditMemo,
+                        gl_Category_ARI_ID, pos, lar_DocumentLetter_A_ID, "NCE", "C");
+                // 203=Nota de Credito Electronica A
+                configuracionEsElectronico(tipoNotaCreditoA_MiPyME, "203");
+                final MDocType tipoNotaCreditoB_MiPyME = crearDocumento("Nota de Crédito Electrónica", "B", MDocType.DOCBASETYPE_ARCreditMemo,
+                        gl_Category_ARI_ID, pos, lar_DocumentLetter_B_ID, "NCE", "C");
+                // 208=Nota de Credito Electronica B
+                configuracionEsElectronico(tipoNotaCreditoB_MiPyME, "208");
+
+                // Nota de Débito Electronica A-B
+                final MDocType tipoNotaDebitoA_MiPyME = crearDocumento("Nota de Débito Electrónica", "A", MDocType.DOCBASETYPE_ARInvoice,
+                        gl_Category_ARI_ID, pos, lar_DocumentLetter_A_ID, "NDE", null);
+                // 202=Nota de Debito Electronica A
+                configuracionEsElectronico(tipoNotaDebitoA_MiPyME, "202");
+                final MDocType tipoNotaDebitoB_MiPyME = crearDocumento("Nota de Débito Electrónica", "B", MDocType.DOCBASETYPE_ARInvoice,
+                        gl_Category_ARI_ID, pos, lar_DocumentLetter_B_ID, "NDE", null);
+                // 207=Nota de Debito Electronica B
+                configuracionEsElectronico(tipoNotaDebitoB_MiPyME, "207");
+            }
         }
         if (p_EsMiles)
         {
@@ -205,20 +249,30 @@ public class LAR_CreacionPDV extends SvrProcess
         tipoPDV.setDocSubTypeSO(MDocType.DOCSUBTYPESO_POSOrder);
         // @fchiappano Guardar tipo de orden de venta despues de modificarlo.
         tipoPDV.saveEx();
-        
-     // Asignamos permisos de accion a los tipos de documento
-        if(p_AD_Role_ID >0)
-        {
-            for(MDocType doctype : docTypes)
-            {
-                asignarPermisos(doctype, p_AD_Role_ID, DOCACTION_Completar);
-                if(doctype.getDocBaseType().equals(MDocType.DOCBASETYPE_MaterialDelivery)
-                        || doctype.getDocBaseType().equals(MDocType.DOCBASETYPE_ARReceipt))
-                {
-                    asignarPermisos(doctype, p_AD_Role_ID, DOCACTION_Anular);
-                }
-            }
-        }
+
+		// recorremos los tipos de documento creados y configuramos segun corresponda
+		for (MDocType doctype : docTypes)
+		{
+			// Asignamos permisos de accion a los tipos de documento
+			if (p_AD_Role_ID > 0)
+			{
+				asignarPermisos(doctype, p_AD_Role_ID, DOCACTION_Completar);
+				if (doctype.getDocBaseType().equals(MDocType.DOCBASETYPE_MaterialDelivery)
+						|| doctype.getDocBaseType().equals(MDocType.DOCBASETYPE_ARReceipt))
+				{
+					asignarPermisos(doctype, p_AD_Role_ID, DOCACTION_Anular);
+				}
+			}
+
+			// Seteamos formato de impresion a las facturas, notas de credito y notas de
+			// debito.
+			if (p_AD_PrintFormat_ID > 0 && (doctype.getDocBaseType().equals(MDocType.DOCBASETYPE_ARInvoice)
+					|| doctype.getDocBaseType().equals(MDocType.DOCBASETYPE_ARCreditMemo)))
+			{
+				doctype.setAD_PrintFormat_ID(p_AD_PrintFormat_ID);
+				doctype.saveEx();
+			}
+		}
 
         // Finalizacion de la configuracion la Terminal PDV
         pos.setC_DocType_ID(tipoPDV.getC_DocType_ID());
