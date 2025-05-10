@@ -239,7 +239,7 @@ public class LAR_CalcularPercepcion
                                 + "  FROM C_InvoiceOrder ol "
                                 + "  LEFT OUTER JOIN M_Product p ON (ol.M_Product_ID = p.M_Product_ID) "
                                 + "  LEFT OUTER JOIN C_Charge c ON (ol.C_Charge_ID = c.C_Charge_ID) "
-                                + "  WHERE C_Order_ID = ? AND il.IsActive='Y'";
+                                + "  WHERE C_Order_ID = ? AND ol.IsActive='Y'";
                         PreparedStatement pstmtwct = DB.prepareStatement(sqlwct, line.get_TrxName());
                         pstmtwct.setInt(1, line.getC_Order_ID());
                         ResultSet rswct = pstmtwct.executeQuery();
