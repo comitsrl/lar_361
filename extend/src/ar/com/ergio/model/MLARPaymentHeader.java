@@ -1888,6 +1888,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
         case MPayment.TENDERTYPE_DirectDebit:
             nombreColumna = "LAR_Tarjeta_Debito_ID";
+            break;
 
         case MPayment.TENDERTYPE_DirectDeposit:
             nombreColumna = "LAR_Deposito_Directo_ID";
