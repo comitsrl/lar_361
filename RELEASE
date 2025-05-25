@@ -1,6 +1,13 @@
 v2.15.4 - 2025-04-18
 =====================
 
+  - 0232_ISSUE-158.sql
+  - 0233_ISSUE-169.sql
+  - 0234_ISSUE-158.sql
+
+v2.15.4 - 2025-04-18
+=====================
+
 No se incorporaron scripts de migración desde el último release oficial.
 
 v2.15.3 - 2025-04-14

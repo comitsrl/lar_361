@@ -654,10 +654,10 @@ import ar.com.ergio.util.LAR_Utils;
         {
             if (type == TYPE_BEFORE_DELETE)
             {
-                // Recupera y borra el Certificado de Retención asociado al Pago Retención que se está borrando
+                // Recupera y borra las líneas del Certificado de Retención asociado al Pago Retención que se está borrando
                 final int c_Payment_ID = payment.getC_Payment_ID();
-                log.info("Borra el certificado de retenci\u00f3n asociado al pago: " + c_Payment_ID);
-                String sql = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
+                log.info("Borra las l\u00edneas del certificado de retenci\u00f3n asociado al pago: " + c_Payment_ID);
+                String sql = "DELETE FROM LAR_PaymentWithholdingLine WHERE LAR_PaymentWithholding_ID IN (SELECT LAR_PaymentWithholding_ID FROM LAR_PaymentWithholding WHERE C_Payment_ID=?)";
                 PreparedStatement pstmt = null;
                 try
                 {
@@ -673,7 +673,31 @@ import ar.com.ergio.util.LAR_Utils;
                     DB.close(pstmt);
                     pstmt = null;
                 }
+                // Recupera y borra el Certificado de Retención asociado al Pago Retención que se está borrando
+                log.info("Borra el certificado de retenci\u00f3n asociado al pago: " + c_Payment_ID);
+                String sql1 = "DELETE FROM LAR_PaymentWithholding WHERE C_Payment_ID=?";
+                PreparedStatement pstmt1 = null;
+                try
+                {
+                    pstmt1 = DB.prepareStatement(sql1, payment.get_TrxName());
+                    pstmt1.setInt(1, c_Payment_ID);
+                    pstmt1.executeUpdate();
+                } catch (Exception e)
+                {
+                    log.log(Level.SEVERE, sql1, e);
+                    return e.getMessage();
+                } finally
+                {
+                    DB.close(pstmt1);
+                    pstmt1 = null;
+                }
             }
+            int lar_PaymentHeader_ID = payment.get_ValueAsInt("LAR_PaymentHeader_ID");
+            if (lar_PaymentHeader_ID == 0)
+                return null;
+            final MLARPaymentHeader header = new MLARPaymentHeader(payment.getCtx(),
+                    lar_PaymentHeader_ID, payment.get_TrxName());
+            MLARPaymentHeader.updateHeaderWithholding(header.getLAR_PaymentHeader_ID(), header.get_TrxName());
             return null;
         }
 
@@ -831,6 +855,24 @@ import ar.com.ergio.util.LAR_Utils;
                 }
             }
         }
+        else if(!header.isReceipt())
+        {
+            // Si tiene líneas de certificado, implica que es una retención de IIBB.
+	        List<MLARPaymentWithholdingLine> lineasCertificado = header.getLineaCertificado();
+	        if(!lineasCertificado.isEmpty())
+	        {
+	            // Se setea la retención de IIBB en la factura en caso de que las retenciones se hayan
+	            // generado desde el botón "generar retenciones" en la Orden de Pago, previo a completar la
+	            // orden de pago.
+	            for(MLARPaymentWithholdingLine linea : lineasCertificado)
+	            {
+	                MInvoice factura = new MInvoice(header.getCtx(), linea.getC_Invoice_ID(), header.get_TrxName());
+	                BigDecimal retAplicada = (BigDecimal) factura.get_Value("ImporteRetencionIIBB");
+	                factura.set_CustomColumn("ImporteRetencionIIBB", retAplicada.add(linea.getTaxAmt()));
+	                factura.saveEx();
+	            }
+	          }
+         }
         return null;
     }
 

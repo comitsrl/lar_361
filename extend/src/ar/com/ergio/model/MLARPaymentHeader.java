@@ -100,6 +100,8 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     final static private int cargoDifCambioCompras = 1000191;
     // @mzuniga Remuneraciones Principales
     final static private int remuneracionPrincipal_ID = 4000000;
+    /** Marca para registrar la Ret de IIBB en las facturas (solo al Completar) */
+    private boolean registrarRetIIBBAlCompletar = false;
 
     /**
      * Recupera la cabecera de pagos relacionada con el id de la factura dada
@@ -263,6 +265,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             for (final MPaymentAllocate mp : facturas)
                             {
                                 MInvoice factura = mp.getInvoice();
+                                // Si se utiliza el tipo de documento
+                                if (wc.isUseDocumentType())
+                                    if (wc.getc_DocTypeInvoice_ID() != factura.getC_DocType_ID())
+                                        continue;
                                 BigDecimal neto = factura.getTotalLines();
                                 BigDecimal impago = mp.getAmount();
                                 /*
@@ -461,15 +467,15 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             for (final MPaymentAllocate mp : facturas)
                             {
                                 MInvoice factura = mp.getInvoice();
+                                // Si se utiliza el tipo de documento
+                                if (wc.isUseDocumentType())
+                                    if (wc.getc_DocTypeInvoice_ID() != factura.getC_DocType_ID())
+                                        continue;
                                 MInvoiceTax[] impFactura = factura.getTaxes(false);
                                 // Se recorren los impuestos de la factura
                                 for (final MInvoiceTax impuesto : impFactura)
                                 {
                                     MTax tax = new MTax(Env.getCtx(), impuesto.getC_Tax_ID(), this.get_TrxName());
-                                    // Si se utiliza el tipo de documento
-                                    if (wc.isUseDocumentType())
-                                        if (wc.getc_DocTypeInvoice_ID() != factura.getC_DocType_ID())
-                                            continue;
                                     // Si el cálculo está configurado como
                                     // Impuesto
                                     aliquot = wc.getAliquot();
@@ -512,7 +518,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                     // Es retención de IIBB
                     else if (wc.isUseBPISIC())
                     {
-                        impRetencion = calculaRetencionIIBB(facturas, bp, aliquot, impMinNoSujeto);
+                        // Se marca variable en true para generar las lineas del certificado
+                        // cuando se genere la retencion desde el botón
+                        registrarRetIIBB = true;
+                        impRetencion = calculaRetencionIIBB(facturas, bp, aliquot, impMinNoSujeto, wc);
                         if (impRetencion.compareTo(Env.ZERO) < 0)
                             return "Error al crear la retenci\u00f3n: " + m_processMsg;
                         // Exención de IIBB
@@ -532,7 +541,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
                             impRetencion = impRetencion.subtract(impExentoDesc).subtract(impExencion);
                         }
                         // Si existen facturas registrar la retención en las mismas
-                        if (facturaID_Cert != null)
+                        if (registrarRetIIBBAlCompletar && facturaID_Cert != null)
                             for (int i = 0; i < facturaID_Cert.size(); i++)
                         {
                             MInvoice factura = new MInvoice(getCtx(), facturaID_Cert.get(i).getKey(), get_TrxName());
@@ -664,7 +673,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     } // recalcPaymentWithholding
 
     private BigDecimal calculaRetencionIIBB(MPaymentAllocate[] facturas, MBPartner bp,
-            BigDecimal aliquot, BigDecimal impMinNoSujeto)
+            BigDecimal aliquot, BigDecimal impMinNoSujeto, WithholdingConfig wc)
     {
         // Se recuperan los valores parametrizados
         // LCO_ISIC_ID CM Otra Convenio Multilateral c/jurisdicción Río Negro
@@ -735,7 +744,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             {
                 boolean noRetener = false;
                 MInvoice factura = mp.getInvoice();
-
+                // Si se utiliza el tipo de documento
+                if (wc.isUseDocumentType())
+                    if (wc.getc_DocTypeInvoice_ID() != factura.getC_DocType_ID())
+                        continue;
                 // Exencion si la factura contiene Percepción de IIBB
                 final MInvoiceLine lineas[] = factura.getLines();
                 for (final MInvoiceLine ln : lineas)
@@ -1006,7 +1018,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     {
         // Se está copletando el documento
         // Se deben registrar en las facturas el importe retenido de IIBB
+        //Determina tambien la creacion de lineas del certificado
         registrarRetIIBB = true;
+        // Solo registrar la retIIBB en la factura si se esta completando
+        registrarRetIIBBAlCompletar = true;
 
         log.info(toString());
         // Dispara la validación del documento
@@ -1315,7 +1330,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 		// Y actualiza el numero de documento del certificado.
 		if (!isReceipt())
 			actualizarCertificado();
-        	
+
         return DocAction.STATUS_Completed;
     } // completeIt
 
@@ -1888,6 +1903,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 
         case MPayment.TENDERTYPE_DirectDebit:
             nombreColumna = "LAR_Tarjeta_Debito_ID";
+            break;
 
         case MPayment.TENDERTYPE_DirectDeposit:
             nombreColumna = "LAR_Deposito_Directo_ID";
@@ -2230,5 +2246,31 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
 				c.saveEx(get_TrxName());
 			}
 	} // actualizarCertificado
+
+	public List<MLARPaymentWithholdingLine> getLineaCertificado()
+	{
+		List<MLARPaymentWithholdingLine> lineasCertificado = new ArrayList<MLARPaymentWithholdingLine>();
+        String sql = "SELECT LAR_PaymentWithholdingLine_ID FROM LAR_PaymentWithholdingLine WHERE LAR_PaymentWithholding_ID IN (SELECT LAR_PaymentWithholding_ID FROM LAR_PaymentWithholding WHERE LAR_PaymentHeader_ID=?)";
+        PreparedStatement pstmt = DB.prepareStatement(sql, get_TrxName());
+        ResultSet rs = null;
+        try
+        {
+            pstmt.setInt(1, getLAR_PaymentHeader_ID());
+            rs = pstmt.executeQuery();
+            while(rs.next())
+                lineasCertificado.add(new MLARPaymentWithholdingLine(getCtx(), rs.getInt(1), get_TrxName()));
+            return lineasCertificado;
+        }
+        catch(SQLException e)
+        {
+            log.log(Level.SEVERE, sql, e);
+        }
+        finally
+        {
+            DB.close(rs, pstmt);
+            rs = null; pstmt = null;
+        }
+        return null;
+	}
     
 }	//	MLARPaymentHeader
