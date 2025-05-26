@@ -15,6 +15,7 @@ package ar.com.ergio.report;
 
 
 import java.awt.print.PrinterJob;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,6 +32,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,6 +43,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -597,12 +602,18 @@ public class ReportStarterWithTxtExporter implements ProcessCall, ClientProcess
                         jrtxt.setParameter(JRTextExporterParameter.CHARACTER_WIDTH, new Float(10));
                         jrtxt.setParameter(JRTextExporterParameter.CHARACTER_HEIGHT, new Float(20));
                         jrtxt.setParameter(JRTextExporterParameter.PAGE_WIDTH, Par_PageWidth.floatValue());
+
+                        // Asegurar que el archivo se genera en formato DOS
+                        jrtxt.setParameter(JRExporterParameter.CHARACTER_ENCODING, "windows-1252");
+                        jrtxt.setParameter(JRTextExporterParameter.LINE_SEPARATOR, "\r\n");
                             try {
                                 jrtxt.exportReport();
+                                // Se Eliminan las líneas en blanco si existen
+                                removeTrailingBlankLines(destFile);
                                 log.info("Archivo Exportado: ");
                                 if (Env.getWindow(0)!=null)
                                 ADialog.info(0, Env.getWindow(0), "Archivo Exportado:", fileName);
-                            } catch (JRException e1) {
+                            } catch (JRException | IOException e1) {
                                 // TODO Auto-generated catch block
                                 e1.printStackTrace();
                             }
@@ -685,11 +696,43 @@ public class ReportStarterWithTxtExporter implements ProcessCall, ClientProcess
         return true;
     }
 
+    /**
+     * Elimina las líneas en blanco al final de un archivo de texto.
+     *
+     * Este método lee el archivo línea por línea, elimina todas las líneas en blanco
+     * que se encuentren al final (trailing blank lines) y sobrescribe el archivo con el contenido limpio.
+     * Una línea en blanco es aquella que está completamente vacía o contiene solo espacios en blanco.
+     *
+     *
+     * @param file El archivo del cual se deben eliminar las líneas en blanco finales.
+     * @throws IOException Si ocurre un error al leer o escribir el archivo.
+     *
+     * @author @mzuniga
+     */
+    private void removeTrailingBlankLines(File file) throws IOException {
+        List<String> allLines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+
+        // Eliminar líneas en blanco al final
+        int lastNonBlankIndex = allLines.size() - 1;
+        while (lastNonBlankIndex >= 0 && allLines.get(lastNonBlankIndex).trim().isEmpty()) {
+            lastNonBlankIndex--;
+        }
+
+        List<String> cleanedLines = allLines.subList(0, lastNonBlankIndex + 1);
+
+        // Reescribir el archivo con \r\n como separador de línea
+        try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
+            for (int i = 0; i < cleanedLines.size(); i++) {
+                writer.write(cleanedLines.get(i));
+                writer.write("\r\n");
+            }
+        }
+    }
+
 	public static JasperPrint getJasperPrint()
 	{
 		return jasperPrint;
 	}
-
 
 	/**
      * Get .property resource file from process attachment
