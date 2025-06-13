@@ -167,12 +167,12 @@ public class LAR_CreacionPDV extends SvrProcess
         // Configuracion de Documentos Electronicos
         if (p_EsElectronico)
         {
-            configuracionEsElectronico(tipoFacturaA, "001");
-            configuracionEsElectronico(tipoFacturaB, "006");
-            configuracionEsElectronico(tipoNotaCreditoA, "003");
-            configuracionEsElectronico(tipoNotaCreditoB, "008");
-            configuracionEsElectronico(tipoNotaDebitoA, "002");
-            configuracionEsElectronico(tipoNotaDebitoB, "007");
+            configuracionEsElectronico(tipoFacturaA, "001", false);
+            configuracionEsElectronico(tipoFacturaB, "006", false);
+            configuracionEsElectronico(tipoNotaCreditoA, "003", false);
+            configuracionEsElectronico(tipoNotaCreditoB, "008", false);
+            configuracionEsElectronico(tipoNotaDebitoA, "002", false);
+            configuracionEsElectronico(tipoNotaDebitoB, "007", false);
 
             // MiPyME
             if (p_EsMiPyME)
@@ -180,32 +180,32 @@ public class LAR_CreacionPDV extends SvrProcess
             	// Factura Electrónica A-B
             	final MDocType tipoFacturaA_MiPyME = crearDocumento("Factura de Crédito Electrónica", "A", MDocType.DOCBASETYPE_ARInvoice, gl_Category_ARI_ID,
                         pos, lar_DocumentLetter_A_ID, "FCE", "F");
-            	// 201=Factura Electronica A
-            	configuracionEsElectronico(tipoFacturaA_MiPyME, "201");
+                // 201=Factura Electronica A
+                configuracionEsElectronico(tipoFacturaA_MiPyME, "201", true);
                 final MDocType tipoFacturaB_MiPyME = crearDocumento("Factura de Crédito Electrónica", "B", MDocType.DOCBASETYPE_ARInvoice, gl_Category_ARI_ID,
                         pos, lar_DocumentLetter_B_ID, "FCE", "F");
                 // 206=Factura Electronica B
-                configuracionEsElectronico(tipoFacturaB_MiPyME, "201");
+                configuracionEsElectronico(tipoFacturaB_MiPyME, "201", true);
 
                 // Nota de Crédito Electrónica A-B
                 final MDocType tipoNotaCreditoA_MiPyME = crearDocumento("Nota de Crédito Electrónica", "A", MDocType.DOCBASETYPE_ARCreditMemo,
                         gl_Category_ARI_ID, pos, lar_DocumentLetter_A_ID, "NCE", "C");
                 // 203=Nota de Credito Electronica A
-                configuracionEsElectronico(tipoNotaCreditoA_MiPyME, "203");
+                configuracionEsElectronico(tipoNotaCreditoA_MiPyME, "203", true);
                 final MDocType tipoNotaCreditoB_MiPyME = crearDocumento("Nota de Crédito Electrónica", "B", MDocType.DOCBASETYPE_ARCreditMemo,
                         gl_Category_ARI_ID, pos, lar_DocumentLetter_B_ID, "NCE", "C");
                 // 208=Nota de Credito Electronica B
-                configuracionEsElectronico(tipoNotaCreditoB_MiPyME, "208");
+                configuracionEsElectronico(tipoNotaCreditoB_MiPyME, "208", true);
 
                 // Nota de Débito Electronica A-B
                 final MDocType tipoNotaDebitoA_MiPyME = crearDocumento("Nota de Débito Electrónica", "A", MDocType.DOCBASETYPE_ARInvoice,
                         gl_Category_ARI_ID, pos, lar_DocumentLetter_A_ID, "NDE", null);
                 // 202=Nota de Debito Electronica A
-                configuracionEsElectronico(tipoNotaDebitoA_MiPyME, "202");
+                configuracionEsElectronico(tipoNotaDebitoA_MiPyME, "202", true);
                 final MDocType tipoNotaDebitoB_MiPyME = crearDocumento("Nota de Débito Electrónica", "B", MDocType.DOCBASETYPE_ARInvoice,
                         gl_Category_ARI_ID, pos, lar_DocumentLetter_B_ID, "NDE", null);
                 // 207=Nota de Debito Electronica B
-                configuracionEsElectronico(tipoNotaDebitoB_MiPyME, "207");
+                configuracionEsElectronico(tipoNotaDebitoB_MiPyME, "207", true);
             }
         }
         if (p_EsMiles)
@@ -307,13 +307,14 @@ public class LAR_CreacionPDV extends SvrProcess
      * @throws AdempiereUserError
      *             si ocurre un error al guardar el tipo de documento
      */
-    private void configuracionEsElectronico(final MDocType doctype, final String docSubTypeCAE)
+    private void configuracionEsElectronico(final MDocType doctype, final String docSubTypeCAE, boolean esMiPyme)
             throws AdempiereUserError
     {
 
         doctype.set_ValueOfColumn("DocSubTypeINV", "EL");
         doctype.set_ValueOfColumn("isElectronic", p_EsElectronico);
         doctype.set_ValueOfColumn("DocSubTypeCAE", docSubTypeCAE);
+        doctype.set_ValueOfColumn("EsFce", esMiPyme);
         doctype.saveEx();
 
     } // configuracionEsElectronico
