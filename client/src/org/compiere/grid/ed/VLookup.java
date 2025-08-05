@@ -1682,5 +1682,9 @@ public class VLookup extends JComponent
 		m_stopediting = stopediting;
 	}
 
+	public JPopupMenu getPopUpMenu()
+	{
+	    return popupMenu;
+	} // getPopUpMenu
 
 }	//	VLookup
