@@ -1,7 +1,11 @@
 package org.adempiere.webui.window;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -242,13 +246,26 @@ public class ZkJRViewer extends Window implements EventListener, ITabOnCloseHand
             jrtxt.setParameter(JRTextExporterParameter.CHARACTER_WIDTH, new Float(10));
             jrtxt.setParameter(JRTextExporterParameter.CHARACTER_HEIGHT, new Float(20));
             jrtxt.setParameter(JRTextExporterParameter.PAGE_WIDTH, new Float (219));
-                    try {
-                        jrtxt.exportReport();
-                    } catch (JRException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
-            media = new AMedia(getTitle(), "txt", "application/txt", file, true);
+
+            // Asegurar que el archivo se genera en formato DOS
+            jrtxt.setParameter(JRExporterParameter.CHARACTER_ENCODING, "windows-1252");
+            jrtxt.setParameter(JRTextExporterParameter.LINE_SEPARATOR, "\r\n");
+            try
+            {
+                jrtxt.exportReport();
+                // Se Eliminan las líneas en blanco si existen
+                removeTrailingBlankLines(file);
+            } catch (JRException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            finally
+            {
+                if (fos != null)
+                    fos.close();
+            }
+            String fileName = new String(jasperPrint.getName() + ".txt");
+            media = new AMedia(fileName, "txt", "application/txt", file, true);
             iframe.setContent(media);
 		}
 
@@ -300,4 +317,39 @@ public class ZkJRViewer extends Window implements EventListener, ITabOnCloseHand
 		}
 	}
 
+	/**
+     * Elimina las líneas en blanco al final de un archivo de texto.
+     *
+     * Este método lee el archivo línea por línea, elimina todas las líneas en blanco
+     * que se encuentren al final (trailing blank lines) y sobrescribe el archivo con el contenido limpio.
+     * Una línea en blanco es aquella que está completamente vacía o contiene solo espacios en blanco.
+     *
+     *
+     * @param file El archivo del cual se deben eliminar las líneas en blanco finales.
+     * @throws IOException Si ocurre un error al leer o escribir el archivo.
+     *
+     * @author @mzuniga
+     */
+    private void removeTrailingBlankLines(File file) throws IOException {
+        List<String> allLines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+
+        // Eliminar líneas en blanco al final
+        int lastNonBlankIndex = allLines.size() - 1;
+        while (lastNonBlankIndex >= 0 && allLines.get(lastNonBlankIndex).trim().isEmpty()) {
+            lastNonBlankIndex--;
+        }
+
+        List<String> cleanedLines = allLines.subList(0, lastNonBlankIndex + 1);
+
+        // Reescribir el archivo con \r\n como separador de línea
+        try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
+            for (int i = 0; i < cleanedLines.size(); i++) {
+                writer.write(cleanedLines.get(i));
+                if (i < cleanedLines.size() - 1)
+                {
+                    writer.write("\r\n"); // Solo hacemos salto entre lineas.
+                }
+            }
+        }
+    }
 }
