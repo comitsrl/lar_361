@@ -171,8 +171,12 @@ public class MLARLoteSueldos extends X_LAR_LoteSueldos implements DocAction, Doc
                     // Completar el header si el estado de pagos es Completed
                     if (getDocStatusPagos().equals(DOCSTATUS_Completed))
                     {
-                        headerPpal.completeIt();
+                        String status = headerPpal.completeIt();
                         headerPpal.saveEx();
+                        if (DocAction.STATUS_Invalid.equals(status)) {
+                            m_processMsg = headerPpal.getProcessMsg();
+                            return DocAction.STATUS_Invalid;
+                        }
                     }
                 }
                 // Procesar Importe Miles
@@ -191,12 +195,8 @@ public class MLARLoteSueldos extends X_LAR_LoteSueldos implements DocAction, Doc
                     headerMiles.set_ValueOfColumn("Description", "Lote " + fechaFormateada + " - Pago Miles");
                     headerMiles.setIsReceipt(false);
                     headerMiles.setC_BankAccount_ID(line.getC_BankAccount_ID());
+                    headerMiles.set_ValueOfColumn("LAR_ConceptoCaja_ID", getLAR_ConceptoCaja_ID());
                     headerMiles.saveEx();
-                    // Completar el header Miles si el estado de pagos es Completed
-                    if (getDocStatusPagos().equals(DOCSTATUS_Completed)) {
-                        headerMiles.completeIt();
-                        headerMiles.saveEx();
-                    }
                     MPayment paymentMiles = new MPayment(getCtx(), 0, get_TrxName());
                     paymentMiles.setAD_Org_ID(orgID);
                     paymentMiles.setC_DocType_ID(docTypeID);
@@ -222,11 +222,16 @@ public class MLARLoteSueldos extends X_LAR_LoteSueldos implements DocAction, Doc
                     paymentMiles.saveEx();
                     line.setLar_PaymentHeaderMiles_ID(headerMiles.get_ID());
                     line.saveEx();
-                    // Completar el header si el estado de pagos es Completed
+                    // Completar el header Miles si el estado de pagos es Completed
                     if (getDocStatusPagos().equals(DOCSTATUS_Completed))
                     {
-                        headerMiles.completeIt();
+                        String status = headerMiles.completeIt();
                         headerMiles.saveEx();
+                        if (DocAction.STATUS_Invalid.equals(status))
+                        {
+                            m_processMsg = headerMiles.getProcessMsg();
+                            return DocAction.STATUS_Invalid;
+                        }
                     }
                 }
                 // Marcar línea como procesada
@@ -244,6 +249,7 @@ public class MLARLoteSueldos extends X_LAR_LoteSueldos implements DocAction, Doc
             return DocAction.STATUS_Invalid;
         setProcessed(true);
         setDocAction(DocAction.ACTION_Void);
+        saveEx();
         return DocAction.STATUS_Completed;
     }
 

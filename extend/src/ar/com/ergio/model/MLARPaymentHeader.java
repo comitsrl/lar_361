@@ -1174,6 +1174,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             pstmt.setTimestamp(1, getDateTrx());
             pstmt.setInt(2, remuneracionPrincipal_ID);
             pstmt.setInt(3, bp.getC_BPartner_ID());
+            log.config( String.valueOf(bp.getC_BPartner_ID()));
             rs = pstmt.executeQuery();
 
             if (rs.next())
@@ -1181,7 +1182,9 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             return sueldo;
         } catch (Exception e)
         {
-            log.log(Level.SEVERE, sql, e);
+            String errorMsg = "Error en recuperarSueldo: SQL=[" + sql + "] C_BPartner_ID=[" + bp.getC_BPartner_ID() + "] " + e.getMessage();
+            log.log(Level.SEVERE, errorMsg, e);
+            m_processMsg = errorMsg;
             return null;
         } finally
         {
@@ -1276,7 +1279,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         if (m_processMsg != null)
             return DocAction.STATUS_Invalid;
 
-        // @fchiapppano Eliminar previamente, los pagos por diferencia de cambio.
+        // @fchiappano Eliminar previamente, los pagos por diferencia de cambio.
         deletePagosDifCambio();
 
         MPayment[] pays = getPayments(get_TrxName());

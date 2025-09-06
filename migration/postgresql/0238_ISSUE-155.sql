@@ -2507,3 +2507,156 @@ UPDATE AD_Column SET AD_Reference_ID=30,Updated=TO_TIMESTAMP('2025-09-03 14:22:1
 UPDATE AD_Table SET AD_Window_ID=3000140,Updated=TO_TIMESTAMP('2025-09-04 09:13:31','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Table_ID=3000010
 ;
 
+-- 06/09/2025 9:04:38 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:04:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005867
+;
+
+-- 06/09/2025 9:05:38 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:05:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005868
+;
+
+-- 06/09/2025 9:05:46 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:05:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005869
+;
+
+-- 06/09/2025 9:05:59 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:05:59','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005899
+;
+
+-- 06/09/2025 9:06:01 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:06:01','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005864
+;
+
+-- 06/09/2025 9:06:10 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:06:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005873
+;
+
+-- 06/09/2025 9:06:13 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:06:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005872
+;
+
+-- 06/09/2025 9:06:15 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:06:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005901
+;
+
+-- 06/09/2025 9:06:20 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:06:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005871
+;
+
+-- 06/09/2025 9:07:51 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+INSERT INTO AD_Reference (AD_Reference_ID,ValidationType,VFormat,EntityType,IsOrderByValue,Name,Description,AD_Client_ID,AD_Org_ID,CreatedBy,Updated,IsActive,Created,UpdatedBy) VALUES (3000179,'L','LL','LAR','N','Document Status only CO, DR','Document Status list',0,0,100,TO_TIMESTAMP('2025-09-06 09:07:50','YYYY-MM-DD HH24:MI:SS'),'Y',TO_TIMESTAMP('2025-09-06 09:07:50','YYYY-MM-DD HH24:MI:SS'),100)
+;
+
+-- 06/09/2025 9:07:51 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+INSERT INTO AD_Reference_Trl (AD_Language,AD_Reference_ID, Help,Name,Description, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Reference_ID, t.Help,t.Name,t.Description, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Reference t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Reference_ID=3000179 AND NOT EXISTS (SELECT * FROM AD_Reference_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Reference_ID=t.AD_Reference_ID)
+;
+
+-- 06/09/2025 9:08:22 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000379,3000179,'LAR','CO','Completed',TO_TIMESTAMP('2025-09-06 09:08:22','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2025-09-06 09:08:22','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 06/09/2025 9:08:22 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000379 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 06/09/2025 9:08:34 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+INSERT INTO AD_Ref_List (AD_Ref_List_ID,AD_Reference_ID,EntityType,Value,Name,Updated,Created,CreatedBy,UpdatedBy,AD_Org_ID,IsActive,AD_Client_ID) VALUES (3000380,3000179,'LAR','DR','Drafted',TO_TIMESTAMP('2025-09-06 09:08:34','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2025-09-06 09:08:34','YYYY-MM-DD HH24:MI:SS'),100,100,0,'Y',0)
+;
+
+-- 06/09/2025 9:08:34 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+INSERT INTO AD_Ref_List_Trl (AD_Language,AD_Ref_List_ID, Description,Name, IsTranslated,AD_Client_ID,AD_Org_ID,Created,Createdby,Updated,UpdatedBy) SELECT l.AD_Language,t.AD_Ref_List_ID, t.Description,t.Name, 'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.Createdby,t.Updated,t.UpdatedBy FROM AD_Language l, AD_Ref_List t WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N' AND t.AD_Ref_List_ID=3000380 AND NOT EXISTS (SELECT * FROM AD_Ref_List_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Ref_List_ID=t.AD_Ref_List_ID)
+;
+
+-- 06/09/2025 9:08:41 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Ref_List_Trl SET IsTranslated='Y',Name='Borrador',Updated=TO_TIMESTAMP('2025-09-06 09:08:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000380 AND AD_Language='es_AR'
+;
+
+-- 06/09/2025 9:08:56 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Ref_List_Trl SET IsTranslated='Y',Name='Completar',Updated=TO_TIMESTAMP('2025-09-06 09:08:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Ref_List_ID=3000379 AND AD_Language='es_AR'
+;
+
+-- 06/09/2025 9:09:09 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET AD_Reference_Value_ID=3000179,Updated=TO_TIMESTAMP('2025-09-06 09:09:09','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005876
+;
+
+-- 06/09/2025 9:10:33 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET DefaultValue='X',Updated=TO_TIMESTAMP('2025-09-06 09:10:33','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005898
+;
+
+-- 06/09/2025 9:10:38 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET DefaultValue='A',Updated=TO_TIMESTAMP('2025-09-06 09:10:38','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005896
+;
+
+-- 06/09/2025 9:13:24 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET DefaultValue='1000047',Updated=TO_TIMESTAMP('2025-09-06 09:13:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005897
+;
+
+-- 06/09/2025 9:14:08 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:14:08','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005890
+;
+
+-- 06/09/2025 9:14:11 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:14:11','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005889
+;
+
+-- 06/09/2025 9:14:15 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:14:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005885
+;
+
+-- 06/09/2025 9:14:24 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsUpdateable='N', IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:14:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005877
+;
+
+-- 06/09/2025 9:14:30 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:14:30','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005894
+;
+
+-- 06/09/2025 9:14:33 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:14:33','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005895
+;
+
+-- 06/09/2025 9:14:36 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2025-09-06 09:14:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005902
+;
+
+-- 06/09/2025 11:00:10 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Field SET IsCentrallyMaintained='N',Updated=TO_TIMESTAMP('2025-09-06 11:00:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009409
+;
+
+-- 06/09/2025 11:01:28 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Field_Trl SET Name='Generar Pagos en',Description='Estado en el que quedarán los documentos generados a partir del Lote',Updated=TO_TIMESTAMP('2025-09-06 11:01:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009409 AND AD_Language='es_AR'
+;
+
+-- Registración de script
+SELECT register_migration_script_lar('0238_ISSUE-155.sql', 'LAR', '')
+;
