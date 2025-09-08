@@ -2650,6 +2650,46 @@ UPDATE AD_Field SET IsCentrallyMaintained='N',Updated=TO_DATE('2025-09-06 11:00:
 UPDATE AD_Field_Trl SET Name='Generar Pagos en',Description='Estado en el que quedarán los documentos generados a partir del Lote',Updated=TO_DATE('2025-09-06 11:01:28','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009409 AND AD_Language='es_AR'
 ;
 
+-- 08/09/2025 10:34:15 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:34:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005869
+;
+
+-- 08/09/2025 10:34:27 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:34:27','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005870
+;
+
+-- 08/09/2025 10:35:22 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsIdentifier='Y', IsUpdateable='N',Updated=TO_DATE('2025-09-08 10:35:22','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005877
+;
+
+-- 08/09/2025 10:35:36 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:35:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005888
+;
+
+-- 08/09/2025 10:35:54 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:35:54','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005889
+;
+
+-- 08/09/2025 10:35:57 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:35:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005890
+;
+
+-- 08/09/2025 10:36:40 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:36:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000237
+;
+
+-- 08/09/2025 10:36:51 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:36:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000238
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0238_ISSUE-155.sql', 'LAR', '') FROM dual
 ;

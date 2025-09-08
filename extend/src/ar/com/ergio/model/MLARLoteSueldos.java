@@ -136,6 +136,7 @@ public class MLARLoteSueldos extends X_LAR_LoteSueldos implements DocAction, Doc
                     headerPpal.setC_BPartner_ID(line.getC_BPartner_ID());
                     headerPpal.setDateTrx(getDateTrx());
                     headerPpal.setDocStatus(DOCSTATUS_Drafted);
+                    headerPpal.setDocAction(DOCACTION_Complete);
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     String fechaFormateada = sdf.format(this.getDateTrx());
                     headerPpal.set_ValueOfColumn("Description", "Lote " + fechaFormateada + " - Pago Principal");
@@ -190,6 +191,7 @@ public class MLARLoteSueldos extends X_LAR_LoteSueldos implements DocAction, Doc
                     headerMiles.setC_BPartner_ID(line.getC_BPartner_ID());
                     headerMiles.setDateTrx(getDateTrx());
                     headerMiles.setDocStatus(DOCSTATUS_Drafted);
+                    headerMiles.setDocAction(DOCACTION_Complete);
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     String fechaFormateada = sdf.format(this.getDateTrx());
                     headerMiles.set_ValueOfColumn("Description", "Lote " + fechaFormateada + " - Pago Miles");
