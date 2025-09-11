@@ -2690,6 +2690,11 @@ UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:36:40','YYY
 UPDATE AD_Column SET IsIdentifier='Y',Updated=TO_DATE('2025-09-08 10:36:51','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3000238
 ;
 
+-- 08/09/2025 18:53:15 ART
+-- -- ISSUE #155: RRHH Lote Sueldos
+UPDATE AD_Column SET DefaultValue='1000045',Updated=TO_DATE('2025-09-08 18:53:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005897
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0238_ISSUE-155.sql', 'LAR', '') FROM dual
 ;
