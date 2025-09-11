@@ -44,6 +44,7 @@ import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MOrg;
+import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
 import org.compiere.model.MSysConfig;
@@ -1075,7 +1076,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             // Si hay error al recuperar el importe pagado
             if (adelantos.compareTo(Env.ZERO) < 0)
             {
-                m_processMsg = "No se pudo recuperar el importe de adelantos acumualdos en el periodo actual.";
+                m_processMsg = "No se pudo recuperar el importe de adelantos acumualdos en el periodo actual. " + bp.getName();
                 return DocAction.STATUS_Invalid;
             }
 
@@ -1083,7 +1084,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             BigDecimal disponible = sueldo.subtract(adelantos);
             if (disponible.compareTo(Env.ZERO) < 0 )
             {
-                m_processMsg = "El empleado no tiene importe disponible para adelantos.";
+                m_processMsg = "El empleado "+ bp.getName()  +" no tiene importe disponible para adelantos.";
                 return DocAction.STATUS_Invalid;
             }
 
@@ -1091,7 +1092,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             // Si se supera el diponible,devolver error con el disponible y estado inválido
             if (saldo.compareTo(Env.ZERO) < 0 )
             {
-                m_processMsg = "El importe supera el disponible para adelantos. Importe Disponible: " + disponible;
+                m_processMsg = "El importe supera el disponible para adelantos. " + bp.getName() + ": Importe Disponible: " + disponible;
                 return DocAction.STATUS_Invalid;
             }
         } // Documentos RRHH
@@ -1155,31 +1156,50 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     */
     private BigDecimal recuperarSueldo(MBPartner bp)
     {
+        MOrgInfo orgInfo = MOrgInfo.get(getCtx(),  getAD_Org_ID(), get_TrxName());
         BigDecimal sueldo =  Env.ZERO;
-
-        String sql = "SELECT COALESCE(GrossRAmt, 0) AS GrossRAmt"
-                   + " FROM C_UserRemuneration"
-                   + " WHERE IsActive = 'Y'"
-                   + " AND ValidFrom <= ?"
-                   + " AND C_Remuneration_ID =?"
-                   + " AND AD_User_ID = (SELECT AD_User_ID FROM AD_User WHERE C_BPartner_ID =?)"
-                   + " ORDER BY ValidFrom DESC"
-                   + " FETCH FIRST 1 ROW ONLY";
-
+        String sql= "";
+        if (orgInfo.get_ValueAsBoolean("IsMiles"))
+        {
+        sql = "SELECT COALESCE(TotalRAmt, 0) - COALESCE(GrossRAmt, 0) AS GrossRAmt"
+               + " FROM C_UserRemuneration"
+               + " WHERE IsActive = 'Y'"
+               + " AND ValidFrom <= ?"
+               + " AND AD_User_ID = (SELECT AD_User_ID FROM AD_User WHERE C_BPartner_ID =?)"
+               + " ORDER BY ValidFrom DESC"
+               + " FETCH FIRST 1 ROW ONLY";
+        }
+        else
+        {
+        sql = "SELECT COALESCE(GrossRAmt, 0) GrossRAmt"
+               + " FROM C_UserRemuneration"
+               + " WHERE IsActive = 'Y'"
+               + " AND ValidFrom <= ?"
+               + " AND AD_User_ID = (SELECT AD_User_ID FROM AD_User WHERE C_BPartner_ID =?)"
+               + " ORDER BY ValidFrom DESC"
+               + " FETCH FIRST 1 ROW ONLY";
+        }
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try
         {
             pstmt = DB.prepareStatement(sql, get_TrxName());
             pstmt.setTimestamp(1, getDateTrx());
-            pstmt.setInt(2, remuneracionPrincipal_ID);
-            pstmt.setInt(3, bp.getC_BPartner_ID());
-            log.config( String.valueOf(bp.getC_BPartner_ID()));
+            pstmt.setInt(2, bp.getC_BPartner_ID());
+            log.config( String.valueOf(bp.getC_BPartner_ID() + ": " + bp.getName()));
             rs = pstmt.executeQuery();
 
             if (rs.next())
                 sueldo = rs.getBigDecimal("GrossRAmt");
-            return sueldo;
+
+            int cBPartnerId = bp.getC_BPartner_ID();
+            // 2. Ejecutar funciones para obtener importes
+            BigDecimal saldo = DB.getSQLValueBD(get_TrxName(),
+                "SELECT comit_saldo_inicial_sueldo_empleado_por_tipo(?, ?, ?)",
+                cBPartnerId, getDateTrx(), orgInfo.get_ValueAsBoolean("IsMiles"));
+            if (saldo == null) saldo = BigDecimal.ZERO;
+            saldo = saldo.add(sueldo);
+            return saldo;
         } catch (Exception e)
         {
             String errorMsg = "Error en recuperarSueldo: SQL=[" + sql + "] C_BPartner_ID=[" + bp.getC_BPartner_ID() + "] " + e.getMessage();

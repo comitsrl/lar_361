@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.model.MDocType;
+import org.compiere.model.MOrg;
 import org.compiere.model.MPayment;
 import org.compiere.model.Query;
 import org.compiere.process.DocAction;
@@ -186,12 +187,13 @@ public class MLARLoteSueldos extends X_LAR_LoteSueldos implements DocAction, Doc
                     int orgID = getAD_Org_ID();
                     int docTypeID = getDocTypeRRHH(true); // Tipo de documento RRHH de la organización Miles
                     MLARPaymentHeader headerMiles = new MLARPaymentHeader(getCtx(), 0, get_TrxName());
-                    headerMiles.setAD_Org_ID(orgID);
                     headerMiles.setC_DocType_ID(docTypeID);
                     headerMiles.setC_BPartner_ID(line.getC_BPartner_ID());
                     headerMiles.setDateTrx(getDateTrx());
                     headerMiles.setDocStatus(DOCSTATUS_Drafted);
                     headerMiles.setDocAction(DOCACTION_Complete);
+                    MOrg org = MOrg.get(getCtx(), orgID);
+                    headerMiles.setAD_Org_ID(org.getAD_Org_ID());
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     String fechaFormateada = sdf.format(this.getDateTrx());
                     headerMiles.set_ValueOfColumn("Description", "Lote " + fechaFormateada + " - Pago Miles");
