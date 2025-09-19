@@ -1178,7 +1178,11 @@ public class MInOut extends X_M_InOut implements DocAction
 		if (isSOTrx() && !isReversal())
 		{
 			I_C_Order order = getC_Order();
-			if (order != null && MDocType.DOCSUBTYPESO_PrepayOrder.equals(order.getC_DocType().getDocSubTypeSO())
+			if (   MDocType.DOCSUBTYPESO_POSOrder.equals(order.getC_DocTypeTarget().getDocSubTypeSO())
+                    && !MOrder.PAYMENTRULE_OnCredit.equals(order.getPaymentRule())
+                    && !MSysConfig.getBooleanValue("CHECK_CREDIT_ON_CASH_POS_ORDER", true, getAD_Client_ID(), getAD_Org_ID())) {
+                // ignore -- don't validate for Cash POS Orders depending on sysconfig parameter
+			} else if (order != null && MDocType.DOCSUBTYPESO_PrepayOrder.equals(order.getC_DocTypeTarget().getDocSubTypeSO())
 					&& !MSysConfig.getBooleanValue("CHECK_CREDIT_ON_PREPAY_ORDER", true, getAD_Client_ID(), getAD_Org_ID())) {
 				// ignore -- don't validate Prepay Orders depending on sysconfig parameter
 			} else {
