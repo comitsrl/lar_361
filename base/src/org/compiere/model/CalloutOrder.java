@@ -440,6 +440,13 @@ public class CalloutOrder extends CalloutEngine
                         if (!rs.wasNull())
                             mTab.setValue("C_PaymentTerm_ID", ii);
                     }
+                    // @fchiappano si el paymentRule es contrarrembolso, actualizarlo en la orden
+                    String paymentRule = rs.getString("PaymentRule");
+                    if (paymentRule.equals("N") || paymentRule.equals("O"))
+                    {
+                        mTab.setValue("PaymentRule", paymentRule);
+                    }
+
 					//	InvoiceRule
 					s = rs.getString("InvoiceRule");
 					if (s != null && s.length() != 0)
