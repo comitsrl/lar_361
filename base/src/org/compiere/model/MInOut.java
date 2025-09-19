@@ -1185,6 +1185,8 @@ public class MInOut extends X_M_InOut implements DocAction
 			} else if (order != null && MDocType.DOCSUBTYPESO_PrepayOrder.equals(order.getC_DocTypeTarget().getDocSubTypeSO())
 					&& !MSysConfig.getBooleanValue("CHECK_CREDIT_ON_PREPAY_ORDER", true, getAD_Client_ID(), getAD_Org_ID())) {
 				// ignore -- don't validate Prepay Orders depending on sysconfig parameter
+			} else if (((MDocType) order.getC_DocTypeTarget()).get_ValueAsBoolean("EsDevolucion")) {
+			    // @fchiappano Permitir realizar devoluciones sin importar el estado de credito.
 			} else {
 				MBPartner bp = new MBPartner (getCtx(), getC_BPartner_ID(), get_TrxName());
 				if (MBPartner.SOCREDITSTATUS_CreditStop.equals(bp.getSOCreditStatus()))

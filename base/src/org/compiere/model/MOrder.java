@@ -1425,7 +1425,7 @@ public class MOrder extends X_C_Order implements DocAction
 			} else if (MDocType.DOCSUBTYPESO_PrepayOrder.equals(dt.getDocSubTypeSO())
 					&& !MSysConfig.getBooleanValue("CHECK_CREDIT_ON_PREPAY_ORDER", true, getAD_Client_ID(), getAD_Org_ID())) {
 				// ignore -- don't validate Prepay Orders depending on sysconfig parameter
-			} else if (MDocType.DOCSUBTYPESO_Proposal.equals(dt.getDocSubTypeSO())) {
+			} else if (MDocType.DOCSUBTYPESO_Proposal.equals(dt.getDocSubTypeSO()) || dt.get_ValueAsBoolean("EsDevolucion")) {
 			    // @fchiappano ignorar validación de credito si se trata de un prespuesto.
 			} else {
 				MBPartner bp = new MBPartner (getCtx(), getBill_BPartner_ID(), get_TrxName()); // bill bp is guaranteed on beforeSave
