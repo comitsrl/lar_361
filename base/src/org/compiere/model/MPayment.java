@@ -1943,13 +1943,14 @@ public final class MPayment extends X_C_Payment
 					+ ", @SO_CreditLimit@=" + bp.getSO_CreditLimit();
 				return DocAction.STATUS_Invalid;
 			}
-			if (X_C_BPartner.SOCREDITSTATUS_CreditHold.equals(bp.getSOCreditStatus()))
+			/*@fchiappano se comenta este codigo, para permitir generar OP con este estado de crédito.
+			 * if (X_C_BPartner.SOCREDITSTATUS_CreditHold.equals(bp.getSOCreditStatus()))
 			{
 				m_processMsg = "@BPartnerCreditHold@ - @TotalOpenBalance@=" 
 					+ bp.getTotalOpenBalance()
 					+ ", @SO_CreditLimit@=" + bp.getSO_CreditLimit();
 				return DocAction.STATUS_Invalid;
-			}
+			}*/
 		}
 		
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this, ModelValidator.TIMING_AFTER_PREPARE);
