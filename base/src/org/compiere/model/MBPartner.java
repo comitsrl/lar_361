@@ -683,7 +683,12 @@ public class MBPartner extends X_C_BPartner
 				+ "WHERE i.C_BPartner_ID=bp.C_BPartner_ID AND i.IsPaid='N' AND i.DocStatus IN ('CO','CL')),0) - "
 			+ "COALESCE((SELECT SUM(currencyBase(Paymentavailable(p.C_Payment_ID),p.C_Currency_ID,p.DateTrx,p.AD_Client_ID,p.AD_Org_ID)) FROM C_Payment_v p "
 				+ "WHERE p.C_BPartner_ID=bp.C_BPartner_ID AND p.IsAllocated='N'"
-				+ " AND p.C_Charge_ID IS NULL AND p.DocStatus IN ('CO','CL')),0) "
+				+ " AND p.C_Charge_ID IS NULL AND p.DocStatus IN ('CO','CL')),0) + "
+			// @fchiappano Sumar al Saldo Actual (TotalOpenBalance) los cheques que esten pendientes de acreditación.
+			+ "COALESCE((SELECT SUM(currencyBase(p.PayAmt,p.C_Currency_ID,p.DateTrx,p.AD_Client_ID,p.AD_Org_ID)) FROM C_Payment_v p "
+			    + "JOIN C_Payment pp ON p.C_Payment_ID = pp.C_Payment_ID "
+			    + "WHERE p.C_BPartner_ID=bp.C_BPartner_ID AND p.IsAllocated='Y' AND pp.AcreditadoCC = 'N'"
+			    + " AND p.C_Charge_ID IS NULL AND p.DocStatus IN ('CO','CL')),0)"
 			+ "FROM C_BPartner bp "
 			+ "WHERE C_BPartner_ID=?";		
 		PreparedStatement pstmt = null;

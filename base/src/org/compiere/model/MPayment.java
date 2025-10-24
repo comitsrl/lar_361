@@ -2030,28 +2030,41 @@ public final class MPayment extends X_C_Payment
 		//	Update BP for Prepayments
 		if (getC_BPartner_ID() != 0 && getC_Invoice_ID() == 0 && getC_Charge_ID() == 0 && MPaymentAllocate.get(this).length == 0)
 		{
-			MBPartner bp = new MBPartner (getCtx(), getC_BPartner_ID(), get_TrxName());
-			//	Update total balance to include this payment 
-			BigDecimal payAmt = MConversionRate.convertBase(getCtx(), getPayAmt(), 
-				getC_Currency_ID(), getDateAcct(), getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
-			if (payAmt == null)
-			{
-				m_processMsg = "Could not convert C_Currency_ID=" + getC_Currency_ID()
-					+ " to base C_Currency_ID=" + MClient.get(Env.getCtx()).getC_Currency_ID();
-				return DocAction.STATUS_Invalid;
-			}
-			//	Total Balance
-			BigDecimal newBalance = bp.getTotalOpenBalance(false);
-			if (newBalance == null)
-				newBalance = Env.ZERO;
-			if (isReceipt())
-				newBalance = newBalance.subtract(payAmt);
-			else
-				newBalance = newBalance.add(payAmt);
-				
-			bp.setTotalOpenBalance(newBalance);
-			bp.setSOCreditStatus();
-			bp.saveEx();
+		    // @fchiappano Si se trata de un cheque recibido de un cliente con vencimiento diferido, no descontar del credito usado.
+            String tenderType = getTenderType();
+            Timestamp fechaVenc = (Timestamp) get_Value("Fecha_Venc_Cheque");
+            if (MSysConfig.getBooleanValue("LAR_Actualizar_CC_Cliente_ChequeDiferido", true, getAD_Client_ID(), getAD_Org_ID())
+                    || !(tenderType.equals(TENDERTYPE_Check) || tenderType.equals("Z"))
+                    || fechaVenc == null
+                    || (!fechaVenc.after(getDateTrx()) && isReceipt()))
+            {
+                MBPartner bp = new MBPartner(getCtx(), getC_BPartner_ID(), get_TrxName());
+                // Update total balance to include this payment
+                BigDecimal payAmt = MConversionRate.convertBase(getCtx(), getPayAmt(), getC_Currency_ID(),
+                        getDateAcct(), getC_ConversionType_ID(), getAD_Client_ID(), getAD_Org_ID());
+                if (payAmt == null)
+                {
+                    m_processMsg = "Could not convert C_Currency_ID=" + getC_Currency_ID() + " to base C_Currency_ID="
+                            + MClient.get(Env.getCtx()).getC_Currency_ID();
+                    return DocAction.STATUS_Invalid;
+                }
+                // Total Balance
+                BigDecimal newBalance = bp.getTotalOpenBalance(false);
+                if (newBalance == null)
+                    newBalance = Env.ZERO;
+                if (isReceipt())
+                    newBalance = newBalance.subtract(payAmt);
+                else
+                    newBalance = newBalance.add(payAmt);
+
+                bp.setTotalOpenBalance(newBalance);
+                bp.setSOCreditStatus();
+                bp.saveEx();
+
+                // @fchiappano si se actualizo el credito del SdN, marcar el
+                // payment como acreditado.
+                set_Value("AcreditadoCC", true);
+            }
 		}		
 
 		//	Counter Doc
