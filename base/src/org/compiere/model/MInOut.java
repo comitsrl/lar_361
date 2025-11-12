@@ -1178,7 +1178,7 @@ public class MInOut extends X_M_InOut implements DocAction
 		if (isSOTrx() && !isReversal())
 		{
 			I_C_Order order = getC_Order();
-			if (   MDocType.DOCSUBTYPESO_POSOrder.equals(order.getC_DocTypeTarget().getDocSubTypeSO())
+			if (   order != null
                     && !MOrder.PAYMENTRULE_OnCredit.equals(order.getPaymentRule())
                     && !MSysConfig.getBooleanValue("CHECK_CREDIT_ON_CASH_POS_ORDER", true, getAD_Client_ID(), getAD_Org_ID())) {
                 // ignore -- don't validate for Cash POS Orders depending on sysconfig parameter
