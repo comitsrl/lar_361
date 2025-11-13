@@ -52,6 +52,11 @@ public class CalloutBPartner extends CalloutEngine
         {
             mTab.setValue(MBPartner.COLUMNNAME_SOCreditStatus, MBPartner.SOCREDITSTATUS_CreditOK);
         }
+        // @fchiappano Contrarrembolso Contado y Contrarrembolso Cheque
+        else if (paymentRule.equals("N") || paymentRule.equals("O"))
+        {
+            mTab.setValue(MBPartner.COLUMNNAME_SOCreditStatus, MBPartner.SOCREDITSTATUS_NoCreditCheck);
+        }
         else if (paymentRule == null || !paymentRule.equals(MBPartner.PAYMENTRULE_OnCredit))
         {
             mTab.setValue(MBPartner.COLUMNNAME_SOCreditStatus, MBPartner.SOCREDITSTATUS_CreditHold);

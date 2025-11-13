@@ -1418,14 +1418,13 @@ public class MOrder extends X_C_Order implements DocAction
 		//	Credit Check
 		if (isSOTrx())
 		{
-			if (   MDocType.DOCSUBTYPESO_POSOrder.equals(dt.getDocSubTypeSO())
-					&& !PAYMENTRULE_OnCredit.equals(getPaymentRule())
+			if (!PAYMENTRULE_OnCredit.equals(getPaymentRule())
 					&& !MSysConfig.getBooleanValue("CHECK_CREDIT_ON_CASH_POS_ORDER", true, getAD_Client_ID(), getAD_Org_ID())) {
 				// ignore -- don't validate for Cash POS Orders depending on sysconfig parameter
 			} else if (MDocType.DOCSUBTYPESO_PrepayOrder.equals(dt.getDocSubTypeSO())
 					&& !MSysConfig.getBooleanValue("CHECK_CREDIT_ON_PREPAY_ORDER", true, getAD_Client_ID(), getAD_Org_ID())) {
 				// ignore -- don't validate Prepay Orders depending on sysconfig parameter
-			} else if (MDocType.DOCSUBTYPESO_Proposal.equals(dt.getDocSubTypeSO())) {
+			} else if (MDocType.DOCSUBTYPESO_Proposal.equals(dt.getDocSubTypeSO()) || dt.get_ValueAsBoolean("EsDevolucion")) {
 			    // @fchiappano ignorar validación de credito si se trata de un prespuesto.
 			} else {
 				MBPartner bp = new MBPartner (getCtx(), getBill_BPartner_ID(), get_TrxName()); // bill bp is guaranteed on beforeSave
