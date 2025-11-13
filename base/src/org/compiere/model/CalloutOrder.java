@@ -442,7 +442,7 @@ public class CalloutOrder extends CalloutEngine
                     }
                     // @fchiappano si el paymentRule es contrarrembolso, actualizarlo en la orden
                     String paymentRule = rs.getString("PaymentRule");
-                    if (paymentRule.equals("N") || paymentRule.equals("O"))
+                    if (paymentRule != null && (paymentRule.equals("N") || paymentRule.equals("O")))
                     {
                         mTab.setValue("PaymentRule", paymentRule);
                     }
