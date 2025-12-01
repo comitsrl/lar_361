@@ -350,7 +350,7 @@ import ar.com.ergio.util.LAR_Utils;
 
         // @fchiappano Verificar si el tipo de documento admite fecha futura.
         if ((po.get_TableName().equals(MOrder.Table_Name) || po.get_TableName().equals(MInvoice.Table_Name)
-                || po.get_TableName().equals(MInOut.Table_Name))
+                || po.get_TableName().equals(MInOut.Table_Name) || po.get_TableName().equals(MLARPaymentHeader.Table_Name))
                 && (type == ModelValidator.TYPE_BEFORE_NEW || (type == ModelValidator.TYPE_BEFORE_CHANGE)))
         {
             boolean permiteFF = true;
@@ -380,6 +380,13 @@ import ar.com.ergio.util.LAR_Utils;
                 MInOut remito = (MInOut) po;
                 permiteFF = ((MDocType) remito.getC_DocType()).get_ValueAsBoolean("Permite_Fecha_Futura");
                 esFechaFutura = remito.getMovementDate().after(new Timestamp(System.currentTimeMillis()));
+            }
+            else if (po.get_TableName().equals(MLARPaymentHeader.Table_Name)
+                    && (esNuevo || po.is_ValueChanged(MLARPaymentHeader.COLUMNNAME_DateTrx)))
+            {
+                MLARPaymentHeader paymentH = (MLARPaymentHeader) po;
+                permiteFF = ((MDocType) paymentH.getC_DocType()).get_ValueAsBoolean("Permite_Fecha_Futura");
+                esFechaFutura = paymentH.getDateTrx().after(new Timestamp(System.currentTimeMillis()));
             }
 
             if (!permiteFF && esFechaFutura)
