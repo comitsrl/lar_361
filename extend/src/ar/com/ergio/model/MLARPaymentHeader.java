@@ -44,8 +44,10 @@ import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MInvoiceTax;
 import org.compiere.model.MOrg;
+import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentAllocate;
+import org.compiere.model.MRole;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.MTax;
 import org.compiere.model.ModelValidationEngine;
@@ -98,8 +100,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     final static private int regionRioNegroID = 224;
     // @fchiappano Cargo diferencia de cambio compras.
     final static private int cargoDifCambioCompras = 1000191;
-    // @mzuniga Remuneraciones Principales
-    final static private int remuneracionPrincipal_ID = 4000000;
+
     /** Marca para registrar la Ret de IIBB en las facturas (solo al Completar) */
     private boolean registrarRetIIBBAlCompletar = false;
 
@@ -1058,7 +1059,10 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         // Documentos RRHH
         // Si Validan adelantos revisar saldo disponible
         MDocType docType = new MDocType(getCtx(), this.getC_DocType_ID(), get_TrxName());
-        if (docType.get_ValueAsBoolean("EsDocumentoRRHH") && (docType.get_ValueAsBoolean("ValidaAdelantosSueldo")))
+        String currentAction = getDocAction();
+
+        if (docType.get_ValueAsBoolean("EsDocumentoRRHH") && docType.get_ValueAsBoolean("ValidaAdelantosSueldo")
+                && (DocAction.ACTION_Complete.equals(currentAction)))
         {
             BigDecimal sumPagos = Env.ZERO;
             for (int p = 0; p < pays.length; p++)
@@ -1067,32 +1071,20 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
             final MBPartner bp = new MBPartner(getCtx(), getC_BPartner_ID(), get_TrxName());
 
             // Recuperar importe Sueldo
-            BigDecimal sueldo = recuperarSueldo(bp);
+            BigDecimal saldo = recuperarSueldo(bp);
 
-            // Sumar pagos realizados en el período Actual
-            BigDecimal adelantos = sumaAdelantos(bp);
-
-            // Si hay error al recuperar el importe pagado
-            if (adelantos.compareTo(Env.ZERO) < 0)
-            {
-                m_processMsg = "No se pudo recuperar el importe de adelantos acumualdos en el periodo actual.";
-                return DocAction.STATUS_Invalid;
-            }
-
-            // Si el importe a pagar supera el disponible
-            BigDecimal disponible = sueldo.subtract(adelantos);
-            if (disponible.compareTo(Env.ZERO) < 0 )
-            {
-                m_processMsg = "El empleado no tiene importe disponible para adelantos.";
-                return DocAction.STATUS_Invalid;
-            }
-
-            BigDecimal saldo = disponible.subtract(sumPagos);
+            BigDecimal importe = saldo.subtract(sumPagos);
             // Si se supera el diponible,devolver error con el disponible y estado inválido
-            if (saldo.compareTo(Env.ZERO) < 0 )
+            if (importe.compareTo(Env.ZERO) < 0)
             {
-                m_processMsg = "El importe supera el disponible para adelantos. Importe Disponible: " + disponible;
-                return DocAction.STATUS_Invalid;
+                // Obtengo el rol del contexto
+                MRole rol = MRole.getDefault(getCtx(), false);
+                m_processMsg = "Rol: " + rol.getName() + " El importe supera el disponible para adelantos. " + bp.getName()
+                        + ": Importe Disponible: " + saldo.setScale(2, RoundingMode.HALF_UP);
+                set_Value( "Description", get_ValueAsString("Description") + " - " + m_processMsg);
+                // Devuelve estado inválido si el rol no tiene permiso de ignorar el límite
+                if (!rol.get_ValueAsBoolean("IgnoraLimiteAdelantos"))
+                    return DocAction.STATUS_Invalid;
             }
         } // Documentos RRHH
 
@@ -1155,33 +1147,60 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
     */
     private BigDecimal recuperarSueldo(MBPartner bp)
     {
+        MOrgInfo orgInfo = MOrgInfo.get(getCtx(),  getAD_Org_ID(), get_TrxName());
         BigDecimal sueldo =  Env.ZERO;
-
-        String sql = "SELECT COALESCE(GrossRAmt, 0) AS GrossRAmt"
-                   + " FROM C_UserRemuneration"
-                   + " WHERE IsActive = 'Y'"
-                   + " AND ValidFrom <= ?"
-                   + " AND C_Remuneration_ID =?"
-                   + " AND AD_User_ID = (SELECT AD_User_ID FROM AD_User WHERE C_BPartner_ID =?)"
-                   + " ORDER BY ValidFrom DESC"
-                   + " FETCH FIRST 1 ROW ONLY";
-
+        String sql= "";
+        if (orgInfo.get_ValueAsBoolean("IsMiles"))
+        {
+        sql = "SELECT COALESCE(TotalRAmt, 0) - COALESCE(GrossRAmt, 0) AS GrossRAmt"
+               + " FROM C_UserRemuneration"
+               + " WHERE IsActive = 'Y'"
+               + " AND ValidFrom <= ?"
+               + " AND AD_User_ID = (SELECT AD_User_ID FROM AD_User WHERE C_BPartner_ID =?)"
+               + " ORDER BY ValidFrom DESC"
+               + " FETCH FIRST 1 ROW ONLY";
+        }
+        else
+        {
+        sql = "SELECT COALESCE(GrossRAmt, 0) GrossRAmt"
+               + " FROM C_UserRemuneration"
+               + " WHERE IsActive = 'Y'"
+               + " AND ValidFrom <= ?"
+               + " AND AD_User_ID = (SELECT AD_User_ID FROM AD_User WHERE C_BPartner_ID =?)"
+               + " ORDER BY ValidFrom DESC"
+               + " FETCH FIRST 1 ROW ONLY";
+        }
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try
         {
             pstmt = DB.prepareStatement(sql, get_TrxName());
             pstmt.setTimestamp(1, getDateTrx());
-            pstmt.setInt(2, remuneracionPrincipal_ID);
-            pstmt.setInt(3, bp.getC_BPartner_ID());
+            pstmt.setInt(2, bp.getC_BPartner_ID());
+            log.info( String.valueOf(bp.getC_BPartner_ID() + ": " + bp.getName()));
             rs = pstmt.executeQuery();
 
             if (rs.next())
                 sueldo = rs.getBigDecimal("GrossRAmt");
-            return sueldo;
+
+            int cBPartnerId = bp.getC_BPartner_ID();
+            // 2. Ejecutar funciones para obtener importes
+            // Fecha + 1 día
+            Timestamp fecha = null;
+            if (getDateTrx() != null)
+                fecha = new Timestamp(getDateTrx().getTime() + 24L * 60L * 60L * 1000L);
+
+            BigDecimal saldo = DB.getSQLValueBD(get_TrxName(),
+                "SELECT comit_saldo_inicial_sueldo_empleado_por_tipo(?, ?, ?)",
+                cBPartnerId, fecha, orgInfo.get_ValueAsBoolean("IsMiles"));
+            if (saldo == null) saldo = BigDecimal.ZERO;
+            saldo = saldo.add(sueldo);
+            return saldo;
         } catch (Exception e)
         {
-            log.log(Level.SEVERE, sql, e);
+            String errorMsg = "Error en recuperarSueldo: SQL=[" + sql + "] C_BPartner_ID=[" + bp.getC_BPartner_ID() + "] " + e.getMessage();
+            log.log(Level.SEVERE, errorMsg, e);
+            m_processMsg = errorMsg;
             return null;
         } finally
         {
@@ -1276,7 +1295,7 @@ public class MLARPaymentHeader extends X_LAR_PaymentHeader implements DocAction,
         if (m_processMsg != null)
             return DocAction.STATUS_Invalid;
 
-        // @fchiapppano Eliminar previamente, los pagos por diferencia de cambio.
+        // @fchiappano Eliminar previamente, los pagos por diferencia de cambio.
         deletePagosDifCambio();
 
         MPayment[] pays = getPayments(get_TrxName());
