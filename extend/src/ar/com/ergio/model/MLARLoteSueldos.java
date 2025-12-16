@@ -465,16 +465,10 @@ public class MLARLoteSueldos extends X_LAR_LoteSueldos implements DocAction, Doc
         int orgID = getAD_Org_ID();
         if (esMiles) {
             orgID = buscarOrgMiles(orgID);
-            // Buscar la organización Miles relacionada (parent_org_id en ad_orginfo)
-            String sqlPrincOrg = "SELECT AD_Org_ID FROM AD_OrgInfo WHERE AD_OrgPrincipal_ID=?";
-            int milesOrgID = DB.getSQLValueEx(get_TrxName(), sqlPrincOrg, orgID);
-            if (milesOrgID > 0) {
-                orgID = milesOrgID;
-            } else {
+            if (orgID < 0)
                 // No se encontró organización Miles, retornar 0
                 return 0;
             }
-        }
         // Buscar el tipo de documento con EsDocumentoRRHH='Y' y la organización correspondiente
         String whereClause = "AD_Org_ID=? AND esdocumentorrhh='Y' AND IsActive='Y'";
         Query query = new Query(getCtx(), "C_DocType", whereClause, get_TrxName())
