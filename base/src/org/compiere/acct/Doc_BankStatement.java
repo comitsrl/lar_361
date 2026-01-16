@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+import ar.com.ergio.model.MLARTenderTypeAcct;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MBankAccount;
@@ -92,6 +93,47 @@ public class Doc_BankStatement extends Doc
 		log.fine("Lines=" + p_lines.length);
 		return null;
 	}   //  loadDocumentDetails
+
+	private MAccount requireTenderTypeInTransitAccount (MAcctSchema as, MPayment pay, int lineId)
+	{
+		if (pay == null)
+			return null;
+		int orgId = pay.getAD_Org_ID();
+		if (orgId == 0)
+			orgId = getAD_Org_ID();
+		MLARTenderTypeAcct config = MLARTenderTypeAcct.get(getCtx(), orgId, as.getC_AcctSchema_ID(),
+				pay.getTenderType(), pay.isReceipt(), getTrxName());
+		if (config == null)
+		{
+			String msg = "Falta configuracion en LAR_TenderType_Acct"
+					+ " (Org=" + orgId
+					+ ", Esquema=" + as.getC_AcctSchema_ID()
+					+ ", TenderType=" + pay.getTenderType()
+					+ ", IsSOTrx=" + (pay.isReceipt() ? "Y" : "N")
+					+ ", BankStatementLine=" + lineId + ")";
+			p_Error = msg;
+			log.severe(msg);
+			return null;
+		}
+		MAccount acct = config.getInTransitAccount();
+		boolean isCash = MPayment.TENDERTYPE_Cash.equals(pay.getTenderType());
+		if (acct == null && isCash)
+			acct = config.getAvailableAccount();
+		if (acct == null)
+		{
+			String missingColumn = isCash ? "TT_Available_Acct" : "TT_Intransit_Acct";
+			String msg = "Falta configuracion en LAR_TenderType_Acct"
+					+ " (" + missingColumn
+					+ ", Org=" + orgId
+					+ ", Esquema=" + as.getC_AcctSchema_ID()
+					+ ", TenderType=" + pay.getTenderType()
+					+ ", IsSOTrx=" + (pay.isReceipt() ? "Y" : "N")
+					+ ", BankStatementLine=" + lineId + ")";
+			p_Error = msg;
+			log.severe(msg);
+		}
+		return acct;
+	}
 
 	/**
 	 *	Load Invoice Line.
@@ -180,9 +222,13 @@ public class Doc_BankStatement extends Doc
 			DocLine_Bank line = (DocLine_Bank)p_lines[i];
 			int C_BPartner_ID = line.getC_BPartner_ID();
             MAccount cuenta = null;
+            MAccount tenderAcct = null;
             if (line.getC_Payment_ID() != 0)
             {
                 MPayment pay = new MPayment(Env.getCtx(), line.getC_Payment_ID(), getTrxName());
+                tenderAcct = requireTenderTypeInTransitAccount(as, pay, line.get_ID());
+                if (p_Error != null)
+                    return null;
                 /*
                  * Si se trata de un cheque se utiliza la cuenta de valores
                  * en lugar de la cuenta de caja.
@@ -218,6 +264,8 @@ public class Doc_BankStatement extends Doc
 
 			MAccount acct_bank_asset =  getAccount(Doc.ACCTTYPE_BankAsset, as);
 			MAccount acct_bank_in_transit = getAccount(Doc.ACCTTYPE_BankInTransit, as);
+			if (tenderAcct != null)
+				acct_bank_in_transit = tenderAcct;
 			if (cuenta != null)
 			    acct_bank_in_transit = cuenta;
 

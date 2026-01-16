@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+import ar.com.ergio.model.MLARTenderTypeAcct;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MBankAccount;
@@ -86,6 +87,81 @@ public class Doc_Payment extends Doc
 		setAmount(Doc.AMTTYPE_Gross, pay.getPayAmt());
 		return null;
 	}   //  loadDocumentDetails
+
+	private MLARTenderTypeAcct getTenderTypeAcct (MAcctSchema as)
+	{
+		int orgId = getBank_Org_ID();
+		if (orgId == 0)
+			orgId = getAD_Org_ID();
+		return MLARTenderTypeAcct.get(getCtx(), orgId, as.getC_AcctSchema_ID(),
+				m_TenderType, isReceipt(), getTrxName());
+	}
+
+	private MLARTenderTypeAcct requireTenderTypeAcct (MAcctSchema as)
+	{
+		MLARTenderTypeAcct config = getTenderTypeAcct(as);
+		if (config == null)
+		{
+			int orgId = getBank_Org_ID();
+			if (orgId == 0)
+				orgId = getAD_Org_ID();
+			String msg = "Falta configuracion en LAR_TenderType_Acct"
+					+ " (Org=" + orgId
+					+ ", Esquema=" + as.getC_AcctSchema_ID()
+					+ ", TenderType=" + m_TenderType
+					+ ", IsSOTrx=" + (isReceipt() ? "Y" : "N") + ")";
+			p_Error = msg;
+			log.severe(msg);
+		}
+		return config;
+	}
+
+	private void setMissingTenderTypeAccount (MAcctSchema as, String columnName)
+	{
+		int orgId = getBank_Org_ID();
+		if (orgId == 0)
+			orgId = getAD_Org_ID();
+		String msg = "Falta configuracion en LAR_TenderType_Acct"
+				+ " (" + columnName
+				+ ", Org=" + orgId
+				+ ", Esquema=" + as.getC_AcctSchema_ID()
+				+ ", TenderType=" + m_TenderType
+				+ ", IsSOTrx=" + (isReceipt() ? "Y" : "N") + ")";
+		p_Error = msg;
+		log.severe(msg);
+	}
+
+	private MAccount getTenderTypeRequiredAsset (MAcctSchema as)
+	{
+		MLARTenderTypeAcct config = requireTenderTypeAcct(as);
+		if (config == null)
+			return null;
+		MAccount acct = null;
+		if (MPayment.TENDERTYPE_Cash.equals(m_TenderType))
+		{
+			acct = config.getAvailableAccount();
+			if (acct == null)
+				setMissingTenderTypeAccount(as, "TT_Available_Acct");
+		}
+		else
+		{
+			acct = config.getInTransitAccount();
+			if (acct == null)
+				setMissingTenderTypeAccount(as, "TT_Intransit_Acct");
+		}
+		return acct;
+	}
+
+	private MAccount getTenderTypeRequiredUnallocated (MAcctSchema as)
+	{
+		MLARTenderTypeAcct config = requireTenderTypeAcct(as);
+		if (config == null)
+			return null;
+		MAccount acct = config.getUnallocatedAccount();
+		if (acct == null)
+			setMissingTenderTypeAccount(as, "TT_Unallocated_Acct");
+		return acct;
+	}
 
 
 	/**************************************************************************
@@ -173,8 +249,12 @@ public class Doc_Payment extends Doc
                                         // Crear la línea con la cuenta a depositar como contrapartida
                 }
                 else
-                    fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-                            getC_Currency_ID(), getAmount(), null);
+                {
+                    MAccount tenderAcct = getTenderTypeRequiredAsset(as);
+                    if (p_Error != null)
+                        return null;
+                    fl = fact.createLine(null, tenderAcct, getC_Currency_ID(), getAmount(), null);
+                }
             }
 			if (fl != null && AD_Org_ID != 0)
 				fl.setAD_Org_ID(AD_Org_ID);
@@ -185,7 +265,9 @@ public class Doc_Payment extends Doc
 			else if (m_Prepayment)
 				acct = getAccount(Doc.ACCTTYPE_C_Prepayment, as);
             else
-				acct = getAccount(Doc.ACCTTYPE_UnallocatedCash, as);
+				acct = getTenderTypeRequiredUnallocated(as);
+			if (p_Error != null)
+				return null;
             // @mzuniga Si es retención sufrida se utiliza la cuenta
             // contable de la tasa de impuesto
             if (m_EsRetencionSufrida)
@@ -244,8 +326,12 @@ public class Doc_Payment extends Doc
                     MAccount cuenta = MAccount.get(as.getCtx(), combinacion_ID_Valores_a_Depositar);
                     fl = fact.createLine(null, cuenta, getC_Currency_ID(), null, getAmount());
                 } else
-                    fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-                            getC_Currency_ID(), null, getAmount());
+                {
+                    MAccount tenderAcct = getTenderTypeRequiredAsset(as);
+                    if (p_Error != null)
+                        return null;
+                    fl = fact.createLine(null, tenderAcct, getC_Currency_ID(), null, getAmount());
+                }
             }
             if (fl != null && AD_Org_ID != 0)
                 fl.setAD_Org_ID(AD_Org_ID);
