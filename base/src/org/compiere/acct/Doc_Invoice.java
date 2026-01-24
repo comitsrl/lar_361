@@ -29,6 +29,7 @@ import org.compiere.model.MClientInfo;
 import org.compiere.model.MConversionRate;
 import org.compiere.model.MCostDetail;
 import org.compiere.model.MCurrency;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLandedCostAllocation;
@@ -70,6 +71,8 @@ public class Doc_Invoice extends Doc
 	private boolean			m_allLinesService = true;
 	/** All lines are product item		*/
 	private boolean			m_allLinesItem = true;
+	/** Categoria de Contabilidad General */
+	private int				m_GL_Category_ID = 0;
 
 	/**
 	 *  Load Specific Document Details
@@ -84,6 +87,9 @@ public class Doc_Invoice extends Doc
 		setAmount(Doc.AMTTYPE_Gross, invoice.getGrandTotal());
 		setAmount(Doc.AMTTYPE_Net, invoice.getTotalLines());
 		setAmount(Doc.AMTTYPE_Charge, invoice.getChargeAmt());
+		// @mzuniga Se obtiene la categoría de contabilidad del tipo de documento
+		MDocType dt_Inv = new MDocType(Env.getCtx(), invoice.getC_DocType_ID(), invoice.get_TrxName());
+		m_GL_Category_ID = dt_Inv.getGL_Category_ID();
 
 		//	Contained Objects
 		m_taxes = loadTaxes();
@@ -309,6 +315,14 @@ public class Doc_Invoice extends Doc
 		ArrayList<Fact> facts = new ArrayList<Fact>();
 		//  create Fact Header
 		Fact fact = new Fact(this, as, Fact.POST_Actual);
+
+		// Si la Cateoría CG (Contabilidad General) del tipo de documento es None (ID 0)
+		// No se genera contabilidad para ese documento
+		if (m_GL_Category_ID == 0)
+		{
+			facts.add(fact);
+			return facts;
+		}
 
 		//  Cash based accounting
 		if (!as.isAccrual())
