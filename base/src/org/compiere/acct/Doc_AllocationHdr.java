@@ -32,8 +32,10 @@ import org.compiere.model.MConversionRate;
 import org.compiere.model.MFactAcct;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
+import org.compiere.model.MDocType;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPayment;
+import org.compiere.model.MPaymentAllocate;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -218,7 +220,7 @@ public class Doc_AllocationHdr extends Doc
 				//	Payment Only
 				if (line.getC_Invoice_ID() == 0 && line.getC_Payment_ID() != 0)
 				{
-					fl = fact.createLine (line, getPaymentAcct(as, line.getC_Payment_ID()),
+					fl = fact.createLine (line, getPaymentAcct(as, payment),
 						getC_Currency_ID(), line.getAmtSource(), null);
 					if (fl != null && payment != null)
 						fl.setAD_Org_ID(payment.getAD_Org_ID());
@@ -240,7 +242,7 @@ public class Doc_AllocationHdr extends Doc
 
 				MAccount acct_unallocated_cash = null;
 				if (line.getC_Payment_ID() != 0)
-					acct_unallocated_cash =  getPaymentAcct(as, line.getC_Payment_ID());
+					acct_unallocated_cash =  getPaymentAcct(as, payment);
 				else if (line.getC_CashLine_ID() != 0)
 					acct_unallocated_cash =  getCashAcct(as, line.getC_CashLine_ID());
 				MAccount acct_receivable = getAccount(Doc.ACCTTYPE_C_Receivable, as);
@@ -265,7 +267,7 @@ public class Doc_AllocationHdr extends Doc
 					//	Payment/Cash	DR
 					if (line.getC_Payment_ID() != 0)
 					{
-						fl = fact.createLine (line, getPaymentAcct(as, line.getC_Payment_ID()),
+						fl = fact.createLine (line, getPaymentAcct(as, payment),
 							getC_Currency_ID(), line.getAmtSource(), null);
 						if (fl != null && payment != null)
 							fl.setAD_Org_ID(payment.getAD_Org_ID());
@@ -332,7 +334,7 @@ public class Doc_AllocationHdr extends Doc
 
 				MAccount acct_payment_select = null;
 				if (line.getC_Payment_ID() != 0)
-					acct_payment_select = getPaymentAcct(as, line.getC_Payment_ID());
+					acct_payment_select = getPaymentAcct(as, payment);
 				else if (line.getC_CashLine_ID() != 0)
 					acct_payment_select = getCashAcct(as, line.getC_CashLine_ID());
 				MAccount acct_liability = getAccount(Doc.ACCTTYPE_V_Liability, as);
@@ -395,7 +397,7 @@ public class Doc_AllocationHdr extends Doc
 				//	Payment/Cash	CR
 				if (isUsingClearing && line.getC_Payment_ID() != 0) // Avoid usage of clearing accounts
 				{
-					fl = fact.createLine (line, getPaymentAcct(as, line.getC_Payment_ID()),
+					fl = fact.createLine (line, getPaymentAcct(as, payment),
 						getC_Currency_ID(), null, line.getAmtSource().negate());
 					if (fl != null && payment != null)
 						fl.setAD_Org_ID(payment.getAD_Org_ID());
@@ -619,52 +621,39 @@ public class Doc_AllocationHdr extends Doc
 	 *	@param C_Payment_ID payment
 	 *	@return acct
 	 */
-	private MAccount getPaymentAcct (MAcctSchema as, int C_Payment_ID)
+	private MAccount getPaymentAcct (MAcctSchema as, MPayment pay)
 	{
 		setC_BankAccount_ID(0);
+		if (pay == null || pay.get_ID() <= 0)
+		{
+			log.log(Level.SEVERE, "NONE for C_Payment_ID");
+			return null;
+		}
 		//	Doc.ACCTTYPE_UnallocatedCash (AR) or C_Prepayment
 		//	or Doc.ACCTTYPE_PaymentSelect (AP) or V_Prepayment
 		int accountType = Doc.ACCTTYPE_UnallocatedCash;
-		//
-		String sql = "SELECT p.C_BankAccount_ID, d.DocBaseType, p.IsReceipt, p.IsPrepayment "
-			+ "FROM C_Payment p INNER JOIN C_DocType d ON (p.C_DocType_ID=d.C_DocType_ID) "
-			+ "WHERE C_Payment_ID=?";
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try
+		boolean isPrepayment = pay.isPrepayment();
+		MDocType dt = new MDocType(getCtx(), pay.getC_DocType_ID(), pay.get_TrxName());
+		boolean isReceipt = MDocType.DOCBASETYPE_ARReceipt.equals(dt.getDocBaseType());
+		boolean isOnAccount = pay.getC_Invoice_ID() == 0
+				&& pay.getC_Charge_ID() == 0
+				&& !isPrepayment
+				&& MPaymentAllocate.get(pay).length == 0;
+		//	Prepayment
+		if (isPrepayment)		//	Prepayment
 		{
-			pstmt = DB.prepareStatement (sql, getTrxName());
-			pstmt.setInt (1, C_Payment_ID);
-			rs = pstmt.executeQuery ();
-			if (rs.next ())
-			{
-				setC_BankAccount_ID(rs.getInt(1));
-				if (DOCTYPE_APPayment.equals(rs.getString(2)))
-					accountType = Doc.ACCTTYPE_PaymentSelect;
-				//	Prepayment
-				if ("Y".equals(rs.getString(4)))		//	Prepayment
-				{
-					if ("Y".equals(rs.getString(3)))	//	Receipt
-						accountType = Doc.ACCTTYPE_C_Prepayment;
-					else
-						accountType = Doc.ACCTTYPE_V_Prepayment;
-				}
-			}
- 		}
-		catch (Exception e)
-		{
-			log.log(Level.SEVERE, sql, e);
+			if (isReceipt)	//	Receipt
+				accountType = Doc.ACCTTYPE_C_Prepayment;
+			else
+				accountType = Doc.ACCTTYPE_V_Prepayment;
 		}
-		finally
-		{
-			DB.close(rs, pstmt);
-			rs = null; pstmt = null;
-		}
+		else if (DOCTYPE_APPayment.equals(dt.getDocBaseType()))
+			accountType = isOnAccount ? Doc.ACCTTYPE_PaymentSelect : Doc.ACCTTYPE_V_Liability;
 
-		//
+		setC_BankAccount_ID(pay.getC_BankAccount_ID());
 		if (getC_BankAccount_ID() <= 0)
 		{
-			log.log(Level.SEVERE, "NONE for C_Payment_ID=" + C_Payment_ID);
+			log.log(Level.SEVERE, "NONE for C_Payment_ID=" + pay.getC_Payment_ID());
 			return null;
 		}
 		return getAccount (accountType, as);
