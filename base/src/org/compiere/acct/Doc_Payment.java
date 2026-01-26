@@ -286,10 +286,8 @@ public class Doc_Payment extends Doc
 				acct = MCharge.getAccount(getC_Charge_ID(), as, getAmount());
 			else if (m_Prepayment)
 				acct = getAccount(Doc.ACCTTYPE_V_Prepayment, as);
-			else if (m_IsOnAccount)
-				acct = getTenderTypeRequiredUnallocated(as);
 			else
-				acct = getAccount(Doc.ACCTTYPE_V_Liability, as);
+				acct = getTenderTypeRequiredUnallocated(as);
 			if (p_Error != null)
 				return null;
 
