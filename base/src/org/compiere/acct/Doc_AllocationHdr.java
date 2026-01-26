@@ -39,6 +39,7 @@ import org.compiere.model.MPaymentAllocate;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import ar.com.ergio.model.MLARTenderTypeAcct;
 
 /**
  *  Post Allocation Documents.
@@ -650,6 +651,14 @@ public class Doc_AllocationHdr extends Doc
 		else if (DOCTYPE_APPayment.equals(dt.getDocBaseType()))
 			accountType = isOnAccount ? Doc.ACCTTYPE_PaymentSelect : Doc.ACCTTYPE_V_Liability;
 
+		if (accountType == Doc.ACCTTYPE_UnallocatedCash || accountType == Doc.ACCTTYPE_PaymentSelect)
+		{
+			MAccount acct = getTenderTypeUnallocated(as, pay, isReceipt);
+			if (acct == null)
+				return null;
+			return acct;
+		}
+
 		setC_BankAccount_ID(pay.getC_BankAccount_ID());
 		if (getC_BankAccount_ID() <= 0)
 		{
@@ -658,6 +667,42 @@ public class Doc_AllocationHdr extends Doc
 		}
 		return getAccount (accountType, as);
 	}	//	getPaymentAcct
+
+	private MAccount getTenderTypeUnallocated (MAcctSchema as, MPayment pay, boolean isReceipt)
+	{
+		int orgId = pay.getAD_Org_ID();
+		if (orgId == 0)
+			orgId = getAD_Org_ID();
+		MLARTenderTypeAcct config = MLARTenderTypeAcct.get(getCtx(), orgId, as.getC_AcctSchema_ID(),
+				pay.getTenderType(), isReceipt, getTrxName());
+		if (config == null)
+		{
+			String msg = "Falta configuracion en LAR_TenderType_Acct"
+					+ " (Org=" + orgId
+					+ ", Esquema=" + as.getC_AcctSchema_ID()
+					+ ", TenderType=" + pay.getTenderType()
+					+ ", IsSOTrx=" + (isReceipt ? "Y" : "N")
+					+ ", C_Payment_ID=" + pay.getC_Payment_ID() + ")";
+			p_Error = msg;
+			log.severe(msg);
+			return null;
+		}
+		MAccount acct = config.getUnallocatedAccount();
+		if (acct == null)
+		{
+			String msg = "Falta configuracion en LAR_TenderType_Acct"
+					+ " (TT_Unallocated_Acct"
+					+ ", Org=" + orgId
+					+ ", Esquema=" + as.getC_AcctSchema_ID()
+					+ ", TenderType=" + pay.getTenderType()
+					+ ", IsSOTrx=" + (isReceipt ? "Y" : "N")
+					+ ", C_Payment_ID=" + pay.getC_Payment_ID() + ")";
+			p_Error = msg;
+			log.severe(msg);
+			return null;
+		}
+		return acct;
+	}
 
 	/**
 	 * 	Get Cash (Transfer) Acct of CashBook

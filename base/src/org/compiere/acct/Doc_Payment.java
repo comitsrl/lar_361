@@ -261,7 +261,9 @@ public class Doc_Payment extends Doc
 			else if (m_Prepayment)
 				acct = getAccount(Doc.ACCTTYPE_C_Prepayment, as);
 			else
-				acct = getAccount(Doc.ACCTTYPE_UnallocatedCash, as);
+				acct = getTenderTypeRequiredUnallocated(as);
+			if (p_Error != null)
+				return null;
             // @mzuniga Si es retención sufrida se utiliza la cuenta
             // contable de la tasa de impuesto
             if (m_EsRetencionSufrida)
@@ -285,9 +287,11 @@ public class Doc_Payment extends Doc
 			else if (m_Prepayment)
 				acct = getAccount(Doc.ACCTTYPE_V_Prepayment, as);
 			else if (m_IsOnAccount)
-				acct = getAccount(Doc.ACCTTYPE_PaymentSelect, as);
+				acct = getTenderTypeRequiredUnallocated(as);
 			else
 				acct = getAccount(Doc.ACCTTYPE_V_Liability, as);
+			if (p_Error != null)
+				return null;
 
             // En el caso de una retención efectuada se modifica la forma de contabilizar
             FactLine fl = null;
@@ -303,8 +307,13 @@ public class Doc_Payment extends Doc
             // Asset
             // En el caso de una retención efectuada se modifica la forma de contabilizar
             if (m_EsRetencionEfectuada)
-            fl = fact.createLine(null, m_Prepayment ? getAccount(Doc.ACCTTYPE_V_Prepayment, as) : getAccount(Doc.ACCTTYPE_PaymentSelect, as),
-                    getC_Currency_ID(), getAmount(), null);
+            {
+                MAccount debitAcct = m_Prepayment ? getAccount(Doc.ACCTTYPE_V_Prepayment, as)
+                        : getTenderTypeRequiredUnallocated(as);
+                if (p_Error != null)
+                    return null;
+                fl = fact.createLine(null, debitAcct, getC_Currency_ID(), getAmount(), null);
+            }
             else
             {
                 MAccount tenderAcct = getTenderTypeRequiredAsset(as);
