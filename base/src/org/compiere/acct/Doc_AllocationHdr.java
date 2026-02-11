@@ -634,6 +634,7 @@ public class Doc_AllocationHdr extends Doc
 		//	or Doc.ACCTTYPE_PaymentSelect (AP) or V_Prepayment
 		int accountType = Doc.ACCTTYPE_UnallocatedCash;
 		boolean isPrepayment = pay.isPrepayment();
+		boolean esRetencion = pay.get_ValueAsBoolean("EsRetencionIIBB");
 		MDocType dt = new MDocType(getCtx(), pay.getC_DocType_ID(), pay.get_TrxName());
 		boolean isReceipt = MDocType.DOCBASETYPE_ARReceipt.equals(dt.getDocBaseType());
 		boolean isOnAccount = pay.getC_Invoice_ID() == 0
@@ -649,7 +650,8 @@ public class Doc_AllocationHdr extends Doc
 				accountType = Doc.ACCTTYPE_V_Prepayment;
 		}
 		else if (DOCTYPE_APPayment.equals(dt.getDocBaseType()))
-			accountType = isOnAccount ? Doc.ACCTTYPE_PaymentSelect : Doc.ACCTTYPE_V_Liability;
+			// For withholding payments, keep allocation against PaymentSelect/Unallocated.
+			accountType = (isOnAccount || esRetencion) ? Doc.ACCTTYPE_PaymentSelect : Doc.ACCTTYPE_V_Liability;
 
 		if (accountType == Doc.ACCTTYPE_UnallocatedCash || accountType == Doc.ACCTTYPE_PaymentSelect)
 		{
