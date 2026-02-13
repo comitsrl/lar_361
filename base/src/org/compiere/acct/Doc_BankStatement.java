@@ -208,6 +208,9 @@ public class Doc_BankStatement extends Doc
 		//  create Fact Header
 		Fact fact = new Fact(this, as, Fact.POST_Actual);
 		// boolean isInterOrg = isInterOrg(as);
+		final boolean isDrawerClose = getPO().get_ValueAsBoolean("EsCierreCaja");
+		final boolean isPrincipalDrawer = isDrawerClose
+				&& MBankAccount.get(getCtx(), m_C_BankAccount_ID).get_ValueAsBoolean("EsCajaPrincipal");
 
 		if (!isPosteable(as))
 		{
@@ -227,13 +230,21 @@ public class Doc_BankStatement extends Doc
 			int C_BPartner_ID = line.getC_BPartner_ID();
             MAccount cuenta = null;
             MAccount tenderAcct = null;
-            if (line.getC_Payment_ID() != 0)
-            {
+			if (line.getC_Payment_ID() != 0)
+			{
                 MPayment pay = new MPayment(Env.getCtx(), line.getC_Payment_ID(), getTrxName());
+					// Cierre de caja:
+					// 1) Solo efectivo impacta contablemente (el resto se controla operativamente).
+					// 2) En Caja Principal el efectivo no se vuelve a contabilizar para evitar
+					//    duplicar el asiento de traspaso ya reflejado en la caja origen.
+					if (isDrawerClose && !MPayment.TENDERTYPE_Cash.equals(pay.getTenderType()))
+						continue;
+					if (isPrincipalDrawer && MPayment.TENDERTYPE_Cash.equals(pay.getTenderType()))
+						continue;
                 tenderAcct = requireTenderTypeInTransitAccount(as, pay, line.get_ID());
                 if (p_Error != null)
                     return null;
-            }
+			}
 			// Avoid usage of clearing accounts
 			// If both accounts BankAsset and BankInTransit are equal
 			// then remove the posting
