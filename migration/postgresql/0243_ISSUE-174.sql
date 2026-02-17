@@ -993,6 +993,176 @@ UPDATE AD_Field SET AD_FieldGroup_ID=50001,Updated=TO_TIMESTAMP('2026-01-22 14:5
 UPDATE AD_Field SET AD_FieldGroup_ID=50001,Updated=TO_TIMESTAMP('2026-01-22 14:53:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009470
 ;
 
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=0, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=265
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=1, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=104
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=2, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=105
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=3, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=384
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=4, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=111
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=5, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=106
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=6, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=3000571
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=7, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=117
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=8, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=418
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=9, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=102
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=10, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=103
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=11, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=270
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=12, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=121
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=13, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=476
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=14, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=409
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=15, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=151
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=16, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=53087
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=17, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=464
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=18, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=124
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=19, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=123
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=20, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=547
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=21, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=53189
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=22, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=174
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=23, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=254
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=24, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=120
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=25, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=135
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=26, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=550
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=27, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=551
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=28, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=306
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=29, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=53091
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=30, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=417
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=31, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=307
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=32, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=393
+;
+
+-- 17/02/2026 17:08:47 ART
+-- ADP #2: Migracion de datos
+UPDATE AD_TreeNodeMM SET Parent_ID=164, SeqNo=33, Updated=CURRENT_TIMESTAMP WHERE AD_Tree_ID=10 AND Node_ID=53248
+;
+
 -- Registración de script
 SELECT register_migration_script_lar('0243_ISSUE-174.sql', 'LAR', '')
 ;
