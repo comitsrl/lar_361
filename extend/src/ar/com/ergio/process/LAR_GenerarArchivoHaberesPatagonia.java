@@ -44,9 +44,9 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
     private static final String CRLF = "\r\n";
 
     private int pLoteSueldosID;
+    private Timestamp pFechaPresentacion;
     private Timestamp pFechaAcreditacion;
     private int pNroEnvio = 1;
-    private String pConcepto;
 
     @Override
     protected void prepare() {
@@ -62,12 +62,13 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
                     || "DateTrx".equalsIgnoreCase(name)
                     || "DatePromised".equalsIgnoreCase(name)) {
                 pFechaAcreditacion = (Timestamp) param.getParameter();
+            } else if ("FechaPresentacion".equalsIgnoreCase(name)
+                    || "DateDoc".equalsIgnoreCase(name)) {
+                pFechaPresentacion = (Timestamp) param.getParameter();
             } else if ("NroEnvio".equalsIgnoreCase(name)
                     || "NumeroEnvio".equalsIgnoreCase(name)
                     || "LAR_NroEnvio".equalsIgnoreCase(name)) {
                 pNroEnvio = param.getParameterAsInt();
-            } else if ("Concepto".equalsIgnoreCase(name)) {
-                pConcepto = (String) param.getParameter();
             } else {
                 log.log(Level.SEVERE, "Unknown Parameter: " + name);
             }
@@ -90,11 +91,11 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
             throw new AdempiereUserError("No se encontró Lote de Sueldos ID=" + pLoteSueldosID);
         }
 
-        if (pFechaAcreditacion == null) {
-            pFechaAcreditacion = lote.getDateTrx();
+        if (pFechaPresentacion == null) {
+            throw new AdempiereUserError("Debe informar Fecha de Presentación");
         }
         if (pFechaAcreditacion == null) {
-            throw new AdempiereUserError("Debe informar fecha de acreditación");
+            throw new AdempiereUserError("Debe informar Fecha de Acreditación");
         }
 
         String tipoLiquidacion = lote.get_ValueAsString("LAR_TipoLiquidacion");
@@ -106,7 +107,7 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         }
 
         HeaderData headerData = loadHeaderData(lote);
-        List<DetailData> detailRows = loadDetailRows(lote, headerData.codigoDependencia);
+        List<DetailData> detailRows = loadDetailRows(lote, headerData.codigoDependencia, headerData.codigoBanco);
 
         if (detailRows.isEmpty()) {
             throw new AdempiereUserError("El lote no tiene líneas con importe principal mayor a cero para exportar");
@@ -120,15 +121,16 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
             totalImporte = totalImporte.add(detailRows.get(i).importe);
         }
 
-        String concepto = resolveConcepto(tipoLiquidacion);
-        String fechaPresentacion = formatDate(new Timestamp(System.currentTimeMillis()));
+        String concepto = resolveConcepto(tipoLiquidacion, lote.getDateTrx());
+        updateLoteDescriptionWithConcept(lote, concepto);
+        String fechaPresentacion = formatDate(pFechaPresentacion);
         String fechaAcreditacion = formatDate(pFechaAcreditacion);
         String nroEnvio = leftPad(String.valueOf(pNroEnvio), 2, '0');
         String nroEmpresa = leftPad(String.valueOf(headerData.nroEmpresa), 4, '0');
         String nroLote = "0001";
 
         StringBuilder fileContent = new StringBuilder();
-        fileContent.append(buildHeaderGeneral(fechaPresentacion, nroEnvio, nroEmpresa, totalImporte));
+        fileContent.append(buildHeaderGeneral(headerData.codigoBanco, fechaPresentacion, nroEnvio, nroEmpresa, totalImporte));
         fileContent.append(CRLF);
         fileContent.append(buildHeaderLote(nroLote, concepto, detailRows.size(), totalImporte, fechaAcreditacion, nroEnvio, nroEmpresa));
         fileContent.append(CRLF);
@@ -148,27 +150,37 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
     }
 
     private HeaderData loadHeaderData(MLARLoteSueldos lote) throws AdempiereUserError {
-        if (lote.getC_BankAccount_ID() <= 0) {
-            throw new AdempiereUserError("El lote no tiene cuenta bancaria informada");
+        if (lote.getLAR_Deposito_Directo_ID() <= 0) {
+            throw new AdempiereUserError("El lote no tiene Tipo de Depósito Directo informado");
         }
 
-        String sql = "SELECT b.LAR_NroEmpresa, ba.LAR_CodigoDependencia "
-                + "FROM C_BankAccount ba "
+        // Importante: el banco del archivo se toma desde la configuracion de forma de pago
+        // (LAR_TenderType_BankAccount) para Deposito Directo (TenderType='A'),
+        // no desde LAR_LoteSueldos.C_BankAccount_ID (que puede ser caja).
+        String sql = "SELECT b.LAR_NroEmpresa, ba.LAR_CodigoDependencia, COALESCE(b.RoutingNo,'') "
+                + "FROM LAR_TenderType_BankAccount ttba "
+                + "JOIN C_BankAccount ba ON ba.C_BankAccount_ID=ttba.C_BankAccount_ID "
                 + "JOIN C_Bank b ON b.C_Bank_ID=ba.C_Bank_ID "
-                + "WHERE ba.C_BankAccount_ID=?";
+                + "WHERE ttba.IsActive='Y' "
+                + "AND ttba.TenderType='A' "
+                + "AND ttba.LAR_Deposito_Directo_ID=? "
+                + "ORDER BY ttba.Updated DESC, ttba.LAR_TenderType_BankAccount_ID DESC";
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
             pstmt = DB.prepareStatement(sql, get_TrxName());
-            pstmt.setInt(1, lote.getC_BankAccount_ID());
+            pstmt.setInt(1, lote.getLAR_Deposito_Directo_ID());
             rs = pstmt.executeQuery();
             if (!rs.next()) {
-                throw new AdempiereUserError("No se encontraron datos de banco/cuenta para el lote");
+                throw new AdempiereUserError("No se encontró una Cuenta Bancaria por Forma de Pago activa "
+                        + "para TenderType='A' y LAR_Deposito_Directo_ID=" + lote.getLAR_Deposito_Directo_ID());
             }
 
             int nroEmpresa = rs.getInt(1);
             String codigoDependencia = rs.getString(2);
+            String routingNo = rs.getString(3);
+            String codigoBanco = digitsOnly(routingNo);
 
             if (nroEmpresa < 1 || nroEmpresa > 8999) {
                 throw new AdempiereUserError("Número de empresa inválido en banco: " + nroEmpresa);
@@ -176,10 +188,14 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
             if (codigoDependencia == null || !codigoDependencia.matches("^[0-9]{1,15}$")) {
                 throw new AdempiereUserError("Código de dependencia inválido en cuenta bancaria del lote");
             }
+            if (codigoBanco.length() == 0 || codigoBanco.length() > 3) {
+                throw new AdempiereUserError("Código de banco inválido en C_Bank.RoutingNo (1-3 dígitos)");
+            }
 
             HeaderData data = new HeaderData();
             data.nroEmpresa = nroEmpresa;
             data.codigoDependencia = codigoDependencia;
+            data.codigoBanco = leftPad(codigoBanco, 3, '0');
             return data;
         } catch (AdempiereUserError e) {
             throw e;
@@ -193,22 +209,24 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         }
     }
 
-    private List<DetailData> loadDetailRows(MLARLoteSueldos lote, String codigoDependencia)
+    private List<DetailData> loadDetailRows(MLARLoteSueldos lote, String codigoDependencia, String codigoBancoConvenio)
             throws AdempiereUserError {
         String sql = "SELECT l.LAR_LoteSueldosLine_ID, l.C_BPartner_ID, bp.Name, bp.TaxID, "
                 + "COALESCE(l.ImportePpal,0), "
-                + "bpa.AccountNo, bpa.BankAccountType, COALESCE(bpa.CBU,''), "
-                + "COALESCE(bpa.RoutingNo,''), COALESCE(bpa.C_BP_BankAccount_ID,0) "
+                + "bpa.AccountNo, bpa.BankAccountType, "
+                + "COALESCE(bpa.RoutingNo,''), COALESCE(bpa.CreditCardNumber,''), COALESCE(bpa.C_BP_BankAccount_ID,0) "
                 + "FROM LAR_LoteSueldosLine l "
                 + "JOIN C_BPartner bp ON bp.C_BPartner_ID=l.C_BPartner_ID "
                 + "LEFT JOIN C_BP_BankAccount bpa ON bpa.C_BP_BankAccount_ID = ("
                 + "SELECT MAX(bpa2.C_BP_BankAccount_ID) "
                 + "FROM C_BP_BankAccount bpa2 "
                 + "WHERE bpa2.C_BPartner_ID=l.C_BPartner_ID "
-                + "AND bpa2.IsActive='Y'"
+                + "AND bpa2.IsActive='Y' "
+                + "AND COALESCE(bpa2.RoutingNo,'')=?"
                 + ") "
                 + "WHERE l.LAR_LoteSueldos_ID=? "
                 + "AND COALESCE(l.ImportePpal,0) > 0 "
+                + "AND l.TenderType='A' "
                 + "ORDER BY l.LAR_LoteSueldosLine_ID";
 
         List<DetailData> rows = new ArrayList<DetailData>();
@@ -216,31 +234,32 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         ResultSet rs = null;
         try {
             pstmt = DB.prepareStatement(sql, get_TrxName());
-            pstmt.setInt(1, lote.getLAR_LoteSueldos_ID());
+            pstmt.setString(1, codigoBancoConvenio);
+            pstmt.setInt(2, lote.getLAR_LoteSueldos_ID());
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                int loteLineID = rs.getInt(1);
                 int bpartnerID = rs.getInt(2);
                 String nombre = rs.getString(3);
                 String taxId = rs.getString(4);
                 BigDecimal importe = rs.getBigDecimal(5);
                 String accountNo = rs.getString(6);
                 String bankAccountType = rs.getString(7);
-                String cbu = rs.getString(8);
-                String routingNo = rs.getString(9);
+                String routingNo = rs.getString(8);
+                String branchCodeRaw = rs.getString(9);
                 int bpBankAccountID = rs.getInt(10);
 
                 if (bpBankAccountID <= 0) {
-                    throw new AdempiereUserError("Línea " + loteLineID
-                            + ": el empleado no tiene cuenta bancaria activa en pestaña Cuenta Bancaria (Socio de Negocio)");
+                    throw new AdempiereUserError("El empleado " + safeEmployeeName(nombre)
+                            + " no tiene cuenta bancaria activa con código de banco "
+                            + codigoBancoConvenio + " en pestaña Cuenta Bancaria (Socio de Negocio)");
                 }
 
                 String tipoCuenta = mapTipoCuenta(bankAccountType);
-                String nroCuenta = resolveNumeroCuenta(accountNo, cbu);
-                String codigoBanco = resolveCodigoBanco(routingNo, cbu);
-                String codigoSucursal = resolveCodigoSucursal(cbu);
-                String nroDocumento = resolveNumeroDocumento(taxId, loteLineID);
+                String nroCuenta = resolveNumeroCuenta(accountNo, nombre);
+                String codigoBanco = resolveCodigoBanco(routingNo, nombre);
+                String codigoSucursal = resolveCodigoSucursal(branchCodeRaw, nombre);
+                String nroDocumento = resolveNumeroDocumento(taxId, nombre);
 
                 DetailData row = new DetailData();
                 row.tipoCuenta = tipoCuenta;
@@ -270,11 +289,11 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         }
     }
 
-    private String buildHeaderGeneral(String fechaPresentacion, String nroEnvio, String nroEmpresa, BigDecimal importeTotal)
+    private String buildHeaderGeneral(String codigoBanco, String fechaPresentacion, String nroEnvio, String nroEmpresa, BigDecimal importeTotal)
             throws AdempiereUserError {
         StringBuilder sb = new StringBuilder(200);
         sb.append("0");
-        sb.append("034");
+        sb.append(leftPad(codigoBanco, 3, '0'));
         sb.append(repeat(' ', 5));
         sb.append(nroEmpresa);
         sb.append(fechaPresentacion);
@@ -335,7 +354,7 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         sb.append(leftPad(detail.codigoDependencia, 15, '0'));
         sb.append(" ");
         sb.append(tipoLiquidacion);
-        sb.append(repeat(' ', 96));
+        sb.append(repeat(' ', 93));
         sb.append(nroEmpresa);
         return ensureLength(sb.toString(), 200, "Detalle");
     }
@@ -383,20 +402,37 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         return normalized;
     }
 
-    private String resolveConcepto(String tipoLiquidacion) {
-        if (pConcepto != null && pConcepto.trim().length() > 0) {
-            return pConcepto.trim();
+    private String resolveConcepto(String tipoLiquidacion, Timestamp fechaLote) throws AdempiereUserError {
+        if (fechaLote == null) {
+            throw new AdempiereUserError("El lote no posee DateTrx para construir el concepto (MM/AA)");
+        }
+        String mmAA = new SimpleDateFormat("MM/yy").format(fechaLote);
+        if ("001".equals(tipoLiquidacion)) {
+            return "SUE " + mmAA;
         }
         if ("002".equals(tipoLiquidacion)) {
-            return "SAC";
+            return "SAC " + mmAA;
         }
-        return "SUELDO";
+        throw new AdempiereUserError("Tipo de liquidación inválido para concepto: " + tipoLiquidacion);
     }
 
-    private String resolveNumeroDocumento(String taxID, int loteLineID) throws AdempiereUserError {
+    private void updateLoteDescriptionWithConcept(MLARLoteSueldos lote, String concepto) {
+        String currentDescription = lote.getDescription();
+        String newDescription;
+        if (currentDescription == null || currentDescription.trim().length() == 0) {
+            newDescription = concepto;
+        } else {
+            newDescription = currentDescription + " - " + concepto;
+        }
+        lote.setDescription(newDescription);
+        lote.saveEx(get_TrxName());
+    }
+
+    private String resolveNumeroDocumento(String taxID, String employeeName) throws AdempiereUserError {
         String doc = digitsOnly(taxID);
         if (doc.length() == 0) {
-            throw new AdempiereUserError("Línea " + loteLineID + ": falta número de documento del empleado");
+            throw new AdempiereUserError("El empleado " + safeEmployeeName(employeeName)
+                    + " no posee número de documento (TaxID)");
         }
         if (doc.length() > 17) {
             doc = doc.substring(doc.length() - 17);
@@ -404,27 +440,26 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         return doc;
     }
 
-    private String resolveCodigoBanco(String routingNo, String cbu) {
-        String cbuDigits = digitsOnly(cbu);
-        if (cbuDigits.length() >= 3) {
-            return cbuDigits.substring(0, 3);
-        }
+    private String resolveCodigoBanco(String routingNo, String employeeName) throws AdempiereUserError {
         String routingDigits = digitsOnly(routingNo);
-        if (routingDigits.length() >= 3) {
-            return routingDigits.substring(0, 3);
+        if (routingDigits.length() > 0 && routingDigits.length() <= 3) {
+            return routingDigits;
         }
-        return "034";
+        throw new AdempiereUserError("El empleado " + safeEmployeeName(employeeName)
+                + " no posee un código de banco válido en RoutingNo (1-3 dígitos)");
     }
 
-    private String resolveCodigoSucursal(String cbu) {
-        String cbuDigits = digitsOnly(cbu);
-        if (cbuDigits.length() >= 8) {
-            return cbuDigits.substring(3, 8);
+    private String resolveCodigoSucursal(String branchCodeRaw, String employeeName)
+            throws AdempiereUserError {
+        String branchDigits = digitsOnly(branchCodeRaw);
+        if (branchDigits.length() > 0 && branchDigits.length() <= 5) {
+            return branchDigits;
         }
-        return "00000";
+        throw new AdempiereUserError("El empleado " + safeEmployeeName(employeeName)
+                + " no posee un código de sucursal válido en CreditCardNumber (1-5 dígitos)");
     }
 
-    private String resolveNumeroCuenta(String accountNo, String cbu) throws AdempiereUserError {
+    private String resolveNumeroCuenta(String accountNo, String employeeName) throws AdempiereUserError {
         String accountDigits = digitsOnly(accountNo);
         if (accountDigits.length() > 10) {
             accountDigits = accountDigits.substring(accountDigits.length() - 10);
@@ -432,13 +467,12 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         if (accountDigits.length() > 0) {
             return accountDigits;
         }
+        throw new AdempiereUserError("El empleado " + safeEmployeeName(employeeName)
+                + " no posee una cuenta bancaria configurada (AccountNo) en su pestaña Cuenta Bancaria");
+    }
 
-        String cbuDigits = digitsOnly(cbu);
-        if (cbuDigits.length() >= 10) {
-            return cbuDigits.substring(cbuDigits.length() - 10);
-        }
-
-        throw new AdempiereUserError("No se pudo determinar número de cuenta (AccountNo/CBU)");
+    private String safeEmployeeName(String employeeName) {
+        return employeeName == null || employeeName.trim().length() == 0 ? "<sin nombre>" : employeeName.trim();
     }
 
     private String mapTipoCuenta(String bankAccountType) throws AdempiereUserError {
@@ -546,6 +580,7 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
     private static class HeaderData {
         int nroEmpresa;
         String codigoDependencia;
+        String codigoBanco;
     }
 
     private static class DetailData {
