@@ -25,7 +25,6 @@ import org.compiere.process.DocAction;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
-import org.compiere.util.Env;
 
 import ar.com.ergio.model.MLARPaymentHeader;
 
@@ -90,7 +89,7 @@ public class LAR_GenerarOrdenPago extends SvrProcess
         paymentHeader.setC_BankAccount_ID(c_BankAccount_ID);
         paymentHeader.setC_DocType_ID(c_DocType_ID);
         paymentHeader.setC_BPartner_ID(factura.getC_BPartner_ID());
-        paymentHeader.setDateTrx(Env.getContextAsDate(getCtx(), "#Date"));
+        paymentHeader.setDateTrx(factura.getDateInvoiced());
         paymentHeader.setDocStatus(DocAction.STATUS_Drafted);
         paymentHeader.setIsReceipt(false);
         paymentHeader.setC_Invoice_ID(factura.getC_Invoice_ID());
@@ -113,6 +112,7 @@ public class LAR_GenerarOrdenPago extends SvrProcess
         payment.setAD_Org_ID(factura.getAD_Org_ID());
         payment.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
         payment.setIsReceipt(false);
+        payment.setDateTrx(factura.getDateInvoiced());
         payment.setC_BPartner_ID(factura.getC_BPartner_ID());
         payment.set_ValueOfColumn("LAR_PaymentHeader_ID", paymentHeader.getLAR_PaymentHeader_ID());
         payment.setAmount(factura.getC_Currency_ID(), factura.getGrandTotal());
