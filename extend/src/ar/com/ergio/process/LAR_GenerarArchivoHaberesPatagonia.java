@@ -39,7 +39,6 @@ import ar.com.ergio.model.MLARLoteSueldos;
  */
 public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
 
-    private static final String TIPO_ARCHIVO = "PAT_SUELDOS";
     private static final Charset OUTPUT_CHARSET = Charset.forName("windows-1252");
     private static final String CRLF = "\r\n";
 
@@ -140,7 +139,7 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
             fileContent.append(CRLF);
         }
 
-        String fileName = buildFileName(lote.getDocumentNo(), tipoLiquidacion, fechaAcreditacion, nroEnvio);
+        String fileName = buildFileName(fechaAcreditacion, nroEnvio);
         int replacedEntries = attachReplacingSameKey(lote, fileName, fileContent.toString().getBytes(OUTPUT_CHARSET));
 
         return "Archivo generado: " + fileName
@@ -182,10 +181,14 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
             String routingNo = rs.getString(3);
             String codigoBanco = digitsOnly(routingNo);
 
+            if (codigoDependencia != null) {
+                codigoDependencia = codigoDependencia.trim();
+            }
+
             if (nroEmpresa < 1 || nroEmpresa > 8999) {
                 throw new AdempiereUserError("Número de empresa inválido en banco: " + nroEmpresa);
             }
-            if (codigoDependencia == null || !codigoDependencia.matches("^[0-9]{1,15}$")) {
+            if (codigoDependencia == null || !codigoDependencia.matches("^[A-Za-z0-9 ]{1,15}$")) {
                 throw new AdempiereUserError("Código de dependencia inválido en cuenta bancaria del lote");
             }
             if (codigoBanco.length() == 0 || codigoBanco.length() > 3) {
@@ -351,7 +354,7 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         } else {
             sb.append("  ");
         }
-        sb.append(leftPad(detail.codigoDependencia, 15, '0'));
+        sb.append(rightPad(detail.codigoDependencia, 15, ' '));
         sb.append(" ");
         sb.append(tipoLiquidacion);
         sb.append(repeat(' ', 93));
@@ -386,12 +389,14 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         return replaced;
     }
 
-    private String buildFileName(String documentNo, String tipoLiquidacion, String fechaAcreditacion, String nroEnvio) {
-        String docNo = sanitizeAlphaNum(documentNo);
-        if (docNo.length() == 0) {
-            docNo = "SIN_DOCNO";
+    private String buildFileName(String fechaAcreditacion, String nroEnvio) {
+        String fechaFormateada = fechaAcreditacion;
+        if (fechaAcreditacion != null && fechaAcreditacion.matches("^[0-9]{8}$")) {
+            fechaFormateada = fechaAcreditacion.substring(6, 8)
+                    + fechaAcreditacion.substring(4, 6)
+                    + fechaAcreditacion.substring(0, 4);
         }
-        return TIPO_ARCHIVO + "_" + docNo + "_" + tipoLiquidacion + "_" + fechaAcreditacion + "_ENV" + nroEnvio + ".txt";
+        return fechaFormateada + "-" + Integer.parseInt(nroEnvio) + ".txt";
     }
 
     private String extractReplaceKey(String fileName) {
