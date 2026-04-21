@@ -182,10 +182,14 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
             String routingNo = rs.getString(3);
             String codigoBanco = digitsOnly(routingNo);
 
+            if (codigoDependencia != null) {
+                codigoDependencia = codigoDependencia.trim();
+            }
+
             if (nroEmpresa < 1 || nroEmpresa > 8999) {
                 throw new AdempiereUserError("Número de empresa inválido en banco: " + nroEmpresa);
             }
-            if (codigoDependencia == null || !codigoDependencia.matches("^[0-9]{1,15}$")) {
+            if (codigoDependencia == null || !codigoDependencia.matches("^[A-Za-z0-9 ]{1,15}$")) {
                 throw new AdempiereUserError("Código de dependencia inválido en cuenta bancaria del lote");
             }
             if (codigoBanco.length() == 0 || codigoBanco.length() > 3) {
@@ -351,7 +355,7 @@ public class LAR_GenerarArchivoHaberesPatagonia extends SvrProcess {
         } else {
             sb.append("  ");
         }
-        sb.append(leftPad(detail.codigoDependencia, 15, '0'));
+        sb.append(rightPad(detail.codigoDependencia, 15, ' '));
         sb.append(" ");
         sb.append(tipoLiquidacion);
         sb.append(repeat(' ', 93));
