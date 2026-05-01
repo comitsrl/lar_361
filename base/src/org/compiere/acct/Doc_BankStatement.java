@@ -17,12 +17,10 @@
 package org.compiere.acct;
 
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
+import ar.com.ergio.model.MLARTenderTypeAcct;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MBankAccount;
@@ -30,7 +28,7 @@ import org.compiere.model.MBankStatement;
 import org.compiere.model.MBankStatementLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
-import org.compiere.model.MSysConfig;
+import org.compiere.util.CCache;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
@@ -65,7 +63,9 @@ public class Doc_BankStatement extends Doc
 
 	/** Bank Account			*/
 	private int			m_C_BankAccount_ID = 0;
-	private boolean     m_esCaja = false;
+
+	private static final CCache<String, Boolean> s_isPosteableCache =
+			new CCache<String, Boolean>("C_BankAccount_Acct_IsPosteable", 200, 5);
 
 	/**
 	 *  Load Specific Document Details
@@ -84,14 +84,53 @@ public class Doc_BankStatement extends Doc
 		//  Set Bank Account Info (Currency)
 		MBankAccount ba = MBankAccount.get (getCtx(), m_C_BankAccount_ID);
 		setC_Currency_ID (ba.getC_Currency_ID());
-		// Chequear si es una Caja
-        m_esCaja = ba.get_ValueAsBoolean("IsDrawer");
 
 		//	Contained Objects
 		p_lines = loadLines(bs);
 		log.fine("Lines=" + p_lines.length);
 		return null;
 	}   //  loadDocumentDetails
+
+	private MAccount requireTenderTypeInTransitAccount (MAcctSchema as, MPayment pay, int lineId)
+	{
+		if (pay == null)
+			return null;
+		int orgId = pay.getAD_Org_ID();
+		if (orgId == 0)
+			orgId = getAD_Org_ID();
+		MLARTenderTypeAcct config = MLARTenderTypeAcct.get(getCtx(), orgId, as.getC_AcctSchema_ID(),
+				pay.getTenderType(), pay.isReceipt(), getTrxName());
+		if (config == null)
+		{
+			String msg = "Falta configuracion en LAR_TenderType_Acct"
+					+ " (Org=" + orgId
+					+ ", Esquema=" + as.getC_AcctSchema_ID()
+					+ ", TenderType=" + pay.getTenderType()
+					+ ", IsSOTrx=" + (pay.isReceipt() ? "Y" : "N")
+					+ ", BankStatementLine=" + lineId + ")";
+			p_Error = msg;
+			log.severe(msg);
+			return null;
+		}
+		MAccount acct = config.getInTransitAccount();
+		boolean isCash = MPayment.TENDERTYPE_Cash.equals(pay.getTenderType());
+		if (acct == null && isCash)
+			acct = config.getAvailableAccount();
+		if (acct == null)
+		{
+			String missingColumn = isCash ? "TT_Available_Acct" : "TT_Intransit_Acct";
+			String msg = "Falta configuracion en LAR_TenderType_Acct"
+					+ " (" + missingColumn
+					+ ", Org=" + orgId
+					+ ", Esquema=" + as.getC_AcctSchema_ID()
+					+ ", TenderType=" + pay.getTenderType()
+					+ ", IsSOTrx=" + (pay.isReceipt() ? "Y" : "N")
+					+ ", BankStatementLine=" + lineId + ")";
+			p_Error = msg;
+			log.severe(msg);
+		}
+		return acct;
+	}
 
 	/**
 	 *	Load Invoice Line.
@@ -169,6 +208,16 @@ public class Doc_BankStatement extends Doc
 		//  create Fact Header
 		Fact fact = new Fact(this, as, Fact.POST_Actual);
 		// boolean isInterOrg = isInterOrg(as);
+		final boolean isDrawerClose = getPO().get_ValueAsBoolean("EsCierreCaja");
+		final boolean isPrincipalDrawer = isDrawerClose
+				&& MBankAccount.get(getCtx(), m_C_BankAccount_ID).get_ValueAsBoolean("EsCajaPrincipal");
+
+		if (!isPosteable(as))
+		{
+			ArrayList<Fact> facts = new ArrayList<Fact>();
+			facts.add(fact);
+			return facts;
+		}
 
 		//  Header -- there may be different currency amounts
 
@@ -180,44 +229,30 @@ public class Doc_BankStatement extends Doc
 			DocLine_Bank line = (DocLine_Bank)p_lines[i];
 			int C_BPartner_ID = line.getC_BPartner_ID();
             MAccount cuenta = null;
-            if (line.getC_Payment_ID() != 0)
-            {
+            MAccount tenderAcct = null;
+			if (line.getC_Payment_ID() != 0)
+			{
                 MPayment pay = new MPayment(Env.getCtx(), line.getC_Payment_ID(), getTrxName());
-                /*
-                 * Si se trata de un cheque se utiliza la cuenta de valores
-                 * en lugar de la cuenta de caja.
-                 *  K     | Check  (Cheque propio)
-                 *  Z     | Cheque Tercero
-                 *  O     | Contra Reembolso Cheque Propio
-                 */
-                // Es una Caja
-                boolean esInterno = false;
-                boolean esChPropio = false;
-                if (m_esCaja)
-                {
-                    // Si el tipo de documento es interno no debe contabilizar
-                    int sdN_ID_Interno = MSysConfig.getIntValue("LAR_SdN_MovimientosDeCaja", 0, getAD_Client_ID());
-                    // El tipo de Documento debe tener el SdN interno y predeterminado
-                    if (pay.getC_BPartner_ID() == sdN_ID_Interno)
-                        esInterno = esDocInterno(pay.getC_DocType_ID());
-                    else
-                        esInterno = false;
-                    // Chequear si es cheque propio, no debe contabilizar en cajas
-                    esChPropio = (pay.get_ValueAsInt("LAR_Cheque_Emitido_ID") != 0) ? true : false;
-                }
-                int combinacion_ID_Valores_a_Depositar = MSysConfig.getIntValue(
-                        "LAR_Combinacion_ID_Valores_a_Depositar", 0, getAD_Client_ID());
-                String tenderType = pay.getTenderType();
-                if (("K".equals(tenderType) || "Z".equals(tenderType) || "O".equals(tenderType))
-                        && combinacion_ID_Valores_a_Depositar != 0 && !esInterno && !esChPropio)
-                    cuenta = MAccount.get(as.getCtx(), combinacion_ID_Valores_a_Depositar);
-            }
+					// Cierre de caja:
+					// 1) Solo efectivo impacta contablemente (el resto se controla operativamente).
+					// 2) En Caja Principal el efectivo no se vuelve a contabilizar para evitar
+					//    duplicar el asiento de traspaso ya reflejado en la caja origen.
+					if (isDrawerClose && !MPayment.TENDERTYPE_Cash.equals(pay.getTenderType()))
+						continue;
+					if (isPrincipalDrawer && MPayment.TENDERTYPE_Cash.equals(pay.getTenderType()))
+						continue;
+                tenderAcct = requireTenderTypeInTransitAccount(as, pay, line.get_ID());
+                if (p_Error != null)
+                    return null;
+			}
 			// Avoid usage of clearing accounts
 			// If both accounts BankAsset and BankInTransit are equal
 			// then remove the posting
 
 			MAccount acct_bank_asset =  getAccount(Doc.ACCTTYPE_BankAsset, as);
 			MAccount acct_bank_in_transit = getAccount(Doc.ACCTTYPE_BankInTransit, as);
+			if (tenderAcct != null)
+				acct_bank_in_transit = tenderAcct;
 			if (cuenta != null)
 			    acct_bank_in_transit = cuenta;
 
@@ -345,50 +380,19 @@ public class Doc_BankStatement extends Doc
 		return ba.getAD_Org_ID();
 	}	//	getBank_Org_ID
 
-	   /**
-     * Devuelve una Lista con todos los tipos de documento marcados por defecto
-     * @param trxName
-     * @return Lista de IDs
-     * @throws SQLException
-     */
-    public ArrayList<Integer> getDefaultDocType(String trxName)
-    {
-        //TODO - Analize genereate a cache for this payments
-        ArrayList<Integer> docIDs = new ArrayList<Integer>();
-        String sql = "SELECT C_DocType_ID FROM C_DocType WHERE IsDefault = 'Y' AND AD_Client_ID = ?";
-
-        PreparedStatement pstmt;
-        pstmt = DB.prepareStatement(sql, trxName);
-        ResultSet rs=null;
-
-        try
-        {
-            pstmt.setInt(1, getAD_Client_ID());
-            rs = pstmt.executeQuery();
-            while(rs.next())
-                docIDs.add(rs.getInt("C_DocType_ID"));
-
-            return docIDs;
-        }
-        catch (SQLException e)
-        {
-            log.log(Level.SEVERE, sql, e);
-            return new ArrayList<Integer>();
-        }
-        finally
-        {
-            DB.close(rs, pstmt);
-            rs = null; pstmt = null;
-        }
-    } // getDefaultDocType
-
-    /**
-     * @return true si el valor se encuentra en la lista
-     */
-    private boolean esDocInterno(int docType_ID)
-    {
-        ArrayList<Integer> docIDs = getDefaultDocType(getTrxName());
-        return docIDs.contains(docType_ID);
-    } // esDocInterno
+	private boolean isPosteable (MAcctSchema as)
+	{
+		if (m_C_BankAccount_ID == 0 || as == null)
+			return true;
+		String key = m_C_BankAccount_ID + "|" + as.getC_AcctSchema_ID();
+		Boolean cached = s_isPosteableCache.get(key);
+		if (cached != null)
+			return cached.booleanValue();
+		String sql = "SELECT IsPosteable FROM C_BankAccount_Acct WHERE C_BankAccount_ID=? AND C_AcctSchema_ID=?";
+		String isPosteable = DB.getSQLValueString(getTrxName(), sql, m_C_BankAccount_ID, as.getC_AcctSchema_ID());
+		boolean result = isPosteable == null || "Y".equals(isPosteable);
+		s_isPosteableCache.put(key, Boolean.valueOf(result));
+		return result;
+	}
 
 }   //  Doc_Bank
