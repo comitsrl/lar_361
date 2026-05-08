@@ -176,6 +176,21 @@ public class Doc_Payment extends Doc
 		return acct;
 	}
 
+	private boolean useLegacyNativeAccounting()
+	{
+		return LARAccountingMode.useLegacyNativeAccounting(getCtx(), getAD_Client_ID());
+	}
+
+	private MAccount getLegacyNativeAsset(MAcctSchema as)
+	{
+		int combinacion_ID_Valores_a_Depositar = MSysConfig.getIntValue(
+				"LAR_Combinacion_ID_Valores_a_Depositar", 0, getAD_Client_ID());
+		if (("K".equals(m_TenderType) || "Z".equals(m_TenderType) || "O".equals(m_TenderType))
+				&& combinacion_ID_Valores_a_Depositar != 0)
+			return MAccount.get(as.getCtx(), combinacion_ID_Valores_a_Depositar);
+		return getAccount(Doc.ACCTTYPE_BankInTransit, as);
+	}
+
 
 	/**************************************************************************
 	 *  Get Source Currency Balance - always zero
@@ -210,6 +225,7 @@ public class Doc_Payment extends Doc
 	{
 		//  create Fact Header
 		Fact fact = new Fact(this, as, Fact.POST_Actual);
+		final boolean useLegacyNativeAccounting = useLegacyNativeAccounting();
 		//	Cash Transfer
 		if ("X".equals(m_TenderType) && !MSysConfig.getBooleanValue("CASH_AS_PAYMENT", true , getAD_Client_ID()))
 		{
@@ -247,8 +263,10 @@ public class Doc_Payment extends Doc
             }
             else
             {
-                MAccount tenderAcct = getTenderTypeRequiredAsset(as);
-                if (p_Error != null)
+                MAccount tenderAcct = useLegacyNativeAccounting
+                        ? getLegacyNativeAsset(as)
+                        : getTenderTypeRequiredAsset(as);
+                if (!useLegacyNativeAccounting && p_Error != null)
                     return null;
                 fl = fact.createLine(null, tenderAcct, getC_Currency_ID(), getAmount(), null);
             }
@@ -260,9 +278,11 @@ public class Doc_Payment extends Doc
 				acct = MCharge.getAccount(getC_Charge_ID(), as, getAmount());
 			else if (m_Prepayment)
 				acct = getAccount(Doc.ACCTTYPE_C_Prepayment, as);
+			else if (useLegacyNativeAccounting)
+				acct = getAccount(Doc.ACCTTYPE_UnallocatedCash, as);
 			else
 				acct = getTenderTypeRequiredUnallocated(as);
-			if (p_Error != null)
+			if (!useLegacyNativeAccounting && p_Error != null)
 				return null;
             // @mzuniga Si es retención sufrida se utiliza la cuenta
             // contable de la tasa de impuesto
@@ -286,9 +306,11 @@ public class Doc_Payment extends Doc
 				acct = MCharge.getAccount(getC_Charge_ID(), as, getAmount());
 			else if (m_Prepayment)
 				acct = getAccount(Doc.ACCTTYPE_V_Prepayment, as);
+			else if (useLegacyNativeAccounting)
+				acct = getAccount(Doc.ACCTTYPE_V_Liability, as);
 			else
 				acct = getTenderTypeRequiredUnallocated(as);
-			if (p_Error != null)
+			if (!useLegacyNativeAccounting && p_Error != null)
 				return null;
 
             // En el caso de una retención efectuada se modifica la forma de contabilizar
@@ -307,15 +329,19 @@ public class Doc_Payment extends Doc
             if (m_EsRetencionEfectuada)
             {
                 MAccount debitAcct = m_Prepayment ? getAccount(Doc.ACCTTYPE_V_Prepayment, as)
-                        : getTenderTypeRequiredUnallocated(as);
-                if (p_Error != null)
+                        : (useLegacyNativeAccounting
+                                ? getAccount(Doc.ACCTTYPE_PaymentSelect, as)
+                                : getTenderTypeRequiredUnallocated(as));
+                if (!useLegacyNativeAccounting && p_Error != null)
                     return null;
                 fl = fact.createLine(null, debitAcct, getC_Currency_ID(), getAmount(), null);
             }
             else
             {
-                MAccount tenderAcct = getTenderTypeRequiredAsset(as);
-                if (p_Error != null)
+                MAccount tenderAcct = useLegacyNativeAccounting
+                        ? getLegacyNativeAsset(as)
+                        : getTenderTypeRequiredAsset(as);
+                if (!useLegacyNativeAccounting && p_Error != null)
                     return null;
                 fl = fact.createLine(null, tenderAcct, getC_Currency_ID(), null, getAmount());
             }
