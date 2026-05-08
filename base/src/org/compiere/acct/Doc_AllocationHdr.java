@@ -76,6 +76,11 @@ public class Doc_AllocationHdr extends Doc
 	/** Facts						*/
 	private ArrayList<Fact>		m_facts = null;
 
+	private boolean useLegacyNativeAccounting()
+	{
+		return LARAccountingMode.useLegacyNativeAccounting(getCtx(), getAD_Client_ID());
+	}
+
 
 	/**
 	 *  Load Specific Document Details
@@ -655,6 +660,16 @@ public class Doc_AllocationHdr extends Doc
 
 		if (accountType == Doc.ACCTTYPE_UnallocatedCash || accountType == Doc.ACCTTYPE_PaymentSelect)
 		{
+			if (useLegacyNativeAccounting())
+			{
+				setC_BankAccount_ID(pay.getC_BankAccount_ID());
+				if (getC_BankAccount_ID() <= 0)
+				{
+					log.log(Level.SEVERE, "NONE for C_Payment_ID=" + pay.getC_Payment_ID());
+					return null;
+				}
+				return getAccount(accountType, as);
+			}
 			MAccount acct = getTenderTypeUnallocated(as, pay, isReceipt);
 			if (acct == null)
 				return null;

@@ -28,6 +28,7 @@ import org.compiere.model.MBankStatement;
 import org.compiere.model.MBankStatementLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
+import org.compiere.model.MSysConfig;
 import org.compiere.util.CCache;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -66,6 +67,11 @@ public class Doc_BankStatement extends Doc
 
 	private static final CCache<String, Boolean> s_isPosteableCache =
 			new CCache<String, Boolean>("C_BankAccount_Acct_IsPosteable", 200, 5);
+
+	private boolean useLegacyNativeAccounting()
+	{
+		return LARAccountingMode.useLegacyNativeAccounting(getCtx(), getAD_Client_ID());
+	}
 
 	/**
 	 *  Load Specific Document Details
@@ -130,6 +136,19 @@ public class Doc_BankStatement extends Doc
 			log.severe(msg);
 		}
 		return acct;
+	}
+
+	private MAccount getLegacyNativeInTransitOverride(MAcctSchema as, MPayment pay)
+	{
+		if (pay == null)
+			return null;
+		int combinacion_ID_Valores_a_Depositar = MSysConfig.getIntValue(
+				"LAR_Combinacion_ID_Valores_a_Depositar", 0, getAD_Client_ID());
+		String tenderType = pay.getTenderType();
+		if (("K".equals(tenderType) || "Z".equals(tenderType) || "O".equals(tenderType))
+				&& combinacion_ID_Valores_a_Depositar != 0)
+			return MAccount.get(as.getCtx(), combinacion_ID_Valores_a_Depositar);
+		return null;
 	}
 
 	/**
@@ -207,8 +226,10 @@ public class Doc_BankStatement extends Doc
 	{
 		//  create Fact Header
 		Fact fact = new Fact(this, as, Fact.POST_Actual);
+		final boolean useLegacyNativeAccounting = useLegacyNativeAccounting();
 		// boolean isInterOrg = isInterOrg(as);
-		final boolean isDrawerClose = getPO().get_ValueAsBoolean("EsCierreCaja");
+		final boolean isDrawerClose = !useLegacyNativeAccounting
+				&& getPO().get_ValueAsBoolean("EsCierreCaja");
 		final boolean isPrincipalDrawer = isDrawerClose
 				&& MBankAccount.get(getCtx(), m_C_BankAccount_ID).get_ValueAsBoolean("EsCajaPrincipal");
 
@@ -233,6 +254,8 @@ public class Doc_BankStatement extends Doc
 			if (line.getC_Payment_ID() != 0)
 			{
                 MPayment pay = new MPayment(Env.getCtx(), line.getC_Payment_ID(), getTrxName());
+				if (!useLegacyNativeAccounting)
+				{
 					// Cierre de caja:
 					// 1) Solo efectivo impacta contablemente (el resto se controla operativamente).
 					// 2) En Caja Principal el efectivo no se vuelve a contabilizar para evitar
@@ -241,9 +264,14 @@ public class Doc_BankStatement extends Doc
 						continue;
 					if (isPrincipalDrawer && MPayment.TENDERTYPE_Cash.equals(pay.getTenderType()))
 						continue;
-                tenderAcct = requireTenderTypeInTransitAccount(as, pay, line.get_ID());
-                if (p_Error != null)
-                    return null;
+					tenderAcct = requireTenderTypeInTransitAccount(as, pay, line.get_ID());
+					if (p_Error != null)
+						return null;
+				}
+				else
+				{
+					cuenta = getLegacyNativeInTransitOverride(as, pay);
+				}
 			}
 			// Avoid usage of clearing accounts
 			// If both accounts BankAsset and BankInTransit are equal
