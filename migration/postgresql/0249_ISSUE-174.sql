@@ -234,7 +234,7 @@ WHERE AD_Column_ID IN (3005976,3005977,3005978)
 ;
 
 UPDATE AD_Column
-SET AD_Reference_ID=19,
+SET AD_Reference_ID=30,
     AD_Reference_Value_ID=NULL,
     Updated=CURRENT_TIMESTAMP,
     UpdatedBy=100
@@ -307,6 +307,13 @@ SET AD_Reference_ID=16,
     Updated=CURRENT_TIMESTAMP,
     UpdatedBy=100
 WHERE AD_Column_ID=3005961
+;
+
+UPDATE AD_Column
+SET DefaultValue='N',
+    Updated=CURRENT_TIMESTAMP,
+    UpdatedBy=100
+WHERE AD_Column_ID IN (3005968,3005969)
 ;
 
 -- Ajuste de layout (referencia: ventana de pagos AD_Window_ID=195)
