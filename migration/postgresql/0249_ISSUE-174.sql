@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS adempiere.LAR_CardSettlement
     Amount                           numeric(18,2)   NOT NULL,
     Description                      varchar(255),
     Compensation_C_BankAccount_ID    numeric(10,0),
+    Drawer_C_BankAccount_ID          numeric(10,0),
     From_C_BankAccount_ID            numeric(10,0),
     To_C_BankAccount_ID              numeric(10,0),
     RoutingNo                        varchar(20),
@@ -57,6 +58,10 @@ ALTER TABLE adempiere.LAR_CardSettlement
 
 ALTER TABLE adempiere.LAR_CardSettlement
     ADD CONSTRAINT LARCardSettlement_BankComp FOREIGN KEY (Compensation_C_BankAccount_ID) REFERENCES adempiere.C_BankAccount(C_BankAccount_ID)
+;
+
+ALTER TABLE adempiere.LAR_CardSettlement
+    ADD CONSTRAINT LARCardSettlement_BankDrawer FOREIGN KEY (Drawer_C_BankAccount_ID) REFERENCES adempiere.C_BankAccount(C_BankAccount_ID)
 ;
 
 ALTER TABLE adempiere.LAR_CardSettlement
@@ -107,6 +112,7 @@ INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,Descr
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,Description,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3001543,'Receipt_C_Payment_ID','LAR','Cobro Generado','Cobro Generado','Referencia al recibo/cobro generado automáticamente',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:03','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:03','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,Description,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3001544,'Payment_C_Payment_ID','LAR','Pago Generado','Pago Generado','Referencia al pago/egreso generado automáticamente',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:03','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:03','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,Description,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3001545,'ProcessMsg','LAR','Mensaje de Proceso','Mensaje de Proceso','Mensaje técnico o funcional del procesamiento del documento',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:03','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:03','YYYY-MM-DD HH24:MI:SS'),'Y');
+INSERT INTO AD_Element (AD_Element_ID,ColumnName,EntityType,Name,PrintName,Description,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3001546,'Drawer_C_BankAccount_ID','LAR','Caja','Caja','Caja donde ingresa el cheque recibido',0,0,100,100,TO_TIMESTAMP('2026-05-31 23:40:00','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-31 23:40:00','YYYY-MM-DD HH24:MI:SS'),'Y');
 
 INSERT INTO AD_Reference (AD_Reference_ID,ValidationType,VFormat,EntityType,IsOrderByValue,Name,Description,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive)
 VALUES (3000182,'L','L','LAR','N','LAR Tipo Operación Tarjetas','Cheque o transferencia bancaria',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:04','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:04','YYYY-MM-DD HH24:MI:SS'),'Y')
@@ -141,6 +147,7 @@ INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,AD_Reference_
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,UpdatedBy,Created,Updated,AD_Client_ID,AD_Org_ID,IsActive) VALUES (3005974,3000284,'LAR',0,'Y','N','N','The Amount indicates the amount for this document line.','N',22,'N',12,'N',1367,'N','Y','N','Amount in a defined currency','Amount','Amount',100,100,TO_TIMESTAMP('2026-05-30 11:00:11','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:11','YYYY-MM-DD HH24:MI:SS'),0,0,'Y');
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,UpdatedBy,Created,Updated,AD_Client_ID,AD_Org_ID,IsActive) VALUES (3005975,3000284,'LAR',0,'N','N','N','A description is limited to 255 characters.','N',255,'Y',10,'N',275,'N','Y','N','Optional short description of the record','Description','Description',100,100,TO_TIMESTAMP('2026-05-30 11:00:11','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:11','YYYY-MM-DD HH24:MI:SS'),0,0,'Y');
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,UpdatedBy,Created,Updated,AD_Client_ID,AD_Org_ID,IsActive) VALUES (3005976,3000284,'LAR',0,'N','N','N','The Bank Account identifies an account at this Bank.','N',10,'N',19,'N',3001540,'N','Y','N','Cuenta bancaria origen para compensación del cheque','Cuenta a Compensar','Compensation_C_BankAccount_ID',100,100,TO_TIMESTAMP('2026-05-30 11:00:12','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:12','YYYY-MM-DD HH24:MI:SS'),0,0,'Y');
+INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,UpdatedBy,Created,Updated,AD_Client_ID,AD_Org_ID,IsActive) VALUES (3005987,3000284,'LAR',0,'N','N','N','The Bank Account identifies an account at this Bank.','N',10,'N',19,'N',3001546,'N','Y','N','Caja donde ingresa el cheque recibido','Caja','Drawer_C_BankAccount_ID',100,100,TO_TIMESTAMP('2026-05-31 23:40:10','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-31 23:40:10','YYYY-MM-DD HH24:MI:SS'),0,0,'Y');
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,UpdatedBy,Created,Updated,AD_Client_ID,AD_Org_ID,IsActive) VALUES (3005977,3000284,'LAR',0,'N','N','N','The Bank Account identifies an account at this Bank.','N',10,'N',19,'N',3001541,'N','Y','N','Cuenta bancaria origen para transferencia','Cuenta Bancaria Origen','From_C_BankAccount_ID',100,100,TO_TIMESTAMP('2026-05-30 11:00:12','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:12','YYYY-MM-DD HH24:MI:SS'),0,0,'Y');
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,UpdatedBy,Created,Updated,AD_Client_ID,AD_Org_ID,IsActive) VALUES (3005978,3000284,'LAR',0,'N','N','N','The Bank Account identifies an account at this Bank.','N',10,'N',19,'N',3001542,'N','Y','N','Cuenta bancaria destino o cartera del cheque','Cuenta Bancaria Destino','To_C_BankAccount_ID',100,100,TO_TIMESTAMP('2026-05-30 11:00:12','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:12','YYYY-MM-DD HH24:MI:SS'),0,0,'Y');
 INSERT INTO AD_Column (AD_Column_ID,AD_Table_ID,EntityType,Version,IsMandatory,IsTranslated,IsIdentifier,Help,IsParent,FieldLength,IsSelectionColumn,AD_Reference_ID,IsKey,AD_Element_ID,IsEncrypted,IsUpdateable,IsAlwaysUpdateable,Description,Name,ColumnName,CreatedBy,UpdatedBy,Created,Updated,AD_Client_ID,AD_Org_ID,IsActive) VALUES (3005979,3000284,'LAR',0,'N','N','N','The Bank Routing Number (ABA Number) identifies a legal Bank.','N',20,'N',10,'N',964,'N','Y','N','Bank Routing Number','Routing No','RoutingNo',100,100,TO_TIMESTAMP('2026-05-30 11:00:12','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:12','YYYY-MM-DD HH24:MI:SS'),0,0,'Y');
@@ -176,6 +183,7 @@ INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplay
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009490,3000319,3005974,22,'Y',90,'N','N','N','Y','N','N','LAR','Amount','Amount in a defined currency','The Amount indicates the amount for this document line.',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009491,3000319,3005975,255,'Y',100,'N','N','N','Y','N','N','LAR','Description','Optional short description of the record','A description is limited to 255 characters.',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009492,3000319,3005976,10,'Y',110,'N','N','N','Y','N','N','LAR','Cuenta a Compensar','Cuenta bancaria origen para compensación del cheque',NULL,0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),'Y');
+INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009508,3000319,3005987,10,'Y',115,'Y','N','N','N','N','N','LAR','Caja','Caja donde ingresa el cheque recibido',NULL,0,0,100,100,TO_TIMESTAMP('2026-05-31 23:40:20','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-31 23:40:20','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009493,3000319,3005977,10,'Y',120,'N','N','N','Y','N','N','LAR','Cuenta Bancaria Origen','Cuenta bancaria origen para transferencia',NULL,0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009494,3000319,3005978,10,'Y',130,'Y','N','N','Y','N','N','LAR','Cuenta Bancaria Destino','Cuenta bancaria destino o cartera del cheque',NULL,0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:31','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009495,3000319,3005979,20,'Y',140,'N','N','N','Y','N','N','LAR','Routing No','Bank Routing Number',NULL,0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:32','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:32','YYYY-MM-DD HH24:MI:SS'),'Y');
@@ -188,7 +196,7 @@ INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplay
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009502,3000319,3005986,80,'Y',210,'N','N','N','Y','Y','N','LAR','Mensaje de Proceso','Mensaje técnico o funcional del procesamiento del documento',NULL,0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:32','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:32','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009503,3000319,3005969,1,'Y',220,'N','N','N','Y','Y','N','LAR','Processed','The document has been processed',NULL,0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:32','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:32','YYYY-MM-DD HH24:MI:SS'),'Y');
 
-UPDATE AD_Field SET DisplayLogic='@OperationType@=''C''' WHERE AD_Field_ID IN (3009492,3009495,3009496,3009497,3009498);
+UPDATE AD_Field SET DisplayLogic='@OperationType@=''C''' WHERE AD_Field_ID IN (3009492,3009508,3009495,3009496,3009497,3009498);
 UPDATE AD_Field SET DisplayLogic='@OperationType@=''T''' WHERE AD_Field_ID=3009493;
 UPDATE AD_Field SET DisplayLogic='@Processed@=''Y''' WHERE AD_Field_ID IN (3009499,3009500,3009501,3009502);
 
@@ -236,6 +244,15 @@ SET AD_Reference_ID=18,
     Updated=CURRENT_TIMESTAMP,
     UpdatedBy=100
 WHERE AD_Column_ID IN (3005976,3005977,3005978)
+;
+
+UPDATE AD_Column
+SET AD_Reference_ID=18,
+    AD_Reference_Value_ID=53283,
+    AD_Val_Rule_ID=3000034,
+    Updated=CURRENT_TIMESTAMP,
+    UpdatedBy=100
+WHERE AD_Column_ID=3005987
 ;
 
 UPDATE AD_Column
@@ -298,7 +315,7 @@ WHERE AD_Column_ID=3005973
 ;
 
 UPDATE AD_Column
-SET DefaultValue='0',
+SET DefaultValue=NULL,
     Updated=CURRENT_TIMESTAMP,
     UpdatedBy=100
 WHERE AD_Column_ID=3005974
@@ -336,6 +353,7 @@ UPDATE AD_Field SET SeqNo=60, IsSameLine='Y' WHERE AD_Field_ID=3009488; -- C_BPa
 UPDATE AD_Field SET SeqNo=70, IsSameLine='N' WHERE AD_Field_ID=3009490; -- Amount
 UPDATE AD_Field SET SeqNo=80, IsSameLine='N' WHERE AD_Field_ID=3009491; -- Description
 UPDATE AD_Field SET SeqNo=90, IsSameLine='N' WHERE AD_Field_ID=3009492; -- Compensation
+UPDATE AD_Field SET SeqNo=95, IsSameLine='Y' WHERE AD_Field_ID=3009508; -- Drawer
 UPDATE AD_Field SET SeqNo=100, IsSameLine='N' WHERE AD_Field_ID=3009493; -- From
 UPDATE AD_Field SET SeqNo=110, IsSameLine='Y' WHERE AD_Field_ID=3009494; -- To
 UPDATE AD_Field SET SeqNo=120, IsSameLine='N' WHERE AD_Field_ID=3009495; -- Routing
@@ -379,7 +397,7 @@ INSERT INTO AD_Element_Trl (AD_Language,AD_Element_ID,Help,PO_Description,PO_Hel
 SELECT l.AD_Language,t.AD_Element_ID,t.Help,t.PO_Description,t.PO_Help,t.Name,t.Description,t.PrintName,t.PO_PrintName,t.PO_Name,'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.CreatedBy,t.Updated,t.UpdatedBy
 FROM AD_Language l, AD_Element t
 WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N'
-  AND t.AD_Element_ID IN (3001538,3001539,3001540,3001541,3001542,3001543,3001544,3001545)
+  AND t.AD_Element_ID IN (3001538,3001539,3001540,3001541,3001542,3001543,3001544,3001545,3001546)
   AND NOT EXISTS (SELECT 1 FROM AD_Element_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Element_ID=t.AD_Element_ID)
 ;
 
@@ -403,7 +421,7 @@ INSERT INTO AD_Column_Trl (AD_Language,AD_Column_ID,Name,IsTranslated,AD_Client_
 SELECT l.AD_Language,t.AD_Column_ID,t.Name,'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.CreatedBy,t.Updated,t.UpdatedBy
 FROM AD_Language l, AD_Column t
 WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N'
-  AND t.AD_Column_ID BETWEEN 3005957 AND 3005986
+  AND t.AD_Column_ID BETWEEN 3005957 AND 3005987
   AND NOT EXISTS (SELECT 1 FROM AD_Column_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Column_ID=t.AD_Column_ID)
 ;
 
@@ -427,8 +445,23 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID,Help,Description,Name,IsTransl
 SELECT l.AD_Language,t.AD_Field_ID,t.Help,t.Description,t.Name,'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.CreatedBy,t.Updated,t.UpdatedBy
 FROM AD_Language l, AD_Field t
 WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N'
-  AND t.AD_Field_ID BETWEEN 3009482 AND 3009507
+  AND t.AD_Field_ID BETWEEN 3009482 AND 3009508
   AND NOT EXISTS (SELECT 1 FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
+;
+
+UPDATE AD_Field_Trl
+SET Name='Caja', IsTranslated='Y', Updated=CURRENT_TIMESTAMP, UpdatedBy=100
+WHERE AD_Field_ID=3009508 AND AD_Language='es_AR'
+;
+
+UPDATE AD_Column_Trl
+SET Name='Caja', IsTranslated='Y', Updated=CURRENT_TIMESTAMP, UpdatedBy=100
+WHERE AD_Column_ID=3005987 AND AD_Language='es_AR'
+;
+
+UPDATE AD_Element_Trl
+SET Name='Caja', PrintName='Caja', Description='Caja donde ingresa el cheque recibido', IsTranslated='Y', Updated=CURRENT_TIMESTAMP, UpdatedBy=100
+WHERE AD_Element_ID=3001546 AND AD_Language='es_AR'
 ;
 
 INSERT INTO AD_Menu_Trl (AD_Language,AD_Menu_ID,Name,Description,IsTranslated,AD_Client_ID,AD_Org_ID,Created,CreatedBy,Updated,UpdatedBy)

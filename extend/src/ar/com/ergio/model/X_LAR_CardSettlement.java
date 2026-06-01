@@ -216,6 +216,26 @@ public class X_LAR_CardSettlement extends PO implements I_LAR_CardSettlement, I_
     }
 
     @Override
+    public void setDrawer_C_BankAccount_ID(int C_BankAccount_ID) {
+        if (C_BankAccount_ID < 1)
+            set_Value(COLUMNNAME_Drawer_C_BankAccount_ID, null);
+        else
+            set_Value(COLUMNNAME_Drawer_C_BankAccount_ID, Integer.valueOf(C_BankAccount_ID));
+    }
+
+    @Override
+    public int getDrawer_C_BankAccount_ID() {
+        Integer ii = (Integer) get_Value(COLUMNNAME_Drawer_C_BankAccount_ID);
+        return ii == null ? 0 : ii.intValue();
+    }
+
+    @Override
+    public I_C_BankAccount getDrawer_C_BankAccount() throws RuntimeException {
+        return (I_C_BankAccount) MTable.get(getCtx(), I_C_BankAccount.Table_Name)
+                .getPO(getDrawer_C_BankAccount_ID(), get_TrxName());
+    }
+
+    @Override
     public void setFrom_C_BankAccount_ID(int C_BankAccount_ID) {
         if (C_BankAccount_ID < 1)
             set_Value(COLUMNNAME_From_C_BankAccount_ID, null);

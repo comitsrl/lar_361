@@ -118,8 +118,8 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
                 m_processMsg = "@Compensation_C_BankAccount_ID@ @Mandatory@";
                 return DocAction.STATUS_Invalid;
             }
-            if (getTo_C_BankAccount_ID() <= 0) {
-                m_processMsg = "@To_C_BankAccount_ID@ @Mandatory@";
+            if (getDrawer_C_BankAccount_ID() <= 0) {
+                m_processMsg = "@Drawer_C_BankAccount_ID@ @Mandatory@";
                 return DocAction.STATUS_Invalid;
             }
         } else if (OPERATIONTYPE_Transfer.equals(getOperationType())) {
@@ -181,7 +181,7 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
 
     private void completeCheck() {
         MBankAccount compensationAccount = new MBankAccount(getCtx(), getCompensation_C_BankAccount_ID(), get_TrxName());
-        MBankAccount targetAccount = new MBankAccount(getCtx(), getTo_C_BankAccount_ID(), get_TrxName());
+        MBankAccount targetAccount = new MBankAccount(getCtx(), getDrawer_C_BankAccount_ID(), get_TrxName());
         validateCurrency(compensationAccount, targetAccount);
 
         MPayment receipt = createBasePayment(true, targetAccount, MPayment.TENDERTYPE_Check,

@@ -50,6 +50,7 @@ public interface I_LAR_CardSettlement {
     String COLUMNNAME_Amount = "Amount";
     String COLUMNNAME_Description = "Description";
     String COLUMNNAME_Compensation_C_BankAccount_ID = "Compensation_C_BankAccount_ID";
+    String COLUMNNAME_Drawer_C_BankAccount_ID = "Drawer_C_BankAccount_ID";
     String COLUMNNAME_From_C_BankAccount_ID = "From_C_BankAccount_ID";
     String COLUMNNAME_To_C_BankAccount_ID = "To_C_BankAccount_ID";
     String COLUMNNAME_RoutingNo = "RoutingNo";
@@ -126,6 +127,10 @@ public interface I_LAR_CardSettlement {
     void setCompensation_C_BankAccount_ID(int C_BankAccount_ID);
     int getCompensation_C_BankAccount_ID();
     I_C_BankAccount getCompensation_C_BankAccount() throws RuntimeException;
+
+    void setDrawer_C_BankAccount_ID(int C_BankAccount_ID);
+    int getDrawer_C_BankAccount_ID();
+    I_C_BankAccount getDrawer_C_BankAccount() throws RuntimeException;
 
     void setFrom_C_BankAccount_ID(int C_BankAccount_ID);
     int getFrom_C_BankAccount_ID();
