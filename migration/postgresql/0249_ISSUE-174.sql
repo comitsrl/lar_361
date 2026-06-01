@@ -162,6 +162,10 @@ VALUES (3000319,3000149,10,3000284,'Y','N','N','N','N','N','N',0,'Y','N','LAR','
 
 -- Campos de la pestaña
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009482,3000319,3005959,10,'Y',10,'N','N','N','Y','N','N','LAR','Organization','Organizational entity within client','An organization is a unit of your client or legal entity.',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:30','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:30','YYYY-MM-DD HH24:MI:SS'),'Y');
+INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009504,3000319,3005957,10,'N',0,'N','N','N','Y','N','N','LAR','Liquidación Operativa Tarjetas',NULL,NULL,0,0,100,100,TO_TIMESTAMP('2026-05-31 22:05:00','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-31 22:05:00','YYYY-MM-DD HH24:MI:SS'),'Y');
+INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009505,3000319,3005958,10,'N',0,'N','N','N','Y','N','N','LAR','Client','Client/Tenant for this installation.','A Client is a company or a legal entity. You cannot share data between Clients. Tenant is a synonym for Client.',0,0,100,100,TO_TIMESTAMP('2026-05-31 22:05:01','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-31 22:05:01','YYYY-MM-DD HH24:MI:SS'),'Y');
+INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009506,3000319,3005960,1,'N',0,'N','N','N','Y','N','N','LAR','Active','The record is active in the system','There are two methods of making records unavailable in the system: one is to delete the record, the other is to deactivate it. A deactivated record is not available for selection, but available for reports.',0,0,100,100,TO_TIMESTAMP('2026-05-31 22:05:02','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-31 22:05:02','YYYY-MM-DD HH24:MI:SS'),'Y');
+INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009507,3000319,3005968,1,'N',0,'N','N','N','Y','N','N','LAR','Process Now',NULL,NULL,0,0,100,100,TO_TIMESTAMP('2026-05-31 22:05:03','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-31 22:05:03','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009483,3000319,3005965,30,'Y',20,'Y','N','N','Y','Y','N','LAR','Document No','Document sequence number of the document','Document sequence number of the document',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:30','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:30','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009484,3000319,3005966,2,'Y',30,'N','N','N','Y','Y','N','LAR','Document Status','The current status of the document','The current status of the document',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:30','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:30','YYYY-MM-DD HH24:MI:SS'),'Y');
 INSERT INTO AD_Field (AD_Field_ID,AD_Tab_ID,AD_Column_ID,DisplayLength,IsDisplayed,SeqNo,IsSameLine,IsHeading,IsFieldOnly,IsCentrallyMaintained,IsReadOnly,IsEncrypted,EntityType,Name,Description,Help,AD_Client_ID,AD_Org_ID,CreatedBy,UpdatedBy,Created,Updated,IsActive) VALUES (3009485,3000319,3005967,2,'Y',40,'Y','N','N','Y','N','N','LAR','Document Action','The targeted status of the document','The targeted status of the document',0,0,100,100,TO_TIMESTAMP('2026-05-30 11:00:30','YYYY-MM-DD HH24:MI:SS'),TO_TIMESTAMP('2026-05-30 11:00:30','YYYY-MM-DD HH24:MI:SS'),'Y');
@@ -226,8 +230,9 @@ WHERE AD_Workflow_ID=3000014
 
 -- Correcciones de referencias/lookups y comportamiento documental
 UPDATE AD_Column
-SET AD_Reference_ID=30,
-    AD_Reference_Value_ID=193,
+SET AD_Reference_ID=18,
+    AD_Reference_Value_ID=53283,
+    AD_Val_Rule_ID=3000147,
     Updated=CURRENT_TIMESTAMP,
     UpdatedBy=100
 WHERE AD_Column_ID IN (3005976,3005977,3005978)
@@ -297,6 +302,13 @@ SET DefaultValue='0',
     Updated=CURRENT_TIMESTAMP,
     UpdatedBy=100
 WHERE AD_Column_ID=3005974
+;
+
+UPDATE AD_Column
+SET DefaultValue='Y',
+    Updated=CURRENT_TIMESTAMP,
+    UpdatedBy=100
+WHERE AD_Column_ID=3005960
 ;
 
 UPDATE AD_Column
@@ -415,7 +427,7 @@ INSERT INTO AD_Field_Trl (AD_Language,AD_Field_ID,Help,Description,Name,IsTransl
 SELECT l.AD_Language,t.AD_Field_ID,t.Help,t.Description,t.Name,'N',t.AD_Client_ID,t.AD_Org_ID,t.Created,t.CreatedBy,t.Updated,t.UpdatedBy
 FROM AD_Language l, AD_Field t
 WHERE l.IsActive='Y' AND l.IsSystemLanguage='Y' AND l.IsBaseLanguage='N'
-  AND t.AD_Field_ID BETWEEN 3009482 AND 3009503
+  AND t.AD_Field_ID BETWEEN 3009482 AND 3009507
   AND NOT EXISTS (SELECT 1 FROM AD_Field_Trl tt WHERE tt.AD_Language=l.AD_Language AND tt.AD_Field_ID=t.AD_Field_ID)
 ;
 
