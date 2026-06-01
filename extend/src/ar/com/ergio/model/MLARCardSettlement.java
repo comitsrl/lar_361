@@ -122,6 +122,14 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
                 m_processMsg = "@Drawer_C_BankAccount_ID@ @Mandatory@";
                 return DocAction.STATUS_Invalid;
             }
+            MBankAccount compensationAccount = new MBankAccount(getCtx(), getCompensation_C_BankAccount_ID(), get_TrxName());
+            MBankAccount drawerAccount = new MBankAccount(getCtx(), getDrawer_C_BankAccount_ID(), get_TrxName());
+            String currencyError = getCurrencyValidationError(compensationAccount, drawerAccount,
+                    "@Compensation_C_BankAccount_ID@", "@Drawer_C_BankAccount_ID@");
+            if (currencyError != null) {
+                m_processMsg = currencyError;
+                return DocAction.STATUS_Invalid;
+            }
         } else if (OPERATIONTYPE_Transfer.equals(getOperationType())) {
             if (getFrom_C_BankAccount_ID() <= 0) {
                 m_processMsg = "@From_C_BankAccount_ID@ @Mandatory@";
@@ -133,6 +141,14 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
             }
             if (getFrom_C_BankAccount_ID() == getTo_C_BankAccount_ID()) {
                 m_processMsg = "@C_BankAccount_ID@ @Invalid@";
+                return DocAction.STATUS_Invalid;
+            }
+            MBankAccount fromAccount = new MBankAccount(getCtx(), getFrom_C_BankAccount_ID(), get_TrxName());
+            MBankAccount toAccount = new MBankAccount(getCtx(), getTo_C_BankAccount_ID(), get_TrxName());
+            String currencyError = getCurrencyValidationError(fromAccount, toAccount,
+                    "@From_C_BankAccount_ID@", "@To_C_BankAccount_ID@");
+            if (currencyError != null) {
+                m_processMsg = currencyError;
                 return DocAction.STATUS_Invalid;
             }
         } else {
@@ -284,6 +300,14 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
     private void validateCurrency(MBankAccount source, MBankAccount target) {
         if (source.getC_Currency_ID() != target.getC_Currency_ID())
             throw new AdempiereException("@C_Currency_ID@ @Invalid@");
+    }
+
+    private String getCurrencyValidationError(MBankAccount source, MBankAccount target, String sourceLabel, String targetLabel) {
+        if (source.getC_Currency_ID() <= 0 || target.getC_Currency_ID() <= 0)
+            return "@C_Currency_ID@ @Invalid@";
+        if (source.getC_Currency_ID() != target.getC_Currency_ID())
+            return sourceLabel + " / " + targetLabel + ": @C_Currency_ID@ @Invalid@";
+        return null;
     }
 
     private String buildPaymentDescription(String action) {
