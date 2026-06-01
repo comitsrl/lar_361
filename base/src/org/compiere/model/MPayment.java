@@ -1454,6 +1454,7 @@ public final class MPayment extends X_C_Payment
                    + " WHERE IsActive='Y' AND AD_Client_ID=?"
                    + "                    AND AD_Org_ID=?"
                    + "                    AND DocBaseType=?"
+                   + "                    AND IsDefault='N'"
                    + " ORDER BY IsDefault DESC";
         PreparedStatement pstmt = null;
         ResultSet rs = null;
