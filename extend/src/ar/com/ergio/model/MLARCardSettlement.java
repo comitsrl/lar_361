@@ -122,6 +122,10 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
                 m_processMsg = "@Drawer_C_BankAccount_ID@ @Mandatory@";
                 return DocAction.STATUS_Invalid;
             }
+            if (getFecha_Venc_Cheque() == null) {
+                m_processMsg = "@Fecha_Venc_Cheque@ @Mandatory@";
+                return DocAction.STATUS_Invalid;
+            }
             MBankAccount compensationAccount = new MBankAccount(getCtx(), getCompensation_C_BankAccount_ID(), get_TrxName());
             MBankAccount drawerAccount = new MBankAccount(getCtx(), getDrawer_C_BankAccount_ID(), get_TrxName());
             String currencyError = getCurrencyValidationError(compensationAccount, drawerAccount,
@@ -208,6 +212,8 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
             receipt.setAccountNo(getAccountNo());
         if (getCheckNo() != null && getCheckNo().trim().length() > 0)
             receipt.setCheckNo(getCheckNo());
+        if (getFecha_Venc_Cheque() != null)
+            receipt.set_ValueOfColumn("Fecha_Venc_Cheque", getFecha_Venc_Cheque());
         if (getA_Name() != null && getA_Name().trim().length() > 0)
             receipt.setA_Name(getA_Name());
         receipt.set_ValueOfColumn("IsOnDrawer", Boolean.TRUE);

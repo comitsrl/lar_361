@@ -306,6 +306,16 @@ public class X_LAR_CardSettlement extends PO implements I_LAR_CardSettlement, I_
     }
 
     @Override
+    public void setFecha_Venc_Cheque(Timestamp Fecha_Venc_Cheque) {
+        set_Value(COLUMNNAME_Fecha_Venc_Cheque, Fecha_Venc_Cheque);
+    }
+
+    @Override
+    public Timestamp getFecha_Venc_Cheque() {
+        return (Timestamp) get_Value(COLUMNNAME_Fecha_Venc_Cheque);
+    }
+
+    @Override
     public void setA_Name(String aName) {
         set_Value(COLUMNNAME_A_Name, aName);
     }
