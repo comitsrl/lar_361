@@ -56,11 +56,14 @@ public interface I_LAR_CardSettlement {
     String COLUMNNAME_RoutingNo = "RoutingNo";
     String COLUMNNAME_AccountNo = "AccountNo";
     String COLUMNNAME_CheckNo = "CheckNo";
+    String COLUMNNAME_Fecha_Venc_Cheque = "Fecha_Venc_Cheque";
     String COLUMNNAME_A_Name = "A_Name";
     String COLUMNNAME_Receipt_C_Payment_ID = "Receipt_C_Payment_ID";
     String COLUMNNAME_Payment_C_Payment_ID = "Payment_C_Payment_ID";
     String COLUMNNAME_C_AllocationHdr_ID = "C_AllocationHdr_ID";
     String COLUMNNAME_ProcessMsg = "ProcessMsg";
+    String COLUMNNAME_LAR_CardSettlement_Hdr_ID = "LAR_CardSettlement_Hdr_ID";
+    String COLUMNNAME_Line = "Line";
 
     String DOCACTION_Complete = "CO";
     String DOCACTION_Void = "VO";
@@ -149,6 +152,9 @@ public interface I_LAR_CardSettlement {
     void setCheckNo(String checkNo);
     String getCheckNo();
 
+    void setFecha_Venc_Cheque(Timestamp Fecha_Venc_Cheque);
+    Timestamp getFecha_Venc_Cheque();
+
     void setA_Name(String aName);
     String getA_Name();
 
@@ -166,4 +172,11 @@ public interface I_LAR_CardSettlement {
 
     void setProcessMsg(String processMsg);
     String getProcessMsg();
+
+    void setLAR_CardSettlement_Hdr_ID(int LAR_CardSettlement_Hdr_ID);
+    int getLAR_CardSettlement_Hdr_ID();
+    I_LAR_CardSettlement_Hdr getLAR_CardSettlement_Hdr() throws RuntimeException;
+
+    void setLine(int Line);
+    int getLine();
 }

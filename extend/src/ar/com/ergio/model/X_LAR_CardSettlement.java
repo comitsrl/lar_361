@@ -306,6 +306,16 @@ public class X_LAR_CardSettlement extends PO implements I_LAR_CardSettlement, I_
     }
 
     @Override
+    public void setFecha_Venc_Cheque(Timestamp Fecha_Venc_Cheque) {
+        set_Value(COLUMNNAME_Fecha_Venc_Cheque, Fecha_Venc_Cheque);
+    }
+
+    @Override
+    public Timestamp getFecha_Venc_Cheque() {
+        return (Timestamp) get_Value(COLUMNNAME_Fecha_Venc_Cheque);
+    }
+
+    @Override
     public void setA_Name(String aName) {
         set_Value(COLUMNNAME_A_Name, aName);
     }
@@ -383,5 +393,39 @@ public class X_LAR_CardSettlement extends PO implements I_LAR_CardSettlement, I_
     @Override
     public String getProcessMsg() {
         return (String) get_Value(COLUMNNAME_ProcessMsg);
+    }
+
+    @Override
+    public void setLAR_CardSettlement_Hdr_ID(int LAR_CardSettlement_Hdr_ID) {
+        if (LAR_CardSettlement_Hdr_ID < 1)
+            set_Value(COLUMNNAME_LAR_CardSettlement_Hdr_ID, null);
+        else
+            set_Value(COLUMNNAME_LAR_CardSettlement_Hdr_ID, Integer.valueOf(LAR_CardSettlement_Hdr_ID));
+    }
+
+    @Override
+    public int getLAR_CardSettlement_Hdr_ID() {
+        Integer ii = (Integer) get_Value(COLUMNNAME_LAR_CardSettlement_Hdr_ID);
+        return ii == null ? 0 : ii.intValue();
+    }
+
+    @Override
+    public I_LAR_CardSettlement_Hdr getLAR_CardSettlement_Hdr() throws RuntimeException {
+        return (I_LAR_CardSettlement_Hdr) MTable.get(getCtx(), I_LAR_CardSettlement_Hdr.Table_Name)
+                .getPO(getLAR_CardSettlement_Hdr_ID(), get_TrxName());
+    }
+
+    @Override
+    public void setLine(int Line) {
+        if (Line < 1)
+            set_Value(COLUMNNAME_Line, null);
+        else
+            set_Value(COLUMNNAME_Line, Integer.valueOf(Line));
+    }
+
+    @Override
+    public int getLine() {
+        Integer ii = (Integer) get_Value(COLUMNNAME_Line);
+        return ii == null ? 0 : ii.intValue();
     }
 }

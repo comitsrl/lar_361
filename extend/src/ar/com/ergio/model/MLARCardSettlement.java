@@ -25,6 +25,7 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
+import org.compiere.model.Query;
 import org.compiere.model.X_C_DocType;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
@@ -41,6 +42,7 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
 
     private String m_processMsg;
     private boolean m_justPrepared;
+    private boolean m_processFromHeader;
 
     public MLARCardSettlement(Properties ctx, int LAR_CardSettlement_ID, String trxName) {
         super(ctx, LAR_CardSettlement_ID, trxName);
@@ -52,6 +54,8 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
 
     @Override
     protected boolean beforeSave(boolean newRecord) {
+        MLARCardSettlementHdr header = getHeader();
+
         if (newRecord) {
             if (getDocumentNo() == null || getDocumentNo().trim().length() == 0)
                 setDocumentNo(nextDocumentNo());
@@ -63,6 +67,24 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
             setProcessing(false);
         }
 
+        if (header != null) {
+            if (header.isProcessed()) {
+                if (newRecord)
+                    throw new AdempiereException("@Processed@");
+                if (!isDocumentTransitionOnly())
+                    throw new AdempiereException("@Processed@");
+            }
+
+            setAD_Org_ID(header.getAD_Org_ID());
+            setDateDoc(header.getDateDoc());
+            setDateAcct(header.getDateAcct());
+            setC_BPartner_ID(header.getC_BPartner_ID());
+            setOperationType(header.getOperationType());
+
+            if (newRecord && getLine() <= 0)
+                setLine(getNextLineNo());
+        }
+
         if (getDateDoc() == null)
             setDateDoc(new Timestamp(System.currentTimeMillis()));
         if (getDateAcct() == null)
@@ -71,9 +93,35 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         return true;
     }
 
+    @Override
+    protected boolean afterSave(boolean newRecord, boolean success) {
+        if (success)
+            recalculateHeaderTotal();
+        return success;
+    }
+
+    @Override
+    protected boolean afterDelete(boolean success) {
+        if (success)
+            recalculateHeaderTotal();
+        return success;
+    }
+
     private String nextDocumentNo() {
         String sequenceName = OPERATIONTYPE_Transfer.equals(getOperationType()) ? DOCSEQ_TRANSFER : DOCSEQ_CHECK;
         return org.compiere.model.MSequence.getDocumentNo(getAD_Client_ID(), sequenceName, get_TrxName(), this);
+    }
+
+    public boolean completeFromHeader() {
+        boolean oldValue = m_processFromHeader;
+        m_processFromHeader = true;
+        try {
+            return processIt(DocAction.ACTION_Complete);
+        } catch (Exception e) {
+            throw new AdempiereException(e);
+        } finally {
+            m_processFromHeader = oldValue;
+        }
     }
 
     @Override
@@ -104,6 +152,10 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
             m_processMsg = "@Amount@ @Invalid@";
             return DocAction.STATUS_Invalid;
         }
+        if (getLAR_CardSettlement_Hdr_ID() > 0 && !m_processFromHeader) {
+            m_processMsg = "@DocAction@ @Invalid@";
+            return DocAction.STATUS_Invalid;
+        }
         if (getC_BPartner_ID() <= 0) {
             m_processMsg = "@C_BPartner_ID@ @NotFound@";
             return DocAction.STATUS_Invalid;
@@ -120,6 +172,10 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
             }
             if (getDrawer_C_BankAccount_ID() <= 0) {
                 m_processMsg = "@Drawer_C_BankAccount_ID@ @Mandatory@";
+                return DocAction.STATUS_Invalid;
+            }
+            if (getFecha_Venc_Cheque() == null) {
+                m_processMsg = "@Fecha_Venc_Cheque@ @Mandatory@";
                 return DocAction.STATUS_Invalid;
             }
             MBankAccount compensationAccount = new MBankAccount(getCtx(), getCompensation_C_BankAccount_ID(), get_TrxName());
@@ -208,6 +264,8 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
             receipt.setAccountNo(getAccountNo());
         if (getCheckNo() != null && getCheckNo().trim().length() > 0)
             receipt.setCheckNo(getCheckNo());
+        if (getFecha_Venc_Cheque() != null)
+            receipt.set_ValueOfColumn("Fecha_Venc_Cheque", getFecha_Venc_Cheque());
         if (getA_Name() != null && getA_Name().trim().length() > 0)
             receipt.setA_Name(getA_Name());
         receipt.set_ValueOfColumn("IsOnDrawer", Boolean.TRUE);
@@ -317,9 +375,24 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         return description.toString();
     }
 
+    public String validateVoidProcessMsg() {
+        try {
+            validateVoid();
+            return null;
+        } catch (AdempiereException e) {
+            return e.getMessage();
+        }
+    }
+
+    public void validateVoid() {
+        validatePaymentCopies(getReceipt_C_Payment_ID());
+        validatePaymentCopies(getPayment_C_Payment_ID());
+    }
+
     @Override
     public boolean voidIt() {
         try {
+            validateVoid();
             reverseGeneratedDocuments();
         } catch (Exception e) {
             m_processMsg = e.getMessage();
@@ -332,6 +405,7 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         setDocAction(DocAction.ACTION_None);
         m_processMsg = "@Reversed@";
         setProcessMsg(m_processMsg);
+        recalculateHeaderTotal();
         return true;
     }
 
@@ -356,10 +430,50 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         MPayment payment = new MPayment(getCtx(), paymentId, get_TrxName());
         if (DOCSTATUS_Reversed.equals(payment.getDocStatus()) || DOCSTATUS_Voided.equals(payment.getDocStatus()))
             return;
-        payment.setDocAction(DocAction.ACTION_Reverse_Correct);
-        if (!payment.processIt(DocAction.ACTION_Reverse_Correct))
+        payment.setDocAction(DocAction.ACTION_Void);
+        if (!payment.processIt(DocAction.ACTION_Void))
             throw new AdempiereException(payment.getProcessMsg());
         payment.saveEx(get_TrxName());
+    }
+
+    private void validatePaymentCopies(int paymentId) {
+        if (paymentId <= 0)
+            return;
+
+        for (Object row : new Query(getCtx(), MPayment.Table_Name,
+                "LAR_PaymentSource_ID=? AND DocStatus IN ('CO','CL')", get_TrxName())
+                        .setParameters(paymentId)
+                        .list()) {
+            MPayment paymentCopy = (MPayment) row;
+            int bankStatementLineId = getBankStatementLineId(paymentCopy.getC_Payment_ID());
+            if (bankStatementLineId > 0) {
+                String sql = "SELECT stm.EsCierreCaja"
+                        + " FROM C_BankStatementLine stml"
+                        + " JOIN C_BankStatement stm ON stml.C_BankStatement_ID = stm.C_BankStatement_ID"
+                        + " WHERE stm.DocStatus NOT IN ('VO')"
+                        + " AND C_BankStatementLine_ID = ?";
+                String esCierreCaja = DB.getSQLValueString(get_TrxName(), sql, bankStatementLineId);
+                if ("N".equals(esCierreCaja))
+                    throw new AdempiereException("No se puede anular el cobro, ya que el mismo fue conciliado en una cuenta bancaria.");
+            }
+
+            if (!paymentCopy.isReceipt() && !DOCSTATUS_Voided.equals(paymentCopy.getDocStatus())
+                    && !DOCSTATUS_Reversed.equals(paymentCopy.getDocStatus())) {
+                int paymentHeaderId = paymentCopy.get_ValueAsInt("LAR_PaymentHeader_ID");
+                if (paymentHeaderId > 0) {
+                    MLARPaymentHeader header = new MLARPaymentHeader(getCtx(), paymentHeaderId, get_TrxName());
+                    throw new AdempiereException(
+                            "No se puede anular el cobro seleccionado. El mismo está siendo utilizado en la Orden de Pago Nro: "
+                                    + header.getDocumentNo());
+                }
+            }
+        }
+    }
+
+    private int getBankStatementLineId(int paymentId) {
+        String sql = "SELECT C_BankStatementLine_ID FROM C_BankStatementLine WHERE C_Payment_ID=?";
+        int id = DB.getSQLValue(get_TrxName(), sql, paymentId);
+        return id < 0 ? 0 : id;
     }
 
     @Override
@@ -432,11 +546,54 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
     public int customizeValidActions(String docStatus, Object processing, String orderType, String isSOTrx,
             int AD_Table_ID, String[] docAction, String[] options, int index) {
         if (AD_Table_ID == Table_ID) {
-            if (DocumentEngine.STATUS_Drafted.equals(docStatus) || DocumentEngine.STATUS_InProgress.equals(docStatus))
+            if ((DocumentEngine.STATUS_Drafted.equals(docStatus) || DocumentEngine.STATUS_InProgress.equals(docStatus))
+                    && getLAR_CardSettlement_Hdr_ID() <= 0)
                 options[index++] = DocumentEngine.ACTION_Complete;
             if (DocumentEngine.STATUS_Completed.equals(docStatus))
                 options[index++] = DocumentEngine.ACTION_Void;
         }
         return index;
+    }
+
+    private MLARCardSettlementHdr getHeader() {
+        if (getLAR_CardSettlement_Hdr_ID() <= 0)
+            return null;
+        return new MLARCardSettlementHdr(getCtx(), getLAR_CardSettlement_Hdr_ID(), get_TrxName());
+    }
+
+    private int getNextLineNo() {
+        return DB.getSQLValueEx(get_TrxName(),
+                "SELECT COALESCE(MAX(Line),0)+10 FROM LAR_CardSettlement WHERE LAR_CardSettlement_Hdr_ID=?",
+                getLAR_CardSettlement_Hdr_ID());
+    }
+
+    private void recalculateHeaderTotal() {
+        MLARCardSettlementHdr header = getHeader();
+        if (header != null)
+            header.recalculateTotalFromLines();
+    }
+
+    private boolean isDocumentTransitionOnly() {
+        return !isBusinessFieldChanged();
+    }
+
+    private boolean isBusinessFieldChanged() {
+        return is_ValueChanged(COLUMNNAME_AD_Org_ID)
+                || is_ValueChanged(COLUMNNAME_DateDoc)
+                || is_ValueChanged(COLUMNNAME_DateAcct)
+                || is_ValueChanged(COLUMNNAME_C_BPartner_ID)
+                || is_ValueChanged(COLUMNNAME_OperationType)
+                || is_ValueChanged(COLUMNNAME_Amount)
+                || is_ValueChanged(COLUMNNAME_Description)
+                || is_ValueChanged(COLUMNNAME_Compensation_C_BankAccount_ID)
+                || is_ValueChanged(COLUMNNAME_Drawer_C_BankAccount_ID)
+                || is_ValueChanged(COLUMNNAME_From_C_BankAccount_ID)
+                || is_ValueChanged(COLUMNNAME_To_C_BankAccount_ID)
+                || is_ValueChanged(COLUMNNAME_RoutingNo)
+                || is_ValueChanged(COLUMNNAME_AccountNo)
+                || is_ValueChanged(COLUMNNAME_CheckNo)
+                || is_ValueChanged(COLUMNNAME_Fecha_Venc_Cheque)
+                || is_ValueChanged(COLUMNNAME_A_Name)
+                || is_ValueChanged(COLUMNNAME_Line);
     }
 }
