@@ -41,6 +41,7 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
 
     private String m_processMsg;
     private boolean m_justPrepared;
+    private boolean m_processFromHeader;
 
     public MLARCardSettlement(Properties ctx, int LAR_CardSettlement_ID, String trxName) {
         super(ctx, LAR_CardSettlement_ID, trxName);
@@ -52,6 +53,8 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
 
     @Override
     protected boolean beforeSave(boolean newRecord) {
+        MLARCardSettlementHdr header = getHeader();
+
         if (newRecord) {
             if (getDocumentNo() == null || getDocumentNo().trim().length() == 0)
                 setDocumentNo(nextDocumentNo());
@@ -63,6 +66,24 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
             setProcessing(false);
         }
 
+        if (header != null) {
+            if (header.isProcessed()) {
+                if (newRecord)
+                    throw new AdempiereException("@Processed@");
+                if (!isDocumentTransitionOnly())
+                    throw new AdempiereException("@Processed@");
+            }
+
+            setAD_Org_ID(header.getAD_Org_ID());
+            setDateDoc(header.getDateDoc());
+            setDateAcct(header.getDateAcct());
+            setC_BPartner_ID(header.getC_BPartner_ID());
+            setOperationType(header.getOperationType());
+
+            if (newRecord && getLine() <= 0)
+                setLine(getNextLineNo());
+        }
+
         if (getDateDoc() == null)
             setDateDoc(new Timestamp(System.currentTimeMillis()));
         if (getDateAcct() == null)
@@ -71,9 +92,35 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         return true;
     }
 
+    @Override
+    protected boolean afterSave(boolean newRecord, boolean success) {
+        if (success)
+            recalculateHeaderTotal();
+        return success;
+    }
+
+    @Override
+    protected boolean afterDelete(boolean success) {
+        if (success)
+            recalculateHeaderTotal();
+        return success;
+    }
+
     private String nextDocumentNo() {
         String sequenceName = OPERATIONTYPE_Transfer.equals(getOperationType()) ? DOCSEQ_TRANSFER : DOCSEQ_CHECK;
         return org.compiere.model.MSequence.getDocumentNo(getAD_Client_ID(), sequenceName, get_TrxName(), this);
+    }
+
+    public boolean completeFromHeader() {
+        boolean oldValue = m_processFromHeader;
+        m_processFromHeader = true;
+        try {
+            return processIt(DocAction.ACTION_Complete);
+        } catch (Exception e) {
+            throw new AdempiereException(e);
+        } finally {
+            m_processFromHeader = oldValue;
+        }
     }
 
     @Override
@@ -102,6 +149,10 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
 
         if (getAmount().signum() <= 0) {
             m_processMsg = "@Amount@ @Invalid@";
+            return DocAction.STATUS_Invalid;
+        }
+        if (getLAR_CardSettlement_Hdr_ID() > 0 && !m_processFromHeader) {
+            m_processMsg = "@DocAction@ @Invalid@";
             return DocAction.STATUS_Invalid;
         }
         if (getC_BPartner_ID() <= 0) {
@@ -338,6 +389,7 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         setDocAction(DocAction.ACTION_None);
         m_processMsg = "@Reversed@";
         setProcessMsg(m_processMsg);
+        recalculateHeaderTotal();
         return true;
     }
 
@@ -438,11 +490,54 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
     public int customizeValidActions(String docStatus, Object processing, String orderType, String isSOTrx,
             int AD_Table_ID, String[] docAction, String[] options, int index) {
         if (AD_Table_ID == Table_ID) {
-            if (DocumentEngine.STATUS_Drafted.equals(docStatus) || DocumentEngine.STATUS_InProgress.equals(docStatus))
+            if ((DocumentEngine.STATUS_Drafted.equals(docStatus) || DocumentEngine.STATUS_InProgress.equals(docStatus))
+                    && getLAR_CardSettlement_Hdr_ID() <= 0)
                 options[index++] = DocumentEngine.ACTION_Complete;
             if (DocumentEngine.STATUS_Completed.equals(docStatus))
                 options[index++] = DocumentEngine.ACTION_Void;
         }
         return index;
+    }
+
+    private MLARCardSettlementHdr getHeader() {
+        if (getLAR_CardSettlement_Hdr_ID() <= 0)
+            return null;
+        return new MLARCardSettlementHdr(getCtx(), getLAR_CardSettlement_Hdr_ID(), get_TrxName());
+    }
+
+    private int getNextLineNo() {
+        return DB.getSQLValueEx(get_TrxName(),
+                "SELECT COALESCE(MAX(Line),0)+10 FROM LAR_CardSettlement WHERE LAR_CardSettlement_Hdr_ID=?",
+                getLAR_CardSettlement_Hdr_ID());
+    }
+
+    private void recalculateHeaderTotal() {
+        MLARCardSettlementHdr header = getHeader();
+        if (header != null)
+            header.recalculateTotalFromLines();
+    }
+
+    private boolean isDocumentTransitionOnly() {
+        return !isBusinessFieldChanged();
+    }
+
+    private boolean isBusinessFieldChanged() {
+        return is_ValueChanged(COLUMNNAME_AD_Org_ID)
+                || is_ValueChanged(COLUMNNAME_DateDoc)
+                || is_ValueChanged(COLUMNNAME_DateAcct)
+                || is_ValueChanged(COLUMNNAME_C_BPartner_ID)
+                || is_ValueChanged(COLUMNNAME_OperationType)
+                || is_ValueChanged(COLUMNNAME_Amount)
+                || is_ValueChanged(COLUMNNAME_Description)
+                || is_ValueChanged(COLUMNNAME_Compensation_C_BankAccount_ID)
+                || is_ValueChanged(COLUMNNAME_Drawer_C_BankAccount_ID)
+                || is_ValueChanged(COLUMNNAME_From_C_BankAccount_ID)
+                || is_ValueChanged(COLUMNNAME_To_C_BankAccount_ID)
+                || is_ValueChanged(COLUMNNAME_RoutingNo)
+                || is_ValueChanged(COLUMNNAME_AccountNo)
+                || is_ValueChanged(COLUMNNAME_CheckNo)
+                || is_ValueChanged(COLUMNNAME_Fecha_Venc_Cheque)
+                || is_ValueChanged(COLUMNNAME_A_Name)
+                || is_ValueChanged(COLUMNNAME_Line);
     }
 }

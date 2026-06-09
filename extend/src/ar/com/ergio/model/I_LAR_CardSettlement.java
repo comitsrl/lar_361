@@ -62,6 +62,8 @@ public interface I_LAR_CardSettlement {
     String COLUMNNAME_Payment_C_Payment_ID = "Payment_C_Payment_ID";
     String COLUMNNAME_C_AllocationHdr_ID = "C_AllocationHdr_ID";
     String COLUMNNAME_ProcessMsg = "ProcessMsg";
+    String COLUMNNAME_LAR_CardSettlement_Hdr_ID = "LAR_CardSettlement_Hdr_ID";
+    String COLUMNNAME_Line = "Line";
 
     String DOCACTION_Complete = "CO";
     String DOCACTION_Void = "VO";
@@ -170,4 +172,11 @@ public interface I_LAR_CardSettlement {
 
     void setProcessMsg(String processMsg);
     String getProcessMsg();
+
+    void setLAR_CardSettlement_Hdr_ID(int LAR_CardSettlement_Hdr_ID);
+    int getLAR_CardSettlement_Hdr_ID();
+    I_LAR_CardSettlement_Hdr getLAR_CardSettlement_Hdr() throws RuntimeException;
+
+    void setLine(int Line);
+    int getLine();
 }
