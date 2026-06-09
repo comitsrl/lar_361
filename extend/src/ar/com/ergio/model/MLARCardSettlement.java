@@ -25,6 +25,7 @@ import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPeriod;
+import org.compiere.model.Query;
 import org.compiere.model.X_C_DocType;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
@@ -374,9 +375,24 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         return description.toString();
     }
 
+    public String validateVoidProcessMsg() {
+        try {
+            validateVoid();
+            return null;
+        } catch (AdempiereException e) {
+            return e.getMessage();
+        }
+    }
+
+    public void validateVoid() {
+        validatePaymentCopies(getReceipt_C_Payment_ID());
+        validatePaymentCopies(getPayment_C_Payment_ID());
+    }
+
     @Override
     public boolean voidIt() {
         try {
+            validateVoid();
             reverseGeneratedDocuments();
         } catch (Exception e) {
             m_processMsg = e.getMessage();
@@ -414,10 +430,50 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         MPayment payment = new MPayment(getCtx(), paymentId, get_TrxName());
         if (DOCSTATUS_Reversed.equals(payment.getDocStatus()) || DOCSTATUS_Voided.equals(payment.getDocStatus()))
             return;
-        payment.setDocAction(DocAction.ACTION_Reverse_Correct);
-        if (!payment.processIt(DocAction.ACTION_Reverse_Correct))
+        payment.setDocAction(DocAction.ACTION_Void);
+        if (!payment.processIt(DocAction.ACTION_Void))
             throw new AdempiereException(payment.getProcessMsg());
         payment.saveEx(get_TrxName());
+    }
+
+    private void validatePaymentCopies(int paymentId) {
+        if (paymentId <= 0)
+            return;
+
+        for (Object row : new Query(getCtx(), MPayment.Table_Name,
+                "LAR_PaymentSource_ID=? AND DocStatus IN ('CO','CL')", get_TrxName())
+                        .setParameters(paymentId)
+                        .list()) {
+            MPayment paymentCopy = (MPayment) row;
+            int bankStatementLineId = getBankStatementLineId(paymentCopy.getC_Payment_ID());
+            if (bankStatementLineId > 0) {
+                String sql = "SELECT stm.EsCierreCaja"
+                        + " FROM C_BankStatementLine stml"
+                        + " JOIN C_BankStatement stm ON stml.C_BankStatement_ID = stm.C_BankStatement_ID"
+                        + " WHERE stm.DocStatus NOT IN ('VO')"
+                        + " AND C_BankStatementLine_ID = ?";
+                String esCierreCaja = DB.getSQLValueString(get_TrxName(), sql, bankStatementLineId);
+                if ("N".equals(esCierreCaja))
+                    throw new AdempiereException("No se puede anular el cobro, ya que el mismo fue conciliado en una cuenta bancaria.");
+            }
+
+            if (!paymentCopy.isReceipt() && !DOCSTATUS_Voided.equals(paymentCopy.getDocStatus())
+                    && !DOCSTATUS_Reversed.equals(paymentCopy.getDocStatus())) {
+                int paymentHeaderId = paymentCopy.get_ValueAsInt("LAR_PaymentHeader_ID");
+                if (paymentHeaderId > 0) {
+                    MLARPaymentHeader header = new MLARPaymentHeader(getCtx(), paymentHeaderId, get_TrxName());
+                    throw new AdempiereException(
+                            "No se puede anular el cobro seleccionado. El mismo está siendo utilizado en la Orden de Pago Nro: "
+                                    + header.getDocumentNo());
+                }
+            }
+        }
+    }
+
+    private int getBankStatementLineId(int paymentId) {
+        String sql = "SELECT C_BankStatementLine_ID FROM C_BankStatementLine WHERE C_Payment_ID=?";
+        int id = DB.getSQLValue(get_TrxName(), sql, paymentId);
+        return id < 0 ? 0 : id;
     }
 
     @Override

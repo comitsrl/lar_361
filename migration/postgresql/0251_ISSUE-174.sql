@@ -540,332 +540,332 @@ SET Name='Liquidación Operativa Tarjetas',
 WHERE AD_Menu_ID=3000577 AND AD_Language='es_AR';
 
 -- 09/06/2026 12:12:14 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET DefaultValue='@SQL=SELECT C_Bpartner_ID FROM LAR_CardSettlement_Hdr hdr WHERE hdr.LAR_CardSettlement_Hdr_ID = @LAR_CardSettlement_Hdr_ID@',Updated=TO_TIMESTAMP('2026-06-09 12:12:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009488
 ;
 
 -- 09/06/2026 12:13:07 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:13:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005974
 ;
 
 -- 09/06/2026 12:13:18 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:13:18','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005985
 ;
 
 -- 09/06/2026 12:13:24 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:13:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005981
 ;
 
 -- 09/06/2026 12:13:39 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:13:39','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005967
 ;
 
 -- 09/06/2026 12:13:47 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:13:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005966
 ;
 
 -- 09/06/2026 12:13:50 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:13:50','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005965
 ;
 
 -- 09/06/2026 12:14:10 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsUpdateable='N', IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:14:10','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005957
 ;
 
 -- 09/06/2026 12:14:14 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:14:14','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3006010
 ;
 
 -- 09/06/2026 12:14:20 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:14:20','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005984
 ;
 
 -- 09/06/2026 12:14:23 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:14:23','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005969
 ;
 
 -- 09/06/2026 12:14:26 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:14:26','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005968
 ;
 
 -- 09/06/2026 12:14:29 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:14:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005986
 ;
 
 -- 09/06/2026 12:14:34 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:14:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005983
 ;
 
 -- 09/06/2026 12:14:57 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 12:14:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005988
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=20,IsDisplayed='Y' WHERE AD_Field_ID=3009523
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=30,IsDisplayed='Y' WHERE AD_Field_ID=3009511
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=40,IsDisplayed='Y' WHERE AD_Field_ID=3009512
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=50,IsDisplayed='Y' WHERE AD_Field_ID=3009513
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=3009514
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=70,IsDisplayed='Y' WHERE AD_Field_ID=3009515
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=80,IsDisplayed='Y' WHERE AD_Field_ID=3009516
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=3009517
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3009518
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3009519
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3009520
 ;
 
 -- 09/06/2026 12:20:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=130,IsDisplayed='Y' WHERE AD_Field_ID=3009521
 ;
 
 -- 09/06/2026 12:20:57 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2026-06-09 12:20:57','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009523
 ;
 
 -- 09/06/2026 12:21:01 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET IsSameLine='N',Updated=TO_TIMESTAMP('2026-06-09 12:21:01','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009511
 ;
 
 -- 09/06/2026 12:21:31 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=30,IsDisplayed='Y' WHERE AD_Field_ID=3009514
 ;
 
 -- 09/06/2026 12:21:31 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=40,IsDisplayed='Y' WHERE AD_Field_ID=3009515
 ;
 
 -- 09/06/2026 12:21:31 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=50,IsDisplayed='Y' WHERE AD_Field_ID=3009511
 ;
 
 -- 09/06/2026 12:21:31 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=3009512
 ;
 
 -- 09/06/2026 12:21:31 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=70,IsDisplayed='Y' WHERE AD_Field_ID=3009513
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=10,IsDisplayed='Y' WHERE AD_Field_ID=3009505
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=20,IsDisplayed='Y' WHERE AD_Field_ID=3009482
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=50,IsDisplayed='Y' WHERE AD_Field_ID=3009483
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=60,IsDisplayed='Y' WHERE AD_Field_ID=3009489
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=70,IsDisplayed='Y' WHERE AD_Field_ID=3009488
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=80,IsDisplayed='Y' WHERE AD_Field_ID=3009490
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=90,IsDisplayed='Y' WHERE AD_Field_ID=3009491
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=100,IsDisplayed='Y' WHERE AD_Field_ID=3009508
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=110,IsDisplayed='Y' WHERE AD_Field_ID=3009492
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=120,IsDisplayed='Y' WHERE AD_Field_ID=3009493
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=130,IsDisplayed='Y' WHERE AD_Field_ID=3009494
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=140,IsDisplayed='Y' WHERE AD_Field_ID=3009495
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=150,IsDisplayed='Y' WHERE AD_Field_ID=3009496
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=160,IsDisplayed='Y' WHERE AD_Field_ID=3009497
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=170,IsDisplayed='Y' WHERE AD_Field_ID=3009509
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=180,IsDisplayed='Y' WHERE AD_Field_ID=3009498
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=190,IsDisplayed='Y' WHERE AD_Field_ID=3009499
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=200,IsDisplayed='Y' WHERE AD_Field_ID=3009500
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=210,IsDisplayed='Y' WHERE AD_Field_ID=3009501
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=220,IsDisplayed='Y' WHERE AD_Field_ID=3009502
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=230,IsDisplayed='Y' WHERE AD_Field_ID=3009503
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=240,IsDisplayed='Y' WHERE AD_Field_ID=3009484
 ;
 
 -- 09/06/2026 12:22:00 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=250,IsDisplayed='Y' WHERE AD_Field_ID=3009485
 ;
 
 -- 09/06/2026 12:22:13 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET IsSameLine='N',Updated=TO_TIMESTAMP('2026-06-09 12:22:13','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009483
 ;
 
 -- 09/06/2026 12:22:19 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2026-06-09 12:22:19','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009482
 ;
 
 -- 09/06/2026 12:22:30 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=10,IsDisplayed='Y' WHERE AD_Field_ID=3009523
 ;
 
 -- 09/06/2026 12:22:30 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET SeqNo=20,IsDisplayed='Y' WHERE AD_Field_ID=3009510
 ;
 
 -- 09/06/2026 12:22:37 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET IsSameLine='N',Updated=TO_TIMESTAMP('2026-06-09 12:22:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009523
 ;
 
 -- 09/06/2026 12:22:40 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET IsSameLine='Y',Updated=TO_TIMESTAMP('2026-06-09 12:22:40','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009510
 ;
 
 -- 09/06/2026 12:24:07 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Field SET DisplayLogic='@DocStatus@ = ''CO''',Updated=TO_TIMESTAMP('2026-06-09 12:24:07','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009485
 ;
 
 -- 09/06/2026 12:26:34 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsMandatory='Y',Updated=TO_TIMESTAMP('2026-06-09 12:26:34','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005981
 ;
 
 -- 09/06/2026 12:26:46 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsMandatory='Y',Updated=TO_TIMESTAMP('2026-06-09 12:26:46','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005988
 ;
 
@@ -882,8 +882,104 @@ WHERE AD_Field_ID=3009485
 
 
 -- 09/06/2026 14:48:56 ART
--- ADP #2: Migracion de datos
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
 UPDATE AD_Column SET IsAlwaysUpdateable='Y',Updated=TO_TIMESTAMP('2026-06-09 14:48:56','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3006011
+;
+
+
+-- 09/06/2026 15:54:24 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:54:24','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3006001
+;
+
+-- 09/06/2026 15:54:32 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:54:32','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3006000
+;
+
+-- 09/06/2026 15:54:37 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:54:37','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3006008
+;
+
+-- 09/06/2026 15:54:41 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:54:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3006006
+;
+
+-- 09/06/2026 15:54:49 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:54:49','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005995
+;
+
+-- 09/06/2026 15:54:52 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:54:52','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005996
+;
+
+-- 09/06/2026 15:55:16 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsUpdateable='N', IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:55:16','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005989
+;
+
+-- 09/06/2026 15:55:21 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:55:21','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005997
+;
+
+-- 09/06/2026 15:55:25 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:55:25','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005998
+;
+
+-- 09/06/2026 15:55:29 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:55:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005999
+;
+
+-- 09/06/2026 15:55:36 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:55:36','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3006007
+;
+
+-- 09/06/2026 15:55:43 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:55:43','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005994
+;
+
+-- 09/06/2026 15:55:45 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET IsAllowCopy='N',Updated=TO_TIMESTAMP('2026-06-09 15:55:45','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005993
+;
+
+-- 09/06/2026 15:57:41 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Field SET DefaultValue='@SQL=SELECT OperationType FROM LAR_CardSettlement_Hdr hdr WHERE hdr.LAR_CardSettlement_Hdr_ID = @LAR_CardSettlement_Hdr_ID@',Updated=TO_TIMESTAMP('2026-06-09 15:57:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Field_ID=3009489
+;
+
+-- 09/06/2026 15:58:47 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET MandatoryLogic='@OperationType@=C',Updated=TO_TIMESTAMP('2026-06-09 15:58:47','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005987
+;
+
+-- 09/06/2026 15:59:00 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET MandatoryLogic='@OperationType@=C',Updated=TO_TIMESTAMP('2026-06-09 15:59:00','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005976
+;
+
+-- 09/06/2026 15:59:29 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET MandatoryLogic='@OperationType@=T',Updated=TO_TIMESTAMP('2026-06-09 15:59:29','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005977
+;
+
+-- 09/06/2026 15:59:41 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET MandatoryLogic='@OperationType@=C',Updated=TO_TIMESTAMP('2026-06-09 15:59:41','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005978
+;
+
+-- 09/06/2026 16:02:15 ART
+-- ISSUE #174: Rediseño cabecera + líneas para Liquidación Operativa Tarjetas
+UPDATE AD_Column SET MandatoryLogic='@OperationType@=T',Updated=TO_TIMESTAMP('2026-06-09 16:02:15','YYYY-MM-DD HH24:MI:SS'),UpdatedBy=100 WHERE AD_Column_ID=3005978
 ;
 
 SELECT register_migration_script_lar('0251_ISSUE-174.sql', 'LAR', '');

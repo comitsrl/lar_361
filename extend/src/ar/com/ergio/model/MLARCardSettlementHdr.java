@@ -211,7 +211,18 @@ public class MLARCardSettlementHdr extends X_LAR_CardSettlement_Hdr implements D
 
     @Override
     public boolean voidIt() {
-        for (MLARCardSettlement line : getLines()) {
+        List<MLARCardSettlement> lines = getLines();
+
+        for (MLARCardSettlement line : lines) {
+            String status = line.getDocStatus();
+            if (MLARCardSettlement.DOCSTATUS_Voided.equals(status) || MLARCardSettlement.DOCSTATUS_Reversed.equals(status))
+                continue;
+            String processMsg = line.validateVoidProcessMsg();
+            if (processMsg != null)
+                throw new AdempiereException("Línea " + line.getLine() + ": " + processMsg);
+        }
+
+        for (MLARCardSettlement line : lines) {
             String status = line.getDocStatus();
             if (MLARCardSettlement.DOCSTATUS_Voided.equals(status) || MLARCardSettlement.DOCSTATUS_Reversed.equals(status))
                 continue;
