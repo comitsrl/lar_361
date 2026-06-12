@@ -311,8 +311,10 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
     private MPayment createBasePayment(boolean receipt, MBankAccount bankAccount, String tenderType, String description) {
         MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
         payment.setAD_Org_ID(getAD_Org_ID());
-        if (!payment.setLAR_C_DoctType_ID(receipt, getAD_Org_ID()))
+        int docTypeId = getCardSettlementDocTypeId(receipt, getAD_Org_ID());
+        if (docTypeId <= 0)
             throw new AdempiereException("@C_DocType_ID@ @NotFound@");
+        payment.setC_DocType_ID(docTypeId);
         payment.setC_BPartner_ID(getC_BPartner_ID());
         payment.setC_BankAccount_ID(bankAccount.getC_BankAccount_ID());
         payment.setTenderType(tenderType);
@@ -323,6 +325,18 @@ public class MLARCardSettlement extends X_LAR_CardSettlement implements DocActio
         payment.setDescription(description);
         payment.setIsReceipt(receipt);
         return payment;
+    }
+
+    private int getCardSettlementDocTypeId(boolean receipt, int adOrgId) {
+        String sql = "SELECT C_DocType_ID"
+                   + "  FROM C_DocType"
+                   + " WHERE IsActive='Y' AND AD_Client_ID=?"
+                   + "                    AND AD_Org_ID=?"
+                   + "                    AND DocBaseType=?"
+                   + "                    AND IsDefault='N'"
+                   + " ORDER BY IsDefault DESC";
+        return DB.getSQLValue(get_TrxName(), sql, getAD_Client_ID(), adOrgId,
+                receipt ? X_C_DocType.DOCBASETYPE_ARReceipt : X_C_DocType.DOCBASETYPE_APPayment);
     }
 
     private void completePayment(MPayment payment) {
