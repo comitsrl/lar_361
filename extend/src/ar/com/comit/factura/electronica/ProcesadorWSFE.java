@@ -52,6 +52,9 @@ import ar.com.comit.wsfe.FECAEDetRequest;
 import ar.com.comit.wsfe.FECAEDetResponse;
 import ar.com.comit.wsfe.FECAERequest;
 import ar.com.comit.wsfe.FECAEResponse;
+import ar.com.comit.wsfe.FECompConsResponse;
+import ar.com.comit.wsfe.FECompConsultaReq;
+import ar.com.comit.wsfe.FECompConsultaResponse;
 import ar.com.comit.wsfe.FERecuperaLastCbteResponse;
 import ar.com.comit.wsfe.Obs;
 import ar.com.comit.wsfe.Opcional;
@@ -225,6 +228,9 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         {
             e.printStackTrace();
             msgError = e.getMessage();
+            // @simas Devolver -1 para distinguir "no se pudo consultar a ARCA" de un
+            // ultimo autorizado legitimamente 0 (PDV nuevo). El llamador debe abortar.
+            return -1;
         }
 
         return ultimoAuto;
@@ -428,6 +434,13 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
      */
     public String generateCAE()
     {
+        // @simas Numero de comprobante que se intenta autorizar (ultimo+1). Se sube fuera
+        // del try para poder reconciliarlo en el catch ante un fallo de comunicacion.
+        int nroIntentado = -1;
+        // @simas Marca que el pedido FECAESolicitar ya salio a ARCA: solo en ese caso tiene
+        // sentido consultar si el comprobante quedo autorizado del lado de ARCA.
+        boolean solicitudEnviada = false;
+
         try
         {
             // @fchiappano Recuperar Ticket de Acceso.
@@ -449,7 +462,15 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
                 return msgError;
 
             // @fchiappano Generar Detalle del documento.
-            FECAEDetRequest detRequest = getFECAEDetRequest(getUltimoAutorizado(tokenSign[0], tokenSign[1]));
+            // @simas Capturar el ultimo autorizado para dejar visible el numero intentado (ultimo+1)
+            // en el catch; getFECAEDetRequest mantiene su +1 interno.
+            int ultimoAutorizado = getUltimoAutorizado(tokenSign[0], tokenSign[1]);
+            // @simas Si no se pudo obtener el ultimo autorizado (-1), abortar antes de armar el
+            // request: evita pedir el comprobante 1 con un numero invalido y disparar la reconciliacion.
+            if (ultimoAutorizado < 0)
+                return msgError;
+            nroIntentado = ultimoAutorizado + 1;
+            FECAEDetRequest detRequest = getFECAEDetRequest(ultimoAutorizado);
 
             if (detRequest == null)
                 return msgError;
@@ -461,6 +482,9 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
 
             // @fchiappano Genero el authentication request.
             FEAuthRequest autRequest = new FEAuthRequest(tokenSign[0], tokenSign[1], cuitOrg);
+
+            // @simas A partir de aca el pedido sale a ARCA: habilitar la reconciliacion en el catch.
+            solicitudEnviada = true;
 
             // @fchiappano Solicitar CAE.
             FECAEResponse response = soap.FECAESolicitar(autRequest, request);
@@ -502,24 +526,156 @@ public class ProcesadorWSFE implements ElectronicInvoiceInterface
         catch (AxisFault e)
         {
             e.printStackTrace();
+            // @simas Fallo de comunicacion: ARCA pudo haber autorizado y perder la respuesta.
+            if (solicitudEnviada)
+            {
+                String recon = reconciliarComprobante(nroIntentado);
+                if (recon != null)
+                    return recon;
+            }
             msgError = "Error de conexión con Servicio Web de ARCA: \n" + e.getMessage();
             return msgError;
         }
         catch (RemoteException e)
         {
             e.printStackTrace();
+            // @simas Fallo de comunicacion: ARCA pudo haber autorizado y perder la respuesta.
+            if (solicitudEnviada)
+            {
+                String recon = reconciliarComprobante(nroIntentado);
+                if (recon != null)
+                    return recon;
+            }
             msgError = "Error de conexión con Servicio Web de ARCA: \n" + e.getMessage();
             return msgError;
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            // @simas Fallo de comunicacion: ARCA pudo haber autorizado y perder la respuesta.
+            if (solicitudEnviada)
+            {
+                String recon = reconciliarComprobante(nroIntentado);
+                if (recon != null)
+                    return recon;
+            }
             msgError = "Error de conexión con Servicio Web de ARCA: \n" + e.getMessage();
             return msgError;
         }
 
         return "";
     } // generateCAE
+
+    /**
+     * Reconciliacion inline ante un fallo de comunicacion en {@link #generateCAE()}.
+     * <p>
+     * ARCA puede autorizar el comprobante y perder la respuesta (timeout/desconexion),
+     * dejando la factura sin CAE y el comprobante "huerfano" del lado de ARCA. Antes de
+     * devolver error, se consulta a ARCA por el numero que se intento autorizar:
+     * <ul>
+     * <li>devuelve "" si ARCA ya lo tiene autorizado y los datos coinciden: se adopta el
+     * CAE (se setean cae / fechaVencCae / nroCbte) y {@code generateCAE} termina como exito;</li>
+     * <li>devuelve {@code null} si ARCA no tiene el comprobante: el flujo sigue con el error
+     * de comunicacion normal, reintentable con el mismo numero;</li>
+     * <li>devuelve un mensaje con prefijo distintivo (INDETERMINADO / RECONCILIACION) si la
+     * consulta tambien fallo o los datos no coinciden: queda en caeerror para revision.</li>
+     * </ul>
+     *
+     * @author simas
+     * @param nroIntentado numero de comprobante que se intento autorizar (ultimo+1).
+     * @return "" si se adopto el CAE, null si es reintentable, o msgError si es indeterminado.
+     */
+    private String reconciliarComprobante(final int nroIntentado)
+    {
+        // @simas Sin numero valido no hay nada que consultar.
+        if (nroIntentado <= 0)
+            return null;
+
+        // @simas Recuperar Ticket de Acceso (cacheado por WSAA).
+        String[] tokenSign = ProcesadorWSAA.getTicketAcceso();
+        if (tokenSign == null)
+        {
+            msgError = "INDETERMINADO: no se pudo confirmar el comprobante " + nroIntentado
+                    + " en ARCA, sin ticket de acceso WSAA para consultar; reintentar luego.";
+            return msgError;
+        }
+
+        try
+        {
+            // @simas Stub propio: evitar reusar el que pudo quedar inconsistente tras el fallo.
+            ServiceSoap12Stub soapConsulta = new ServiceSoap12Stub(new URL(ProcesadorWSAA.getWSDL()), null);
+            FEAuthRequest autRequest = new FEAuthRequest(tokenSign[0], tokenSign[1], cuitOrg);
+            FECompConsultaReq consulta = new FECompConsultaReq(getDocSubTypeCAE(factura), nroIntentado,
+                    getPuntoVenta(factura));
+
+            FECompConsultaResponse respuesta = soapConsulta.FECompConsultar(autRequest, consulta);
+
+            // @simas Distinguir el "no existe" (reintentable) de cualquier otro error de la
+            // consulta (no se pudo confirmar -> indeterminado). Segun el manual ARCA FE v4.2,
+            // el codigo 602 = "No existen datos en nuestros registros" es el unico que confirma
+            // que ARCA no tiene el comprobante; el resto (500/501/502/600/601...) deja duda.
+            Err[] erroresConsulta = respuesta.getErrors();
+            if (erroresConsulta != null)
+            {
+                boolean noExiste = false;
+                for (Err er : erroresConsulta)
+                    if (er.getCode() == 602)
+                        noExiste = true;
+
+                if (noExiste)
+                    return null;       // ARCA confirma que no lo tiene -> reintentable con el mismo numero
+
+                msgError = "INDETERMINADO: la consulta del comprobante " + nroIntentado
+                        + " devolvio error de ARCA (" + erroresConsulta[0].getCode() + " "
+                        + erroresConsulta[0].getMsg() + "); reintentar/revisar luego.";
+                return msgError;
+            }
+
+            FECompConsResponse comprobante = respuesta.getResultGet();
+
+            // @simas ARCA no tiene el comprobante autorizado: reintentable con el mismo numero.
+            if (comprobante == null || !"A".equals(comprobante.getResultado())
+                    || comprobante.getCodAutorizacion() == null || comprobante.getCodAutorizacion().equals(""))
+                return null;
+
+            // @simas Defensa: el comprobante existe pero debe coincidir con la factura en importe
+            // total, fecha, moneda y CUIT del cliente para no adoptar por error un CAE de otro
+            // documento (p. ej. dos facturas concurrentes del mismo PDV/tipo con igual importe y fecha).
+            double totalFactura = factura.getGrandTotal().setScale(2, RoundingMode.HALF_UP).doubleValue();
+            String fechaFactura = formatTime(factura.getDateInvoiced(), "yyyyMMdd");
+            String monedaFactura = getCodMoneda();
+            MBPartner cliente = (MBPartner) factura.getC_BPartner();
+            long docCliente = Long.parseLong(cliente.getTaxID().replaceAll("-", "").replaceAll(" ", ""));
+
+            if (Math.abs(comprobante.getImpTotal() - totalFactura) > 0.01
+                    || !fechaFactura.equals(comprobante.getCbteFch())
+                    || !monedaFactura.equals(comprobante.getMonId())
+                    || docCliente != comprobante.getDocNro())
+            {
+                msgError = "RECONCILIACION: el comprobante " + nroIntentado
+                        + " existe en ARCA pero sus datos (importe/fecha/moneda/CUIT cliente) no"
+                        + " coinciden con la factura; revisar manualmente.";
+                return msgError;
+            }
+
+            // @simas Adoptar el CAE recuperado: generateCAE terminara como exito.
+            cae = comprobante.getCodAutorizacion();
+            // @simas Dejar el estado interno igual que el camino feliz normal.
+            aceptado = "A";
+            fechaVencCae = ProcesadorWSAA.getTimestamp(comprobante.getFchVto(), "yyyyMMdd");
+            nroCbte = String.valueOf(comprobante.getCbteDesde());
+            msgError = "";
+            return "";
+        }
+        catch (Exception e)
+        {
+            // @simas La consulta tambien fallo: estado indeterminado, no avanzar la numeracion.
+            e.printStackTrace();
+            msgError = "INDETERMINADO: no se pudo confirmar el comprobante " + nroIntentado
+                    + " en ARCA (la consulta fallo); reintentar luego. " + e.getMessage();
+            return msgError;
+        }
+    } // reconciliarComprobante
 
     public String getAccepted()
     {
