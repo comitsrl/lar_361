@@ -48,6 +48,13 @@ import ar.com.ergio.util.LAR_Utils;
  */
 public class LAR_ObtenerCotizaciones extends SvrProcess
 {
+    private static final String BNA_PERSONAS_URL = "https://www.bna.com.ar/Personas";
+    private static final String BNA_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+    private static final int BNA_TIMEOUT_MS = 60 * 1000;
+    private static final int BNA_MAX_INTENTOS = 5;
+    private static final long BNA_REINTENTO_BASE_MS = 30 * 1000L;
+
     private int monedaExtranjera = 100;
     private int tipoCambioDivisa = 4000001;
     private int tipoCambioBillete = 4000002;
@@ -80,60 +87,123 @@ public class LAR_ObtenerCotizaciones extends SvrProcess
          * Ruta destino en instalación de Adempiere: Adempiere/jboss/server/adempiere/lib/jsoup-1.10.3.jar
          **************************************************************************************************/
 
-        // @fchiappano Chequear estado de la pagina web, del banco nación.
         try
         {
-            Response response = Jsoup.connect("http://www.bna.com.ar").execute();
+            // @fchiappano Conectarse al sitio web y recuperar codigo HTML
+            Document doc = obtenerDocumentoBNA();
 
-            if (response.statusCode() != 200)
-                throw new AdempiereUserError("Error al acceder al sitio web: " + response.statusMessage());
+            // @fchiappano Obtener tasa de venta Dolar Billete y Dolar Divisa.
+            Elements cotizacionesBilletes = doc.select("#billetes > table:nth-child(1) > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(3)");
+            Elements cotizacionesDivisas = doc.select("#divisas > table:nth-child(1) > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(3)");
+
+            BigDecimal bnaBillete = Env.ZERO;
+            BigDecimal bnaDivisa = Env.ZERO;
+
+            // @fchiappano Validar que se haya recuperado una tasa billete.
+            if (cotizacionesBilletes.size() > 0)
+                bnaBillete = new BigDecimal(cotizacionesBilletes.get(0).text().replace(",", "."));
+            else
+                throw new AdempiereUserError("No fue posible recuperar tasa de cambio BNA Billete");
+
+            // @fchiappano Validar que se haya recuperado una tasa divisa.
+            if (cotizacionesDivisas.size() > 0)
+                bnaDivisa = new BigDecimal(cotizacionesDivisas.get(0).text().replace(",", "."));
+            else
+                throw new AdempiereUserError("No fue posible recuperar tasa de cambio BNA Divisa");
+
+            // @fchiappano Redondear tasas, según la precisión de la moneda.
+            int precision = MCurrency.getStdPrecision(getCtx(), monedaExtranjera);
+            bnaBillete = bnaBillete.setScale(precision, RoundingMode.HALF_UP);
+            bnaDivisa = bnaDivisa.setScale(precision, RoundingMode.HALF_UP);
+
+            // @fchiappano Recuperar y actualizar tasas de cambio de Adempiere.
+            MConversionRate tasaBillete = getTasaCambio(tipoCambioBillete);
+
+            if (tasaBillete == null || bnaBillete.compareTo(tasaBillete.getMultiplyRate()) != 0)
+                generarTasacambio(bnaBillete, tipoCambioBillete);
+
+            MConversionRate tasaDivisa = getTasaCambio(tipoCambioDivisa);
+
+            if (tasaDivisa == null || bnaDivisa.compareTo(tasaDivisa.getMultiplyRate()) != 0)
+                generarTasacambio(bnaDivisa, tipoCambioDivisa);
         }
         catch (IOException ex)
         {
-            log.log(Level.SEVERE, "Error al intentar conectar con el sitio web: ", ex.getMessage());
+            log.log(Level.SEVERE, "Error al intentar conectar con el sitio web", ex);
             throw new AdempiereUserError("Error al intentar conectar con el sitio web: " + ex.getMessage());
         }
-
-        // @fchiappano Conectarse al sitio web y recuperar codigo HTML
-        Document doc = Jsoup.connect("http://www.bna.com.ar").get();
-
-        // @fchiappano Obtener tasa de venta Dolar Billete y Dolar Divisa.
-        Elements cotizacionesBilletes = doc.select("#billetes > table:nth-child(1) > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(3)");
-        Elements cotizacionesDivisas = doc.select("#divisas > table:nth-child(1) > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(3)");
-
-        BigDecimal bnaBillete = Env.ZERO;
-        BigDecimal bnaDivisa = Env.ZERO;
-
-        // @fchiappano Validar que se haya recuperado una tasa billete.
-        if (cotizacionesBilletes.size() > 0)
-            bnaBillete = new BigDecimal(cotizacionesBilletes.get(0).text().replace(",", "."));
-        else
-            throw new AdempiereUserError("No fue posible recuperar tasa de cambio BNA Billete");
-
-        // @fchiappano Validar que se haya recuperado una tasa divisa.
-        if (cotizacionesDivisas.size() > 0)
-            bnaDivisa = new BigDecimal(cotizacionesDivisas.get(0).text().replace(",", "."));
-        else
-            throw new AdempiereUserError("No fue posible recuperar tasa de cambio BNA Divisa");
-
-        // @fchiappano Redondear tasas, según la precisión de la moneda.
-        int precision = MCurrency.getStdPrecision(getCtx(), monedaExtranjera);
-        bnaBillete.setScale(precision, RoundingMode.HALF_UP);
-        bnaDivisa.setScale(precision, RoundingMode.HALF_UP);
-
-        // @fchiappano Recuperar y actualizar tasas de cambio de Adempiere.
-        MConversionRate tasaBillete = getTasaCambio(tipoCambioBillete);
-
-        if (tasaBillete == null || bnaBillete.compareTo(tasaBillete.getMultiplyRate()) != 0)
-            generarTasacambio(bnaBillete, tipoCambioBillete);
-
-        MConversionRate tasaDivisa = getTasaCambio(tipoCambioDivisa);
-
-        if (tasaDivisa == null || bnaDivisa.compareTo(tasaDivisa.getMultiplyRate()) != 0)
-            generarTasacambio(bnaDivisa, tipoCambioDivisa);
+        catch (InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+            log.log(Level.SEVERE, "Se interrumpio la conexion con el sitio web", ex);
+            throw new AdempiereUserError("Se interrumpio la conexion con el sitio web: " + ex.getMessage());
+        }
 
         return null;
     } // doIt
+
+    private Document obtenerDocumentoBNA() throws IOException, InterruptedException, AdempiereUserError
+    {
+        IOException ultimoError = null;
+
+        for (int intento = 1; intento <= BNA_MAX_INTENTOS; intento++)
+        {
+            try
+            {
+                Response response = buildBNAConnection().execute();
+
+                if (response.statusCode() == 200)
+                    return response.parse();
+
+                String errorMsg = "Error al acceder al sitio web: Status code = " + response.statusCode()
+                        + ", Response = " + limitarTexto(response.body());
+                if (!isStatusReintentable(response.statusCode()) || intento == BNA_MAX_INTENTOS)
+                {
+                    log.severe(errorMsg);
+                    throw new AdempiereUserError(errorMsg);
+                }
+
+                log.warning(errorMsg + ". Reintentando conexion con BNA (" + intento + "/" + BNA_MAX_INTENTOS + ").");
+            }
+            catch (IOException ex)
+            {
+                ultimoError = ex;
+                if (intento == BNA_MAX_INTENTOS)
+                    throw ex;
+
+                log.log(Level.WARNING, "Fallo transitorio al conectar con BNA. Reintentando (" + intento + "/"
+                        + BNA_MAX_INTENTOS + ").", ex);
+            }
+
+            Thread.sleep(getDemoraReintento(intento));
+        }
+
+        throw ultimoError;
+    } // obtenerDocumentoBNA
+
+    private org.jsoup.Connection buildBNAConnection()
+    {
+        return Jsoup.connect(BNA_PERSONAS_URL)
+                .userAgent(BNA_USER_AGENT)
+                .timeout(BNA_TIMEOUT_MS);
+    } // buildBNAConnection
+
+    private boolean isStatusReintentable(int statusCode)
+    {
+        return statusCode == 408 || statusCode == 429 || statusCode >= 500;
+    } // isStatusReintentable
+
+    private long getDemoraReintento(int intento)
+    {
+        return BNA_REINTENTO_BASE_MS * intento;
+    } // getDemoraReintento
+
+    private String limitarTexto(String texto)
+    {
+        if (texto == null)
+            return "";
+        return texto.length() <= 500 ? texto : texto.substring(0, 500);
+    } // limitarTexto
 
     /**
      * Obtener la tasa vigente, según el tipo de cambio indicado.
@@ -215,7 +285,7 @@ public class LAR_ObtenerCotizaciones extends SvrProcess
         nuevaTasa.setAD_Org_ID(0);
         nuevaTasa.setMultiplyRate(tasaMultiplicadora);
         nuevaTasa.setC_ConversionType_ID(tipoCambio);
-        nuevaTasa.setValidTo(getFechaVigencia());
+        nuevaTasa.setValidTo(new Timestamp(System.currentTimeMillis()));
         nuevaTasa.setC_Currency_ID(monedaExtranjera);
         nuevaTasa.setC_Currency_ID_To(monedaLocal);
         nuevaTasa.saveEx(get_TrxName());
