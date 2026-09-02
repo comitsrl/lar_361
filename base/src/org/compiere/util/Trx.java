@@ -537,7 +537,6 @@ public class Trx implements VetoableChangeListener
 				}
 				catch (SQLException e2) {;}
 			}
-			trx = null;
 			// Throw exception
 			if (e instanceof RuntimeException)
 			{
