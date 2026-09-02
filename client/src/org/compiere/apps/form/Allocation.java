@@ -968,7 +968,8 @@ public class Allocation
                     // @fchiappano procesar la asignación de factura.
                     if (alloc != null && alloc.get_ID() != 0)
                     {
-                        alloc.processIt(DocAction.ACTION_Complete);
+                        if (!alloc.processIt(DocAction.ACTION_Complete))
+                            throw new AdempiereException("Cannot complete allocation: " + alloc.getProcessMsg());
                         alloc.saveEx();
                     }
                     monedaFactura_ID = factura.getC_Currency_ID();
@@ -1125,7 +1126,8 @@ public class Allocation
         // @fchiappano procesar la asignación de factura.
         if (alloc != null && alloc.get_ID() != 0)
         {
-            alloc.processIt(DocAction.ACTION_Complete);
+            if (!alloc.processIt(DocAction.ACTION_Complete))
+                throw new AdempiereException("Cannot complete allocation: " + alloc.getProcessMsg());
             alloc.saveEx();
         }
 
@@ -1156,7 +1158,8 @@ public class Allocation
             // Should start WF
             if (alloc.get_ID() != 0)
             {
-                alloc.processIt(DocAction.ACTION_Complete);
+                if (!alloc.processIt(DocAction.ACTION_Complete))
+                    throw new AdempiereException("Cannot complete allocation: " + alloc.getProcessMsg());
                 alloc.saveEx();
             }
 		}
