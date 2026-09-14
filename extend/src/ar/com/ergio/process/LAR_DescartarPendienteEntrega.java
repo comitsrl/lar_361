@@ -77,7 +77,7 @@ public class LAR_DescartarPendienteEntrega extends SvrProcess
         if (c_Order_ID <= 0)
             throw new AdempiereUserError("La Factura o Factura Origen (en caso de tratarse de una Nota de Credito), no posee una Orden de Venta asociada.");
 
-        MOrder orden = new MOrder(getCtx(), c_Order_ID, docBaseType);
+        MOrder orden = new MOrder(getCtx(), c_Order_ID, get_TrxName());
 
         for (MOrderLine linea : orden.getLines())
         {
